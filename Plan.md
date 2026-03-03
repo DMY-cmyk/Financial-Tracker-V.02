@@ -42,6 +42,12 @@ Rebuild the project from scratch in `HTML`, `CSS`, and `JavaScript` based on thi
 - [x] Commit all changes atomically.
 - [x] Push to `origin/main`.
 
+## UI/UX Enhancement Iteration (Post-Rebuild)
+- [x] Added transaction explorer search input.
+- [x] Improved table usability (sticky headers, zebra rows, hover states).
+- [x] Added interaction feedback (toast on submit/error).
+- [x] Added visual cues for positive/negative balances.
+
 ## Calculation Rules Implemented
 - `Total Income` = sum of all income transaction amounts.
 - `Total Expense` = sum of all expense transaction amounts.

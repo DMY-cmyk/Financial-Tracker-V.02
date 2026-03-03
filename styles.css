@@ -36,6 +36,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 12px 24px rgba(27, 31, 45, 0.06);
+  transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .hero {
@@ -116,6 +117,10 @@ h2 {
   padding: 1rem;
 }
 
+.card:hover {
+  box-shadow: 0 16px 30px rgba(27, 31, 45, 0.1);
+}
+
 .stack {
   display: grid;
   gap: 0.6rem;
@@ -137,6 +142,13 @@ button {
   font: inherit;
 }
 
+input:focus,
+select:focus,
+button:focus {
+  outline: 2px solid rgba(10, 147, 150, 0.35);
+  outline-offset: 1px;
+}
+
 button {
   background: linear-gradient(135deg, var(--brand), var(--brand-2));
   color: #fff;
@@ -149,9 +161,28 @@ button:hover {
   filter: brightness(0.95);
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f6f8fd;
+  z-index: 1;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background: #fcfdff;
+}
+
+.data-table tbody tr:hover {
+  background: #eef7fa;
 }
 
 th,
@@ -171,11 +202,63 @@ th {
 
 .table-scroll {
   overflow-x: auto;
+  max-height: 340px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.search-wrap input {
+  font-size: 0.95rem;
+  background: #fbfcff;
+}
+
+.toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  min-width: 220px;
+  max-width: 340px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  font-size: 0.86rem;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.amount-positive {
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.amount-negative {
+  color: #b91c1c;
+  font-weight: 700;
 }
 
 @media (max-width: 1080px) {
   .analytics {
     grid-template-columns: 1fr;
+  }
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 

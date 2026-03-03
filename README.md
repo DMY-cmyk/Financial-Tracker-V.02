@@ -41,6 +41,11 @@ Open:
   - Expense recap by category
   - Bill notes
 - Supports adding income and expense entries in-browser with immediate recalculation.
+- Adds UX upgrades:
+  - Global transaction search filter (income + expense tables)
+  - Sticky table headers and zebra rows for readability
+  - Visual positive/negative balance cues
+  - Toast feedback for form success and validation errors
 
 ## Calculation Logic
 - `Total Income` = sum of income amounts.

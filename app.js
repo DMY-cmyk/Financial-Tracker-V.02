@@ -29,6 +29,8 @@ const el = {
   billBody: document.getElementById("billBody"),
   incomeForm: document.getElementById("incomeForm"),
   expenseForm: document.getElementById("expenseForm"),
+  searchInput: document.getElementById("searchInput"),
+  toast: document.getElementById("toast"),
 };
 
 function parseCsv(text) {
@@ -76,6 +78,16 @@ function formatRupiah(amount) {
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(amount || 0);
+}
+
+function showToast(message) {
+  if (!el.toast) return;
+  el.toast.textContent = message;
+  el.toast.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => {
+    el.toast.classList.remove("show");
+  }, 1900);
 }
 
 function fillSelect(select, list) {
@@ -210,9 +222,18 @@ function calculate() {
   return { totalIncome, totalExpense, totalAssets, methodBalances, expenseByCategory };
 }
 
+function getFilterText() {
+  return (el.searchInput?.value || "").trim().toLowerCase();
+}
+
 function renderRows(body, rows, columns) {
+  const filterText = getFilterText();
   body.innerHTML = "";
   rows.forEach((row) => {
+    if (filterText) {
+      const searchable = columns.map((col) => String(row[col] || "")).join(" ").toLowerCase();
+      if (!searchable.includes(filterText)) return;
+    }
     const tr = document.createElement("tr");
     columns.forEach((col) => {
       const td = document.createElement("td");
@@ -232,6 +253,7 @@ function render() {
   el.totalIncome.textContent = formatRupiah(metrics.totalIncome);
   el.totalExpense.textContent = formatRupiah(metrics.totalExpense);
   el.totalAssets.textContent = formatRupiah(metrics.totalAssets);
+  el.totalAssets.className = metrics.totalAssets >= 0 ? "amount-positive" : "amount-negative";
 
   fillSelect(el.incomeCategorySelect, state.incomeCategories);
   fillSelect(el.incomeMethodSelect, state.methods);
@@ -244,7 +266,8 @@ function render() {
   el.methodBody.innerHTML = "";
   Object.entries(metrics.methodBalances).forEach(([key, value]) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${key}</td><td>${formatRupiah(value)}</td>`;
+    const amountClass = value >= 0 ? "amount-positive" : "amount-negative";
+    tr.innerHTML = `<td>${key}</td><td class="${amountClass}">${formatRupiah(value)}</td>`;
     el.methodBody.appendChild(tr);
   });
 
@@ -267,7 +290,10 @@ function onIncomeSubmit(evt) {
   evt.preventDefault();
   const form = new FormData(el.incomeForm);
   const amount = parseRupiah(form.get("amount"));
-  if (amount <= 0) return;
+  if (amount <= 0) {
+    showToast("Income amount must be greater than zero.");
+    return;
+  }
   state.incomeTransactions.push({
     no: state.incomeTransactions.length + 1,
     date: String(form.get("date") || ""),
@@ -277,13 +303,17 @@ function onIncomeSubmit(evt) {
   });
   render();
   el.incomeForm.reset();
+  showToast("Income entry added.");
 }
 
 function onExpenseSubmit(evt) {
   evt.preventDefault();
   const form = new FormData(el.expenseForm);
   const amount = parseRupiah(form.get("amount"));
-  if (amount <= 0) return;
+  if (amount <= 0) {
+    showToast("Expense amount must be greater than zero.");
+    return;
+  }
   state.expenseTransactions.push({
     no: state.expenseTransactions.length + 1,
     date: String(form.get("date") || ""),
@@ -294,6 +324,7 @@ function onExpenseSubmit(evt) {
   });
   render();
   el.expenseForm.reset();
+  showToast("Expense entry added.");
 }
 
 async function init() {
@@ -306,6 +337,7 @@ async function init() {
 
   el.incomeForm.addEventListener("submit", onIncomeSubmit);
   el.expenseForm.addEventListener("submit", onExpenseSubmit);
+  el.searchInput?.addEventListener("input", render);
 }
 
 init().catch((error) => {

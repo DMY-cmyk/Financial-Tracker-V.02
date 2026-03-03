@@ -80,9 +80,19 @@
     </section>
 
     <section class="card">
+      <div class="section-head">
+        <h2>Transaction Explorer</h2>
+        <p class="muted">Filter both tables instantly by date, category, method/account, or notes.</p>
+      </div>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search transactions..." aria-label="Search transactions">
+      </div>
+    </section>
+
+    <section class="card">
       <h2>Income Transactions</h2>
       <div class="table-scroll">
-        <table>
+        <table class="data-table">
           <thead><tr><th>No</th><th>Date</th><th>Amount</th><th>Category</th><th>Method</th></tr></thead>
           <tbody id="incomeBody"></tbody>
         </table>
@@ -92,13 +102,14 @@
     <section class="card">
       <h2>Expense Transactions</h2>
       <div class="table-scroll">
-        <table>
+        <table class="data-table">
           <thead><tr><th>No</th><th>Date</th><th>Amount</th><th>Category</th><th>Account</th><th>Notes</th></tr></thead>
           <tbody id="expenseBody"></tbody>
         </table>
       </div>
     </section>
   </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
 </body>
 </html>
