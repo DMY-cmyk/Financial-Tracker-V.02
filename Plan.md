@@ -23,6 +23,9 @@ Replicate the Google Sheet budgeting tracker into a static web app using `HTML`,
 - `app.js`: CSV parsing, data normalization, rendering, and recalculation.
 - `data/source.csv`: static snapshot used by the app.
 - `README.md`: setup, architecture, and maintenance policy.
+- `scripts/check-doc-sync.ps1`: staged-file policy validator.
+- `scripts/install-hooks.ps1`: hook installer and `core.hooksPath` setup.
+- `scripts/hooks/pre-commit`: pre-commit entrypoint for policy enforcement.
 
 ## Validation Checklist
 - [x] CSV source can be loaded at runtime.
@@ -30,6 +33,8 @@ Replicate the Google Sheet budgeting tracker into a static web app using `HTML`,
 - [x] New transactions appear immediately in corresponding tables.
 - [x] Expense recap and method balances stay synchronized with state updates.
 - [x] Layout remains usable on desktop and mobile widths.
+- [x] Commit guardrail script blocks implementation-only commits without doc sync.
+- [x] Hook installer configures `.githooks` path from repo scripts.
 
 ## Ongoing Update Policy (Mandatory)
 For every meaningful feature or behavior change:
@@ -37,6 +42,10 @@ For every meaningful feature or behavior change:
 2. Update `Plan.md` to reflect scope, decisions, and checklist state.
 3. Update `README.md` to reflect usage, architecture, and behavior.
 4. Commit only after both docs are synchronized with the code.
+
+## Automation Note
+- Run `powershell -ExecutionPolicy Bypass -File .\scripts\install-hooks.ps1` after clone/setup.
+- The pre-commit hook enforces that staged implementation changes include both `Plan.md` and `README.md`.
 
 ## Git Delivery Protocol
 1. Verify working tree with `git status`.

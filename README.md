@@ -45,3 +45,26 @@ Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile 'data/source.csv'
 
 ## Documentation Synchronization Rule
 For each meaningful code change, `Plan.md` and `README.md` must both be updated in the same cycle before commit.
+
+## Commit Guardrail
+This repository now includes a local pre-commit enforcement flow:
+- `scripts/check-doc-sync.ps1` validates staged files.
+- `scripts/install-hooks.ps1` installs and activates git hooks.
+- `scripts/hooks/pre-commit` runs the validator before each commit.
+
+Install hooks once per clone:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-hooks.ps1
+```
+
+Validation logic:
+- If implementation files (`*.html`, `*.css`, `*.js`, `data/*.csv`) are staged, both `Plan.md` and `README.md` must also be staged.
+- Docs-only commits are allowed.
+- Non-implementation changes (for example script/hook files) are allowed.
+
+If blocked, update/stage docs and retry:
+
+```powershell
+git add Plan.md README.md
+```
