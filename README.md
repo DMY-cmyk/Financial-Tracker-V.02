@@ -68,3 +68,13 @@ If blocked, update/stage docs and retry:
 ```powershell
 git add Plan.md README.md
 ```
+
+## GitHub Workflow
+CI is configured in `.github/workflows/ci.yml` and runs on `push` and `pull_request` to `main`.
+
+Checks included:
+- `node --check app.js` for JavaScript syntax validation.
+- `scripts/check-doc-sync-ci.ps1` to enforce documentation sync at PR/push level using changed-file diff.
+
+CI policy mirrors local policy:
+- If implementation files change (`*.html`, `*.css`, `*.js`, `data/*.csv`), both `Plan.md` and `README.md` must be part of the same change set.
