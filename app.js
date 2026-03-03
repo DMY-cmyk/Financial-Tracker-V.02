@@ -2,7 +2,7 @@ const state = {
   meta: {
     month: "",
     year: "",
-    snapshotDate: "",
+    snapshot: "",
   },
   incomeCategories: [],
   expenseCategories: [],
@@ -12,66 +12,62 @@ const state = {
   bills: [],
 };
 
-const ids = {
-  heroTitle: document.getElementById("heroTitle"),
-  heroDate: document.getElementById("heroDate"),
+const el = {
+  dashboardTitle: document.getElementById("dashboardTitle"),
+  snapshotInfo: document.getElementById("snapshotInfo"),
   totalIncome: document.getElementById("totalIncome"),
   totalExpense: document.getElementById("totalExpense"),
   totalAssets: document.getElementById("totalAssets"),
+  incomeCategorySelect: document.getElementById("incomeCategorySelect"),
+  incomeMethodSelect: document.getElementById("incomeMethodSelect"),
+  expenseCategorySelect: document.getElementById("expenseCategorySelect"),
+  expenseAccountSelect: document.getElementById("expenseAccountSelect"),
   incomeBody: document.getElementById("incomeBody"),
   expenseBody: document.getElementById("expenseBody"),
   methodBody: document.getElementById("methodBody"),
   expenseRecapBody: document.getElementById("expenseRecapBody"),
   billBody: document.getElementById("billBody"),
-  incomeCategorySelect: document.getElementById("incomeCategorySelect"),
-  expenseCategorySelect: document.getElementById("expenseCategorySelect"),
-  incomeMethodSelect: document.getElementById("incomeMethodSelect"),
-  expenseAccountSelect: document.getElementById("expenseAccountSelect"),
   incomeForm: document.getElementById("incomeForm"),
   expenseForm: document.getElementById("expenseForm"),
 };
 
 function parseCsv(text) {
   const rows = [];
-  let current = "";
   let row = [];
-  let inQuotes = false;
+  let value = "";
+  let quoted = false;
   for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
+    const ch = text[i];
     const next = text[i + 1];
-    if (char === '"' && inQuotes && next === '"') {
-      current += '"';
+    if (ch === '"' && quoted && next === '"') {
+      value += '"';
       i += 1;
-    } else if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
-      row.push(current);
-      current = "";
-    } else if ((char === "\n" || char === "\r") && !inQuotes) {
-      if (char === "\r" && next === "\n") {
-        i += 1;
-      }
-      row.push(current);
+    } else if (ch === '"') {
+      quoted = !quoted;
+    } else if (ch === "," && !quoted) {
+      row.push(value);
+      value = "";
+    } else if ((ch === "\n" || ch === "\r") && !quoted) {
+      if (ch === "\r" && next === "\n") i += 1;
+      row.push(value);
       rows.push(row);
       row = [];
-      current = "";
+      value = "";
     } else {
-      current += char;
+      value += ch;
     }
   }
-  if (current.length > 0 || row.length > 0) {
-    row.push(current);
+  if (value.length > 0 || row.length > 0) {
+    row.push(value);
     rows.push(row);
   }
   return rows;
 }
 
-function parseRupiah(value) {
-  if (typeof value !== "string") return 0;
-  const cleaned = value.replace(/[^\d-]/g, "");
-  if (!cleaned) return 0;
-  const parsed = Number.parseInt(cleaned, 10);
-  return Number.isNaN(parsed) ? 0 : parsed;
+function parseRupiah(raw) {
+  const clean = String(raw || "").replace(/[^\d-]/g, "");
+  const num = Number.parseInt(clean, 10);
+  return Number.isNaN(num) ? 0 : num;
 }
 
 function formatRupiah(amount) {
@@ -82,32 +78,36 @@ function formatRupiah(amount) {
   }).format(amount || 0);
 }
 
-function uniqueNonEmpty(values) {
-  return [...new Set(values.map((v) => v.trim()).filter(Boolean))];
+function fillSelect(select, list) {
+  select.innerHTML = "";
+  list.forEach((item) => {
+    const opt = document.createElement("option");
+    opt.value = item;
+    opt.textContent = item;
+    select.appendChild(opt);
+  });
 }
 
-function parseRows(rows) {
+function normalizeRows(rows) {
   const incomeCategories = [];
   const expenseCategories = [];
   const methods = [];
-  const incomeTransactions = [];
-  const expenseTransactions = [];
+  const income = [];
+  const expense = [];
   const bills = [];
+
   let categoryMode = false;
   let methodMode = false;
 
-  rows.forEach((cells) => {
-    const c = Array.from({ length: 20 }, (_, idx) => (cells[idx] || "").trim());
+  rows.forEach((source) => {
+    const c = Array.from({ length: 20 }, (_, idx) => (source[idx] || "").trim());
 
-    if (c[1] === "B U L A N" && c[3] === "T A H U N") {
-      return;
-    }
     if (c[1] && c[3] && !Number.isNaN(Number.parseInt(c[3], 10)) && c[1] !== "B U L A N") {
       state.meta.month = c[1];
       state.meta.year = c[3];
     }
-    if (c[1] && /\d{4}/.test(c[1]) && c[1].includes(",")) {
-      state.meta.snapshotDate = c[1];
+    if (c[1] && c[1].includes(",") && /\d{4}/.test(c[1])) {
+      state.meta.snapshot = c[1];
     }
 
     if (c[1] === "Pemasukan" && c[3] === "Pengeluaran") {
@@ -121,6 +121,7 @@ function parseRows(rows) {
       return;
     }
     if (c[1] && c[1].includes("C A T A T A N")) {
+      categoryMode = false;
       methodMode = false;
     }
 
@@ -128,14 +129,13 @@ function parseRows(rows) {
       incomeCategories.push(c[1]);
       expenseCategories.push(c[3]);
     }
-
     if (methodMode && c[1] && c[3].startsWith("Rp")) {
       methods.push(c[1]);
     }
 
     const incomeNo = Number.parseInt(c[5], 10);
     if (!Number.isNaN(incomeNo)) {
-      incomeTransactions.push({
+      income.push({
         no: incomeNo,
         date: c[6],
         amount: parseRupiah(c[7]),
@@ -146,7 +146,7 @@ function parseRows(rows) {
 
     const expenseNo = Number.parseInt(c[11], 10);
     if (!Number.isNaN(expenseNo)) {
-      expenseTransactions.push({
+      expense.push({
         no: expenseNo,
         date: c[12],
         amount: parseRupiah(c[13]),
@@ -165,169 +165,150 @@ function parseRows(rows) {
     }
   });
 
-  state.incomeCategories = uniqueNonEmpty(incomeCategories);
-  state.expenseCategories = uniqueNonEmpty(expenseCategories);
-  state.methods = uniqueNonEmpty(methods);
-  state.incomeTransactions = incomeTransactions.sort((a, b) => a.no - b.no);
-  state.expenseTransactions = expenseTransactions.sort((a, b) => a.no - b.no);
+  state.incomeCategories = [...new Set(incomeCategories)];
+  state.expenseCategories = [...new Set(expenseCategories)];
+  state.methods = [...new Set(methods)];
+  state.incomeTransactions = income.sort((a, b) => a.no - b.no);
+  state.expenseTransactions = expense.sort((a, b) => a.no - b.no);
   state.bills = bills;
 
   if (state.methods.length === 0) {
-    state.methods = uniqueNonEmpty([
-      ...state.incomeTransactions.map((tx) => tx.method),
-      ...state.expenseTransactions.map((tx) => tx.account),
-    ]);
+    state.methods = [...new Set([
+      ...state.incomeTransactions.map((item) => item.method),
+      ...state.expenseTransactions.map((item) => item.account),
+    ])];
   }
 }
 
-function computeMetrics() {
-  const totalIncome = state.incomeTransactions.reduce((sum, item) => sum + item.amount, 0);
-  const totalExpense = state.expenseTransactions.reduce((sum, item) => sum + item.amount, 0);
+function calculate() {
+  const totalIncome = state.incomeTransactions.reduce((sum, row) => sum + row.amount, 0);
+  const totalExpense = state.expenseTransactions.reduce((sum, row) => sum + row.amount, 0);
   const totalAssets = totalIncome - totalExpense;
 
   const methodBalances = {};
   state.methods.forEach((method) => {
     methodBalances[method] = 0;
   });
-
-  state.incomeTransactions.forEach((item) => {
-    if (!methodBalances[item.method] && methodBalances[item.method] !== 0) {
-      methodBalances[item.method] = 0;
-    }
-    methodBalances[item.method] += item.amount;
+  state.incomeTransactions.forEach((row) => {
+    if (methodBalances[row.method] === undefined) methodBalances[row.method] = 0;
+    methodBalances[row.method] += row.amount;
+  });
+  state.expenseTransactions.forEach((row) => {
+    if (methodBalances[row.account] === undefined) methodBalances[row.account] = 0;
+    methodBalances[row.account] -= row.amount;
   });
 
-  state.expenseTransactions.forEach((item) => {
-    if (!methodBalances[item.account] && methodBalances[item.account] !== 0) {
-      methodBalances[item.account] = 0;
-    }
-    methodBalances[item.account] -= item.amount;
+  const expenseByCategory = {};
+  state.expenseCategories.forEach((cat) => {
+    expenseByCategory[cat] = 0;
+  });
+  state.expenseTransactions.forEach((row) => {
+    if (expenseByCategory[row.category] === undefined) expenseByCategory[row.category] = 0;
+    expenseByCategory[row.category] += row.amount;
   });
 
-  const expenseRecap = {};
-  state.expenseCategories.forEach((category) => {
-    expenseRecap[category] = 0;
-  });
-  state.expenseTransactions.forEach((item) => {
-    if (!expenseRecap[item.category] && expenseRecap[item.category] !== 0) {
-      expenseRecap[item.category] = 0;
-    }
-    expenseRecap[item.category] += item.amount;
-  });
-
-  return { totalIncome, totalExpense, totalAssets, methodBalances, expenseRecap };
+  return { totalIncome, totalExpense, totalAssets, methodBalances, expenseByCategory };
 }
 
-function renderOptions(select, values) {
-  select.innerHTML = "";
-  values.forEach((value) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = value;
-    select.appendChild(option);
-  });
-}
-
-function renderTableBody(tbody, rows, cells) {
-  tbody.innerHTML = "";
+function renderRows(body, rows, columns) {
+  body.innerHTML = "";
   rows.forEach((row) => {
     const tr = document.createElement("tr");
-    cells.forEach((key) => {
+    columns.forEach((col) => {
       const td = document.createElement("td");
-      const value = row[key];
-      td.textContent = key === "amount" ? formatRupiah(value) : (value || "-");
+      td.textContent = col === "amount" ? formatRupiah(row[col]) : (row[col] || "-");
       tr.appendChild(td);
     });
-    tbody.appendChild(tr);
+    body.appendChild(tr);
   });
 }
 
 function render() {
-  const metrics = computeMetrics();
+  const metrics = calculate();
 
-  ids.heroTitle.textContent = `Budgeting Dashboard ${state.meta.month || ""} ${state.meta.year || ""}`.trim();
-  ids.heroDate.textContent = state.meta.snapshotDate || "Snapshot loaded";
+  el.dashboardTitle.textContent = `Budget Tracker ${state.meta.month} ${state.meta.year}`.trim();
+  el.snapshotInfo.textContent = state.meta.snapshot || "Snapshot loaded";
 
-  ids.totalIncome.textContent = formatRupiah(metrics.totalIncome);
-  ids.totalExpense.textContent = formatRupiah(metrics.totalExpense);
-  ids.totalAssets.textContent = formatRupiah(metrics.totalAssets);
+  el.totalIncome.textContent = formatRupiah(metrics.totalIncome);
+  el.totalExpense.textContent = formatRupiah(metrics.totalExpense);
+  el.totalAssets.textContent = formatRupiah(metrics.totalAssets);
 
-  renderOptions(ids.incomeCategorySelect, state.incomeCategories);
-  renderOptions(ids.expenseCategorySelect, state.expenseCategories);
-  renderOptions(ids.incomeMethodSelect, state.methods);
-  renderOptions(ids.expenseAccountSelect, state.methods);
+  fillSelect(el.incomeCategorySelect, state.incomeCategories);
+  fillSelect(el.incomeMethodSelect, state.methods);
+  fillSelect(el.expenseCategorySelect, state.expenseCategories);
+  fillSelect(el.expenseAccountSelect, state.methods);
 
-  renderTableBody(ids.incomeBody, state.incomeTransactions, ["no", "date", "amount", "category", "method"]);
-  renderTableBody(ids.expenseBody, state.expenseTransactions, ["no", "date", "amount", "category", "account", "notes"]);
+  renderRows(el.incomeBody, state.incomeTransactions, ["no", "date", "amount", "category", "method"]);
+  renderRows(el.expenseBody, state.expenseTransactions, ["no", "date", "amount", "category", "account", "notes"]);
 
-  ids.methodBody.innerHTML = "";
-  Object.entries(metrics.methodBalances).forEach(([method, amount]) => {
+  el.methodBody.innerHTML = "";
+  Object.entries(metrics.methodBalances).forEach(([key, value]) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${method}</td><td>${formatRupiah(amount)}</td>`;
-    ids.methodBody.appendChild(tr);
+    tr.innerHTML = `<td>${key}</td><td>${formatRupiah(value)}</td>`;
+    el.methodBody.appendChild(tr);
   });
 
-  ids.expenseRecapBody.innerHTML = "";
-  Object.entries(metrics.expenseRecap).forEach(([category, amount]) => {
+  el.expenseRecapBody.innerHTML = "";
+  Object.entries(metrics.expenseByCategory).forEach(([key, value]) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${category}</td><td>${formatRupiah(amount)}</td>`;
-    ids.expenseRecapBody.appendChild(tr);
+    tr.innerHTML = `<td>${key}</td><td>${formatRupiah(value)}</td>`;
+    el.expenseRecapBody.appendChild(tr);
   });
 
-  ids.billBody.innerHTML = "";
-  state.bills.forEach((bill) => {
+  el.billBody.innerHTML = "";
+  state.bills.forEach((item) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${bill.status}</td><td>${bill.name}</td><td>${formatRupiah(bill.amount)}</td>`;
-    ids.billBody.appendChild(tr);
+    tr.innerHTML = `<td>${item.status}</td><td>${item.name}</td><td>${formatRupiah(item.amount)}</td>`;
+    el.billBody.appendChild(tr);
   });
 }
 
-function handleIncomeSubmit(event) {
-  event.preventDefault();
-  const formData = new FormData(ids.incomeForm);
-  const amount = parseRupiah(formData.get("amount"));
+function onIncomeSubmit(evt) {
+  evt.preventDefault();
+  const form = new FormData(el.incomeForm);
+  const amount = parseRupiah(form.get("amount"));
   if (amount <= 0) return;
   state.incomeTransactions.push({
     no: state.incomeTransactions.length + 1,
-    date: String(formData.get("date") || ""),
+    date: String(form.get("date") || ""),
     amount,
-    category: String(formData.get("category") || ""),
-    method: String(formData.get("method") || ""),
+    category: String(form.get("category") || ""),
+    method: String(form.get("method") || ""),
   });
   render();
-  ids.incomeForm.reset();
+  el.incomeForm.reset();
 }
 
-function handleExpenseSubmit(event) {
-  event.preventDefault();
-  const formData = new FormData(ids.expenseForm);
-  const amount = parseRupiah(formData.get("amount"));
+function onExpenseSubmit(evt) {
+  evt.preventDefault();
+  const form = new FormData(el.expenseForm);
+  const amount = parseRupiah(form.get("amount"));
   if (amount <= 0) return;
   state.expenseTransactions.push({
     no: state.expenseTransactions.length + 1,
-    date: String(formData.get("date") || ""),
+    date: String(form.get("date") || ""),
     amount,
-    category: String(formData.get("category") || ""),
-    account: String(formData.get("account") || ""),
-    notes: String(formData.get("notes") || ""),
+    category: String(form.get("category") || ""),
+    account: String(form.get("account") || ""),
+    notes: String(form.get("notes") || ""),
   });
   render();
-  ids.expenseForm.reset();
+  el.expenseForm.reset();
 }
 
 async function init() {
   const response = await fetch("./data/source.csv");
-  const csv = await response.text();
-  const rows = parseCsv(csv);
-  parseRows(rows);
+  if (!response.ok) throw new Error(`Failed to load CSV: ${response.status}`);
+  const csvText = await response.text();
+  const rows = parseCsv(csvText);
+  normalizeRows(rows);
   render();
 
-  ids.incomeForm.addEventListener("submit", handleIncomeSubmit);
-  ids.expenseForm.addEventListener("submit", handleExpenseSubmit);
+  el.incomeForm.addEventListener("submit", onIncomeSubmit);
+  el.expenseForm.addEventListener("submit", onExpenseSubmit);
 }
 
 init().catch((error) => {
-  // This keeps failure mode visible without breaking the page shell.
-  ids.heroDate.textContent = "Failed to load data.";
+  el.snapshotInfo.textContent = "Failed to load snapshot data.";
   console.error(error);
 });
