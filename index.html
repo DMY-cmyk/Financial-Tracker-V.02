@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Tracker Web Clone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <p class="badge">Financial Tracker</p>
+      <h1 id="heroTitle">Budgeting Dashboard</h1>
+      <p id="heroDate" class="hero-date">Snapshot date</p>
+      <div class="summary-grid">
+        <article class="metric">
+          <h2>Total Income</h2>
+          <p id="totalIncome">Rp0</p>
+        </article>
+        <article class="metric">
+          <h2>Total Expense</h2>
+          <p id="totalExpense">Rp0</p>
+        </article>
+        <article class="metric">
+          <h2>Total Assets</h2>
+          <p id="totalAssets">Rp0</p>
+        </article>
+      </div>
+    </header>
+
+    <section class="forms">
+      <article class="panel">
+        <h2>Add Income</h2>
+        <form id="incomeForm">
+          <label>Date<input name="date" type="text" required placeholder="2 Jan 2026"></label>
+          <label>Amount<input name="amount" type="text" required placeholder="Rp100.000"></label>
+          <label>Category<select name="category" id="incomeCategorySelect"></select></label>
+          <label>Method<select name="method" id="incomeMethodSelect"></select></label>
+          <button type="submit">Save Income</button>
+        </form>
+      </article>
+      <article class="panel">
+        <h2>Add Expense</h2>
+        <form id="expenseForm">
+          <label>Date<input name="date" type="text" required placeholder="2 Jan 2026"></label>
+          <label>Amount<input name="amount" type="text" required placeholder="Rp50.000"></label>
+          <label>Category<select name="category" id="expenseCategorySelect"></select></label>
+          <label>Account<select name="account" id="expenseAccountSelect"></select></label>
+          <label>Notes<input name="notes" type="text" placeholder="Optional note"></label>
+          <button type="submit">Save Expense</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="analytics">
+      <article class="panel">
+        <h2>Payment Method Balances</h2>
+        <table>
+          <thead><tr><th>Method</th><th>Balance</th></tr></thead>
+          <tbody id="methodBody"></tbody>
+        </table>
+      </article>
+      <article class="panel">
+        <h2>Expense Recap by Category</h2>
+        <table>
+          <thead><tr><th>Category</th><th>Total</th></tr></thead>
+          <tbody id="expenseRecapBody"></tbody>
+        </table>
+      </article>
+      <article class="panel">
+        <h2>Bill Notes</h2>
+        <table>
+          <thead><tr><th>Status</th><th>Name</th><th>Amount</th></tr></thead>
+          <tbody id="billBody"></tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="tables">
+      <article class="panel wide">
+        <h2>Income Transactions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Date</th><th>Amount</th><th>Category</th><th>Method</th></tr>
+            </thead>
+            <tbody id="incomeBody"></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="panel wide">
+        <h2>Expense Transactions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Date</th><th>Amount</th><th>Category</th><th>Account</th><th>Notes</th></tr>
+            </thead>
+            <tbody id="expenseBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
