@@ -43,11 +43,20 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] i18n system with EN/ID translation dictionary
 - [x] Root layout with StoreProvider (theme + locale + data seed)
 - [x] Navbar (desktop horizontal top nav with glass effect)
-- [x] BottomNav (mobile 5-tab bottom bar)
-- [x] PageHeader component
+- [x] BottomNav (mobile 5-tab bottom bar, lg breakpoint)
+- [x] PageHeader component (enhanced with responsive flex layout)
 - [x] All 7 page route files created
 - [x] GitHub Actions workflow updated for Next.js build
 - [x] .gitignore updated (node_modules, .next, out)
+- [x] Sidebar (collapsible desktop sidebar with nav, quick-add, settings)
+- [x] Topbar (month navigation with prev/next, mobile logo)
+- [x] AppShell (sidebar + topbar + content shell with h-screen layout)
+- [x] SectionCard (generic section wrapper with title/action/content)
+- [x] StatBadge (colored metric badge component)
+- [x] QuickActionButton (CTA action card with icon/label/description)
+- [x] FilterBar (reusable filter container wrapper)
+- [x] Mock data constants (quick actions, empty state messages)
+- [x] DashboardSummary + QuickAction TypeScript interfaces
 
 ### Phase 2: Dashboard Analytics (Bento Grid)
 
@@ -64,6 +73,9 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Framer Motion stagger entrance (60ms per card, y:12->0, 400ms)
 - [x] Empty states for all widgets
 - [x] Dark mode for all widgets
+- [x] Dashboard page with sectioned layout (summary cards, charts, budget, activity, quick actions)
+- [x] 4 SummaryCard metrics (balance, income, expense, savings rate) with icon backgrounds
+- [x] Quick Actions section (add transaction, upload receipt, export data)
 - [ ] Decorative background blur circles on hero card
 - [ ] Chart clip-path wipe entrance animation
 
@@ -72,11 +84,12 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] TransactionFilters (search input, type toggle, category dropdown)
 - [x] TransactionTable (date-grouped sections, hover action buttons)
 - [x] TransactionForm (type toggle, amount with live IDR formatting, all fields)
-- [x] Summary strip (income/expense/net in 3-cell card)
+- [x] Summary strip (income/expense/net in 3-cell card) → TransactionSummary component
 - [x] Sheet slide-over for add/edit
 - [x] CategoryChip (colored dot + name badge)
 - [x] Delete transaction
-- [x] Standalone /transactions/new page
+- [x] Standalone /transactions/new page (with back navigation + description)
+- [x] Empty state with CTA button when no transactions match filters
 - [ ] Toast notifications (save/delete/error feedback)
 - [ ] Delete confirmation dialog
 - [ ] Payment method filter in filter bar
@@ -167,12 +180,12 @@ src/
       categories/page.tsx     # Category & payment method management
   components/
     ui/                       # shadcn/ui primitives (14 components)
-    layout/                   # Navbar, BottomNav, PageHeader
+    layout/                   # AppShell, Sidebar, Topbar, BottomNav, Navbar, PageHeader
     dashboard/                # 9 bento widgets
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard
+    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar
     providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
@@ -183,6 +196,7 @@ src/
     data-migration.ts         # workbook.json -> typed objects
     i18n.ts                   # EN/ID translations + context
     design-tokens.ts          # Design token constants (colors, motion, typography)
+    mock-data.ts              # Quick actions, empty state messages
     export-utils.ts           # CSV/Excel/PDF generation (to add)
     utils.ts                  # cn() utility (shadcn)
   store/

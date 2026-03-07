@@ -4,15 +4,16 @@ import { useState, useMemo } from 'react';
 import { useMonthlyTransactions, useMonthlyIncome, useMonthlyExpense } from '@/store/selectors';
 import { useStore } from '@/store';
 import { Transaction } from '@/lib/types';
-import { formatCurrency } from '@/lib/formatters';
 import { t, useLocale } from '@/lib/i18n';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionForm } from '@/components/transactions/TransactionForm';
+import { TransactionSummary } from '@/components/transactions/TransactionSummary';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus } from 'lucide-react';
+import { Plus, Receipt } from 'lucide-react';
 
 export default function TransactionsPage() {
   const allTransactions = useMonthlyTransactions();
@@ -59,36 +60,15 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <PageHeader
         title={t(locale, 'transactions')}
-        description={`${filtered.length} transactions`}
+        description={`${filtered.length} ${filtered.length === 1 ? 'transaction' : 'transactions'} this month`}
       >
-        <Button onClick={() => { setEditingTx(undefined); setFormOpen(true); }} className="gap-2">
+        <Button onClick={() => { setEditingTx(undefined); setFormOpen(true); }} className="gap-2 shadow-sm">
           <Plus className="h-4 w-4" />
           {t(locale, 'addTransaction')}
         </Button>
       </PageHeader>
 
-      <div className="flex flex-wrap gap-3 rounded-2xl border border-border bg-card p-4">
-        <div className="flex-1 text-center">
-          <p className="text-xs text-muted-foreground">{t(locale, 'income')}</p>
-          <p className="mt-1 font-mono text-lg font-semibold text-emerald-600 dark:text-emerald-400">
-            {formatCurrency(income)}
-          </p>
-        </div>
-        <div className="w-px bg-border" />
-        <div className="flex-1 text-center">
-          <p className="text-xs text-muted-foreground">{t(locale, 'expense')}</p>
-          <p className="mt-1 font-mono text-lg font-semibold text-red-600 dark:text-red-400">
-            {formatCurrency(expense)}
-          </p>
-        </div>
-        <div className="w-px bg-border" />
-        <div className="flex-1 text-center">
-          <p className="text-xs text-muted-foreground">{t(locale, 'netBalance')}</p>
-          <p className="mt-1 font-mono text-lg font-semibold">
-            {formatCurrency(income - expense)}
-          </p>
-        </div>
-      </div>
+      <TransactionSummary income={income} expense={expense} />
 
       <TransactionFilters
         search={search}
@@ -99,11 +79,24 @@ export default function TransactionsPage() {
         onCategoryChange={setCategoryFilter}
       />
 
-      <TransactionTable
-        transactions={filtered}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {filtered.length > 0 ? (
+        <TransactionTable
+          transactions={filtered}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      ) : (
+        <EmptyState
+          title={t(locale, 'noData')}
+          description="Try adjusting your filters or add a new transaction."
+          icon={<Receipt className="h-12 w-12" />}
+        >
+          <Button onClick={() => { setEditingTx(undefined); setFormOpen(true); }} className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t(locale, 'addTransaction')}
+          </Button>
+        </EmptyState>
+      )}
 
       <Sheet open={formOpen} onOpenChange={setFormOpen}>
         <SheetContent className="overflow-y-auto">

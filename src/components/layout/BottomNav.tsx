@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { NAV_ITEMS } from '@/lib/constants';
 import {
   LayoutDashboard,
   Receipt,
@@ -12,40 +11,35 @@ import {
   Settings,
 } from 'lucide-react';
 
-const iconMap: Record<string, React.ElementType> = {
-  'layout-dashboard': LayoutDashboard,
-  receipt: Receipt,
-  upload: Upload,
-  download: Download,
-  settings: Settings,
-};
+const items = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/transactions', label: 'Transactions', icon: Receipt },
+  { href: '/upload', label: 'Upload', icon: Upload },
+  { href: '/export', label: 'Export', icon: Download },
+  { href: '/settings', label: 'Settings', icon: Settings },
+];
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md lg:hidden">
       <div className="flex items-center justify-around py-2">
-        {NAV_ITEMS.map((item) => {
-          const Icon = iconMap[item.icon];
+        {items.map(({ href, label, icon: Icon }) => {
           const isActive =
-            item.href === '/'
-              ? pathname === '/'
-              : pathname.startsWith(item.href);
+            href === '/' ? pathname === '/' : pathname.startsWith(href);
 
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-1 text-xs transition-colors',
-                isActive
-                  ? 'text-primary'
-                  : 'text-muted-foreground'
+                isActive ? 'text-primary' : 'text-muted-foreground'
               )}
             >
-              {Icon && <Icon className="h-5 w-5" />}
-              <span>{item.label}</span>
+              <Icon className="h-5 w-5" />
+              <span>{label}</span>
             </Link>
           );
         })}

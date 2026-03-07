@@ -50,6 +50,22 @@ export interface UIState {
   locale: 'en' | 'id';
 }
 
+export interface DashboardSummary {
+  totalBalance: number;
+  monthlyIncome: number;
+  monthlyExpense: number;
+  savingsRate: number;
+  transactionCount: number;
+}
+
+export interface QuickAction {
+  id: string;
+  label: string;
+  description: string;
+  href: string;
+  icon: string;
+}
+
 export interface FinancialStore {
   transactions: Transaction[];
   categories: Category[];

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/layout/Navbar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { StoreProvider } from '@/components/providers/StoreProvider';
+import { AppShell } from '@/components/layout/AppShell';
 
 const jakarta = Plus_Jakarta_Sans({
   variable: '--font-sans',
@@ -31,11 +30,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${jakarta.variable} ${jetbrains.variable} antialiased font-sans`}>
         <StoreProvider>
-          <Navbar />
-          <main className="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 md:pb-6">
+          <AppShell>
             {children}
-          </main>
-          <BottomNav />
+          </AppShell>
         </StoreProvider>
       </body>
     </html>
