@@ -93,10 +93,10 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Date extraction (DD/MM/YYYY patterns)
 - [x] Extracted fields review form (amount, description, date, category)
 - [x] Save as transaction
-- [ ] Extract DropZone into separate component
-- [ ] Extract OcrPreview into separate component
-- [ ] ProcessingOverlay component (spinner on image)
-- [ ] ConfidenceBar component (green/amber/red)
+- [x] Extract DropZone into separate component
+- [x] Extract OcrPreview into separate component
+- [x] ProcessingOverlay component (spinner on image)
+- [x] ConfidenceBar component (green/amber/red)
 - [ ] Category auto-suggestion from merchant text matching
 - [ ] Upload history list
 - [ ] Error state with retry button
@@ -114,9 +114,9 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [ ] Install jspdf + jspdf-autotable for PDF export
 - [ ] PDF export with styled table and totals
 - [ ] Custom date range picker (start/end)
-- [ ] Export options toggles (include summary, categories, group by date)
-- [ ] Export preview table (first 5 rows)
-- [ ] Extract into FormatCard/ScopeSelector/ExportOptions components
+- [x] Export options toggles (include summary, categories, group by date)
+- [x] Export preview table (first 5 rows)
+- [x] Extract into FormatCard/ScopeSelector/ExportOptions components
 
 ### Phase 6: Categories & Settings
 
@@ -169,10 +169,10 @@ src/
     ui/                       # shadcn/ui primitives (14 components)
     layout/                   # Navbar, BottomNav, PageHeader
     dashboard/                # 9 bento widgets
-    transactions/             # Table, Form, Filters, CategoryChip
-    upload/                   # DropZone, OcrPreview (to extract)
-    export/                   # FormatCard, ScopeSelector (to add)
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState
+    transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
+    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
+    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
+    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard
     providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
@@ -182,6 +182,7 @@ src/
     storage.ts                # localStorage helpers
     data-migration.ts         # workbook.json -> typed objects
     i18n.ts                   # EN/ID translations + context
+    design-tokens.ts          # Design token constants (colors, motion, typography)
     export-utils.ts           # CSV/Excel/PDF generation (to add)
     utils.ts                  # cn() utility (shadcn)
   store/
@@ -205,6 +206,7 @@ GitHub Actions: Checkout -> Node 20 -> `npm ci` -> `npm run build` -> Deploy `ou
 | Document | Purpose |
 |----------|---------|
 | [BLUEPRINT.md](./BLUEPRINT.md) | Full production blueprint (15 sections: concept, IA, nav, page specs, design system, motion, i18n, components, roadmap) |
+| [WIREFRAMES.md](./WIREFRAMES.md) | Wireframe definitions, ASCII wireframes, component map, folder tree, build recommendations |
 | [README.md](./README.md) | Project overview, getting started, tech stack |
 | `data/workbook.json` | Source data (12 monthly sheets, cell-based format) |
 | `scripts/extract_xlsx.py` | XLSX to JSON extraction pipeline |

@@ -85,13 +85,13 @@ src/
   components/
     dashboard/                # 9 bento widgets
     transactions/             # Table, form, filters, category chip
-    upload/                   # Drop zone, OCR preview
-    export/                   # Format cards, scope selector
+    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
+    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
     layout/                   # Navbar, BottomNav, PageHeader
-    shared/                   # AnimatedCounter, ProgressRing, AmountDisplay
+    shared/                   # AnimatedCounter, ProgressRing, AmountDisplay, SummaryCard, ChartCard
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 14 shadcn/ui primitives
-  lib/                        # Types, formatters, calculations, i18n, migration
+  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens
   store/                      # Zustand store + memoized selectors
 ```
 
@@ -100,6 +100,7 @@ src/
 | Document | Description |
 |----------|-------------|
 | [BLUEPRINT.md](./BLUEPRINT.md) | Full production blueprint - concept rationale, information architecture, navigation, detailed page specs, design system, motion system, bilingual UX, component architecture, folder structure, implementation roadmap, dashboard layout specification |
+| [WIREFRAMES.md](./WIREFRAMES.md) | Wireframe definitions, ASCII wireframes, component map (37 components), folder tree, build recommendations |
 | [Plan.md](./Plan.md) | Implementation checklist with phase-by-phase status tracking |
 
 ## Data Pipeline
