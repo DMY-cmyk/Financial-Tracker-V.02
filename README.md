@@ -8,11 +8,18 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 
 ## Features
 
+### App Shell
+- [x] Collapsible sidebar navigation (desktop, 260px/72px)
+- [x] Top bar with month navigation (prev/next)
+- [x] Bottom navigation for mobile (5 tabs)
+- [x] Full-height layout with internal content scrolling
+
 ### Dashboard
-- [x] 9-widget Bento Grid: balance hero, cash flow chart, category donut, budget bars, payment methods, bills checklist, savings rings, recent transactions
-- [x] Animated counter with Framer Motion spring for balance
-- [x] Month selector (4x3 pill grid with year navigation)
-- [x] Responsive 3/2/1 column layout
+- [x] 4 summary metric cards (balance, income, expense, savings rate)
+- [x] 9 bento widgets: cash flow chart, category donut, budget bars, payment methods, bills checklist, savings rings, recent transactions
+- [x] Quick Actions section (add transaction, upload receipt, export data)
+- [x] Animated counter with Framer Motion spring
+- [x] Responsive sectioned layout with visual hierarchy
 - [x] Stagger entrance animations
 
 ### Transactions
@@ -20,7 +27,9 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Search, type filter (income/expense/all), category filter
 - [x] Date-grouped list with category color chips
 - [x] Slide-over Sheet form with live IDR formatting
-- [x] Summary strip (income / expense / net balance)
+- [x] TransactionSummary component (income / expense / net balance)
+- [x] Empty state with CTA when no results
+- [x] Back navigation on add transaction page
 
 ### Upload & OCR
 - [x] Drag-and-drop receipt image upload
@@ -87,11 +96,11 @@ src/
     transactions/             # Table, form, filters, category chip
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
-    layout/                   # Navbar, BottomNav, PageHeader
-    shared/                   # AnimatedCounter, ProgressRing, AmountDisplay, SummaryCard, ChartCard
+    layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
+    shared/                   # SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 14 shadcn/ui primitives
-  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens
+  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens, mock-data
   store/                      # Zustand store + memoized selectors
 ```
 
