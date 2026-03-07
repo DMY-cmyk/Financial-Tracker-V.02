@@ -1,23 +1,51 @@
 # Financial Tracker V.02
 
-A modern personal finance tracking dashboard built with Next.js, featuring a **Bento Grid** layout with animated widgets, interactive charts, and full transaction management. Designed for Indonesian Rupiah (IDR) budgeting with bilingual support (EN/ID).
+A modern personal finance tracking dashboard using a **Modular Bento Grid** layout. Built with Next.js 16, featuring animated widgets, interactive charts, and full transaction management. Designed for Indonesian Rupiah (IDR) budgeting with bilingual support (EN/ID).
+
+## Concept
+
+Card-based, widget-driven financial dashboard. Every data domain (balance, transactions, budgets, bills, savings) lives in its own self-contained tile arranged in an asymmetric bento grid. Interactions happen inline or in slide-over panels. Inspired by Mercury, Copilot Money, and Wise.
 
 ## Features
 
-- **Bento Grid Dashboard** - 9 interactive widgets: balance hero, cash flow chart, category donut, budget progress bars, payment method summary, bills checklist, savings goals, recent transactions
-- **Animated Counters** - Spring-animated balance numbers via Framer Motion
-- **Transaction Management** - Full CRUD with search, filters (type/category), date-grouped list, slide-over edit form
-- **Live IDR Formatting** - Currency inputs format as you type (e.g., 8.500.000)
-- **Budget Tracking** - Color-coded progress bars (green/amber/red) per expense category
-- **Interactive Charts** - Recharts area chart (cash flow) + donut chart (category breakdown)
-- **Bills Checklist** - Toggle paid/unpaid status with checkbox
-- **Savings Goals** - SVG progress ring indicators with percentage
-- **OCR Receipt Upload** - Client-side text extraction via Tesseract.js
-- **Export** - Download transactions as CSV or JSON (current month or all data)
-- **Dark Mode** - Light / Dark / System theme with class-based toggle
-- **Bilingual** - English and Bahasa Indonesia translations
-- **Responsive** - Desktop top nav + mobile bottom nav, 3/2/1 column grid
-- **Offline-Ready** - All data persisted in localStorage via Zustand
+### Dashboard
+- [x] 9-widget Bento Grid: balance hero, cash flow chart, category donut, budget bars, payment methods, bills checklist, savings rings, recent transactions
+- [x] Animated counter with Framer Motion spring for balance
+- [x] Month selector (4x3 pill grid with year navigation)
+- [x] Responsive 3/2/1 column layout
+- [x] Stagger entrance animations
+
+### Transactions
+- [x] Full CRUD (add, edit, delete)
+- [x] Search, type filter (income/expense/all), category filter
+- [x] Date-grouped list with category color chips
+- [x] Slide-over Sheet form with live IDR formatting
+- [x] Summary strip (income / expense / net balance)
+
+### Upload & OCR
+- [x] Drag-and-drop receipt image upload
+- [x] Client-side OCR via Tesseract.js (lazy-loaded)
+- [x] Auto-extract amount, date, description
+- [x] Review and correct extracted fields before saving
+
+### Export
+- [x] CSV and JSON export
+- [x] Scope: current month or all data
+- [ ] Excel (.xlsx) export
+- [ ] PDF export
+- [ ] Custom date range
+
+### Settings
+- [x] Theme: Light / Dark / System
+- [x] Language: English / Bahasa Indonesia
+- [x] Category & payment method management (CRUD, color picker, budget)
+- [x] Data clear/reset
+
+### Design System
+- [x] Custom color palette (Blue primary, Emerald income, Red expense, Amber warning)
+- [x] Plus Jakarta Sans (UI) + JetBrains Mono (currency)
+- [x] Light and dark mode with CSS variable theming
+- [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 
 ## Tech Stack
 
@@ -27,7 +55,7 @@ A modern personal finance tracking dashboard built with Next.js, featuring a **B
 | **Language** | TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
 | **State** | Zustand (localStorage persistence) |
-| **Charts** | Recharts |
+| **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
 | **Fonts** | Plus Jakarta Sans + JetBrains Mono |
@@ -35,25 +63,18 @@ A modern personal finance tracking dashboard built with Next.js, featuring a **B
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
-npm run dev
-# Open http://localhost:3000
-
-# Build for production (static export)
-npm run build
-# Output in out/ directory
+npm run dev        # http://localhost:3000
+npm run build      # Static export to out/
 ```
 
-On first load, the app automatically seeds data from `data/workbook.json` (12 months of sample transactions, bills, and savings goals).
+On first load, the app seeds sample data from `data/workbook.json` (12 months of transactions, bills, and savings goals).
 
 ## Project Structure
 
 ```
 src/
-  app/                        # Next.js pages (7 routes)
+  app/                        # 7 page routes
     page.tsx                  #   Dashboard (bento grid)
     transactions/page.tsx     #   Transaction list + filters
     transactions/new/page.tsx #   Add transaction form
@@ -64,25 +85,28 @@ src/
   components/
     dashboard/                # 9 bento widgets
     transactions/             # Table, form, filters, category chip
+    upload/                   # Drop zone, OCR preview
+    export/                   # Format cards, scope selector
     layout/                   # Navbar, BottomNav, PageHeader
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing
+    shared/                   # AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 14 shadcn/ui primitives
   lib/                        # Types, formatters, calculations, i18n, migration
   store/                      # Zustand store + memoized selectors
-data/
-  workbook.json               # Source spreadsheet data (12 months)
-scripts/
-  extract_xlsx.py             # XLSX to JSON extraction (Python/openpyxl)
 ```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [BLUEPRINT.md](./BLUEPRINT.md) | Full production blueprint - concept rationale, information architecture, navigation, detailed page specs, design system, motion system, bilingual UX, component architecture, folder structure, implementation roadmap, dashboard layout specification |
+| [Plan.md](./Plan.md) | Implementation checklist with phase-by-phase status tracking |
 
 ## Data Pipeline
 
 ```
-Financial Tracker.xlsx  -->  scripts/extract_xlsx.py  -->  data/workbook.json  -->  data-migration.ts  -->  Zustand Store
+Financial Tracker.xlsx  -->  extract_xlsx.py  -->  workbook.json  -->  data-migration.ts  -->  Zustand Store
 ```
-
-To regenerate data from a new spreadsheet:
 
 ```bash
 pip install openpyxl
@@ -91,23 +115,12 @@ python scripts/extract_xlsx.py
 
 ## Deployment
 
-Pushes to `main` trigger GitHub Pages deployment via GitHub Actions:
-
-1. `npm ci` -> `npm run build` -> Upload `out/` -> Deploy
+GitHub Actions (`.github/workflows/deploy-pages.yml`):
+`npm ci` -> `npm run build` -> Deploy `out/` to GitHub Pages
 
 ## Branch Strategy
 
 | Branch | Purpose |
 |--------|---------|
 | `main` | Production (original spreadsheet clone preserved) |
-| `redesign` | Complete React/Next.js redesign (this version) |
-
-## Screenshots
-
-The dashboard features a modular bento grid with:
-- Hero balance card with animated counter and income/expense chips
-- Monthly selector with year navigation
-- Area chart showing daily income vs expense cash flow
-- Donut chart with category breakdown percentages
-- Budget progress bars color-coded by status
-- Interactive bills checklist and savings goal rings
+| `redesign` | Modular Bento Grid redesign (active development) |

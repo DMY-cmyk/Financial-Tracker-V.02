@@ -2,7 +2,7 @@
 
 ## Overview
 
-A modern, premium financial tracking dashboard built with React. Replaces the original Google Sheets-style spreadsheet clone with a **Modular Bento Grid** layout featuring animated widgets, interactive charts, and a clean card-based design inspired by Copilot Money, Mercury, and Wise.
+A modern, premium financial tracking dashboard using a **Modular Bento Grid** layout. Every data domain (balance, transactions, budgets, bills, savings) lives in its own self-contained card arranged in an asymmetric grid. Built with Next.js 16, Tailwind CSS v4, shadcn/ui, Zustand, Recharts, and Framer Motion. See [BLUEPRINT.md](./BLUEPRINT.md) for full production specifications.
 
 ## Architecture
 
@@ -12,10 +12,6 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
                                                  localStorage
 ```
 
-1. **Data migration**: TypeScript module parses the cell-based workbook JSON and transforms it into typed `Transaction[]`, `Category[]`, `Bill[]`, and `SavingsGoal[]` objects
-2. **State management**: Zustand store with localStorage persistence provides reactive data to all components
-3. **Frontend**: Next.js 16 static export with Tailwind v4, shadcn/ui, Recharts, and Framer Motion
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -24,161 +20,191 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 + shadcn/ui (base-nova) |
 | State | Zustand with localStorage persistence |
-| Charts | Recharts (area, pie) |
-| Animations | Framer Motion (spring counters, stagger) |
+| Charts | Recharts (area, pie, bars) |
+| Animations | Framer Motion (spring counters, stagger, transitions) |
 | Fonts | Plus Jakarta Sans + JetBrains Mono |
-| OCR | Tesseract.js (client-side) |
+| OCR | Tesseract.js (client-side, lazy-loaded) |
+| Export | CSV (native) + xlsx (SheetJS) + PDF (jspdf) |
 | Hosting | GitHub Pages (static `out/` directory) |
 
-## Design System
+---
 
-### Color Palette
-```
-Primary:        #2563EB (Blue 600)     - Actions, active nav, links
-Success:        #059669 (Emerald 600)  - Income, positive balance, paid
-Warning:        #D97706 (Amber 600)    - Approaching budget limit
-Danger:         #DC2626 (Red 600)      - Expenses, over budget, overdue
+## Implementation Checklist
 
-Category Colors:
-  Food: #F59E0B    Transport: #3B82F6    Utilities: #8B5CF6
-  Entertainment: #EC4899    Salary: #10B981    Freelance: #06B6D4
+### Phase 1: Core Structure (Foundation)
 
-Dark Mode: Slate 800-900 surfaces, Slate 100 text, same accent colors
-```
+- [x] Next.js 16 + TypeScript + Tailwind v4 + static export
+- [x] shadcn/ui initialization (14 primitives: button, card, dialog, input, label, select, checkbox, progress, tabs, badge, separator, sheet, dropdown-menu, tooltip)
+- [x] Plus Jakarta Sans + JetBrains Mono fonts
+- [x] Custom design system color palette in globals.css (light + dark)
+- [x] Zustand store with all slices (transactions, categories, paymentMethods, bills, savings, ui)
+- [x] localStorage persistence middleware
+- [x] Data migration from workbook.json (cell format -> typed objects)
+- [x] i18n system with EN/ID translation dictionary
+- [x] Root layout with StoreProvider (theme + locale + data seed)
+- [x] Navbar (desktop horizontal top nav with glass effect)
+- [x] BottomNav (mobile 5-tab bottom bar)
+- [x] PageHeader component
+- [x] All 7 page route files created
+- [x] GitHub Actions workflow updated for Next.js build
+- [x] .gitignore updated (node_modules, .next, out)
 
-### Typography
-```
-Primary:  "Plus Jakarta Sans", system-ui, sans-serif
-Mono:     "JetBrains Mono", monospace (for currency amounts)
-```
+### Phase 2: Dashboard Analytics (Bento Grid)
 
-## Screen Architecture (7 Pages)
+- [x] NetBalanceCard with AnimatedCounter (Framer Motion spring)
+- [x] MonthSelector (4x3 pill grid with year chevron navigation)
+- [x] CashFlowChart (Recharts dual-series area chart, gradient fills)
+- [x] CategoryBreakdown (Recharts donut chart, 60% cutout, legend with percentages)
+- [x] BudgetProgress (horizontal progress bars, green/amber/red color coding)
+- [x] PaymentMethodsSummary (horizontal bars normalized to max)
+- [x] BillsChecklist (interactive shadcn checkboxes, paid strikethrough)
+- [x] SavingsGoals (SVG ProgressRing, percentage center text)
+- [x] RecentTransactions (mini list, category color dots, "View all" link)
+- [x] Responsive 3/2/1 column CSS Grid layout
+- [x] Framer Motion stagger entrance (60ms per card, y:12->0, 400ms)
+- [x] Empty states for all widgets
+- [x] Dark mode for all widgets
+- [ ] Decorative background blur circles on hero card
+- [ ] Chart clip-path wipe entrance animation
 
-### 1. Dashboard (`/`) - Bento Widget Grid
-- [x] **Net Balance Hero** (2-col): Large animated balance, income/expense chips
-- [x] **Month Selector** (1-col): 12-month pill grid with year navigation
-- [x] **Cash Flow Chart** (2-col): Recharts area chart, income vs expense by date
-- [x] **Category Breakdown** (1-col): Donut chart with percentage legend
-- [x] **Budget Progress** (2-col): Color-coded progress bars per category
-- [x] **Payment Methods** (1-col): Horizontal bar summary
-- [x] **Bills Checklist** (1-col): Interactive checkboxes with amount/due date
-- [x] **Savings Goals** (1-col): SVG progress ring indicators
-- [x] **Recent Transactions** (1-col): Last 5 transactions with "View all" link
-- [x] Responsive 3/2/1 column bento grid layout
-- [x] Framer Motion stagger entrance animations
+### Phase 3: Transaction Management
 
-### 2. Transactions (`/transactions`) - Full List with Filters
-- [x] Filter bar: search, income/expense toggle, category select
-- [x] Summary strip: total income, total expenses, net balance
-- [x] Date-grouped transaction list with category chips
-- [x] Edit/delete inline action buttons (hover reveal)
-- [x] Add button + slide-over Sheet panel with full form
+- [x] TransactionFilters (search input, type toggle, category dropdown)
+- [x] TransactionTable (date-grouped sections, hover action buttons)
+- [x] TransactionForm (type toggle, amount with live IDR formatting, all fields)
+- [x] Summary strip (income/expense/net in 3-cell card)
+- [x] Sheet slide-over for add/edit
+- [x] CategoryChip (colored dot + name badge)
+- [x] Delete transaction
+- [x] Standalone /transactions/new page
+- [ ] Toast notifications (save/delete/error feedback)
+- [ ] Delete confirmation dialog
+- [ ] Payment method filter in filter bar
+- [ ] Description autocomplete from previous entries
+- [ ] AnimatePresence for row add/remove transitions
+- [ ] FAB button on mobile for quick add
 
-### 3. Add/Edit Transaction (`/transactions/new` + Sheet panel)
-- [x] Income/Expense type toggle
-- [x] Amount input with live IDR formatting
-- [x] Date picker, description, category select, payment method select, notes
-- [x] Save/Cancel actions
+### Phase 4: Upload & Extraction (OCR)
 
-### 4. Categories & Sources (`/settings/categories`)
-- [x] Two-column layout: expense categories + income sources
-- [x] Color swatches, names, inline budget editing
-- [x] Add/delete categories
-- [x] Payment methods management section
-
-### 5. Upload & OCR (`/upload`)
-- [x] Drag-and-drop zone + file input
+- [x] Drop zone (drag-and-drop + click-to-browse)
 - [x] Image preview display
-- [x] Tesseract.js client-side processing (lazy-loaded)
-- [x] Extracted fields review form (amount, date, description, category)
-- [x] Confirm & Save creates transaction
+- [x] Tesseract.js integration (lazy-loaded dynamic import)
+- [x] Amount extraction (Rp patterns, dot/comma separators)
+- [x] Date extraction (DD/MM/YYYY patterns)
+- [x] Extracted fields review form (amount, description, date, category)
+- [x] Save as transaction
+- [ ] Extract DropZone into separate component
+- [ ] Extract OcrPreview into separate component
+- [ ] ProcessingOverlay component (spinner on image)
+- [ ] ConfidenceBar component (green/amber/red)
+- [ ] Category auto-suggestion from merchant text matching
+- [ ] Upload history list
+- [ ] Error state with retry button
+- [ ] Progress percentage display during OCR
 
-### 6. Export (`/export`)
-- [x] Format cards: CSV, JSON
-- [x] Scope: current month / all data
-- [x] Direct browser download
+### Phase 5: Export System
 
-### 7. Settings (`/settings`)
-- [x] Theme selector: Light / Dark / System (card-based)
-- [x] Language toggle: English / Bahasa Indonesia
-- [x] Link to category management
-- [x] Data clear/reset
+- [x] CSV export (native string generation)
+- [x] JSON export
+- [x] Scope selector (current month / all data)
+- [x] Format selection cards (click to select, blue border)
+- [x] Direct browser download trigger
+- [ ] Install SheetJS (xlsx) for Excel export
+- [ ] Excel export with formatted headers and number columns
+- [ ] Install jspdf + jspdf-autotable for PDF export
+- [ ] PDF export with styled table and totals
+- [ ] Custom date range picker (start/end)
+- [ ] Export options toggles (include summary, categories, group by date)
+- [ ] Export preview table (first 5 rows)
+- [ ] Extract into FormatCard/ScopeSelector/ExportOptions components
+
+### Phase 6: Categories & Settings
+
+- [x] Expense category list with color dots and inline budget editing
+- [x] Income source list with color dots
+- [x] Payment method list with type badges
+- [x] Add category form (type, name, color palette, budget)
+- [x] Add payment method form (name, type dropdown)
+- [x] Delete category/payment method
+- [x] Theme selector (Light/Dark/System cards)
+- [x] Language toggle (English/Bahasa Indonesia cards)
+- [x] Clear all data with confirmation
+- [ ] Category icon selection
+- [ ] Drag-to-reorder categories
+- [ ] Quick language switcher in desktop navbar (EN/ID pill toggle)
+- [ ] Expanded i18n coverage (validation messages, toasts, empty states)
+
+### Phase 7: Polish & Production
+
+- [ ] Toast/Toaster component (shadcn/ui sonner or custom)
+- [ ] Skeleton loading states for all pages
+- [ ] Error boundaries for each page
+- [ ] Accessibility audit (ARIA labels, keyboard navigation, focus management, contrast)
+- [ ] Meta tags, OG tags, favicon
+- [ ] Performance audit (lazy-load heavy pages, tree-shake Recharts)
+- [ ] Responsive breakpoint testing (1440px, 1024px, 768px, 375px)
+- [ ] Cross-browser testing
+- [ ] Verify `next export` static output correctness
+- [ ] Final dark mode audit (all pages, all states)
+
+---
 
 ## Project Structure
 
 ```
 src/
   app/
-    layout.tsx                # Root layout (nav, providers, fonts)
+    layout.tsx                # Root layout (fonts, providers, nav)
     page.tsx                  # Dashboard (bento grid)
     globals.css               # Tailwind v4 + design tokens
     transactions/
-      page.tsx                # Transaction list
-      new/page.tsx            # Add transaction form
-    upload/page.tsx           # OCR upload
-    export/page.tsx           # Export
+      page.tsx                # Transaction list + filters
+      new/page.tsx            # Add transaction (standalone)
+    upload/page.tsx           # OCR receipt upload
+    export/page.tsx           # Export center
     settings/
       page.tsx                # General settings
-      categories/page.tsx     # Category management
+      categories/page.tsx     # Category & payment method management
   components/
-    ui/                       # 14 shadcn/ui primitives
+    ui/                       # shadcn/ui primitives (14 components)
     layout/                   # Navbar, BottomNav, PageHeader
     dashboard/                # 9 bento widgets
     transactions/             # Table, Form, Filters, CategoryChip
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, etc.
-    providers/                # StoreProvider (Zustand + theme + locale)
+    upload/                   # DropZone, OcrPreview (to extract)
+    export/                   # FormatCard, ScopeSelector (to add)
+    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState
+    providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
     constants.ts              # Colors, defaults, nav items
     formatters.ts             # Currency/date formatting (IDR)
-    calculations.ts           # Financial computation logic
+    calculations.ts           # Financial computation functions
     storage.ts                # localStorage helpers
     data-migration.ts         # workbook.json -> typed objects
-    i18n.ts                   # EN/ID translations
+    i18n.ts                   # EN/ID translations + context
+    export-utils.ts           # CSV/Excel/PDF generation (to add)
+    utils.ts                  # cn() utility (shadcn)
   store/
     index.ts                  # Zustand store (persist middleware)
     selectors.ts              # Memoized computed selectors
   data/
     sample-data.ts            # Workbook migration entry point
-data/
-  workbook.json               # Source data (12 monthly sheets)
 ```
-
-## State Management
-
-### Zustand Store
-```typescript
-Transaction { id, date, description, category, type, amount, paymentMethod, notes }
-Category { id, name, type, color, icon, budget }
-PaymentMethod { id, name, icon, type }
-Bill { id, name, amount, dueDate, isPaid, month, year }
-SavingsGoal { id, name, targetAmount, savedAmount, color }
-UIState { selectedMonth, selectedYear, theme, locale }
-```
-
-### Memoized Selectors
-- `useMonthlyTransactions()` - Filter by selected month/year
-- `useMonthlyIncome()` / `useMonthlyExpense()` / `useMonthlyBalance()`
-- `useCategoryTotals()` / `usePaymentMethodTotals()`
-- `useBudgetStatus()` - Budget vs actual with percentage
-- `useCashFlow()` - Daily income/expense for chart
-- `useMonthlyBills()` / `useMonthlyBillsSummary()`
-- `useRecentTransactions(n)` - Last n sorted by date
 
 ## Build & Deploy
 
 ```bash
-npm run dev          # Local dev server (http://localhost:3000)
+npm run dev          # http://localhost:3000
 npm run build        # Static export to out/
 ```
 
-GitHub Actions workflow (`.github/workflows/deploy-pages.yml`):
-1. Checkout -> Setup Node 20 -> `npm ci` -> `npm run build`
-2. Upload `out/` directory -> Deploy to GitHub Pages
+GitHub Actions: Checkout -> Node 20 -> `npm ci` -> `npm run build` -> Deploy `out/` to GitHub Pages
 
-## Migration from V.01
+## Reference Documents
 
-The original spreadsheet clone (vanilla HTML/CSS/JS) remains on the `main` branch as reference. The redesign lives on the `redesign` branch. Key files preserved:
-- `data/workbook.json` - Source data used by both versions
-- `scripts/extract_xlsx.py` - Data pipeline for future XLSX imports
-- `index.html`, `script.js`, `styles.css` - Original app (main branch only)
+| Document | Purpose |
+|----------|---------|
+| [BLUEPRINT.md](./BLUEPRINT.md) | Full production blueprint (15 sections: concept, IA, nav, page specs, design system, motion, i18n, components, roadmap) |
+| [README.md](./README.md) | Project overview, getting started, tech stack |
+| `data/workbook.json` | Source data (12 monthly sheets, cell-based format) |
+| `scripts/extract_xlsx.py` | XLSX to JSON extraction pipeline |
