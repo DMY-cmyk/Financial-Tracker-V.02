@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financial Tracker V.02</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Top Header -->
+    <div class="top-header">
+      <!-- Brand Row -->
+      <div class="brand-row">
+        <div class="brand-left">
+          <div class="sheets-dot"></div>
+          <div>
+            <h1>Financial Tracker V.02</h1>
+            <div class="menu-row">
+              <button class="menu-btn" type="button">File</button>
+              <button class="menu-btn" type="button">Edit</button>
+              <button class="menu-btn" type="button">View</button>
+              <button class="menu-btn" type="button">Insert</button>
+              <button class="menu-btn" type="button">Format</button>
+              <button class="menu-btn" type="button">Data</button>
+              <button class="menu-btn" type="button">Tools</button>
+              <button class="menu-btn" type="button">Help</button>
+            </div>
+          </div>
+        </div>
+        <div class="brand-right">
+          <button class="header-btn" id="open-history" type="button">History</button>
+          <button class="header-btn" id="open-share" type="button">Share</button>
+          <button class="avatar-btn" type="button">U</button>
+        </div>
+      </div>
+
+      <!-- Toolbar Row -->
+      <div class="toolbar-row">
+        <button class="tool-btn" type="button" title="Undo">&#x21A9;</button>
+        <button class="tool-btn" type="button" title="Redo">&#x21AA;</button>
+        <div class="divider"></div>
+        <button class="tool-btn" type="button" title="Bold"><b>B</b></button>
+        <button class="tool-btn" type="button" title="Italic"><i>I</i></button>
+        <button class="tool-btn" type="button" title="Strikethrough"><s>S</s></button>
+        <div class="divider"></div>
+        <button class="tool-btn" type="button" title="Align Left">&#x2261;</button>
+        <button class="tool-btn" type="button" title="Align Center">&#x2261;</button>
+        <button class="tool-btn" type="button" title="Align Right">&#x2261;</button>
+      </div>
+
+      <!-- Formula Row -->
+      <div class="formula-row">
+        <span class="name-box" id="name-box">A1</span>
+        <span class="formula-label">fx</span>
+        <input class="formula-input" id="formula-input" type="text" placeholder="Enter formula or value" />
+      </div>
+
+      <!-- Control Row -->
+      <div class="control-row">
+        <button class="small-chip" id="freeze-row-toggle" type="button">Freeze row 1: Off</button>
+        <button class="small-chip" id="freeze-col-toggle" type="button">Freeze column A: Off</button>
+        <div class="divider"></div>
+        <button class="small-chip" id="sort-asc" type="button">Sort A&#x2192;Z</button>
+        <button class="small-chip" id="sort-desc" type="button">Sort Z&#x2192;A</button>
+        <div class="divider"></div>
+        <div class="inline-input">
+          <label for="filter-input">Filter:</label>
+          <input id="filter-input" type="text" placeholder="Search cells..." />
+          <button class="small-chip" id="clear-filter" type="button">Clear</button>
+        </div>
+        <div class="divider"></div>
+        <div class="inline-input">
+          <label for="csv-file">Import CSV:</label>
+          <input id="csv-file" type="file" accept=".csv" />
+        </div>
+        <button class="small-chip" id="export-csv" type="button">Export CSV</button>
+        <div class="divider"></div>
+        <div class="inline-input">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sheet Shell (Grid Area) -->
+    <div class="sheet-shell">
+      <div class="corner-cell"></div>
+      <div class="column-header" id="column-header"></div>
+      <div class="row-header" id="row-header"></div>
+      <div class="grid" id="grid" tabindex="0"></div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      <div class="tabs" id="tabs"></div>
+      <span class="status-right" id="selection-label">Sheet 1 - A1</span>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <dialog class="modal" id="share-modal">
+    <h3>Share this spreadsheet</h3>
+    <p>Copy the link below to share:</p>
+    <input type="text" value="" style="width:100%;padding:6px;margin:8px 0;" readonly onfocus="this.value=location.href;this.select();" />
+    <button data-close-modal="share-modal" type="button">Close</button>
+  </dialog>
+
+  <!-- History Modal -->
+  <dialog class="modal" id="history-modal">
+    <h3>Version History</h3>
+    <p>No version history available for static deployment.</p>
+    <button data-close-modal="history-modal" type="button">Close</button>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
