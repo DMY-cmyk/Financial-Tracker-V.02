@@ -190,6 +190,21 @@ function renderHeaders() {
   }
 }
 
+function detectHeaderRows(sheet) {
+  const headers = new Set();
+  for (let r = 0; r < sheetRowCount(sheet); r++) {
+    for (let c = 0; c < Math.min(sheetColCount(sheet), 8); c++) {
+      const val = getCell(sheet, r, c).display.trim();
+      if (val && val.length > 3 && val === val.toUpperCase() && !/^\d/.test(val) && !/^#/.test(val) && !/^TRUE$|^FALSE$/i.test(val)) {
+        headers.add(r);
+        if (r + 1 < sheetRowCount(sheet)) headers.add(r + 1);
+        break;
+      }
+    }
+  }
+  return headers;
+}
+
 function renderGrid() {
   const sheet = currentSheet();
   const visibleRows = getVisibleRows(sheet);
@@ -204,8 +219,7 @@ function renderGrid() {
   inner.style.width = `${totalWidth}px`;
   inner.style.height = `${totalHeight}px`;
 
-  const headerRows = new Set([2, 3, 8, 9, 11, 15, 16, 31, 47, 49]);
-  const billCheckboxRows = { min: 50, max: 66 };
+  const headerRows = detectHeaderRows(sheet);
 
   for (const realRow of visibleRows) {
     for (let c = 0; c < sheetColCount(sheet); c++) {
@@ -217,18 +231,18 @@ function renderGrid() {
 
       const display = cell.display;
 
-      if (realRow >= billCheckboxRows.min && realRow <= billCheckboxRows.max && c === 1 && (display === "TRUE" || display === "FALSE")) {
+      if (display === "TRUE" || display === "FALSE") {
         const cb = document.createElement("input");
         cb.type = "checkbox";
         cb.checked = display === "TRUE";
-        cb.disabled = true;
+        cb.addEventListener("change", () => {
+          cell.raw = cb.checked ? "TRUE" : "FALSE";
+          render();
+        });
         cellEl.classList.add("checkbox-cell");
         cellEl.appendChild(cb);
       } else {
         const num = Number(display);
-        if (display !== "" && Number.isFinite(num) && !/^\d+$/.test(display.trim()) === false) {
-          cellEl.textContent = display;
-        }
         if (display !== "" && Number.isFinite(num) && !Number.isInteger(num)) {
           cellEl.textContent = num.toLocaleString("id-ID", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
           cellEl.classList.add("number");
@@ -1098,6 +1112,11 @@ async function init() {
   setSelection(0, 0, 0, 0);
   render();
   elements.grid.focus();
+
+  elements.grid.addEventListener("scroll", () => {
+    elements.columnHeader.scrollLeft = elements.grid.scrollLeft;
+    elements.rowHeader.scrollTop = elements.grid.scrollTop;
+  });
 }
 
 init();

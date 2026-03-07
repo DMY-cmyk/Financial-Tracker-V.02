@@ -14,6 +14,7 @@
   --select-bg: #e8f0fe;
   --comment-dot: #f29900;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --gradient-start: #d4e4ff;
 }
 
 :root[data-theme="dark"] {
@@ -31,6 +32,7 @@
   --row-col-bg: #303134;
   --select-bg: #1b3f6f;
   --comment-dot: #fbbc04;
+  --gradient-start: #1a1a2e;
 }
 
 * {
@@ -42,7 +44,7 @@ body {
   height: 100%;
   margin: 0;
   font-family: Roboto, sans-serif;
-  background: radial-gradient(circle at top, #d4e4ff, var(--app-bg) 35%);
+  background: radial-gradient(circle at top, var(--gradient-start), var(--app-bg) 35%);
   color: var(--text-main);
 }
 

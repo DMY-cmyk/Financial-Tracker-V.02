@@ -5,14 +5,17 @@ A static HTML/CSS/JS clone of a personal monthly budgeting spreadsheet, designed
 ## Features
 
 - **12 Monthly Tabs** - JAN through DES with independent data
-- **Formula Engine** - SUM, AVERAGE, IF, SUMIF, COUNTIF, IFERROR, NOW
-- **Interactive Grid** - Cell selection, keyboard navigation, inline editing
-- **Bills Checkboxes** - TRUE/FALSE values rendered as checkboxes
+- **Formula Engine** - SUM, AVERAGE, IF, SUMIF, COUNTIF, IFERROR, NOW with circular reference detection
+- **Interactive Grid** - Cell selection, keyboard navigation (Arrow/Tab/Enter), inline editing
+- **Interactive Checkboxes** - TRUE/FALSE values rendered as toggleable checkboxes
 - **Number Formatting** - Locale-aware thousand separators (id-ID)
+- **Dynamic Headers** - Auto-detects and styles section header rows
 - **Freeze Rows/Columns** - Sticky headers for easier navigation
-- **Filter & Sort** - Text filtering and column sorting
+- **Scroll Sync** - Column and row headers scroll in sync with the grid
+- **Filter & Sort** - Text filtering across all columns, ascending/descending sort
 - **CSV Import/Export** - Load data from CSV or export current sheet
-- **Light/Dark Theme** - Toggle between light and dark modes
+- **Light/Dark Theme** - Toggle between light and dark modes with localStorage persistence
+- **Cell Comments** - Hover popovers for cells with comments
 - **Responsive Layout** - Adapts to different screen sizes
 
 ## Local Development
@@ -36,9 +39,26 @@ pip install openpyxl
 python scripts/extract_xlsx.py
 ```
 
+## Project Structure
+
+```
+├── index.html                          # Main HTML page
+├── script.js                           # Spreadsheet engine & UI logic
+├── styles.css                          # Google Sheets-style theming
+├── data/
+│   └── workbook.json                   # Extracted spreadsheet data (12 months)
+├── scripts/
+│   └── extract_xlsx.py                 # XLSX to JSON extraction script
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml            # GitHub Pages auto-deployment
+├── Plan.md                             # Implementation plan & checklist
+└── README.md
+```
+
 ## Deployment
 
-Pushes to `main` trigger GitHub Pages deployment via `.github/workflows/deploy-pages.yml`. The site is served as a static page.
+Pushes to `main` trigger GitHub Pages deployment via `.github/workflows/deploy-pages.yml`. The site is served as a static page with no build step required.
 
 ## Tech Stack
 
