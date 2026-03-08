@@ -90,12 +90,14 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Delete transaction
 - [x] Standalone /transactions/new page (with back navigation + description)
 - [x] Empty state with CTA button when no transactions match filters
-- [ ] Toast notifications (save/delete/error feedback)
-- [ ] Delete confirmation dialog
+- [x] Toast notifications (save/delete feedback via Sonner)
+- [x] Delete confirmation dialog (shadcn AlertDialog via ConfirmDialog component)
+- [x] Form validation with inline field errors and bilingual messages
+- [x] FAB button on mobile for quick add
+- [x] Framer Motion entrance animations on page sections
 - [ ] Payment method filter in filter bar
 - [ ] Description autocomplete from previous entries
 - [ ] AnimatePresence for row add/remove transitions
-- [ ] FAB button on mobile for quick add
 
 ### Phase 4: Upload & Extraction (OCR)
 
@@ -132,10 +134,14 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] ExportActionBar component (transaction count, format label, download button)
 - [x] Export page rewrite using modular components with full pipeline
 - [x] "Coming soon" overlay for unavailable formats (xlsx, pdf)
-- [ ] Install SheetJS (xlsx) for Excel export
-- [ ] Excel export with formatted headers and number columns
-- [ ] Install jspdf + jspdf-autotable for PDF export
-- [ ] PDF export with styled table and totals
+- [x] SheetJS (xlsx) installed and integrated for Excel export
+- [x] Excel export with formatted headers, column widths, and summary sheet
+- [x] jsPDF + jspdf-autotable installed and integrated for PDF export
+- [x] PDF export with styled table, summary section, and metadata
+- [x] Export utilities in `src/lib/export-utils.ts`
+- [x] All 4 formats working (CSV, JSON, Excel, PDF)
+- [x] Toast feedback for export success/failure
+- [x] Framer Motion entrance animations on export sections
 - [ ] Custom date range picker (start/end)
 
 ### Phase 6: Categories & Settings
@@ -168,12 +174,29 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] LANGUAGE_OPTIONS, EXPORT_FORMATS, UPLOAD constants in mock-data
 - [x] i18n expanded to ~80+ keys (navigation, dashboard, actions, states, settings, export, upload, validation)
 
-### Phase 7: Polish & Production
+### Batch 3: Polish & Production Foundations
 
-- [ ] Toast/Toaster component (shadcn/ui sonner or custom)
-- [ ] Skeleton loading states for all pages
+- [x] Sonner Toaster integrated in root layout (save/delete/export feedback)
+- [x] ConfirmDialog component (reusable AlertDialog for destructive actions)
+- [x] Replace all `window.confirm()` with ConfirmDialog
+- [x] Skeleton loading states (PageSkeleton, SummaryCardSkeleton, ChartCardSkeleton, ListSkeleton, CardSkeleton, TransactionRowSkeleton)
+- [x] EmptyState, NoResults, and InlineError shared components
+- [x] Form validation library (`src/lib/validation.ts`) with bilingual messages
+- [x] TransactionForm validation with inline field errors
+- [x] Export utilities (`src/lib/export-utils.ts`) — CSV, JSON, Excel, PDF
+- [x] API boundary placeholders (`src/lib/services.ts`)
+- [x] Custom hooks: useDashboardData, useTransactions, useUpload, useExport
+- [x] Enhanced motion presets (staggerGrid, staggerList, hoverLift, panelVariants)
+- [x] StaggerList/StaggerItem components for reusable list animation
+- [x] Motion applied to Dashboard, Transactions, Upload, Export, Settings pages
+- [x] Accessibility: ARIA labels, role attributes, aria-checked, aria-invalid, aria-describedby
+- [x] Responsive refinement: mobile padding, grid gaps, form layouts, FAB placement
+- [x] CLAUDE.md project instruction draft
+- [x] shadcn/ui alert-dialog and sonner primitives added
+
+### Phase 7: Remaining Polish
+
 - [ ] Error boundaries for each page
-- [ ] Accessibility audit (ARIA labels, keyboard navigation, focus management, contrast)
 - [ ] Meta tags, OG tags, favicon
 - [ ] Performance audit (lazy-load heavy pages, tree-shake Recharts)
 - [ ] Responsive breakpoint testing (1440px, 1024px, 768px, 375px)
@@ -200,14 +223,14 @@ src/
       page.tsx                # General settings
       categories/page.tsx     # Category & payment method management
   components/
-    ui/                       # shadcn/ui primitives (14 components)
+    ui/                       # shadcn/ui primitives (16 components incl. alert-dialog, sonner)
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, Navbar, PageHeader
     dashboard/                # 9 bento widgets
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
     settings/                 # SettingsSection
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, MotionWrapper, LanguageSwitcher
+    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
@@ -220,8 +243,15 @@ src/
     design-tokens.ts          # Design token constants (colors, motion, typography)
     mock-data.ts              # Quick actions, empty messages, language options, export formats, upload constants
     motion.ts                 # Framer Motion animation presets (fadeIn, stagger, spring, ease)
-    export-utils.ts           # CSV/Excel/PDF generation (to add)
+    export-utils.ts           # CSV/Excel/PDF generation
+    validation.ts             # Form validation schemas (bilingual)
+    services.ts               # API boundary placeholders
     utils.ts                  # cn() utility (shadcn)
+  hooks/
+    useDashboardData.ts       # Dashboard data hook
+    useTransactions.ts        # Transactions CRUD + filters hook
+    useUpload.ts              # Upload/OCR state hook
+    useExport.ts              # Export jobs hook
   store/
     index.ts                  # Zustand store (persist middleware)
     selectors.ts              # Memoized computed selectors

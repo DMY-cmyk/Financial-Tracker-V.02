@@ -28,8 +28,12 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Date-grouped list with category color chips
 - [x] Slide-over Sheet form with live IDR formatting
 - [x] TransactionSummary component (income / expense / net balance)
-- [x] Empty state with CTA when no results
-- [x] Back navigation on add transaction page
+- [x] Empty state and no-results state with clear filters
+- [x] Form validation with inline field errors (bilingual)
+- [x] Delete confirmation dialog (AlertDialog)
+- [x] Toast feedback (save/delete)
+- [x] Mobile FAB for quick add
+- [x] Framer Motion entrance animations
 
 ### Upload & OCR
 - [x] Drag-and-drop receipt image upload (enhanced DropZone with drag state feedback)
@@ -43,12 +47,13 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 ### Export
 - [x] CSV and JSON export
 - [x] Scope: current month or all data
-- [x] Format selection with "Coming soon" indicators for xlsx/pdf
+- [x] Format selection (CSV, JSON, Excel, PDF)
 - [x] Export options (include summary, group by date)
 - [x] Transaction preview table
+- [x] Excel export via SheetJS (formatted workbook with summary sheet)
+- [x] PDF export via jsPDF (styled report with summary and table)
+- [x] Toast feedback for export success/failure
 - [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
-- [ ] Excel (.xlsx) export
-- [ ] PDF export
 - [ ] Custom date range
 
 ### Settings
@@ -57,16 +62,24 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Category & payment method management (CRUD, color picker, budget)
 - [x] Data management section (export link, import placeholder, clear/reset)
 - [x] SaaS-style sectioned layout with SettingsSection component
-- [x] Compact LanguageSwitcher pill toggle
+- [x] Delete confirmation dialog (replaces browser confirm)
+- [x] Toast feedback for data clear
 
 ### Design System
 - [x] Custom color palette (Blue primary, Emerald income, Red expense, Amber warning)
 - [x] Plus Jakarta Sans (UI) + JetBrains Mono (currency)
 - [x] Light and dark mode with CSS variable theming
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
-- [x] Motion presets library (fadeIn, stagger, spring, ease curves)
-- [x] MotionWrapper component for reusable Framer Motion animations
+- [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
+- [x] Reusable animation components (MotionWrapper, StaggerList)
 - [x] i18n dictionary with ~80+ keys (EN/ID bilingual)
+- [x] Skeleton loading states (page, card, chart, list, transaction row)
+- [x] Empty/NoResults/InlineError shared state components
+- [x] ConfirmDialog for destructive actions
+- [x] Sonner toast system for feedback
+- [x] Form validation with bilingual error messages
+- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport)
+- [x] API boundary placeholders (services.ts)
 
 ## Tech Stack
 
@@ -79,6 +92,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 | **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
+| **Export** | SheetJS (xlsx), jsPDF (pdf), native CSV/JSON |
+| **Toasts** | Sonner |
 | **Fonts** | Plus Jakarta Sans + JetBrains Mono |
 
 ## Getting Started
@@ -110,10 +125,11 @@ src/
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
     settings/                 # SettingsSection
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
-    shared/                   # SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay, MotionWrapper, LanguageSwitcher
+    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider (state + theme + locale)
-    ui/                       # 14 shadcn/ui primitives
-  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens, mock-data, motion
+    ui/                       # 16 shadcn/ui primitives (incl. alert-dialog, sonner)
+  hooks/                      # useDashboardData, useTransactions, useUpload, useExport
+  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, design-tokens, mock-data
   store/                      # Zustand store + memoized selectors
 ```
 
@@ -124,6 +140,7 @@ src/
 | [BLUEPRINT.md](./BLUEPRINT.md) | Full production blueprint - concept rationale, information architecture, navigation, detailed page specs, design system, motion system, bilingual UX, component architecture, folder structure, implementation roadmap, dashboard layout specification |
 | [WIREFRAMES.md](./WIREFRAMES.md) | Wireframe definitions, ASCII wireframes, component map (37 components), folder tree, build recommendations |
 | [Plan.md](./Plan.md) | Implementation checklist with phase-by-phase status tracking |
+| [CLAUDE.md](./CLAUDE.md) | Project instructions for Claude Code — product goals, UX constraints, coding conventions, anti-patterns |
 
 ## Data Pipeline
 
