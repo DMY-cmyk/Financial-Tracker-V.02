@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
   const handleClearData = () => {
     clearAllData();
-    toast.success(locale === 'id' ? 'Semua data dihapus' : 'All data cleared');
+    toast.success(t(locale, 'dataClearedToast'));
     setClearDialogOpen(false);
     window.location.reload();
   };
@@ -187,9 +187,9 @@ export default function SettingsPage() {
       <ConfirmDialog
         open={clearDialogOpen}
         onOpenChange={setClearDialogOpen}
-        title={locale === 'id' ? 'Hapus Semua Data' : 'Clear All Data'}
+        title={t(locale, 'clearData')}
         description={t(locale, 'confirmDelete')}
-        confirmLabel={locale === 'id' ? 'Hapus Semua' : 'Clear All'}
+        confirmLabel={t(locale, 'clear')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={handleClearData}
       />

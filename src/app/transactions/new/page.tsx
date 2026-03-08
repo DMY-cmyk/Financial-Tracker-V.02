@@ -21,13 +21,11 @@ export default function NewTransactionPage() {
           className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {locale === 'id' ? 'Kembali ke Transaksi' : 'Back to Transactions'}
+          {t(locale, 'backToTransactions')}
         </Link>
         <PageHeader
           title={t(locale, 'addTransaction')}
-          description={
-            locale === 'id' ? 'Catat transaksi baru' : 'Record a new income or expense transaction'
-          }
+          description={t(locale, 'recordTransaction')}
         />
       </motion.div>
 

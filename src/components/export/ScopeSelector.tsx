@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { t, useLocale } from '@/lib/i18n';
 
 interface ScopeSelectorProps {
   scope: 'current' | 'all';
@@ -13,6 +14,8 @@ export function ScopeSelector({
   monthLabel,
   transactionCount,
 }: ScopeSelectorProps) {
+  const locale = useLocale();
+
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
@@ -24,7 +27,7 @@ export function ScopeSelector({
             : 'bg-muted/50 hover:bg-muted border-transparent'
         )}
       >
-        <p className="text-sm font-semibold">This Month</p>
+        <p className="text-sm font-semibold">{t(locale, 'thisMonth')}</p>
         <p className="text-muted-foreground text-xs">{monthLabel}</p>
       </button>
       <button
@@ -36,8 +39,10 @@ export function ScopeSelector({
             : 'bg-muted/50 hover:bg-muted border-transparent'
         )}
       >
-        <p className="text-sm font-semibold">All Data</p>
-        <p className="text-muted-foreground text-xs">{transactionCount} transactions</p>
+        <p className="text-sm font-semibold">{t(locale, 'all')}</p>
+        <p className="text-muted-foreground text-xs">
+          {transactionCount} {t(locale, 'transactions').toLowerCase()}
+        </p>
       </button>
     </div>
   );

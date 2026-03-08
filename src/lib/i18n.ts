@@ -154,6 +154,32 @@ type TranslationKeys = {
   clearFilters: string;
   and: string;
   more: string;
+  delete: string;
+  edit: string;
+  add: string;
+  name: string;
+  transactionType: string;
+  previousYear: string;
+  nextYear: string;
+  clearFile: string;
+  receiptPreview: string;
+  uploadAnother: string;
+  failedExtract: string;
+  noTransactionsMatch: string;
+  backToTransactions: string;
+  recordTransaction: string;
+  transactionCount: string;
+  expenseCategories: string;
+  incomeSources: string;
+  addCategory: string;
+  categoryName: string;
+  methodName: string;
+  transactionUpdated: string;
+  transactionAdded: string;
+  failedSave: string;
+  exportFailed: string;
+  fixExtractedErrors: string;
+  savedFromReceipt: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -277,6 +303,32 @@ const translations: Record<Locale, TranslationKeys> = {
     clearFilters: 'Clear Filters',
     and: 'and',
     more: 'more',
+    delete: 'Delete',
+    edit: 'Edit',
+    add: 'Add',
+    name: 'Name',
+    transactionType: 'Transaction type',
+    previousYear: 'Previous year',
+    nextYear: 'Next year',
+    clearFile: 'Clear file',
+    receiptPreview: 'Receipt preview',
+    uploadAnother: 'Upload Another',
+    failedExtract: 'Failed to extract text',
+    noTransactionsMatch: 'No transactions match your filters',
+    backToTransactions: 'Back to Transactions',
+    recordTransaction: 'Record a new income or expense transaction',
+    transactionCount: 'transactions this month',
+    expenseCategories: 'Expense Categories',
+    incomeSources: 'Income Sources',
+    addCategory: 'Add Category',
+    categoryName: 'Category name',
+    methodName: 'Method name',
+    transactionUpdated: 'Transaction updated',
+    transactionAdded: 'Transaction added',
+    failedSave: 'Failed to save',
+    exportFailed: 'Export failed',
+    fixExtractedErrors: 'Please fix extracted data errors',
+    savedFromReceipt: 'Transaction saved from receipt',
   },
   id: {
     dashboard: 'Dasbor',
@@ -398,6 +450,32 @@ const translations: Record<Locale, TranslationKeys> = {
     clearFilters: 'Hapus Filter',
     and: 'dan',
     more: 'lainnya',
+    delete: 'Hapus',
+    edit: 'Edit',
+    add: 'Tambah',
+    name: 'Nama',
+    transactionType: 'Tipe transaksi',
+    previousYear: 'Tahun sebelumnya',
+    nextYear: 'Tahun berikutnya',
+    clearFile: 'Hapus file',
+    receiptPreview: 'Pratinjau struk',
+    uploadAnother: 'Unggah Lagi',
+    failedExtract: 'Gagal mengekstrak teks',
+    noTransactionsMatch: 'Tidak ada transaksi yang cocok dengan filter',
+    backToTransactions: 'Kembali ke Transaksi',
+    recordTransaction: 'Catat transaksi baru',
+    transactionCount: 'transaksi bulan ini',
+    expenseCategories: 'Kategori Pengeluaran',
+    incomeSources: 'Sumber Pemasukan',
+    addCategory: 'Tambah Kategori',
+    categoryName: 'Nama kategori',
+    methodName: 'Nama metode',
+    transactionUpdated: 'Transaksi diperbarui',
+    transactionAdded: 'Transaksi ditambahkan',
+    failedSave: 'Gagal menyimpan',
+    exportFailed: 'Ekspor gagal',
+    fixExtractedErrors: 'Periksa data yang diekstrak',
+    savedFromReceipt: 'Transaksi disimpan dari struk',
   },
 };
 

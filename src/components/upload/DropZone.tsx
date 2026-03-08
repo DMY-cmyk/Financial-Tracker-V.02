@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Upload, ImagePlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { t, useLocale } from '@/lib/i18n';
 
 interface DropZoneProps {
   onFileSelect: (file: File) => void;
@@ -14,6 +15,7 @@ interface DropZoneProps {
 export function DropZone({ onFileSelect, accept = 'image/*', className, disabled }: DropZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const locale = useLocale();
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -46,12 +48,23 @@ export function DropZone({ onFileSelect, accept = 'image/*', className, disabled
     if (inputRef.current) inputRef.current.value = '';
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+      e.preventDefault();
+      inputRef.current?.click();
+    }
+  };
+
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={t(locale, 'dropHere')}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onClick={() => !disabled && inputRef.current?.click()}
+      onKeyDown={handleKeyDown}
       className={cn(
         'flex h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-200',
         isDragOver
@@ -63,15 +76,15 @@ export function DropZone({ onFileSelect, accept = 'image/*', className, disabled
     >
       {isDragOver ? (
         <>
-          <ImagePlus className="text-primary mb-3 h-10 w-10" />
-          <p className="text-primary text-sm font-medium">Drop to upload</p>
+          <ImagePlus className="text-primary mb-3 h-10 w-10" aria-hidden="true" />
+          <p className="text-primary text-sm font-medium">{t(locale, 'dropHere')}</p>
         </>
       ) : (
         <>
-          <Upload className="text-muted-foreground mb-3 h-10 w-10" />
-          <p className="text-sm font-medium">Drop receipt image here</p>
-          <p className="text-muted-foreground mt-1 text-xs">or click to browse</p>
-          <p className="text-muted-foreground/60 mt-2 text-[10px]">PNG, JPG, WebP up to 10MB</p>
+          <Upload className="text-muted-foreground mb-3 h-10 w-10" aria-hidden="true" />
+          <p className="text-sm font-medium">{t(locale, 'dropHere')}</p>
+          <p className="text-muted-foreground mt-1 text-xs">{t(locale, 'orClickBrowse')}</p>
+          <p className="text-muted-foreground/60 mt-2 text-[10px]">PNG, JPG, WebP</p>
         </>
       )}
       <input

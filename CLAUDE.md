@@ -84,7 +84,7 @@ src/store/        — Zustand store and memoized selectors
 - Derived/computed values via custom hooks or selectors, not in components
 
 ### Internationalization
-- Translation dictionary in `src/lib/i18n.ts` (~110+ keys)
+- Translation dictionary in `src/lib/i18n.ts` (~140+ keys)
 - Use `t(locale, 'key')` for translations
 - Always add both EN and ID entries for new keys
 - Keep strings short and clear for both languages

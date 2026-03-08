@@ -72,8 +72,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Light and dark mode with CSS variable theming
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 - [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
-- [x] Reusable animation components (MotionWrapper, StaggerList)
-- [x] i18n dictionary with ~110+ keys (EN/ID bilingual)
+- [x] Motion presets (fadeIn, stagger, spring, panel variants, ease curves)
+- [x] i18n dictionary with ~140+ keys (EN/ID bilingual)
 - [x] Skeleton loading states (page, card, chart, list, transaction row)
 - [x] Empty/NoResults/InlineError shared state components
 - [x] ConfirmDialog for destructive actions
@@ -84,7 +84,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
 - [x] App-level error boundary and custom 404 page
 - [x] Skip link for keyboard navigation
-- [x] ARIA landmarks, aria-current, aria-label on navigation
+- [x] ARIA landmarks, aria-current, aria-label on all interactive elements
+- [x] Keyboard-accessible drop zones and action buttons
 - [x] Enhanced metadata (title template, OG tags)
 
 ## Tech Stack
@@ -136,17 +137,17 @@ src/
     settings/page.tsx         #   Theme, language, data
     settings/categories/      #   Category & payment method CRUD
   components/
-    dashboard/                # 9 bento widgets
+    dashboard/                # 8 bento widgets
     transactions/             # Table, form, filters, category chip
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
-    settings/                 # SettingsSection
+    settings/                 # SettingsSection, ImportDialog
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
-    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
+    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, QuickActionButton, ProgressRing
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 16 shadcn/ui primitives (incl. alert-dialog, sonner)
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
-  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, import-utils, category-suggest, design-tokens, mock-data
+  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, import-utils, category-suggest, mock-data
   store/                      # Zustand store + memoized selectors
 ```
 

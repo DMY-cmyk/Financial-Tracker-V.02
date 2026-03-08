@@ -65,14 +65,14 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     try {
       if (transaction) {
         updateTransaction(transaction.id, data);
-        toast.success(locale === 'id' ? 'Transaksi diperbarui' : 'Transaction updated');
+        toast.success(t(locale, 'transactionUpdated'));
       } else {
         addTransaction(data);
-        toast.success(locale === 'id' ? 'Transaksi ditambahkan' : 'Transaction added');
+        toast.success(t(locale, 'transactionAdded'));
       }
       onClose();
     } catch {
-      toast.error(locale === 'id' ? 'Gagal menyimpan' : 'Failed to save');
+      toast.error(t(locale, 'failedSave'));
     } finally {
       setSubmitting(false);
     }
@@ -86,7 +86,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       <div
         className="border-border flex rounded-lg border p-1"
         role="radiogroup"
-        aria-label="Transaction type"
+        aria-label={t(locale, 'transactionType')}
       >
         {(['expense', 'income'] as const).map((tp) => (
           <button

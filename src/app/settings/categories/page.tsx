@@ -57,9 +57,7 @@ export default function CategoriesPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Expense Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
-          <h3 className="mb-4 text-sm font-semibold">
-            {locale === 'id' ? 'Kategori Pengeluaran' : 'Expense Categories'}
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'expenseCategories')}</h3>
           <div className="space-y-2">
             {expenseCategories.map((c) => (
               <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
@@ -79,6 +77,7 @@ export default function CategoriesPage() {
                   size="icon"
                   className="text-destructive h-7 w-7"
                   onClick={() => deleteCategory(c.id)}
+                  aria-label={t(locale, 'delete')}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -89,9 +88,7 @@ export default function CategoriesPage() {
 
         {/* Income Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
-          <h3 className="mb-4 text-sm font-semibold">
-            {locale === 'id' ? 'Sumber Pemasukan' : 'Income Sources'}
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'incomeSources')}</h3>
           <div className="space-y-2">
             {incomeCategories.map((c) => (
               <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
@@ -102,6 +99,7 @@ export default function CategoriesPage() {
                   size="icon"
                   className="text-destructive h-7 w-7"
                   onClick={() => deleteCategory(c.id)}
+                  aria-label={t(locale, 'delete')}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -113,9 +111,7 @@ export default function CategoriesPage() {
 
       {/* Add Category */}
       <div className="border-border bg-card rounded-2xl border p-6">
-        <h3 className="mb-4 text-sm font-semibold">
-          {locale === 'id' ? 'Tambah Kategori' : 'Add Category'}
-        </h3>
+        <h3 className="mb-4 text-sm font-semibold">{t(locale, 'addCategory')}</h3>
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">{t(locale, 'type')}</label>
@@ -129,13 +125,11 @@ export default function CategoriesPage() {
             </select>
           </div>
           <div className="min-w-[120px] flex-1">
-            <label className="text-muted-foreground mb-1 block text-xs">
-              {locale === 'id' ? 'Nama' : 'Name'}
-            </label>
+            <label className="text-muted-foreground mb-1 block text-xs">{t(locale, 'name')}</label>
             <Input
               value={newCatName}
               onChange={(e) => setNewCatName(e.target.value)}
-              placeholder={locale === 'id' ? 'Nama kategori' : 'Category name'}
+              placeholder={t(locale, 'categoryName')}
             />
           </div>
           <div className="flex gap-1">
@@ -162,7 +156,7 @@ export default function CategoriesPage() {
             </div>
           )}
           <Button onClick={handleAddCategory} className="gap-1">
-            <Plus className="h-4 w-4" /> {locale === 'id' ? 'Tambah' : 'Add'}
+            <Plus className="h-4 w-4" /> {t(locale, 'add')}
           </Button>
         </div>
       </div>
@@ -182,6 +176,7 @@ export default function CategoriesPage() {
                 size="icon"
                 className="text-destructive h-7 w-7"
                 onClick={() => deletePaymentMethod(m.id)}
+                aria-label={t(locale, 'delete')}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -193,7 +188,7 @@ export default function CategoriesPage() {
             <Input
               value={newMethodName}
               onChange={(e) => setNewMethodName(e.target.value)}
-              placeholder={locale === 'id' ? 'Nama metode' : 'Method name'}
+              placeholder={t(locale, 'methodName')}
             />
           </div>
           <select
@@ -206,7 +201,7 @@ export default function CategoriesPage() {
             <option value="ewallet">E-Wallet</option>
           </select>
           <Button onClick={handleAddMethod} className="gap-1">
-            <Plus className="h-4 w-4" /> {locale === 'id' ? 'Tambah' : 'Add'}
+            <Plus className="h-4 w-4" /> {t(locale, 'add')}
           </Button>
         </div>
       </div>
