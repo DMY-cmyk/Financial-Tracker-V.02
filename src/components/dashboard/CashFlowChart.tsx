@@ -18,19 +18,19 @@ export function CashFlowChart() {
   const data = useCashFlow();
   const locale = useLocale();
 
-  const filtered = data.filter(d => d.income > 0 || d.expense > 0);
+  const filtered = data.filter((d) => d.income > 0 || d.expense > 0);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
-      className="rounded-2xl border border-border bg-card p-6"
+      className="border-border bg-card rounded-2xl border p-6"
     >
       <h3 className="mb-4 text-sm font-semibold">{t(locale, 'cashFlow')}</h3>
       <div className="h-56">
         {filtered.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
             {t(locale, 'noData')}
           </div>
         ) : (

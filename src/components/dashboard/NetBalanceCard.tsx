@@ -13,8 +13,8 @@ export function NetBalanceCard() {
   const balance = useMonthlyBalance();
   const income = useMonthlyIncome();
   const expense = useMonthlyExpense();
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
 
   return (
@@ -22,12 +22,12 @@ export function NetBalanceCard() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="relative overflow-hidden rounded-2xl border border-border bg-card p-6"
+      className="border-border bg-card relative overflow-hidden rounded-2xl border p-6"
     >
-      <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/5" />
-      <div className="absolute -right-4 top-4 h-16 w-16 rounded-full bg-primary/10" />
+      <div className="bg-primary/5 absolute -top-8 -right-8 h-32 w-32 rounded-full" />
+      <div className="bg-primary/10 absolute top-4 -right-4 h-16 w-16 rounded-full" />
 
-      <p className="text-sm font-medium text-muted-foreground">
+      <p className="text-muted-foreground text-sm font-medium">
         {t(locale, 'netBalance')} &middot; {MONTH_NAMES[month]} {year}
       </p>
 

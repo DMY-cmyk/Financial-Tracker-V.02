@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { MONTH_NAMES } from '@/lib/constants';
 import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/lib/motion';
@@ -15,17 +16,29 @@ import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { PageSkeleton, SummaryCardSkeleton, ChartCardSkeleton, CardSkeleton } from '@/components/shared/Skeletons';
-import { Wallet, TrendingUp, TrendingDown, PiggyBank, Plus, Upload, Download, BarChart3 } from 'lucide-react';
+import { PageSkeleton } from '@/components/shared/Skeletons';
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  PiggyBank,
+  Plus,
+  Upload,
+  Download,
+  BarChart3,
+} from 'lucide-react';
 
 export default function DashboardPage() {
-  const {
-    month, year, balance, income, expense, savingsRate,
-    isLoading, isEmpty,
-  } = useDashboardData();
+  const locale = useLocale();
+  const { month, year, balance, income, expense, savingsRate, isLoading, isEmpty } =
+    useDashboardData();
 
   if (isLoading) {
-    return <div className="mx-auto max-w-7xl"><PageSkeleton /></div>;
+    return (
+      <div className="mx-auto max-w-7xl">
+        <PageSkeleton />
+      </div>
+    );
   }
 
   return (
@@ -36,9 +49,11 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your financial overview for {MONTH_NAMES[month]} {year}
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{t(locale, 'dashboard')}</h1>
+        <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
+          {locale === 'id'
+            ? `Ringkasan keuangan untuk ${MONTH_NAMES[month]} ${year}`
+            : `Your financial overview for ${MONTH_NAMES[month]} ${year}`}
         </p>
       </motion.div>
 
@@ -51,7 +66,7 @@ export default function DashboardPage() {
       >
         <motion.div variants={staggerGridItem}>
           <SummaryCard
-            label="Net Balance"
+            label={t(locale, 'netBalance')}
             value={formatCurrency(balance)}
             icon={Wallet}
             color="default"
@@ -59,7 +74,7 @@ export default function DashboardPage() {
         </motion.div>
         <motion.div variants={staggerGridItem}>
           <SummaryCard
-            label="Income"
+            label={t(locale, 'income')}
             value={formatCurrency(income)}
             icon={TrendingUp}
             color="success"
@@ -67,7 +82,7 @@ export default function DashboardPage() {
         </motion.div>
         <motion.div variants={staggerGridItem}>
           <SummaryCard
-            label="Expenses"
+            label={t(locale, 'totalExpense')}
             value={formatCurrency(expense)}
             icon={TrendingDown}
             color="danger"
@@ -75,7 +90,7 @@ export default function DashboardPage() {
         </motion.div>
         <motion.div variants={staggerGridItem}>
           <SummaryCard
-            label="Savings Rate"
+            label={t(locale, 'savingsRate')}
             value={`${savingsRate}%`}
             icon={PiggyBank}
             color={savingsRate >= 20 ? 'success' : savingsRate >= 0 ? 'warning' : 'danger'}
@@ -90,16 +105,20 @@ export default function DashboardPage() {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <EmptyState
-            title="No transactions yet"
-            description="Start by adding your first transaction to see your financial overview come to life."
+            title={locale === 'id' ? 'Belum ada transaksi' : 'No transactions yet'}
+            description={
+              locale === 'id'
+                ? 'Mulai dengan menambahkan transaksi pertama Anda.'
+                : 'Start by adding your first transaction to see your financial overview come to life.'
+            }
             icon={<BarChart3 className="h-12 w-12" />}
           >
             <a
               href="/transactions/new"
-              className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 mt-2 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm"
             >
               <Plus className="h-4 w-4" />
-              Add Transaction
+              {t(locale, 'addTransaction')}
             </a>
           </EmptyState>
         </motion.div>
@@ -161,26 +180,30 @@ export default function DashboardPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.4 }}
       >
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-          Quick Actions
+        <h3 className="text-muted-foreground/70 mb-3 text-xs font-semibold tracking-wider uppercase">
+          {t(locale, 'quickActions')}
         </h3>
         <div className="grid gap-3 sm:grid-cols-3">
           <QuickActionButton
             icon={Plus}
-            label="Add Transaction"
-            description="Record income or expense"
+            label={t(locale, 'addTransaction')}
+            description={
+              locale === 'id' ? 'Catat pemasukan atau pengeluaran' : 'Record income or expense'
+            }
             href="/transactions/new"
           />
           <QuickActionButton
             icon={Upload}
-            label="Upload Receipt"
-            description="Scan and extract data"
+            label={t(locale, 'uploadReceipt')}
+            description={locale === 'id' ? 'Pindai dan ekstrak data' : 'Scan and extract data'}
             href="/upload"
           />
           <QuickActionButton
             icon={Download}
-            label="Export Data"
-            description="Download CSV, Excel, or PDF"
+            label={t(locale, 'exportData')}
+            description={
+              locale === 'id' ? 'Unduh CSV, Excel, atau PDF' : 'Download CSV, Excel, or PDF'
+            }
             href="/export"
           />
         </div>

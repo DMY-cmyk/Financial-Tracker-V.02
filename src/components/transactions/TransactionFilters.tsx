@@ -22,13 +22,13 @@ export function TransactionFilters({
   categoryFilter,
   onCategoryChange,
 }: TransactionFiltersProps) {
-  const categories = useStore(s => s.categories);
+  const categories = useStore((s) => s.categories);
   const locale = useLocale();
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="relative flex-1 min-w-[200px]">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative min-w-[200px] flex-1">
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           placeholder={`${t(locale, 'search')}...`}
           value={search}
@@ -37,7 +37,7 @@ export function TransactionFilters({
         />
       </div>
 
-      <div className="flex rounded-lg border border-border">
+      <div className="border-border flex rounded-lg border">
         {(['all', 'income', 'expense'] as const).map((type) => (
           <button
             key={type}
@@ -56,11 +56,15 @@ export function TransactionFilters({
       <select
         value={categoryFilter}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs"
+        className="border-border bg-card rounded-lg border px-3 py-1.5 text-xs"
       >
-        <option value="">{t(locale, 'all')} {t(locale, 'categories')}</option>
+        <option value="">
+          {t(locale, 'all')} {t(locale, 'categories')}
+        </option>
         {categories.map((c) => (
-          <option key={c.id} value={c.name}>{c.name}</option>
+          <option key={c.id} value={c.name}>
+            {c.name}
+          </option>
         ))}
       </select>
     </div>

@@ -7,29 +7,19 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function MonthSelector() {
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
-  const setMonth = useStore(s => s.setMonth);
-  const setYear = useStore(s => s.setYear);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
+  const setMonth = useStore((s) => s.setMonth);
+  const setYear = useStore((s) => s.setYear);
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
+    <div className="border-border bg-card rounded-2xl border p-4">
       <div className="mb-3 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => setYear(year - 1)}
-        >
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setYear(year - 1)}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="text-sm font-semibold">{year}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => setYear(year + 1)}
-        >
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setYear(year + 1)}>
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

@@ -15,7 +15,12 @@ const sizeClasses = {
   xl: 'text-3xl font-bold',
 };
 
-export function AmountDisplay({ amount, type = 'neutral', size = 'md', className }: AmountDisplayProps) {
+export function AmountDisplay({
+  amount,
+  type = 'neutral',
+  size = 'md',
+  className,
+}: AmountDisplayProps) {
   return (
     <span
       className={cn(

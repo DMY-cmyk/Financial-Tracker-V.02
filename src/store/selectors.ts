@@ -14,9 +14,9 @@ import {
 } from '@/lib/calculations';
 
 export function useMonthlyTransactions() {
-  const transactions = useStore(s => s.transactions);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const transactions = useStore((s) => s.transactions);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   return useMemo(() => filterByMonth(transactions, month, year), [transactions, month, year]);
 }
 
@@ -47,22 +47,25 @@ export function usePaymentMethodTotals() {
 
 export function useBudgetStatus() {
   const monthly = useMonthlyTransactions();
-  const categories = useStore(s => s.categories);
+  const categories = useStore((s) => s.categories);
   return useMemo(() => budgetStatus(monthly, categories), [monthly, categories]);
 }
 
 export function useCashFlow() {
-  const transactions = useStore(s => s.transactions);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
-  const monthly = useMemo(() => filterByMonth(transactions, month, year), [transactions, month, year]);
+  const transactions = useStore((s) => s.transactions);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
+  const monthly = useMemo(
+    () => filterByMonth(transactions, month, year),
+    [transactions, month, year]
+  );
   return useMemo(() => cashFlowByDate(monthly, month, year), [monthly, month, year]);
 }
 
 export function useMonthlyBills() {
-  const bills = useStore(s => s.bills);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const bills = useStore((s) => s.bills);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   return useMemo(() => billsForMonth(bills, month, year), [bills, month, year]);
 }
 
@@ -74,7 +77,10 @@ export function useMonthlyBillsSummary() {
 export function useRecentTransactions(count: number = 5) {
   const monthly = useMonthlyTransactions();
   return useMemo(
-    () => [...monthly].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, count),
+    () =>
+      [...monthly]
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, count),
     [monthly, count]
   );
 }

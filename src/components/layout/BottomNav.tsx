@@ -3,43 +3,44 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  Receipt,
-  Upload,
-  Download,
-  Settings,
-} from 'lucide-react';
+import { t, useLocale } from '@/lib/i18n';
+import { LayoutDashboard, Receipt, Upload, Download, Settings } from 'lucide-react';
 
-const items = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/transactions', label: 'Transactions', icon: Receipt },
-  { href: '/upload', label: 'Upload', icon: Upload },
-  { href: '/export', label: 'Export', icon: Download },
-  { href: '/settings', label: 'Settings', icon: Settings },
+type NavKey = 'dashboard' | 'transactions' | 'upload' | 'export' | 'settings';
+
+const items: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
+  { href: '/', key: 'dashboard', icon: LayoutDashboard },
+  { href: '/transactions', key: 'transactions', icon: Receipt },
+  { href: '/upload', key: 'upload', icon: Upload },
+  { href: '/export', key: 'export', icon: Download },
+  { href: '/settings', key: 'settings', icon: Settings },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const locale = useLocale();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md lg:hidden">
+    <nav
+      aria-label={locale === 'id' ? 'Navigasi bawah' : 'Bottom navigation'}
+      className="border-border bg-card/95 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-md lg:hidden"
+    >
       <div className="flex items-center justify-around py-2">
-        {items.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            href === '/' ? pathname === '/' : pathname.startsWith(href);
+        {items.map(({ href, key, icon: Icon }) => {
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
 
           return (
             <Link
               key={href}
               href={href}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-1 text-xs transition-colors',
                 isActive ? 'text-primary' : 'text-muted-foreground'
               )}
             >
               <Icon className="h-5 w-5" />
-              <span>{label}</span>
+              <span>{t(locale, key)}</span>
             </Link>
           );
         })}

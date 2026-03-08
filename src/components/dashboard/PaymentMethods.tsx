@@ -20,19 +20,19 @@ export function PaymentMethodsSummary() {
     .map(([name, value]) => ({ name, value, color: METHOD_COLORS[name] || '#6B7280' }))
     .sort((a, b) => b.value - a.value);
 
-  const max = Math.max(...data.map(d => d.value), 1);
+  const max = Math.max(...data.map((d) => d.value), 1);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.25 }}
-      className="rounded-2xl border border-border bg-card p-6"
+      className="border-border bg-card rounded-2xl border p-6"
     >
       <h3 className="mb-4 text-sm font-semibold">{t(locale, 'paymentMethods')}</h3>
 
       {data.length === 0 ? (
-        <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex h-20 items-center justify-center text-sm">
           {t(locale, 'noData')}
         </div>
       ) : (
@@ -41,11 +41,9 @@ export function PaymentMethodsSummary() {
             <div key={d.name}>
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="font-medium">{d.name}</span>
-                <span className="font-mono text-muted-foreground">
-                  {formatCurrency(d.value)}
-                </span>
+                <span className="text-muted-foreground font-mono">{formatCurrency(d.value)}</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
+              <div className="bg-muted h-2 overflow-hidden rounded-full">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{

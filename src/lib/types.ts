@@ -66,7 +66,13 @@ export interface QuickAction {
   icon: string;
 }
 
-export type ExtractionStatus = 'idle' | 'uploading' | 'processing' | 'extracted' | 'saved' | 'error';
+export type ExtractionStatus =
+  | 'idle'
+  | 'uploading'
+  | 'processing'
+  | 'extracted'
+  | 'saved'
+  | 'error';
 
 export interface ExtractionField {
   key: string;

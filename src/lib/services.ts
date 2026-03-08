@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // API boundary placeholders — fake async for future backend integration
 // Replace these with real API calls when backend is ready
 
@@ -5,7 +6,7 @@ import { type Transaction, type ExportFormat, type ExportScope } from './types';
 
 // Simulate network latency
 function delay(ms: number = 300): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // --- Dashboard ---
@@ -24,12 +25,12 @@ export async function fetchDashboardStats(
   transactions: Transaction[]
 ): Promise<DashboardStats> {
   await delay(100);
-  const monthly = transactions.filter(t => {
+  const monthly = transactions.filter((t) => {
     const d = new Date(t.date);
     return d.getMonth() === month && d.getFullYear() === year;
   });
-  const income = monthly.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const expense = monthly.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const income = monthly.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const expense = monthly.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   return {
     totalBalance: income - expense,
     monthlyIncome: income,
@@ -42,14 +43,14 @@ export async function fetchDashboardStats(
 // --- Transactions ---
 
 export async function saveTransaction(
-  data: Omit<Transaction, 'id'>
+  _data: Omit<Transaction, 'id'>
 ): Promise<{ success: boolean; id: string }> {
   await delay(200);
   // In real app, POST to /api/transactions
   return { success: true, id: `tx_${Date.now()}` };
 }
 
-export async function deleteTransactionRemote(id: string): Promise<{ success: boolean }> {
+export async function deleteTransactionRemote(_id: string): Promise<{ success: boolean }> {
   await delay(200);
   return { success: true };
 }
@@ -90,7 +91,7 @@ export interface OcrResponse {
   description?: string;
 }
 
-export async function processReceiptOcr(file: File): Promise<OcrResponse> {
+export async function processReceiptOcr(_file: File): Promise<OcrResponse> {
   // In real app, POST file to /api/ocr or use Tesseract.js
   await delay(1000);
   return {

@@ -18,12 +18,20 @@ import { toast } from 'sonner';
 
 export default function UploadPage() {
   const locale = useLocale();
-  const categories = useStore(s => s.categories);
+  const categories = useStore((s) => s.categories);
   const {
-    file, preview, handleFileSelect, handleClear,
-    status, confidence, ocrResult, setOcrResult,
-    processOcr, handleSave,
-    isProcessing, errors,
+    file,
+    preview,
+    handleFileSelect,
+    handleClear,
+    status,
+    confidence,
+    ocrResult,
+    setOcrResult,
+    processOcr,
+    handleSave,
+    isProcessing,
+    errors,
   } = useUpload();
 
   const onSave = () => {
@@ -31,7 +39,9 @@ export default function UploadPage() {
     if (success) {
       toast.success(locale === 'id' ? 'Transaksi disimpan' : 'Transaction saved from receipt');
     } else if (errors.length > 0) {
-      toast.error(locale === 'id' ? 'Periksa data yang diekstrak' : 'Please fix extracted data errors');
+      toast.error(
+        locale === 'id' ? 'Periksa data yang diekstrak' : 'Please fix extracted data errors'
+      );
     }
   };
 
@@ -51,7 +61,7 @@ export default function UploadPage() {
       >
         {/* Upload Zone */}
         <motion.div variants={staggerItem}>
-          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+          <div className="border-border bg-card rounded-2xl border p-4 sm:p-6">
             <h3 className="mb-4 text-sm font-semibold">{t(locale, 'uploadImage')}</h3>
 
             {!file ? (
@@ -96,7 +106,7 @@ export default function UploadPage() {
 
         {/* OCR Result Form */}
         <motion.div variants={staggerItem}>
-          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+          <div className="border-border bg-card rounded-2xl border p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold">{t(locale, 'extractedData')}</h3>
               {status === 'saved' && (
@@ -111,9 +121,7 @@ export default function UploadPage() {
               <div className="space-y-4">
                 {confidence > 0 && <ConfidenceBar confidence={confidence} />}
 
-                <p className="text-xs text-muted-foreground">
-                  {t(locale, 'reviewExtracted')}
-                </p>
+                <p className="text-muted-foreground text-xs">{t(locale, 'reviewExtracted')}</p>
 
                 {errors.length > 0 && (
                   <div className="rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900/50 dark:bg-red-950/20">
@@ -134,8 +142,8 @@ export default function UploadPage() {
               </div>
             ) : (
               <div className="flex h-48 flex-col items-center justify-center text-center sm:h-64">
-                <ScanLine className="mb-3 h-10 w-10 text-muted-foreground/30" />
-                <p className="text-sm font-medium text-muted-foreground">
+                <ScanLine className="text-muted-foreground/30 mb-3 h-10 w-10" />
+                <p className="text-muted-foreground text-sm font-medium">
                   {locale === 'id'
                     ? 'Unggah dan ekstrak struk untuk melihat data'
                     : 'Upload and extract a receipt to see data here'}

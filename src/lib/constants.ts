@@ -11,18 +11,48 @@ export const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 export const MONTH_NAMES_SHORT = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 export const MONTH_NAMES_ID = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
 ];
 
 export const DEFAULT_EXPENSE_CATEGORIES: Omit<Category, 'id'>[] = [
@@ -45,9 +75,18 @@ export const DEFAULT_PAYMENT_METHODS: Omit<PaymentMethod, 'id'>[] = [
 ];
 
 export const PALETTE_COLORS = [
-  '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899',
-  '#10B981', '#06B6D4', '#EF4444', '#F97316',
-  '#84CC16', '#14B8A6', '#6366F1', '#A855F7',
+  '#F59E0B',
+  '#3B82F6',
+  '#8B5CF6',
+  '#EC4899',
+  '#10B981',
+  '#06B6D4',
+  '#EF4444',
+  '#F97316',
+  '#84CC16',
+  '#14B8A6',
+  '#6366F1',
+  '#A855F7',
 ];
 
 export const NAV_ITEMS = [

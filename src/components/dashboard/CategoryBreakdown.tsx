@@ -10,12 +10,12 @@ import { motion } from 'framer-motion';
 
 export function CategoryBreakdown() {
   const totals = useCategoryTotals('expense');
-  const categories = useStore(s => s.categories);
+  const categories = useStore((s) => s.categories);
   const locale = useLocale();
 
   const data = Object.entries(totals)
     .map(([name, value]) => {
-      const cat = categories.find(c => c.name === name);
+      const cat = categories.find((c) => c.name === name);
       return {
         name,
         value,
@@ -31,12 +31,12 @@ export function CategoryBreakdown() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.15 }}
-      className="rounded-2xl border border-border bg-card p-6"
+      className="border-border bg-card rounded-2xl border p-6"
     >
       <h3 className="mb-4 text-sm font-semibold">{t(locale, 'categoryBreakdown')}</h3>
 
       {data.length === 0 ? (
-        <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex h-40 items-center justify-center text-sm">
           {t(locale, 'noData')}
         </div>
       ) : (
@@ -74,10 +74,7 @@ export function CategoryBreakdown() {
             {data.map((d) => (
               <div key={d.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <div
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: d.color }}
-                  />
+                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
                   <span className="text-muted-foreground">{d.name}</span>
                 </div>
                 <span className="font-mono font-medium">

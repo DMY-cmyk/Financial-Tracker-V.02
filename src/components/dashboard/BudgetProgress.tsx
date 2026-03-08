@@ -15,12 +15,12 @@ export function BudgetProgress() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="rounded-2xl border border-border bg-card p-6"
+      className="border-border bg-card rounded-2xl border p-6"
     >
       <h3 className="mb-4 text-sm font-semibold">{t(locale, 'budgetProgress')}</h3>
 
       {budgets.length === 0 ? (
-        <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex h-20 items-center justify-center text-sm">
           {t(locale, 'noData')}
         </div>
       ) : (
@@ -39,19 +39,15 @@ export function BudgetProgress() {
                     />
                     <span className="font-medium">{b.category}</span>
                   </div>
-                  <span className="font-mono text-muted-foreground">
+                  <span className="text-muted-foreground font-mono">
                     {formatCurrency(b.spent)} / {formatCurrency(b.budget)}
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                <div className="bg-muted h-2 overflow-hidden rounded-full">
                   <div
                     className={cn(
                       'h-full rounded-full transition-all duration-700 ease-out',
-                      isOver
-                        ? 'bg-red-500'
-                        : isWarning
-                        ? 'bg-amber-500'
-                        : 'bg-emerald-500'
+                      isOver ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'
                     )}
                     style={{ width: `${Math.min(b.percentage, 100)}%` }}
                   />

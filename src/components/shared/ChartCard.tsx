@@ -10,11 +10,11 @@ interface ChartCardProps {
 
 export function ChartCard({ title, subtitle, action, children, className }: ChartCardProps) {
   return (
-    <div className={cn('rounded-2xl border border-border bg-card p-6', className)}>
+    <div className={cn('border-border bg-card rounded-2xl border p-6', className)}>
       <div className="mb-4 flex items-start justify-between">
         <div>
           <h3 className="text-sm font-semibold">{title}</h3>
-          {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
+          {subtitle && <p className="text-muted-foreground mt-0.5 text-xs">{subtitle}</p>}
         </div>
         {action}
       </div>

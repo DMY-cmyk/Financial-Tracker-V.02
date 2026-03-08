@@ -10,10 +10,10 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const locale = useLocale();
-  const setLocale = useStore(s => s.setLocale);
+  const setLocale = useStore((s) => s.setLocale);
 
   return (
-    <div className={cn('inline-flex rounded-lg border border-border p-0.5', className)}>
+    <div className={cn('border-border inline-flex rounded-lg border p-0.5', className)}>
       {(['en', 'id'] as const).map((code) => (
         <button
           key={code}

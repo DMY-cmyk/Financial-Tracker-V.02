@@ -60,7 +60,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
 - [x] Category & payment method management (CRUD, color picker, budget)
-- [x] Data management section (export link, import placeholder, clear/reset)
+- [x] Data management section (export, import, clear/reset)
+- [x] Import data from JSON/CSV with validation and preview
 - [x] SaaS-style sectioned layout with SettingsSection component
 - [x] Delete confirmation dialog (replaces browser confirm)
 - [x] Toast feedback for data clear
@@ -72,14 +73,19 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 - [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
 - [x] Reusable animation components (MotionWrapper, StaggerList)
-- [x] i18n dictionary with ~80+ keys (EN/ID bilingual)
+- [x] i18n dictionary with ~110+ keys (EN/ID bilingual)
 - [x] Skeleton loading states (page, card, chart, list, transaction row)
 - [x] Empty/NoResults/InlineError shared state components
 - [x] ConfirmDialog for destructive actions
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
-- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport)
+- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport, useImport)
 - [x] API boundary placeholders (services.ts)
+- [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
+- [x] App-level error boundary and custom 404 page
+- [x] Skip link for keyboard navigation
+- [x] ARIA landmarks, aria-current, aria-label on navigation
+- [x] Enhanced metadata (title template, OG tags)
 
 ## Tech Stack
 
@@ -102,6 +108,17 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 npm install
 npm run dev        # http://localhost:3000
 npm run build      # Static export to out/
+```
+
+### Quality Scripts
+
+```bash
+npm run typecheck    # TypeScript type checking
+npm run lint         # ESLint
+npm run format       # Prettier auto-format
+npm run format:check # Verify formatting
+npm run validate     # typecheck + lint + build
+npm run preflight    # Full CI-equivalent check
 ```
 
 On first load, the app seeds sample data from `data/workbook.json` (12 months of transactions, bills, and savings goals).
@@ -128,8 +145,8 @@ src/
     shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 16 shadcn/ui primitives (incl. alert-dialog, sonner)
-  hooks/                      # useDashboardData, useTransactions, useUpload, useExport
-  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, design-tokens, mock-data
+  hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
+  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, import-utils, category-suggest, design-tokens, mock-data
   store/                      # Zustand store + memoized selectors
 ```
 
@@ -141,6 +158,8 @@ src/
 | [WIREFRAMES.md](./WIREFRAMES.md) | Wireframe definitions, ASCII wireframes, component map (37 components), folder tree, build recommendations |
 | [Plan.md](./Plan.md) | Implementation checklist with phase-by-phase status tracking |
 | [CLAUDE.md](./CLAUDE.md) | Project instructions for Claude Code — product goals, UX constraints, coding conventions, anti-patterns |
+| [docs/RELEASE.md](./docs/RELEASE.md) | Release guide — deployment, environment variables, QA checklists |
+| [docs/QA-CHECKLIST.md](./docs/QA-CHECKLIST.md) | QA checklist — responsive, dark mode, cross-browser, smoke tests |
 
 ## Data Pipeline
 
@@ -153,10 +172,13 @@ pip install openpyxl
 python scripts/extract_xlsx.py
 ```
 
-## Deployment
+## CI/CD
 
-GitHub Actions (`.github/workflows/deploy-pages.yml`):
-`npm ci` -> `npm run build` -> Deploy `out/` to GitHub Pages
+### PR Validation (`.github/workflows/ci.yml`)
+Runs on pushes to `redesign` and PRs: `npm ci` -> typecheck -> lint -> format check -> build -> verify export
+
+### Deployment (`.github/workflows/deploy-pages.yml`)
+Runs on pushes to `main`: `npm ci` -> typecheck -> lint -> build -> Deploy `out/` to GitHub Pages
 
 ## Branch Strategy
 

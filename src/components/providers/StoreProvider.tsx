@@ -6,10 +6,10 @@ import { getSampleData } from '@/data/sample-data';
 import { LocaleContext } from '@/lib/i18n';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const initialized = useStore(s => s.initialized);
-  const initialize = useStore(s => s.initialize);
-  const theme = useStore(s => s.ui.theme);
-  const locale = useStore(s => s.ui.locale);
+  const initialized = useStore((s) => s.initialized);
+  const initialize = useStore((s) => s.initialize);
+  const theme = useStore((s) => s.ui.theme);
+  const locale = useStore((s) => s.ui.locale);
 
   useEffect(() => {
     if (!initialized) {
@@ -35,9 +35,5 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  return (
-    <LocaleContext.Provider value={locale}>
-      {children}
-    </LocaleContext.Provider>
-  );
+  return <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>;
 }

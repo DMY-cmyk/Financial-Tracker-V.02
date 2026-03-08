@@ -22,14 +22,16 @@ interface OcrPreviewProps {
 
 export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewProps) {
   const locale = useLocale();
-  const expenseCategories = categories.filter(c => c.type === 'expense');
+  const expenseCategories = categories.filter((c) => c.type === 'expense');
 
   return (
     <div className="space-y-4">
       <div>
         <Label>{t(locale, 'amount')}</Label>
         <div className="relative mt-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-mono">Rp</span>
+          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 font-mono text-sm">
+            Rp
+          </span>
           <Input
             value={data.amount}
             onChange={(e) => onChange({ ...data, amount: e.target.value })}
@@ -59,11 +61,13 @@ export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewPro
         <select
           value={data.category}
           onChange={(e) => onChange({ ...data, category: e.target.value })}
-          className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm"
         >
           <option value="">Select...</option>
-          {expenseCategories.map(c => (
-            <option key={c.id} value={c.name}>{c.name}</option>
+          {expenseCategories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
           ))}
         </select>
       </div>

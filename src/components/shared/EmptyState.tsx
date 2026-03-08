@@ -12,10 +12,10 @@ interface EmptyStateProps {
 export function EmptyState({ title, description, icon, className, children }: EmptyStateProps) {
   return (
     <div className={cn('flex flex-col items-center justify-center py-12 text-center', className)}>
-      {icon && <div className="mb-4 text-muted-foreground/40">{icon}</div>}
-      <h3 className="text-base font-medium text-muted-foreground">{title}</h3>
+      {icon && <div className="text-muted-foreground/40 mb-4">{icon}</div>}
+      <h3 className="text-muted-foreground text-base font-medium">{title}</h3>
       {description && (
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground/70">{description}</p>
+        <p className="text-muted-foreground/70 mt-1 max-w-sm text-sm">{description}</p>
       )}
       {children && <div className="mt-4">{children}</div>}
     </div>
@@ -37,13 +37,10 @@ export function NoResults({
 }: NoResultsProps) {
   return (
     <div className={cn('flex flex-col items-center justify-center py-10 text-center', className)}>
-      <SearchX className="mb-3 h-10 w-10 text-muted-foreground/40" />
-      <p className="text-sm font-medium text-muted-foreground">{message}</p>
+      <SearchX className="text-muted-foreground/40 mb-3 h-10 w-10" />
+      <p className="text-muted-foreground text-sm font-medium">{message}</p>
       {onClear && (
-        <button
-          onClick={onClear}
-          className="mt-2 text-xs font-medium text-primary hover:underline"
-        >
+        <button onClick={onClear} className="text-primary mt-2 text-xs font-medium hover:underline">
           {clearLabel}
         </button>
       )}
@@ -65,10 +62,12 @@ export function InlineError({
   className,
 }: InlineErrorProps) {
   return (
-    <div className={cn(
-      'flex flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 py-8 text-center dark:border-red-900/50 dark:bg-red-950/20',
-      className
-    )}>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50 py-8 text-center dark:border-red-900/50 dark:bg-red-950/20',
+        className
+      )}
+    >
       <p className="text-sm font-medium text-red-600 dark:text-red-400">{message}</p>
       {onRetry && (
         <button

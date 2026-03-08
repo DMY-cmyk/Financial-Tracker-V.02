@@ -84,7 +84,10 @@ export const staggerListItem: Variants = {
 
 export const tapScale = { scale: 0.97 } as const;
 export const hoverLift = { y: -2, transition: { duration: 0.2 } } as const;
-export const hoverGlow = { boxShadow: '0 4px 20px rgba(0,0,0,0.08)', transition: { duration: 0.2 } } as const;
+export const hoverGlow = {
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  transition: { duration: 0.2 },
+} as const;
 
 // --- Panel transitions (dialog, sheet, overlay) ---
 

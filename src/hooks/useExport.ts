@@ -26,9 +26,9 @@ interface UseExportReturn {
 }
 
 export function useExport(): UseExportReturn {
-  const transactions = useStore(s => s.transactions);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const transactions = useStore((s) => s.transactions);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
 
   const [format, setFormat] = useState<ExportFormat>('csv');
   const [scope, setScope] = useState<ExportScope>('current');
@@ -40,16 +40,19 @@ export function useExport(): UseExportReturn {
   const [exportError, setExportError] = useState<string | null>(null);
 
   const scopedTransactions = useMemo(
-    () => scope === 'current' ? filterByMonth(transactions, month, year) : transactions,
+    () => (scope === 'current' ? filterByMonth(transactions, month, year) : transactions),
     [transactions, month, year, scope]
   );
 
   const scopeLabel = scope === 'current' ? `${MONTH_NAMES[month]} ${year}` : 'All Data';
 
-  const buildFilename = useCallback((ext: string) => {
-    const tag = scope === 'current' ? `${MONTH_NAMES[month]}-${year}` : 'all';
-    return `transactions-${tag}.${ext}`;
-  }, [scope, month, year]);
+  const buildFilename = useCallback(
+    (ext: string) => {
+      const tag = scope === 'current' ? `${MONTH_NAMES[month]}-${year}` : 'all';
+      return `transactions-${tag}.${ext}`;
+    },
+    [scope, month, year]
+  );
 
   const handleExport = useCallback(async () => {
     if (scopedTransactions.length === 0) return;
@@ -65,10 +68,20 @@ export function useExport(): UseExportReturn {
           exportJSON(scopedTransactions, buildFilename('json'));
           break;
         case 'xlsx':
-          await exportExcel(scopedTransactions, buildFilename('xlsx'), scopeLabel, options.includeSummary);
+          await exportExcel(
+            scopedTransactions,
+            buildFilename('xlsx'),
+            scopeLabel,
+            options.includeSummary
+          );
           break;
         case 'pdf':
-          await exportPDF(scopedTransactions, buildFilename('pdf'), scopeLabel, options.includeSummary);
+          await exportPDF(
+            scopedTransactions,
+            buildFilename('pdf'),
+            scopeLabel,
+            options.includeSummary
+          );
           break;
       }
     } catch (err) {

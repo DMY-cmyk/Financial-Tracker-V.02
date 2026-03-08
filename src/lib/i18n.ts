@@ -118,6 +118,42 @@ type TranslationKeys = {
   required: string;
   invalidAmount: string;
   selectCategory: string;
+
+  // Import
+  importFile: string;
+  importSuccess: string;
+  importError: string;
+  selectFile: string;
+  supportedFormats: string;
+  transactionsFound: string;
+  rowsSkipped: string;
+  importNow: string;
+  tryAgain: string;
+
+  // Navigation
+  menu: string;
+  newTransaction: string;
+  collapse: string;
+
+  // Toasts
+  transactionSaved: string;
+  transactionDeleted: string;
+  exportSuccess: string;
+  dataClearedToast: string;
+
+  // Pages
+  pageNotFound: string;
+  somethingWentWrong: string;
+  refreshPage: string;
+  backToDashboard: string;
+
+  // Misc
+  type: string;
+  net: string;
+  noResults: string;
+  clearFilters: string;
+  and: string;
+  more: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -210,6 +246,37 @@ const translations: Record<Locale, TranslationKeys> = {
     required: 'This field is required',
     invalidAmount: 'Enter a valid amount',
     selectCategory: 'Select a category',
+
+    importFile: 'Import File',
+    importSuccess: 'Import successful',
+    importError: 'Import failed',
+    selectFile: 'Choose or drag a file',
+    supportedFormats: '.json, .csv',
+    transactionsFound: 'transactions found',
+    rowsSkipped: 'rows skipped',
+    importNow: 'Import Now',
+    tryAgain: 'Try Again',
+
+    menu: 'Menu',
+    newTransaction: 'New Transaction',
+    collapse: 'Collapse',
+
+    transactionSaved: 'Transaction saved',
+    transactionDeleted: 'Transaction deleted',
+    exportSuccess: 'Export successful',
+    dataClearedToast: 'All data cleared',
+
+    pageNotFound: 'Page Not Found',
+    somethingWentWrong: 'Something went wrong',
+    refreshPage: 'Refresh Page',
+    backToDashboard: 'Back to Dashboard',
+
+    type: 'Type',
+    net: 'Net',
+    noResults: 'No results found',
+    clearFilters: 'Clear Filters',
+    and: 'and',
+    more: 'more',
   },
   id: {
     dashboard: 'Dasbor',
@@ -300,6 +367,37 @@ const translations: Record<Locale, TranslationKeys> = {
     required: 'Kolom ini wajib diisi',
     invalidAmount: 'Masukkan jumlah yang valid',
     selectCategory: 'Pilih kategori',
+
+    importFile: 'Impor File',
+    importSuccess: 'Impor berhasil',
+    importError: 'Impor gagal',
+    selectFile: 'Pilih atau seret file',
+    supportedFormats: '.json, .csv',
+    transactionsFound: 'transaksi ditemukan',
+    rowsSkipped: 'baris dilewati',
+    importNow: 'Impor Sekarang',
+    tryAgain: 'Coba Lagi',
+
+    menu: 'Menu',
+    newTransaction: 'Transaksi Baru',
+    collapse: 'Perkecil',
+
+    transactionSaved: 'Transaksi disimpan',
+    transactionDeleted: 'Transaksi dihapus',
+    exportSuccess: 'Ekspor berhasil',
+    dataClearedToast: 'Semua data dihapus',
+
+    pageNotFound: 'Halaman Tidak Ditemukan',
+    somethingWentWrong: 'Terjadi Kesalahan',
+    refreshPage: 'Muat Ulang',
+    backToDashboard: 'Kembali ke Dasbor',
+
+    type: 'Tipe',
+    net: 'Bersih',
+    noResults: 'Tidak ada hasil',
+    clearFilters: 'Hapus Filter',
+    and: 'dan',
+    more: 'lainnya',
   },
 };
 

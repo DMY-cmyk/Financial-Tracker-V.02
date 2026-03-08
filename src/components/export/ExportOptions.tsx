@@ -20,9 +20,7 @@ export function ExportOptions({ options, onChange }: ExportOptionsProps) {
         <Checkbox
           id="include-summary"
           checked={options.includeSummary}
-          onCheckedChange={(checked) =>
-            onChange({ ...options, includeSummary: checked === true })
-          }
+          onCheckedChange={(checked) => onChange({ ...options, includeSummary: checked === true })}
         />
         <Label htmlFor="include-summary" className="cursor-pointer text-sm">
           Include summary totals
@@ -32,9 +30,7 @@ export function ExportOptions({ options, onChange }: ExportOptionsProps) {
         <Checkbox
           id="group-by-date"
           checked={options.groupByDate}
-          onCheckedChange={(checked) =>
-            onChange({ ...options, groupByDate: checked === true })
-          }
+          onCheckedChange={(checked) => onChange({ ...options, groupByDate: checked === true })}
         />
         <Label htmlFor="group-by-date" className="cursor-pointer text-sm">
           Group by date

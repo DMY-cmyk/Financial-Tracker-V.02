@@ -29,11 +29,9 @@ export function AnimatedCounter({ value, className, prefix }: AnimatedCounterPro
   }, [display]);
 
   return (
-    <motion.span
-      ref={ref}
-      className={cn('font-mono tabular-nums', className)}
-    >
-      {prefix}{rendered}
+    <motion.span ref={ref} className={cn('font-mono tabular-nums', className)}>
+      {prefix}
+      {rendered}
     </motion.span>
   );
 }

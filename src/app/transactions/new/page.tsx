@@ -18,14 +18,16 @@ export default function NewTransactionPage() {
       <motion.div {...fadeInUp}>
         <Link
           href="/transactions"
-          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center gap-1.5 text-sm transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           {locale === 'id' ? 'Kembali ke Transaksi' : 'Back to Transactions'}
         </Link>
         <PageHeader
           title={t(locale, 'addTransaction')}
-          description={locale === 'id' ? 'Catat transaksi baru' : 'Record a new income or expense transaction'}
+          description={
+            locale === 'id' ? 'Catat transaksi baru' : 'Record a new income or expense transaction'
+          }
         />
       </motion.div>
 
@@ -33,7 +35,7 @@ export default function NewTransactionPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.1 }}
-        className="rounded-2xl border border-border bg-card p-4 sm:p-6"
+        className="border-border bg-card rounded-2xl border p-4 sm:p-6"
       >
         <TransactionForm onClose={() => router.push('/transactions')} />
       </motion.div>

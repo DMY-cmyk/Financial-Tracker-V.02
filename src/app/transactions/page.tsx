@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
 import { t, useLocale } from '@/lib/i18n';
-import { staggerContainer, staggerItem, fadeInUp } from '@/lib/motion';
+import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
@@ -21,15 +21,26 @@ import { toast } from 'sonner';
 export default function TransactionsPage() {
   const locale = useLocale();
   const {
-    filtered, income, expense,
-    search, setSearch,
-    typeFilter, setTypeFilter,
-    categoryFilter, setCategoryFilter,
-    hasActiveFilters, clearFilters,
-    formOpen, setFormOpen,
-    editingTx, openAdd, openEdit, closeForm,
+    filtered,
+    income,
+    expense,
+    search,
+    setSearch,
+    typeFilter,
+    setTypeFilter,
+    categoryFilter,
+    setCategoryFilter,
+    clearFilters,
+    formOpen,
+    setFormOpen,
+    editingTx,
+    openAdd,
+    openEdit,
+    closeForm,
     deleteTransaction,
-    isLoading, isEmpty, hasNoResults,
+    isLoading,
+    isEmpty,
+    hasNoResults,
   } = useTransactions();
 
   // Delete confirmation
@@ -91,7 +102,11 @@ export default function TransactionsPage() {
           <motion.div key="empty" {...fadeInUp}>
             <EmptyState
               title={t(locale, 'noData')}
-              description={locale === 'id' ? 'Tambahkan transaksi pertama Anda.' : 'Start by adding your first transaction.'}
+              description={
+                locale === 'id'
+                  ? 'Tambahkan transaksi pertama Anda.'
+                  : 'Start by adding your first transaction.'
+              }
               icon={<Receipt className="h-12 w-12" />}
             >
               <Button onClick={openAdd} className="gap-2">
@@ -109,17 +124,8 @@ export default function TransactionsPage() {
             />
           </motion.div>
         ) : (
-          <motion.div
-            key="list"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="show"
-          >
-            <TransactionTable
-              transactions={filtered}
-              onEdit={openEdit}
-              onDelete={handleDelete}
-            />
+          <motion.div key="list" variants={staggerContainer} initial="hidden" animate="show">
+            <TransactionTable transactions={filtered} onEdit={openEdit} onDelete={handleDelete} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -143,9 +149,11 @@ export default function TransactionsPage() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t(locale, 'deleteTransaction')}
-        description={locale === 'id'
-          ? 'Transaksi ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
-          : 'This transaction will be permanently deleted. This action cannot be undone.'}
+        description={
+          locale === 'id'
+            ? 'Transaksi ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
+            : 'This transaction will be permanently deleted. This action cannot be undone.'
+        }
         confirmLabel={locale === 'id' ? 'Hapus' : 'Delete'}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
@@ -154,7 +162,7 @@ export default function TransactionsPage() {
       {/* Mobile FAB */}
       <button
         onClick={openAdd}
-        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
+        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
         aria-label={t(locale, 'addTransaction')}
       >
         <Plus className="h-6 w-6" />

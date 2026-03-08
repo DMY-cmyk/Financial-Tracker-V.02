@@ -84,10 +84,17 @@ src/store/        — Zustand store and memoized selectors
 - Derived/computed values via custom hooks or selectors, not in components
 
 ### Internationalization
-- Translation dictionary in `src/lib/i18n.ts` (~80+ keys)
+- Translation dictionary in `src/lib/i18n.ts` (~110+ keys)
 - Use `t(locale, 'key')` for translations
 - Always add both EN and ID entries for new keys
 - Keep strings short and clear for both languages
+- Indonesian text is ~20-40% longer — test for overflow
+
+### Code Quality
+- Prettier for formatting (`npm run format`)
+- ESLint for linting (`npm run lint`)
+- `npm run preflight` runs format check + typecheck + lint + build
+- CI runs on every push to `redesign` and every PR
 
 ## Responsiveness Expectations
 
@@ -114,9 +121,16 @@ src/store/        — Zustand store and memoized selectors
 ```bash
 npm run dev          # Local development
 npm run build        # Static export to out/
+npm run typecheck    # TypeScript check
+npm run lint         # ESLint
+npm run format       # Prettier auto-format
+npm run format:check # Prettier verify
+npm run validate     # typecheck + lint + build
+npm run preflight    # Full CI check locally
 ```
 
-GitHub Actions builds from `redesign` branch and deploys `out/` to GitHub Pages.
+GitHub Actions CI runs on pushes to `redesign` and PRs.
+Deploy workflow builds from `main` branch and deploys `out/` to GitHub Pages.
 
 ## Key Dependencies
 
