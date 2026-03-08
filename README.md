@@ -60,7 +60,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
 - [x] Category & payment method management (CRUD, color picker, budget)
-- [x] Data management section (export link, import placeholder, clear/reset)
+- [x] Data management section (export, import, clear/reset)
+- [x] Import data from JSON/CSV with validation and preview
 - [x] SaaS-style sectioned layout with SettingsSection component
 - [x] Delete confirmation dialog (replaces browser confirm)
 - [x] Toast feedback for data clear
@@ -72,14 +73,19 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 - [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
 - [x] Reusable animation components (MotionWrapper, StaggerList)
-- [x] i18n dictionary with ~80+ keys (EN/ID bilingual)
+- [x] i18n dictionary with ~110+ keys (EN/ID bilingual)
 - [x] Skeleton loading states (page, card, chart, list, transaction row)
 - [x] Empty/NoResults/InlineError shared state components
 - [x] ConfirmDialog for destructive actions
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
-- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport)
+- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport, useImport)
 - [x] API boundary placeholders (services.ts)
+- [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
+- [x] App-level error boundary and custom 404 page
+- [x] Skip link for keyboard navigation
+- [x] ARIA landmarks, aria-current, aria-label on navigation
+- [x] Enhanced metadata (title template, OG tags)
 
 ## Tech Stack
 
@@ -128,8 +134,8 @@ src/
     shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 16 shadcn/ui primitives (incl. alert-dialog, sonner)
-  hooks/                      # useDashboardData, useTransactions, useUpload, useExport
-  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, design-tokens, mock-data
+  hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
+  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, import-utils, category-suggest, design-tokens, mock-data
   store/                      # Zustand store + memoized selectors
 ```
 

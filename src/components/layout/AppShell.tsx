@@ -24,7 +24,7 @@ export function AppShell({ children }: AppShellProps) {
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar />
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" className="flex-1 overflow-y-auto">
           <div className="p-4 pb-20 sm:p-6 lg:pb-6">
             {children}
           </div>

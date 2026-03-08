@@ -4,6 +4,7 @@ import { type ExtractionStatus } from '@/lib/types';
 import { type OcrData } from '@/components/upload/OcrPreview';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { validateOcrFields, type FieldError } from '@/lib/validation';
+import { suggestCategory } from '@/lib/category-suggest';
 
 interface UseUploadReturn {
   // File state
@@ -30,6 +31,7 @@ interface UseUploadReturn {
 
 export function useUpload(): UseUploadReturn {
   const addTransaction = useStore(s => s.addTransaction);
+  const categories = useStore(s => s.categories);
   const paymentMethods = useStore(s => s.paymentMethods);
   const month = useStore(s => s.ui.selectedMonth);
   const year = useStore(s => s.ui.selectedYear);
@@ -80,11 +82,14 @@ export function useUpload(): UseUploadReturn {
         dateStr = `${y}-${dateMatch[2].padStart(2, '0')}-${dateMatch[1].padStart(2, '0')}`;
       }
 
+      const desc = text.split('\n')[0]?.trim().substring(0, 50) || '';
+      const suggestion = suggestCategory(text, categories);
+
       setOcrResult({
         amount: amount ? formatCurrencyInput(parseInt(amount)) : '',
-        description: text.split('\n')[0]?.trim().substring(0, 50) || '',
+        description: desc,
         date: dateStr,
-        category: '',
+        category: suggestion?.name || '',
       });
       setConfidence(conf);
       setStatus('extracted');

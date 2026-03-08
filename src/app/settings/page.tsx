@@ -10,6 +10,7 @@ import { SettingsSection } from '@/components/settings/SettingsSection';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ImportDialog } from '@/components/settings/ImportDialog';
 import { Moon, Sun, Monitor, Globe, Trash2, FolderOpen, Download, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LANGUAGE_OPTIONS } from '@/lib/mock-data';
@@ -23,6 +24,7 @@ export default function SettingsPage() {
   const clearAllData = useStore(s => s.clearAllData);
 
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const themes = [
     { value: 'light' as const, label: t(locale, 'light'), icon: Sun },
@@ -137,7 +139,11 @@ export default function SettingsPage() {
                     {t(locale, 'exportData')}
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full gap-2" disabled>
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  onClick={() => setImportDialogOpen(true)}
+                >
                   <Upload className="h-4 w-4" />
                   {t(locale, 'importData')}
                 </Button>
@@ -157,6 +163,9 @@ export default function SettingsPage() {
           </SettingsSection>
         </motion.div>
       </motion.div>
+
+      {/* Import dialog */}
+      <ImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
 
       {/* Clear data confirmation */}
       <ConfirmDialog

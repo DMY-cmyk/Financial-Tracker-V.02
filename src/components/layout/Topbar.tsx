@@ -2,6 +2,7 @@
 
 import { useStore } from '@/store';
 import { MONTH_NAMES } from '@/lib/constants';
+import { useLocale } from '@/lib/i18n';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 export function Topbar() {
@@ -9,6 +10,7 @@ export function Topbar() {
   const year = useStore(s => s.ui.selectedYear);
   const setMonth = useStore(s => s.setMonth);
   const setYear = useStore(s => s.setYear);
+  const locale = useLocale();
 
   const handlePrev = () => {
     if (month === 0) {
@@ -42,9 +44,10 @@ export function Topbar() {
       <div className="hidden lg:block" />
 
       {/* Month Navigation */}
-      <div className="flex items-center gap-1 rounded-xl border border-border bg-card px-1 py-1">
+      <div className="flex items-center gap-1 rounded-xl border border-border bg-card px-1 py-1" role="group" aria-label={locale === 'id' ? 'Navigasi bulan' : 'Month navigation'}>
         <button
           onClick={handlePrev}
+          aria-label={locale === 'id' ? 'Bulan sebelumnya' : 'Previous month'}
           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
@@ -57,6 +60,7 @@ export function Topbar() {
         </div>
         <button
           onClick={handleNext}
+          aria-label={locale === 'id' ? 'Bulan berikutnya' : 'Next month'}
           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ChevronRight className="h-3.5 w-3.5" />

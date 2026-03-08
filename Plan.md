@@ -117,7 +117,7 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Upload page rewrite using modular components
 - [x] Status-driven UI flow (idle -> processing -> extracted -> saved)
 - [x] Error/empty states with contextual messaging
-- [ ] Category auto-suggestion from merchant text matching
+- [x] Category auto-suggestion from merchant text matching
 - [ ] Upload history list
 - [ ] Progress percentage display during OCR
 
@@ -158,8 +158,9 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] SettingsSection component (reusable settings group wrapper)
 - [x] LanguageSwitcher component (compact EN/ID pill toggle)
 - [x] Settings page rewrite with SaaS-style sectioned layout
-- [x] Data management section (export link, import placeholder, clear)
-- [x] Expanded i18n coverage (~80+ translation keys covering all pages)
+- [x] Data management section (export link, import, clear)
+- [x] Import data dialog (JSON/CSV file upload with validation and preview)
+- [x] Expanded i18n coverage (~110+ translation keys covering all pages)
 - [ ] Category icon selection
 - [ ] Drag-to-reorder categories
 - [ ] Quick language switcher in sidebar
@@ -194,10 +195,27 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] CLAUDE.md project instruction draft
 - [x] shadcn/ui alert-dialog and sonner primitives added
 
+### Batch 4: Production Hardening
+
+- [x] Category auto-suggest engine (`src/lib/category-suggest.ts`) — keyword matching for Indonesian & English receipt terms
+- [x] Import utilities (`src/lib/import-utils.ts`) — JSON/CSV parsing with validation
+- [x] useImport hook (`src/hooks/useImport.ts`) — import state management
+- [x] ImportDialog component (`src/components/settings/ImportDialog.tsx`) — drag-and-drop import flow with preview
+- [x] Import wired into settings page (replaces disabled button)
+- [x] Category auto-suggest wired into useUpload hook (OCR -> category suggestion)
+- [x] App-level error boundary (`src/app/error.tsx`)
+- [x] Custom 404 page (`src/app/not-found.tsx`)
+- [x] Skip link for keyboard navigation (root layout)
+- [x] Expanded i18n to ~110+ keys (import, navigation, toasts, pages, misc)
+- [x] Sidebar i18n (all labels translated based on locale)
+- [x] BottomNav i18n (all labels translated based on locale)
+- [x] Topbar a11y (ARIA labels on month navigation buttons)
+- [x] Navigation a11y (aria-current="page", aria-label on nav landmarks)
+- [x] Enhanced metadata (title template, OG tags, keywords)
+- [x] `id="main-content"` on main element for skip link target
+
 ### Phase 7: Remaining Polish
 
-- [ ] Error boundaries for each page
-- [ ] Meta tags, OG tags, favicon
 - [ ] Performance audit (lazy-load heavy pages, tree-shake Recharts)
 - [ ] Responsive breakpoint testing (1440px, 1024px, 768px, 375px)
 - [ ] Cross-browser testing
@@ -219,6 +237,8 @@ src/
       new/page.tsx            # Add transaction (standalone)
     upload/page.tsx           # OCR receipt upload
     export/page.tsx           # Export center
+    error.tsx                 # App-level error boundary
+    not-found.tsx             # Custom 404 page
     settings/
       page.tsx                # General settings
       categories/page.tsx     # Category & payment method management
@@ -229,7 +249,7 @@ src/
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
-    settings/                 # SettingsSection
+    settings/                 # SettingsSection, ImportDialog
     shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
     providers/                # StoreProvider
   lib/
@@ -244,6 +264,8 @@ src/
     mock-data.ts              # Quick actions, empty messages, language options, export formats, upload constants
     motion.ts                 # Framer Motion animation presets (fadeIn, stagger, spring, ease)
     export-utils.ts           # CSV/Excel/PDF generation
+    import-utils.ts           # JSON/CSV import parsing + validation
+    category-suggest.ts       # OCR category auto-suggestion
     validation.ts             # Form validation schemas (bilingual)
     services.ts               # API boundary placeholders
     utils.ts                  # cn() utility (shadcn)
@@ -252,6 +274,7 @@ src/
     useTransactions.ts        # Transactions CRUD + filters hook
     useUpload.ts              # Upload/OCR state hook
     useExport.ts              # Export jobs hook
+    useImport.ts              # Import data hook
   store/
     index.ts                  # Zustand store (persist middleware)
     selectors.ts              # Memoized computed selectors
