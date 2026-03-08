@@ -92,10 +92,13 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 
 | | |
 |---|---|
-| **Framework** | Next.js 16 (App Router, static export) |
+| **Framework** | Next.js 16 (App Router, API routes + static pages) |
 | **Language** | TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
-| **State** | Zustand (localStorage persistence) |
+| **State** | Zustand (UI/bills/savings) + SQLite API (transactions, categories, payment methods, settings) |
+| **Database** | SQLite via better-sqlite3 (WAL mode, 8 tables) |
+| **Validation** | Zod (API request/response schemas) |
+| **Testing** | Vitest (84 tests: validation, all services) |
 | **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -108,12 +111,14 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm run build      # Static export to out/
+npm run build      # Production build
 ```
 
 ### Quality Scripts
 
 ```bash
+npm run test         # Run tests (Vitest)
+npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
 npm run format       # Prettier auto-format
@@ -128,27 +133,42 @@ On first load, the app seeds sample data from `data/workbook.json` (12 months of
 
 ```
 src/
-  app/                        # 7 page routes
-    page.tsx                  #   Dashboard (bento grid)
-    transactions/page.tsx     #   Transaction list + filters
-    transactions/new/page.tsx #   Add transaction form
-    upload/page.tsx           #   OCR receipt upload
-    export/page.tsx           #   CSV/JSON export
-    settings/page.tsx         #   Theme, language, data
-    settings/categories/      #   Category & payment method CRUD
+  app/
+    page.tsx                  # Dashboard (bento grid)
+    api/
+      transactions/           # GET (list) + POST (create), [id] PATCH/DELETE
+      categories/             # GET (list) + POST, [id] PATCH/DELETE
+      payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
+      settings/               # GET + PATCH
+      uploads/                # GET (list) + POST, [id] PATCH
+      export-jobs/            # GET (list) + POST
+      dashboard/summary/      # GET (aggregated summary)
+    transactions/page.tsx     # Transaction list + filters
+    transactions/new/page.tsx # Add transaction form
+    upload/page.tsx           # OCR receipt upload
+    export/page.tsx           # CSV/JSON export
+    settings/page.tsx         # Theme, language, data
+    settings/categories/      # Category & payment method CRUD
+  server/
+    db/                       # SQLite connection + seed (better-sqlite3)
+    repositories/             # CRUD repositories (transaction, category, payment-method, settings, upload, export-job)
+    services/                 # Business logic (transaction, dashboard, category, payment-method, settings, upload, export-job)
   components/
     dashboard/                # 8 bento widgets
     transactions/             # Table, form, filters, category chip
-    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
+    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
     settings/                 # SettingsSection, ImportDialog
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
-    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, QuickActionButton, ProgressRing
-    providers/                # StoreProvider (state + theme + locale)
-    ui/                       # 16 shadcn/ui primitives (incl. alert-dialog, sonner)
+    shared/                   # SummaryCard, EmptyState, NoResults, Skeletons, ConfirmDialog
+    providers/                # StoreProvider (API sync + theme + locale)
+    ui/                       # 16 shadcn/ui primitives
+  lib/
+    api/                      # Contracts, validation (Zod), API client
+    ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
-  lib/                        # Types, formatters, calculations, i18n, validation, motion, services, export-utils, import-utils, category-suggest, mock-data
   store/                      # Zustand store + memoized selectors
+  __tests__/                  # Vitest tests (84 tests: validation, transaction, dashboard, category, payment-method, settings, export-job)
 ```
 
 ## Documentation

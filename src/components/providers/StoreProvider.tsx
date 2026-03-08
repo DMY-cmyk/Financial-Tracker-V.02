@@ -13,8 +13,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!initialized) {
-      const data = getSampleData();
-      initialize(data);
+      // Seed bills, savings goals, and UI defaults from sample data
+      // Categories, payment methods, and transactions are now API-backed (SQLite)
+      const sampleData = getSampleData();
+      initialize(sampleData);
     }
   }, [initialized, initialize]);
 

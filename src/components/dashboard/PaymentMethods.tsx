@@ -1,6 +1,5 @@
 'use client';
 
-import { usePaymentMethodTotals } from '@/store/selectors';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { motion } from 'framer-motion';
@@ -12,8 +11,11 @@ const METHOD_COLORS: Record<string, string> = {
   OVO: '#8B5CF6',
 };
 
-export function PaymentMethodsSummary() {
-  const totals = usePaymentMethodTotals();
+interface PaymentMethodsSummaryProps {
+  totals: Record<string, number>;
+}
+
+export function PaymentMethodsSummary({ totals }: PaymentMethodsSummaryProps) {
   const locale = useLocale();
 
   const data = Object.entries(totals)

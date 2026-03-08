@@ -1,6 +1,5 @@
 'use client';
 
-import { useCashFlow } from '@/store/selectors';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrencyShort } from '@/lib/formatters';
 import {
@@ -14,8 +13,11 @@ import {
 } from 'recharts';
 import { motion } from 'framer-motion';
 
-export function CashFlowChart() {
-  const data = useCashFlow();
+interface CashFlowChartProps {
+  data: { date: string; income: number; expense: number }[];
+}
+
+export function CashFlowChart({ data }: CashFlowChartProps) {
   const locale = useLocale();
 
   const filtered = data.filter((d) => d.income > 0 || d.expense > 0);

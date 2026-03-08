@@ -1,18 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useRecentTransactions } from '@/store/selectors';
-import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency, formatDateShort } from '@/lib/formatters';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { Transaction, Category } from '@/lib/types';
 
-export function RecentTransactions() {
-  const transactions = useRecentTransactions(5);
-  const categories = useStore((s) => s.categories);
+interface RecentTransactionsProps {
+  transactions: Transaction[];
+  categories: Category[];
+}
+
+export function RecentTransactions({ transactions, categories }: RecentTransactionsProps) {
   const locale = useLocale();
 
   return (

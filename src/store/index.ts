@@ -130,6 +130,8 @@ export const useStore = create<FinancialStore>()(
           initialized: true,
         }),
 
+      setTransactions: (transactions: Transaction[]) => set({ transactions }),
+
       clearAllData: () =>
         set({
           transactions: [],

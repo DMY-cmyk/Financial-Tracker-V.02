@@ -158,5 +158,6 @@ export interface FinancialStore {
     bills: Bill[];
     savingsGoals: SavingsGoal[];
   }) => void;
+  setTransactions: (transactions: Transaction[]) => void;
   clearAllData: () => void;
 }

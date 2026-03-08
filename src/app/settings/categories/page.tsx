@@ -1,54 +1,126 @@
 'use client';
 
-import { useState } from 'react';
-import { useStore } from '@/store';
+import { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '@/lib/i18n';
+import { api } from '@/lib/api/client';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PALETTE_COLORS } from '@/lib/constants';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Loader2 } from 'lucide-react';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
+import { toast } from 'sonner';
+import type { Category, PaymentMethod } from '@/lib/types';
 
 export default function CategoriesPage() {
-  const categories = useStore((s) => s.categories);
-  const paymentMethods = useStore((s) => s.paymentMethods);
-  const addCategory = useStore((s) => s.addCategory);
-  const deleteCategory = useStore((s) => s.deleteCategory);
-  const updateCategory = useStore((s) => s.updateCategory);
-  const addPaymentMethod = useStore((s) => s.addPaymentMethod);
-  const deletePaymentMethod = useStore((s) => s.deletePaymentMethod);
   const locale = useLocale();
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [fetchCount, setFetchCount] = useState(0);
+  const [loadedCount, setLoadedCount] = useState(-1);
+  const loading = loadedCount !== fetchCount;
 
   const [newCatName, setNewCatName] = useState('');
   const [newCatType, setNewCatType] = useState<'expense' | 'income'>('expense');
   const [newCatColor, setNewCatColor] = useState(PALETTE_COLORS[0]);
   const [newCatBudget, setNewCatBudget] = useState('');
+  const [addingCat, setAddingCat] = useState(false);
 
   const [newMethodName, setNewMethodName] = useState('');
   const [newMethodType, setNewMethodType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
+  const [addingMethod, setAddingMethod] = useState(false);
+
+  const refetch = useCallback(() => setFetchCount((c) => c + 1), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(([catResult, pmResult]) => {
+      if (cancelled) return;
+      if (catResult.data) setCategories(catResult.data.categories);
+      if (pmResult.data) setPaymentMethods(pmResult.data.paymentMethods);
+      setLoadedCount(fetchCount);
+    });
+    return () => { cancelled = true; };
+  }, [fetchCount]);
 
   const expenseCategories = categories.filter((c) => c.type === 'expense');
   const incomeCategories = categories.filter((c) => c.type === 'income');
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCatName) return;
-    addCategory({
+    setAddingCat(true);
+    const result = await api.categories.create({
       name: newCatName,
       type: newCatType,
       color: newCatColor,
       icon: 'circle',
       budget: parseCurrencyInput(newCatBudget),
     });
-    setNewCatName('');
-    setNewCatBudget('');
+    if (result.data) {
+      setCategories((prev) => [...prev, result.data!]);
+      setNewCatName('');
+      setNewCatBudget('');
+      toast.success(t(locale, 'saved'));
+    } else {
+      toast.error(result.error?.message || t(locale, 'failedSave'));
+    }
+    setAddingCat(false);
   };
 
-  const handleAddMethod = () => {
-    if (!newMethodName) return;
-    addPaymentMethod({ name: newMethodName, icon: 'wallet', type: newMethodType });
-    setNewMethodName('');
+  const handleUpdateBudget = async (id: string, budget: number) => {
+    const result = await api.categories.update(id, { budget });
+    if (result.data) {
+      setCategories((prev) => prev.map((c) => (c.id === id ? result.data! : c)));
+    }
   };
+
+  const handleDeleteCategory = async (id: string) => {
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+    const result = await api.categories.delete(id);
+    if (result.error) {
+      toast.error(result.error.message);
+      refetch();
+    }
+  };
+
+  const handleAddMethod = async () => {
+    if (!newMethodName) return;
+    setAddingMethod(true);
+    const result = await api.paymentMethods.create({
+      name: newMethodName,
+      icon: 'wallet',
+      type: newMethodType,
+    });
+    if (result.data) {
+      setPaymentMethods((prev) => [...prev, result.data!]);
+      setNewMethodName('');
+      toast.success(t(locale, 'saved'));
+    } else {
+      toast.error(result.error?.message || t(locale, 'failedSave'));
+    }
+    setAddingMethod(false);
+  };
+
+  const handleDeleteMethod = async (id: string) => {
+    setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
+    const result = await api.paymentMethods.delete(id);
+    if (result.error) {
+      toast.error(result.error.message);
+      refetch();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-6">
+        <PageHeader title={t(locale, 'categories')} />
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -69,14 +141,15 @@ export default function CategoriesPage() {
                   placeholder={t(locale, 'budget')}
                   onChange={(e) => {
                     const budget = parseCurrencyInput(e.target.value);
-                    updateCategory(c.id, { budget });
+                    setCategories((prev) => prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat)));
+                    handleUpdateBudget(c.id, budget);
                   }}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   className="text-destructive h-7 w-7"
-                  onClick={() => deleteCategory(c.id)}
+                  onClick={() => handleDeleteCategory(c.id)}
                   aria-label={t(locale, 'delete')}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -98,7 +171,7 @@ export default function CategoriesPage() {
                   variant="ghost"
                   size="icon"
                   className="text-destructive h-7 w-7"
-                  onClick={() => deleteCategory(c.id)}
+                  onClick={() => handleDeleteCategory(c.id)}
                   aria-label={t(locale, 'delete')}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -155,8 +228,9 @@ export default function CategoriesPage() {
               />
             </div>
           )}
-          <Button onClick={handleAddCategory} className="gap-1">
-            <Plus className="h-4 w-4" /> {t(locale, 'add')}
+          <Button onClick={handleAddCategory} className="gap-1" disabled={addingCat}>
+            {addingCat ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            {t(locale, 'add')}
           </Button>
         </div>
       </div>
@@ -175,7 +249,7 @@ export default function CategoriesPage() {
                 variant="ghost"
                 size="icon"
                 className="text-destructive h-7 w-7"
-                onClick={() => deletePaymentMethod(m.id)}
+                onClick={() => handleDeleteMethod(m.id)}
                 aria-label={t(locale, 'delete')}
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -200,8 +274,9 @@ export default function CategoriesPage() {
             <option value="cash">Cash</option>
             <option value="ewallet">E-Wallet</option>
           </select>
-          <Button onClick={handleAddMethod} className="gap-1">
-            <Plus className="h-4 w-4" /> {t(locale, 'add')}
+          <Button onClick={handleAddMethod} className="gap-1" disabled={addingMethod}>
+            {addingMethod ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            {t(locale, 'add')}
           </Button>
         </div>
       </div>

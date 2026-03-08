@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '@/store';
-import { Transaction } from '@/lib/types';
+import { Transaction, Category, PaymentMethod } from '@/lib/types';
 import { parseCurrencyInput, formatCurrencyInput } from '@/lib/formatters';
 import { validateTransactionForm, getFieldError, type FieldError } from '@/lib/validation';
+import { api } from '@/lib/api/client';
 import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,13 +20,17 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ transaction, onClose }: TransactionFormProps) {
-  const addTransaction = useStore((s) => s.addTransaction);
-  const updateTransaction = useStore((s) => s.updateTransaction);
-  const categories = useStore((s) => s.categories);
-  const paymentMethods = useStore((s) => s.paymentMethods);
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+
+  useEffect(() => {
+    api.categories.list().then((r) => { if (r.data) setCategories(r.data.categories); });
+    api.paymentMethods.list().then((r) => { if (r.data) setPaymentMethods(r.data.paymentMethods); });
+  }, []);
 
   const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense');
   const [description, setDescription] = useState(transaction?.description || '');
@@ -64,10 +69,12 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
     try {
       if (transaction) {
-        updateTransaction(transaction.id, data);
+        const result = await api.transactions.update(transaction.id, data);
+        if (result.error) throw new Error(result.error.message);
         toast.success(t(locale, 'transactionUpdated'));
       } else {
-        addTransaction(data);
+        const result = await api.transactions.create(data);
+        if (result.error) throw new Error(result.error.message);
         toast.success(t(locale, 'transactionAdded'));
       }
       onClose();

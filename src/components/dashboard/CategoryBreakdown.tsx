@@ -1,19 +1,21 @@
 'use client';
 
-import { useCategoryTotals } from '@/store/selectors';
-import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { motion } from 'framer-motion';
+import type { Category } from '@/lib/types';
 
-export function CategoryBreakdown() {
-  const totals = useCategoryTotals('expense');
-  const categories = useStore((s) => s.categories);
+interface CategoryBreakdownProps {
+  categoryTotals: Record<string, number>;
+  categories: Category[];
+}
+
+export function CategoryBreakdown({ categoryTotals, categories }: CategoryBreakdownProps) {
   const locale = useLocale();
 
-  const data = Object.entries(totals)
+  const data = Object.entries(categoryTotals)
     .map(([name, value]) => {
       const cat = categories.find((c) => c.name === name);
       return {

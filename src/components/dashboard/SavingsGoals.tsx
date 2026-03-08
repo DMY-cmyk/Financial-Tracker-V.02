@@ -1,13 +1,16 @@
 'use client';
 
-import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { ProgressRing } from '@/components/shared/ProgressRing';
 import { motion } from 'framer-motion';
+import type { SavingsGoal } from '@/lib/types';
 
-export function SavingsGoals() {
-  const goals = useStore((s) => s.savingsGoals);
+interface SavingsGoalsProps {
+  goals: SavingsGoal[];
+}
+
+export function SavingsGoals({ goals }: SavingsGoalsProps) {
   const locale = useLocale();
 
   return (
