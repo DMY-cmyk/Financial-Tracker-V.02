@@ -1,6 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+'use client';
+
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
-import { useMonthlyTransactions, useMonthlyIncome, useMonthlyExpense } from '@/store/selectors';
+import { api } from '@/lib/api/client';
 import { type Transaction } from '@/lib/types';
 
 interface UseTransactionsReturn {
@@ -38,11 +40,20 @@ interface UseTransactionsReturn {
 }
 
 export function useTransactions(): UseTransactionsReturn {
-  const allTransactions = useMonthlyTransactions();
-  const income = useMonthlyIncome();
-  const expense = useMonthlyExpense();
-  const deleteTx = useStore((s) => s.deleteTransaction);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
+  const zustandDelete = useStore((s) => s.deleteTransaction);
+
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+  const [income, setIncome] = useState(0);
+  const [expense, setExpense] = useState(0);
+  const [fetchKey, setFetchKey] = useState(0);
+
+  // Derive loading from comparing requested vs loaded data key
+  const [loadedKey, setLoadedKey] = useState('');
+  const targetKey = `${month}-${year}-${fetchKey}`;
+  const isApiLoading = loadedKey !== targetKey;
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
@@ -50,6 +61,30 @@ export function useTransactions(): UseTransactionsReturn {
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
+  // Fetch transactions from API
+  useEffect(() => {
+    if (!initialized) return;
+
+    let cancelled = false;
+
+    api.transactions.list({ month, year }).then((result) => {
+      if (cancelled) return;
+      if (result.data) {
+        setAllTransactions(result.data.transactions);
+        setIncome(result.data.income);
+        setExpense(result.data.expense);
+      }
+      setLoadedKey(`${month}-${year}-${fetchKey}`);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [month, year, fetchKey, initialized]);
+
+  const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
+
+  // Client-side filtering
   const filtered = useMemo(() => {
     return allTransactions.filter((tx) => {
       if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
@@ -87,7 +122,22 @@ export function useTransactions(): UseTransactionsReturn {
   const closeForm = useCallback(() => {
     setFormOpen(false);
     setEditingTx(undefined);
-  }, []);
+    refetch();
+  }, [refetch]);
+
+  const deleteTransaction = useCallback(
+    (id: string) => {
+      // Optimistic update: remove from local state immediately
+      setAllTransactions((prev) => prev.filter((t) => t.id !== id));
+      // Sync to Zustand for dashboard widgets
+      zustandDelete(id);
+      // Fire API call in background
+      api.transactions.delete(id);
+    },
+    [zustandDelete]
+  );
+
+  const isLoading = !initialized || isApiLoading;
 
   return {
     transactions: allTransactions,
@@ -108,9 +158,9 @@ export function useTransactions(): UseTransactionsReturn {
     openAdd,
     openEdit,
     closeForm,
-    deleteTransaction: deleteTx,
-    isLoading: !initialized,
-    isEmpty: initialized && allTransactions.length === 0,
-    hasNoResults: initialized && allTransactions.length > 0 && filtered.length === 0,
+    deleteTransaction,
+    isLoading,
+    isEmpty: !isLoading && allTransactions.length === 0,
+    hasNoResults: !isLoading && allTransactions.length > 0 && filtered.length === 0,
   };
 }

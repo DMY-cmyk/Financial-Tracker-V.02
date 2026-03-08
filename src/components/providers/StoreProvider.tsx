@@ -3,20 +3,30 @@
 import { useEffect } from 'react';
 import { useStore } from '@/store';
 import { getSampleData } from '@/data/sample-data';
+import { api } from '@/lib/api/client';
 import { LocaleContext } from '@/lib/i18n';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const initialized = useStore((s) => s.initialized);
   const initialize = useStore((s) => s.initialize);
+  const setTransactions = useStore((s) => s.setTransactions);
   const theme = useStore((s) => s.ui.theme);
   const locale = useStore((s) => s.ui.locale);
 
   useEffect(() => {
     if (!initialized) {
-      const data = getSampleData();
-      initialize(data);
+      // Seed non-transaction data from sample data immediately
+      const sampleData = getSampleData();
+      initialize(sampleData);
+
+      // Then sync transactions from API (server is the source of truth)
+      api.transactions.list().then((result) => {
+        if (result.data) {
+          setTransactions(result.data.transactions);
+        }
+      });
     }
-  }, [initialized, initialize]);
+  }, [initialized, initialize, setTransactions]);
 
   useEffect(() => {
     const root = document.documentElement;

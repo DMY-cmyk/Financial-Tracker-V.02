@@ -5,6 +5,7 @@ import { useStore } from '@/store';
 import { Transaction } from '@/lib/types';
 import { parseCurrencyInput, formatCurrencyInput } from '@/lib/formatters';
 import { validateTransactionForm, getFieldError, type FieldError } from '@/lib/validation';
+import { api } from '@/lib/api/client';
 import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,8 +20,8 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ transaction, onClose }: TransactionFormProps) {
-  const addTransaction = useStore((s) => s.addTransaction);
-  const updateTransaction = useStore((s) => s.updateTransaction);
+  const setTransactions = useStore((s) => s.setTransactions);
+  const storeTransactions = useStore((s) => s.transactions);
   const categories = useStore((s) => s.categories);
   const paymentMethods = useStore((s) => s.paymentMethods);
   const month = useStore((s) => s.ui.selectedMonth);
@@ -64,10 +65,20 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
     try {
       if (transaction) {
-        updateTransaction(transaction.id, data);
+        const result = await api.transactions.update(transaction.id, data);
+        if (result.error) throw new Error(result.error.message);
+        // Sync to Zustand for dashboard widgets
+        setTransactions(
+          storeTransactions.map((t) => (t.id === transaction.id ? { ...t, ...data } : t))
+        );
         toast.success(t(locale, 'transactionUpdated'));
       } else {
-        addTransaction(data);
+        const result = await api.transactions.create(data);
+        if (result.error) throw new Error(result.error.message);
+        // Sync to Zustand for dashboard widgets
+        if (result.data) {
+          setTransactions([...storeTransactions, result.data]);
+        }
         toast.success(t(locale, 'transactionAdded'));
       }
       onClose();

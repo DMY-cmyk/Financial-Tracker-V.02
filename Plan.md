@@ -7,25 +7,29 @@ A modern, premium financial tracking dashboard using a **Modular Bento Grid** la
 ## Architecture
 
 ```
-data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashboard
+data/workbook.json  -->  data-migration.ts  -->  Server In-Memory Store  -->  API Routes
+                                                      |                         |
+                                                 Zustand Store  <---  API Client  -->  React UI
                                                       |
-                                                 localStorage
+                                                 localStorage (categories, bills, savings, UI)
 ```
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router, static export) |
+| Framework | Next.js 16 (App Router, API routes + static pages) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 + shadcn/ui (base-nova) |
-| State | Zustand with localStorage persistence |
+| State | Zustand (UI/categories/bills/savings) + API (transactions) |
+| Validation | Zod (API request/response validation) |
+| Testing | Vitest (validation, services, dashboard) |
 | Charts | Recharts (area, pie, bars) |
 | Animations | Framer Motion (spring counters, stagger, transitions) |
 | Fonts | Plus Jakarta Sans + JetBrains Mono |
 | OCR | Tesseract.js (client-side, lazy-loaded) |
 | Export | CSV (native) + xlsx (SheetJS) + PDF (jspdf) |
-| Hosting | GitHub Pages (static `out/` directory) |
+| Hosting | Vercel, Railway, or any Node.js host (API routes require server) |
 
 ---
 
@@ -294,6 +298,50 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Zero lint warnings/errors
 - [x] All files formatted with Prettier
 
+### Backend Batch 1: Transaction API Integration
+
+#### Architecture & Contracts
+- [x] Removed `output: 'export'` from next.config.ts (API routes require server runtime)
+- [x] Installed Zod for API validation, Vitest for testing
+- [x] API contracts (`src/lib/api/contracts.ts`) — request/response types for all endpoints
+- [x] Zod validation schemas (`src/lib/api/validation.ts`) — create, update, list, dashboard
+- [x] Typed API client (`src/lib/api/client.ts`) — fetch wrapper with error handling
+
+#### Server Layer
+- [x] In-memory data store (`src/server/db/store.ts`) — persists across requests, resets on restart
+- [x] Seed module (`src/server/db/seed.ts`) — auto-seeds from workbook.json on first request
+- [x] Transaction repository (`src/server/repositories/transaction.repository.ts`) — CRUD with clean interface
+- [x] Transaction service (`src/server/services/transaction.service.ts`) — validation + business logic
+- [x] Dashboard service (`src/server/services/dashboard.service.ts`) — aggregation (balance, totals, cash flow)
+
+#### API Routes
+- [x] `GET /api/transactions` — list with filters (month, year, type, category, search)
+- [x] `POST /api/transactions` — create with Zod validation
+- [x] `PATCH /api/transactions/[id]` — partial update
+- [x] `DELETE /api/transactions/[id]` — delete by ID
+- [x] `GET /api/dashboard/summary` — aggregated dashboard data (balance, income, expense, savings rate, category totals, payment method totals, cash flow, recent transactions)
+
+#### Frontend Integration
+- [x] `useTransactions` hook rewritten to fetch from API (with refetch on mutations)
+- [x] `useDashboardData` hook rewritten to fetch summary from API (budget status computed client-side from API data + Zustand categories)
+- [x] `TransactionForm` uses API client for create/update (syncs to Zustand for dashboard widget compatibility)
+- [x] `StoreProvider` seeds Zustand transactions from API on init (same IDs as server)
+- [x] Optimistic delete (removes from local state + Zustand immediately, API call in background)
+- [x] Zustand `setTransactions` action added for API sync
+
+#### Testing
+- [x] Vitest configured (`vitest.config.ts`) with path aliases
+- [x] Validation schema tests (16 tests — all create/update/list/dashboard schemas)
+- [x] Transaction service tests (13 tests — create, list, filter, update, delete)
+- [x] Dashboard service tests (7 tests — summary, totals, cash flow, empty month, errors)
+- [x] All 36 tests passing
+
+#### What's Still Mocked / In Zustand
+- Categories, payment methods, bills, savings goals remain in Zustand (localStorage)
+- Dashboard widgets (CashFlowChart, CategoryBreakdown, etc.) still read from Zustand selectors
+- Zustand kept in sync via dual-write on create/update/delete
+- In-memory server store resets on server restart (no persistence)
+
 ---
 
 ## Project Structure
@@ -304,6 +352,12 @@ src/
     layout.tsx                # Root layout (fonts, providers, nav)
     page.tsx                  # Dashboard (bento grid)
     globals.css               # Tailwind v4 + design tokens
+    api/
+      transactions/
+        route.ts              # GET (list) + POST (create)
+        [id]/route.ts         # PATCH (update) + DELETE
+      dashboard/
+        summary/route.ts      # GET (aggregated dashboard data)
     transactions/
       page.tsx                # Transaction list + filters
       new/page.tsx            # Add transaction (standalone)
@@ -314,25 +368,38 @@ src/
     settings/
       page.tsx                # General settings
       categories/page.tsx     # Category & payment method management
+  server/
+    db/
+      store.ts                # In-memory data store
+      seed.ts                 # Auto-seed from workbook.json
+    repositories/
+      transaction.repository.ts  # Transaction CRUD interface
+    services/
+      transaction.service.ts  # Transaction business logic + validation
+      dashboard.service.ts    # Dashboard aggregation service
   components/
     ui/                       # shadcn/ui primitives (16 components incl. alert-dialog, sonner)
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
-    dashboard/                # 8 bento widgets (MonthSelector, CashFlowChart, CategoryBreakdown, BudgetProgress, PaymentMethods, BillsChecklist, SavingsGoals, RecentTransactions)
+    dashboard/                # 8 bento widgets
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
     settings/                 # SettingsSection, ImportDialog
     shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, QuickActionButton, ProgressRing
-    providers/                # StoreProvider
+    providers/                # StoreProvider (seeds from API + manages theme/locale)
   lib/
+    api/
+      contracts.ts            # API request/response types
+      validation.ts           # Zod schemas for all endpoints
+      client.ts               # Typed fetch wrapper (frontend API client)
     types.ts                  # TypeScript interfaces
     constants.ts              # Colors, defaults, nav items
     formatters.ts             # Currency/date formatting (IDR)
     calculations.ts           # Financial computation functions
     data-migration.ts         # workbook.json -> typed objects
     i18n.ts                   # EN/ID translations + context
-    mock-data.ts              # Quick actions, empty messages, language options, export formats, upload constants
-    motion.ts                 # Framer Motion animation presets (fadeIn, stagger, spring, ease)
+    mock-data.ts              # Quick actions, empty messages, language options
+    motion.ts                 # Framer Motion animation presets
     export-utils.ts           # CSV/Excel/PDF generation
     import-utils.ts           # JSON/CSV import parsing + validation
     category-suggest.ts       # OCR category auto-suggestion
@@ -340,14 +407,18 @@ src/
     services.ts               # API boundary placeholders
     utils.ts                  # cn() utility (shadcn)
   hooks/
-    useDashboardData.ts       # Dashboard data hook
-    useTransactions.ts        # Transactions CRUD + filters hook
+    useDashboardData.ts       # Dashboard data (fetches from API)
+    useTransactions.ts        # Transactions CRUD + filters (fetches from API)
     useUpload.ts              # Upload/OCR state hook
     useExport.ts              # Export jobs hook
     useImport.ts              # Import data hook
   store/
     index.ts                  # Zustand store (persist middleware)
     selectors.ts              # Memoized computed selectors
+  __tests__/
+    validation.test.ts        # Zod schema tests
+    transaction.service.test.ts  # Transaction service tests
+    dashboard.service.test.ts # Dashboard service tests
   data/
     sample-data.ts            # Workbook migration entry point
 ```
@@ -356,10 +427,12 @@ src/
 
 ```bash
 npm run dev          # http://localhost:3000
-npm run build        # Static export to out/
+npm run build        # Production build (static pages + API routes)
+npm run test         # Run vitest tests
 ```
 
-GitHub Actions: Checkout -> Node 20 -> `npm ci` -> `npm run build` -> Deploy `out/` to GitHub Pages
+Deployment: Vercel, Railway, or any Node.js host (API routes require server runtime).
+Static-only GitHub Pages deployment no longer supported due to API routes.
 
 ## Reference Documents
 
