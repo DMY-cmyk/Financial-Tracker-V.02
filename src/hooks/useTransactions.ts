@@ -43,7 +43,6 @@ export function useTransactions(): UseTransactionsReturn {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
-  const zustandDelete = useStore((s) => s.deleteTransaction);
 
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [income, setIncome] = useState(0);
@@ -129,12 +128,10 @@ export function useTransactions(): UseTransactionsReturn {
     (id: string) => {
       // Optimistic update: remove from local state immediately
       setAllTransactions((prev) => prev.filter((t) => t.id !== id));
-      // Sync to Zustand for dashboard widgets
-      zustandDelete(id);
       // Fire API call in background
       api.transactions.delete(id);
     },
-    [zustandDelete]
+    []
   );
 
   const isLoading = !initialized || isApiLoading;

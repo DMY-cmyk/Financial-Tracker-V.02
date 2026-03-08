@@ -1,13 +1,24 @@
 'use client';
 
-import { useBudgetStatus } from '@/store/selectors';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-export function BudgetProgress() {
-  const budgets = useBudgetStatus();
+interface BudgetItem {
+  category: string;
+  budget: number;
+  spent: number;
+  remaining: number;
+  color: string;
+  percentage: number;
+}
+
+interface BudgetProgressProps {
+  budgets: BudgetItem[];
+}
+
+export function BudgetProgress({ budgets }: BudgetProgressProps) {
   const locale = useLocale();
 
   return (

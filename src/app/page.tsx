@@ -30,8 +30,12 @@ import {
 
 export default function DashboardPage() {
   const locale = useLocale();
-  const { month, year, balance, income, expense, savingsRate, isLoading, isEmpty } =
-    useDashboardData();
+  const {
+    month, year, balance, income, expense, savingsRate,
+    cashFlow, categoryTotals, budgetStatus, paymentMethodTotals,
+    recentTransactions, bills, savingsGoals, categories,
+    isLoading, isEmpty,
+  } = useDashboardData();
 
   if (isLoading) {
     return (
@@ -132,10 +136,10 @@ export default function DashboardPage() {
             animate="show"
           >
             <motion.div className="lg:col-span-2" variants={staggerItem}>
-              <CashFlowChart />
+              <CashFlowChart data={cashFlow} />
             </motion.div>
             <motion.div variants={staggerItem}>
-              <CategoryBreakdown />
+              <CategoryBreakdown categoryTotals={categoryTotals} categories={categories} />
             </motion.div>
           </motion.div>
 
@@ -147,10 +151,10 @@ export default function DashboardPage() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BudgetProgress />
+              <BudgetProgress budgets={budgetStatus} />
             </motion.div>
             <motion.div variants={staggerItem}>
-              <RecentTransactions />
+              <RecentTransactions transactions={recentTransactions} categories={categories} />
             </motion.div>
           </motion.div>
 
@@ -162,13 +166,13 @@ export default function DashboardPage() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BillsChecklist />
+              <BillsChecklist bills={bills} />
             </motion.div>
             <motion.div variants={staggerItem}>
-              <SavingsGoals />
+              <SavingsGoals goals={savingsGoals} />
             </motion.div>
             <motion.div variants={staggerItem}>
-              <PaymentMethodsSummary />
+              <PaymentMethodsSummary totals={paymentMethodTotals} />
             </motion.div>
           </motion.div>
         </>

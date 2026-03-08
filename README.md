@@ -95,9 +95,10 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 | **Framework** | Next.js 16 (App Router, API routes + static pages) |
 | **Language** | TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
-| **State** | Zustand (UI/categories/bills/savings) + API (transactions) |
+| **State** | Zustand (UI/bills/savings) + SQLite API (transactions, categories, payment methods, settings) |
+| **Database** | SQLite via better-sqlite3 (WAL mode, 8 tables) |
 | **Validation** | Zod (API request/response schemas) |
-| **Testing** | Vitest (36 tests: validation, services, dashboard) |
+| **Testing** | Vitest (84 tests: validation, all services) |
 | **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -135,8 +136,12 @@ src/
   app/
     page.tsx                  # Dashboard (bento grid)
     api/
-      transactions/route.ts   # GET (list) + POST (create)
-      transactions/[id]/      # PATCH (update) + DELETE
+      transactions/           # GET (list) + POST (create), [id] PATCH/DELETE
+      categories/             # GET (list) + POST, [id] PATCH/DELETE
+      payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
+      settings/               # GET + PATCH
+      uploads/                # GET (list) + POST, [id] PATCH
+      export-jobs/            # GET (list) + POST
       dashboard/summary/      # GET (aggregated summary)
     transactions/page.tsx     # Transaction list + filters
     transactions/new/page.tsx # Add transaction form
@@ -145,9 +150,9 @@ src/
     settings/page.tsx         # Theme, language, data
     settings/categories/      # Category & payment method CRUD
   server/
-    db/                       # In-memory store + seed
-    repositories/             # Transaction repository (CRUD interface)
-    services/                 # Transaction + Dashboard business logic
+    db/                       # SQLite connection + seed (better-sqlite3)
+    repositories/             # CRUD repositories (transaction, category, payment-method, settings, upload, export-job)
+    services/                 # Business logic (transaction, dashboard, category, payment-method, settings, upload, export-job)
   components/
     dashboard/                # 8 bento widgets
     transactions/             # Table, form, filters, category chip
@@ -163,7 +168,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store + memoized selectors
-  __tests__/                  # Vitest tests (validation, services, dashboard)
+  __tests__/                  # Vitest tests (84 tests: validation, transaction, dashboard, category, payment-method, settings, export-job)
 ```
 
 ## Documentation

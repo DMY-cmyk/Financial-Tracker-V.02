@@ -4,6 +4,11 @@ import {
   updateTransactionSchema,
   listTransactionsQuerySchema,
   dashboardSummaryQuerySchema,
+  createCategorySchema,
+  createPaymentMethodSchema,
+  updateSettingsSchema,
+  createUploadSchema,
+  createExportJobSchema,
 } from '@/lib/api/validation';
 
 describe('createTransactionSchema', () => {
@@ -149,5 +154,84 @@ describe('dashboardSummaryQuerySchema', () => {
       month: 5,
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('createCategorySchema', () => {
+  it('accepts valid input', () => {
+    const result = createCategorySchema.safeParse({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.icon).toBe('circle');
+      expect(result.data.budget).toBe(0);
+    }
+  });
+
+  it('rejects empty name', () => {
+    expect(createCategorySchema.safeParse({ name: '', type: 'expense', color: '#000' }).success).toBe(false);
+  });
+
+  it('rejects invalid type', () => {
+    expect(createCategorySchema.safeParse({ name: 'X', type: 'transfer', color: '#000' }).success).toBe(false);
+  });
+});
+
+describe('createPaymentMethodSchema', () => {
+  it('accepts valid input', () => {
+    const result = createPaymentMethodSchema.safeParse({
+      name: 'Bank BCA',
+      type: 'bank',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.icon).toBe('wallet');
+  });
+
+  it('rejects invalid type', () => {
+    expect(createPaymentMethodSchema.safeParse({ name: 'X', type: 'crypto' }).success).toBe(false);
+  });
+});
+
+describe('updateSettingsSchema', () => {
+  it('accepts string record', () => {
+    const result = updateSettingsSchema.safeParse({ theme: 'dark', locale: 'id' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty object', () => {
+    expect(updateSettingsSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe('createUploadSchema', () => {
+  it('accepts valid input', () => {
+    const result = createUploadSchema.safeParse({ filename: 'receipt.jpg' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.fileSize).toBe(0);
+      expect(result.data.mimeType).toBe('');
+    }
+  });
+
+  it('rejects empty filename', () => {
+    expect(createUploadSchema.safeParse({ filename: '' }).success).toBe(false);
+  });
+});
+
+describe('createExportJobSchema', () => {
+  it('accepts valid input', () => {
+    const result = createExportJobSchema.safeParse({ format: 'csv', scope: 'current' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects invalid format', () => {
+    expect(createExportJobSchema.safeParse({ format: 'docx', scope: 'current' }).success).toBe(false);
+  });
+
+  it('rejects invalid scope', () => {
+    expect(createExportJobSchema.safeParse({ format: 'csv', scope: 'monthly' }).success).toBe(false);
   });
 });

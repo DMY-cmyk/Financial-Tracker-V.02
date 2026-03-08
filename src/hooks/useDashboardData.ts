@@ -76,6 +76,7 @@ export function useDashboardData() {
     paymentMethodTotals: summary?.paymentMethodTotals ?? {},
     bills,
     savingsGoals,
+    categories,
     isLoading,
     isEmpty: !isLoading && summary?.transactionCount === 0,
   };

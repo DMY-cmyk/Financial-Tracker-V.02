@@ -1,4 +1,4 @@
-import type { Transaction } from '@/lib/types';
+import type { Transaction, Category, PaymentMethod } from '@/lib/types';
 
 // === Request types ===
 
@@ -70,4 +70,58 @@ export interface DashboardSummaryResponse {
   paymentMethodTotals: Record<string, number>;
   cashFlow: { date: string; income: number; expense: number }[];
   recentTransactions: Transaction[];
+}
+
+// === Category contracts ===
+
+export interface CategoryListResponse {
+  categories: Category[];
+}
+
+// === Payment method contracts ===
+
+export interface PaymentMethodListResponse {
+  paymentMethods: PaymentMethod[];
+}
+
+// === Settings contracts ===
+
+export interface SettingsResponse {
+  settings: Record<string, string>;
+}
+
+// === Upload contracts ===
+
+export interface UploadResponse {
+  id: string;
+  filename: string;
+  fileSize: number;
+  mimeType: string;
+  status: 'pending' | 'processing' | 'extracted' | 'saved' | 'error';
+  extractedData: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UploadListResponse {
+  uploads: UploadResponse[];
+}
+
+// === Export job contracts ===
+
+export interface ExportJobResponse {
+  id: string;
+  format: string;
+  scope: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  filters: string | null;
+  options: string | null;
+  filename: string | null;
+  recordCount: number;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface ExportJobListResponse {
+  jobs: ExportJobResponse[];
 }

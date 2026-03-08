@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetStore, initializeStore } from '@/server/db/store';
+import { resetDb } from '@/server/db/sqlite';
+import { resetSeeded, markSeeded } from '@/server/db/seed';
 import {
   listTransactions,
   createTransaction,
@@ -8,15 +9,9 @@ import {
 } from '@/server/services/transaction.service';
 
 beforeEach(() => {
-  resetStore();
-  // Mark as initialized with empty data so ensureSeeded() won't load sample data
-  initializeStore({
-    transactions: [],
-    categories: [],
-    paymentMethods: [],
-    bills: [],
-    savingsGoals: [],
-  });
+  resetDb();
+  resetSeeded();
+  markSeeded();
 });
 
 describe('createTransaction', () => {
@@ -58,7 +53,6 @@ describe('createTransaction', () => {
 
 describe('listTransactions', () => {
   beforeEach(() => {
-    // Create some test transactions
     createTransaction({
       date: '2025-01-15',
       description: 'Salary',

@@ -1,15 +1,18 @@
 'use client';
 
-import { useMonthlyBills } from '@/store/selectors';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import type { Bill } from '@/lib/types';
 
-export function BillsChecklist() {
-  const bills = useMonthlyBills();
+interface BillsChecklistProps {
+  bills: Bill[];
+}
+
+export function BillsChecklist({ bills }: BillsChecklistProps) {
   const toggleBillPaid = useStore((s) => s.toggleBillPaid);
   const locale = useLocale();
 

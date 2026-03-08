@@ -336,11 +336,84 @@ data/workbook.json  -->  data-migration.ts  -->  Server In-Memory Store  -->  AP
 - [x] Dashboard service tests (7 tests — summary, totals, cash flow, empty month, errors)
 - [x] All 36 tests passing
 
-#### What's Still Mocked / In Zustand
-- Categories, payment methods, bills, savings goals remain in Zustand (localStorage)
-- Dashboard widgets (CashFlowChart, CategoryBreakdown, etc.) still read from Zustand selectors
-- Zustand kept in sync via dual-write on create/update/delete
-- In-memory server store resets on server restart (no persistence)
+#### What's Still Mocked / In Zustand (After Batch 1)
+- ~~Categories, payment methods remain in Zustand~~ (moved to API in Batch 2)
+- Bills, savings goals remain in Zustand (localStorage)
+- ~~Dashboard widgets read from Zustand selectors~~ (refactored to props in Batch 2)
+- ~~Dual-write pattern~~ (removed in Batch 2)
+- ~~In-memory server store~~ (replaced by SQLite in Batch 2)
+
+### Backend Batch 2: Full Backend Integration + SQLite
+
+#### SQLite Persistence
+- [x] Installed better-sqlite3 + @types/better-sqlite3
+- [x] SQLite module (`src/server/db/sqlite.ts`) — WAL mode, schema init (8 tables)
+- [x] Schema: transactions, categories, payment_methods, bills, savings_goals, settings, uploads, export_jobs
+- [x] Seed module rewritten for SQLite (`src/server/db/seed.ts`) — bulk insert with transactions
+- [x] Test helpers: `resetDb()`, `resetSeeded()`, `markSeeded()` for clean test isolation
+- [x] Removed old in-memory store (`src/server/db/store.ts`)
+
+#### Repositories (SQLite-backed)
+- [x] Transaction repository rewritten for SQLite (LIKE prefix for month filtering)
+- [x] Category repository (`src/server/repositories/category.repository.ts`) — full CRUD
+- [x] Payment method repository (`src/server/repositories/payment-method.repository.ts`) — full CRUD
+- [x] Settings repository (`src/server/repositories/settings.repository.ts`) — key-value store
+- [x] Upload repository (`src/server/repositories/upload.repository.ts`) — metadata persistence
+- [x] Export job repository (`src/server/repositories/export-job.repository.ts`) — job tracking
+
+#### Services
+- [x] Category service — listCategories, createCategory, updateCategory, deleteCategory
+- [x] Payment method service — listPaymentMethods, createPaymentMethod, updatePaymentMethod, deletePaymentMethod
+- [x] Settings service — getSettings, updateSettings
+- [x] Upload service — listUploads, createUpload, updateUpload
+- [x] Export job service — listExportJobs, createExportJob (marks completed immediately)
+
+#### Validation Schemas (Zod)
+- [x] createCategorySchema, updateCategorySchema
+- [x] createPaymentMethodSchema, updatePaymentMethodSchema
+- [x] updateSettingsSchema (record of strings, non-empty)
+- [x] createUploadSchema, updateUploadSchema
+- [x] createExportJobSchema
+
+#### API Routes
+- [x] `GET/POST /api/categories` — list (with type filter) + create
+- [x] `PATCH/DELETE /api/categories/[id]` — update + delete
+- [x] `GET/POST /api/payment-methods` — list + create
+- [x] `PATCH/DELETE /api/payment-methods/[id]` — update + delete
+- [x] `GET/PATCH /api/settings` — get all + update settings
+- [x] `GET/POST /api/uploads` — list + create
+- [x] `PATCH /api/uploads/[id]` — update status/extracted data
+- [x] `GET/POST /api/export-jobs` — list + create
+
+#### API Client Extensions
+- [x] `api.categories` — list, create, update, delete
+- [x] `api.paymentMethods` — list, create, update, delete
+- [x] `api.settings` — get, update
+- [x] `api.uploads` — list, create, update
+- [x] `api.exportJobs` — list, create
+- [x] Contract types: CategoryListResponse, PaymentMethodListResponse, SettingsResponse, UploadResponse, ExportJobResponse
+
+#### Frontend Integration
+- [x] Dashboard widgets refactored to receive data via props (CashFlowChart, CategoryBreakdown, BudgetProgress, PaymentMethods, RecentTransactions, BillsChecklist, SavingsGoals)
+- [x] Dashboard page passes all data from `useDashboardData()` to widgets
+- [x] Categories page rewritten to use API (fetch, create, update budget, delete)
+- [x] TransactionForm fetches categories/payment methods from API instead of Zustand
+- [x] StoreProvider simplified — no longer syncs transactions from API
+- [x] Removed dual-write pattern from useTransactions (no more Zustand sync)
+
+#### Testing
+- [x] Existing tests migrated from old store to SQLite (`resetDb()` + `markSeeded()`)
+- [x] Category service tests (13 tests — CRUD, filtering, validation, edge cases)
+- [x] Payment method service tests (10 tests — CRUD, validation, defaults)
+- [x] Settings service tests (6 tests — get, update, preserve, validation)
+- [x] Export job service tests (7 tests — create, list, validation)
+- [x] Validation tests expanded (12 new tests for new schemas)
+- [x] All 84 tests passing
+
+#### What's Still In Zustand
+- Bills and savings goals remain in Zustand (localStorage)
+- UI state (month, year, theme, locale) remains in Zustand
+- These will move to API in a future batch
 
 ---
 
@@ -356,6 +429,17 @@ src/
       transactions/
         route.ts              # GET (list) + POST (create)
         [id]/route.ts         # PATCH (update) + DELETE
+      categories/
+        route.ts              # GET (list) + POST (create)
+        [id]/route.ts         # PATCH (update) + DELETE
+      payment-methods/
+        route.ts              # GET (list) + POST (create)
+        [id]/route.ts         # PATCH (update) + DELETE
+      settings/route.ts       # GET + PATCH
+      uploads/
+        route.ts              # GET (list) + POST (create)
+        [id]/route.ts         # PATCH (update status)
+      export-jobs/route.ts    # GET (list) + POST (create)
       dashboard/
         summary/route.ts      # GET (aggregated dashboard data)
     transactions/
@@ -370,13 +454,23 @@ src/
       categories/page.tsx     # Category & payment method management
   server/
     db/
-      store.ts                # In-memory data store
-      seed.ts                 # Auto-seed from workbook.json
+      sqlite.ts               # SQLite connection + schema (better-sqlite3)
+      seed.ts                 # Auto-seed from workbook.json into SQLite
     repositories/
-      transaction.repository.ts  # Transaction CRUD interface
+      transaction.repository.ts   # Transaction CRUD (SQLite)
+      category.repository.ts      # Category CRUD (SQLite)
+      payment-method.repository.ts # Payment method CRUD (SQLite)
+      settings.repository.ts      # Settings key-value store (SQLite)
+      upload.repository.ts        # Upload metadata (SQLite)
+      export-job.repository.ts    # Export job tracking (SQLite)
     services/
       transaction.service.ts  # Transaction business logic + validation
       dashboard.service.ts    # Dashboard aggregation service
+      category.service.ts     # Category CRUD service
+      payment-method.service.ts # Payment method CRUD service
+      settings.service.ts     # Settings service
+      upload.service.ts       # Upload metadata service
+      export-job.service.ts   # Export job service
   components/
     ui/                       # shadcn/ui primitives (16 components incl. alert-dialog, sonner)
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
@@ -416,9 +510,13 @@ src/
     index.ts                  # Zustand store (persist middleware)
     selectors.ts              # Memoized computed selectors
   __tests__/
-    validation.test.ts        # Zod schema tests
-    transaction.service.test.ts  # Transaction service tests
-    dashboard.service.test.ts # Dashboard service tests
+    validation.test.ts            # Zod schema tests (28 tests)
+    transaction.service.test.ts   # Transaction service tests (13 tests)
+    dashboard.service.test.ts     # Dashboard service tests (7 tests)
+    category.service.test.ts      # Category service tests (13 tests)
+    payment-method.service.test.ts # Payment method service tests (10 tests)
+    settings.service.test.ts      # Settings service tests (6 tests)
+    export-job.service.test.ts    # Export job service tests (7 tests)
   data/
     sample-data.ts            # Workbook migration entry point
 ```

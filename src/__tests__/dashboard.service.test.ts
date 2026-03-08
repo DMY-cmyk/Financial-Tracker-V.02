@@ -1,17 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetStore, initializeStore } from '@/server/db/store';
+import { resetDb } from '@/server/db/sqlite';
+import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { createTransaction } from '@/server/services/transaction.service';
 import { getDashboardSummary } from '@/server/services/dashboard.service';
 
 beforeEach(() => {
-  resetStore();
-  initializeStore({
-    transactions: [],
-    categories: [],
-    paymentMethods: [],
-    bills: [],
-    savingsGoals: [],
-  });
+  resetDb();
+  resetSeeded();
+  markSeeded();
 });
 
 function seedJanuary() {
