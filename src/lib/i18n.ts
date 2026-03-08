@@ -5,12 +5,15 @@ import { createContext, useContext } from 'react';
 export type Locale = 'en' | 'id';
 
 type TranslationKeys = {
+  // Navigation
   dashboard: string;
   transactions: string;
   upload: string;
   export: string;
   settings: string;
   categories: string;
+
+  // Dashboard
   netBalance: string;
   totalIncome: string;
   totalExpense: string;
@@ -19,6 +22,7 @@ type TranslationKeys = {
   budget: string;
   spent: string;
   remaining: string;
+  savingsRate: string;
   cashFlow: string;
   categoryBreakdown: string;
   budgetProgress: string;
@@ -27,6 +31,9 @@ type TranslationKeys = {
   savingsGoals: string;
   recentTransactions: string;
   viewAll: string;
+  quickActions: string;
+
+  // Transactions
   addTransaction: string;
   editTransaction: string;
   deleteTransaction: string;
@@ -36,33 +43,81 @@ type TranslationKeys = {
   date: string;
   paymentMethod: string;
   notes: string;
+
+  // Common actions
   save: string;
   cancel: string;
   search: string;
   filter: string;
+  ok: string;
+  back: string;
+  clear: string;
+  confirm: string;
+
+  // States
   noData: string;
+  loading: string;
+  success: string;
+  error: string;
+
+  // Bills
   paid: string;
   unpaid: string;
   overdue: string;
   dueDate: string;
+
+  // Savings
   target: string;
   saved: string;
   of: string;
+
+  // Filters
   all: string;
   thisMonth: string;
+
+  // Settings
   language: string;
   theme: string;
   light: string;
   dark: string;
   system: string;
+  appearance: string;
+  dataManagement: string;
+
+  // Export
   exportData: string;
   importData: string;
   clearData: string;
   confirmDelete: string;
-  ok: string;
+  exportFormat: string;
+  exportScope: string;
+  exportOptions: string;
+  exportPreview: string;
+  includeSummary: string;
+  groupByDate: string;
+  downloadReady: string;
+
+  // Upload & OCR
+  uploadReceipt: string;
+  extractData: string;
+  extractedData: string;
+  processing: string;
+  uploadImage: string;
+  dropHere: string;
+  orClickBrowse: string;
+  extractText: string;
+  saveTransaction: string;
+  confidence: string;
+  reviewExtracted: string;
+
+  // Budget
   overBudget: string;
   onTrack: string;
-  uploadReceipt: string;
+
+  // Validation
+  required: string;
+  invalidAmount: string;
+  selectCategory: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -81,6 +136,7 @@ const translations: Record<Locale, TranslationKeys> = {
     budget: 'Budget',
     spent: 'Spent',
     remaining: 'Remaining',
+    savingsRate: 'Savings Rate',
     cashFlow: 'Cash Flow',
     categoryBreakdown: 'Category Breakdown',
     budgetProgress: 'Budget Progress',
@@ -89,6 +145,7 @@ const translations: Record<Locale, TranslationKeys> = {
     savingsGoals: 'Savings Goals',
     recentTransactions: 'Recent Transactions',
     viewAll: 'View all',
+    quickActions: 'Quick Actions',
     addTransaction: 'Add Transaction',
     editTransaction: 'Edit Transaction',
     deleteTransaction: 'Delete Transaction',
@@ -102,7 +159,14 @@ const translations: Record<Locale, TranslationKeys> = {
     cancel: 'Cancel',
     search: 'Search',
     filter: 'Filter',
+    ok: 'OK',
+    back: 'Back',
+    clear: 'Clear',
+    confirm: 'Confirm',
     noData: 'No data yet',
+    loading: 'Loading...',
+    success: 'Success',
+    error: 'Something went wrong',
     paid: 'Paid',
     unpaid: 'Unpaid',
     overdue: 'Overdue',
@@ -117,14 +181,35 @@ const translations: Record<Locale, TranslationKeys> = {
     light: 'Light',
     dark: 'Dark',
     system: 'System',
+    appearance: 'Appearance',
+    dataManagement: 'Data Management',
     exportData: 'Export Data',
     importData: 'Import Data',
-    clearData: 'Clear Data',
-    confirmDelete: 'Are you sure you want to delete this?',
-    ok: 'OK',
+    clearData: 'Clear All Data',
+    confirmDelete: 'Are you sure? This will permanently delete all your data.',
+    exportFormat: 'Format',
+    exportScope: 'Scope',
+    exportOptions: 'Options',
+    exportPreview: 'Preview',
+    includeSummary: 'Include summary totals',
+    groupByDate: 'Group by date',
+    downloadReady: 'Ready to download',
+    uploadReceipt: 'Upload Receipt',
+    extractData: 'Extract Data',
+    extractedData: 'Extracted Data',
+    processing: 'Processing...',
+    uploadImage: 'Upload Image',
+    dropHere: 'Drop receipt image here',
+    orClickBrowse: 'or click to browse',
+    extractText: 'Extract Text',
+    saveTransaction: 'Save Transaction',
+    confidence: 'Confidence',
+    reviewExtracted: 'Review extracted data before saving',
     overBudget: 'Over Budget',
     onTrack: 'On Track',
-    uploadReceipt: 'Upload Receipt',
+    required: 'This field is required',
+    invalidAmount: 'Enter a valid amount',
+    selectCategory: 'Select a category',
   },
   id: {
     dashboard: 'Dasbor',
@@ -141,6 +226,7 @@ const translations: Record<Locale, TranslationKeys> = {
     budget: 'Anggaran',
     spent: 'Terpakai',
     remaining: 'Tersisa',
+    savingsRate: 'Tingkat Tabungan',
     cashFlow: 'Arus Kas',
     categoryBreakdown: 'Rincian Kategori',
     budgetProgress: 'Progres Anggaran',
@@ -149,6 +235,7 @@ const translations: Record<Locale, TranslationKeys> = {
     savingsGoals: 'Target Tabungan',
     recentTransactions: 'Transaksi Terbaru',
     viewAll: 'Lihat semua',
+    quickActions: 'Aksi Cepat',
     addTransaction: 'Tambah Transaksi',
     editTransaction: 'Edit Transaksi',
     deleteTransaction: 'Hapus Transaksi',
@@ -162,7 +249,14 @@ const translations: Record<Locale, TranslationKeys> = {
     cancel: 'Batal',
     search: 'Cari',
     filter: 'Filter',
+    ok: 'OK',
+    back: 'Kembali',
+    clear: 'Hapus',
+    confirm: 'Konfirmasi',
     noData: 'Belum ada data',
+    loading: 'Memuat...',
+    success: 'Berhasil',
+    error: 'Terjadi kesalahan',
     paid: 'Lunas',
     unpaid: 'Belum Lunas',
     overdue: 'Terlambat',
@@ -177,14 +271,35 @@ const translations: Record<Locale, TranslationKeys> = {
     light: 'Terang',
     dark: 'Gelap',
     system: 'Sistem',
+    appearance: 'Tampilan',
+    dataManagement: 'Manajemen Data',
     exportData: 'Ekspor Data',
     importData: 'Impor Data',
-    clearData: 'Hapus Data',
-    confirmDelete: 'Yakin ingin menghapus ini?',
-    ok: 'OK',
+    clearData: 'Hapus Semua Data',
+    confirmDelete: 'Yakin? Semua data akan dihapus secara permanen.',
+    exportFormat: 'Format',
+    exportScope: 'Cakupan',
+    exportOptions: 'Opsi',
+    exportPreview: 'Pratinjau',
+    includeSummary: 'Sertakan total ringkasan',
+    groupByDate: 'Kelompokkan berdasarkan tanggal',
+    downloadReady: 'Siap diunduh',
+    uploadReceipt: 'Unggah Struk',
+    extractData: 'Ekstrak Data',
+    extractedData: 'Data Terekstrak',
+    processing: 'Memproses...',
+    uploadImage: 'Unggah Gambar',
+    dropHere: 'Letakkan gambar struk di sini',
+    orClickBrowse: 'atau klik untuk pilih file',
+    extractText: 'Ekstrak Teks',
+    saveTransaction: 'Simpan Transaksi',
+    confidence: 'Kepercayaan',
+    reviewExtracted: 'Periksa data terekstrak sebelum menyimpan',
     overBudget: 'Melebihi Anggaran',
     onTrack: 'Sesuai',
-    uploadReceipt: 'Unggah Struk',
+    required: 'Kolom ini wajib diisi',
+    invalidAmount: 'Masukkan jumlah yang valid',
+    selectCategory: 'Pilih kategori',
   },
 };
 

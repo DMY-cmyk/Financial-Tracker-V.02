@@ -66,6 +66,43 @@ export interface QuickAction {
   icon: string;
 }
 
+export type ExtractionStatus = 'idle' | 'uploading' | 'processing' | 'extracted' | 'saved' | 'error';
+
+export interface ExtractionField {
+  key: string;
+  label: string;
+  value: string;
+  confidence: number; // 0-100
+  editable: boolean;
+}
+
+export interface ExtractionResult {
+  amount: string;
+  description: string;
+  date: string;
+  category: string;
+  paymentMethod: string;
+  confidence: number; // overall 0-100
+  status: ExtractionStatus;
+}
+
+export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf';
+export type ExportScope = 'current' | 'all';
+
+export interface ExportState {
+  format: ExportFormat;
+  scope: ExportScope;
+  includeSummary: boolean;
+  groupByDate: boolean;
+}
+
+export interface LanguageOption {
+  code: 'en' | 'id';
+  label: string;
+  nativeLabel: string;
+  flag: string;
+}
+
 export interface FinancialStore {
   transactions: Transaction[];
   categories: Category[];
