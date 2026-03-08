@@ -57,7 +57,9 @@ export default function CategoriesPage() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Expense Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
-          <h3 className="mb-4 text-sm font-semibold">Expense {t(locale, 'categories')}</h3>
+          <h3 className="mb-4 text-sm font-semibold">
+            {locale === 'id' ? 'Kategori Pengeluaran' : 'Expense Categories'}
+          </h3>
           <div className="space-y-2">
             {expenseCategories.map((c) => (
               <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
@@ -66,7 +68,7 @@ export default function CategoriesPage() {
                 <Input
                   className="w-28 font-mono text-xs"
                   value={c.budget > 0 ? formatCurrencyInput(c.budget) : ''}
-                  placeholder="Budget"
+                  placeholder={t(locale, 'budget')}
                   onChange={(e) => {
                     const budget = parseCurrencyInput(e.target.value);
                     updateCategory(c.id, { budget });
@@ -87,7 +89,9 @@ export default function CategoriesPage() {
 
         {/* Income Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
-          <h3 className="mb-4 text-sm font-semibold">Income Sources</h3>
+          <h3 className="mb-4 text-sm font-semibold">
+            {locale === 'id' ? 'Sumber Pemasukan' : 'Income Sources'}
+          </h3>
           <div className="space-y-2">
             {incomeCategories.map((c) => (
               <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
@@ -109,25 +113,29 @@ export default function CategoriesPage() {
 
       {/* Add Category */}
       <div className="border-border bg-card rounded-2xl border p-6">
-        <h3 className="mb-4 text-sm font-semibold">Add Category</h3>
+        <h3 className="mb-4 text-sm font-semibold">
+          {locale === 'id' ? 'Tambah Kategori' : 'Add Category'}
+        </h3>
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="text-muted-foreground mb-1 block text-xs">Type</label>
+            <label className="text-muted-foreground mb-1 block text-xs">{t(locale, 'type')}</label>
             <select
               value={newCatType}
               onChange={(e) => setNewCatType(e.target.value as 'expense' | 'income')}
               className="border-input bg-background rounded-md border px-3 py-2 text-sm"
             >
-              <option value="expense">Expense</option>
-              <option value="income">Income</option>
+              <option value="expense">{t(locale, 'expense')}</option>
+              <option value="income">{t(locale, 'income')}</option>
             </select>
           </div>
           <div className="min-w-[120px] flex-1">
-            <label className="text-muted-foreground mb-1 block text-xs">Name</label>
+            <label className="text-muted-foreground mb-1 block text-xs">
+              {locale === 'id' ? 'Nama' : 'Name'}
+            </label>
             <Input
               value={newCatName}
               onChange={(e) => setNewCatName(e.target.value)}
-              placeholder="Category name"
+              placeholder={locale === 'id' ? 'Nama kategori' : 'Category name'}
             />
           </div>
           <div className="flex gap-1">
@@ -142,7 +150,9 @@ export default function CategoriesPage() {
           </div>
           {newCatType === 'expense' && (
             <div className="w-28">
-              <label className="text-muted-foreground mb-1 block text-xs">Budget</label>
+              <label className="text-muted-foreground mb-1 block text-xs">
+                {t(locale, 'budget')}
+              </label>
               <Input
                 value={newCatBudget}
                 onChange={(e) => setNewCatBudget(e.target.value)}
@@ -152,7 +162,7 @@ export default function CategoriesPage() {
             </div>
           )}
           <Button onClick={handleAddCategory} className="gap-1">
-            <Plus className="h-4 w-4" /> Add
+            <Plus className="h-4 w-4" /> {locale === 'id' ? 'Tambah' : 'Add'}
           </Button>
         </div>
       </div>
@@ -183,7 +193,7 @@ export default function CategoriesPage() {
             <Input
               value={newMethodName}
               onChange={(e) => setNewMethodName(e.target.value)}
-              placeholder="Method name"
+              placeholder={locale === 'id' ? 'Nama metode' : 'Method name'}
             />
           </div>
           <select
@@ -196,7 +206,7 @@ export default function CategoriesPage() {
             <option value="ewallet">E-Wallet</option>
           </select>
           <Button onClick={handleAddMethod} className="gap-1">
-            <Plus className="h-4 w-4" /> Add
+            <Plus className="h-4 w-4" /> {locale === 'id' ? 'Tambah' : 'Add'}
           </Button>
         </div>
       </div>
