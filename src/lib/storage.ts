@@ -22,8 +22,8 @@ export function saveState<T>(key: string, value: T): void {
 
 export function clearAll(): void {
   if (typeof window === 'undefined') return;
-  const keys = Object.keys(localStorage).filter(k => k.startsWith(STORAGE_KEY));
-  keys.forEach(k => localStorage.removeItem(k));
+  const keys = Object.keys(localStorage).filter((k) => k.startsWith(STORAGE_KEY));
+  keys.forEach((k) => localStorage.removeItem(k));
 }
 
 export function isFirstLoad(): boolean {

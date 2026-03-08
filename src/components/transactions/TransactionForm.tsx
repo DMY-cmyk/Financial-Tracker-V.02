@@ -19,12 +19,12 @@ interface TransactionFormProps {
 }
 
 export function TransactionForm({ transaction, onClose }: TransactionFormProps) {
-  const addTransaction = useStore(s => s.addTransaction);
-  const updateTransaction = useStore(s => s.updateTransaction);
-  const categories = useStore(s => s.categories);
-  const paymentMethods = useStore(s => s.paymentMethods);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const addTransaction = useStore((s) => s.addTransaction);
+  const updateTransaction = useStore((s) => s.updateTransaction);
+  const categories = useStore((s) => s.categories);
+  const paymentMethods = useStore((s) => s.paymentMethods);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
 
   const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense');
@@ -41,7 +41,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   const [errors, setErrors] = useState<FieldError[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const filteredCategories = categories.filter(c => c.type === type);
+  const filteredCategories = categories.filter((c) => c.type === type);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,14 +83,21 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       {/* Type toggle */}
-      <div className="flex rounded-lg border border-border p-1" role="radiogroup" aria-label="Transaction type">
+      <div
+        className="border-border flex rounded-lg border p-1"
+        role="radiogroup"
+        aria-label="Transaction type"
+      >
         {(['expense', 'income'] as const).map((tp) => (
           <button
             key={tp}
             type="button"
             role="radio"
             aria-checked={type === tp}
-            onClick={() => { setType(tp); setCategory(''); }}
+            onClick={() => {
+              setType(tp);
+              setCategory('');
+            }}
             className={cn(
               'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
               type === tp
@@ -100,7 +107,13 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
                 : 'text-muted-foreground hover:bg-muted'
             )}
           >
-            {tp === 'income' ? (locale === 'id' ? 'Pemasukan' : 'Income') : (locale === 'id' ? 'Pengeluaran' : 'Expense')}
+            {tp === 'income'
+              ? locale === 'id'
+                ? 'Pemasukan'
+                : 'Income'
+              : locale === 'id'
+                ? 'Pengeluaran'
+                : 'Expense'}
           </button>
         ))}
       </div>
@@ -109,7 +122,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       <div>
         <Label htmlFor="amount">{t(locale, 'amount')}</Label>
         <div className="relative mt-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-mono">
+          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 font-mono text-sm">
             Rp
           </span>
           <Input
@@ -118,7 +131,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             onChange={(e) => {
               const num = parseCurrencyInput(e.target.value);
               setAmountStr(num > 0 ? formatCurrencyInput(num) : '');
-              if (fieldError('amount')) setErrors(errors.filter(e => e.field !== 'amount'));
+              if (fieldError('amount')) setErrors(errors.filter((e) => e.field !== 'amount'));
             }}
             className={cn('pl-10 font-mono text-lg', fieldError('amount') && 'border-red-500')}
             placeholder="0"
@@ -128,7 +141,9 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           />
         </div>
         {fieldError('amount') && (
-          <p id="amount-error" className="mt-1 text-xs text-red-500">{fieldError('amount')}</p>
+          <p id="amount-error" className="mt-1 text-xs text-red-500">
+            {fieldError('amount')}
+          </p>
         )}
       </div>
 
@@ -144,9 +159,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             className={cn('mt-1', fieldError('date') && 'border-red-500')}
             aria-invalid={!!fieldError('date')}
           />
-          {fieldError('date') && (
-            <p className="mt-1 text-xs text-red-500">{fieldError('date')}</p>
-          )}
+          {fieldError('date') && <p className="mt-1 text-xs text-red-500">{fieldError('date')}</p>}
         </div>
         <div>
           <Label htmlFor="category">{t(locale, 'category')}</Label>
@@ -155,17 +168,19 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
-              if (fieldError('category')) setErrors(errors.filter(e => e.field !== 'category'));
+              if (fieldError('category')) setErrors(errors.filter((e) => e.field !== 'category'));
             }}
             className={cn(
-              'mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm',
+              'bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm',
               fieldError('category') ? 'border-red-500' : 'border-input'
             )}
             aria-invalid={!!fieldError('category')}
           >
             <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
-            {filteredCategories.map(c => (
-              <option key={c.id} value={c.name}>{c.name}</option>
+            {filteredCategories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
             ))}
           </select>
           {fieldError('category') && (
@@ -182,7 +197,8 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           value={description}
           onChange={(e) => {
             setDescription(e.target.value);
-            if (fieldError('description')) setErrors(errors.filter(e => e.field !== 'description'));
+            if (fieldError('description'))
+              setErrors(errors.filter((e) => e.field !== 'description'));
           }}
           className={cn('mt-1', fieldError('description') && 'border-red-500')}
           aria-invalid={!!fieldError('description')}
@@ -200,17 +216,20 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           value={paymentMethod}
           onChange={(e) => {
             setPaymentMethod(e.target.value);
-            if (fieldError('paymentMethod')) setErrors(errors.filter(e => e.field !== 'paymentMethod'));
+            if (fieldError('paymentMethod'))
+              setErrors(errors.filter((e) => e.field !== 'paymentMethod'));
           }}
           className={cn(
-            'mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm',
+            'bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm',
             fieldError('paymentMethod') ? 'border-red-500' : 'border-input'
           )}
           aria-invalid={!!fieldError('paymentMethod')}
         >
           <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
-          {paymentMethods.map(p => (
-            <option key={p.id} value={p.name}>{p.name}</option>
+          {paymentMethods.map((p) => (
+            <option key={p.id} value={p.name}>
+              {p.name}
+            </option>
           ))}
         </select>
         {fieldError('paymentMethod') && (
@@ -221,12 +240,23 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       {/* Notes */}
       <div>
         <Label htmlFor="notes">{t(locale, 'notes')}</Label>
-        <Input id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="mt-1" />
+        <Input
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="mt-1"
+        />
       </div>
 
       {/* Actions */}
       <div className="flex gap-3 pt-2">
-        <Button type="button" variant="outline" className="flex-1" onClick={onClose} disabled={submitting}>
+        <Button
+          type="button"
+          variant="outline"
+          className="flex-1"
+          onClick={onClose}
+          disabled={submitting}
+        >
           {t(locale, 'cancel')}
         </Button>
         <Button type="submit" className="flex-1 gap-2" disabled={submitting}>

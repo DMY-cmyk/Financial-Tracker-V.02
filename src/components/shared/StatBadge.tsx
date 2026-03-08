@@ -16,8 +16,14 @@ const variantClasses = {
 
 export function StatBadge({ label, value, variant = 'default', className }: StatBadgeProps) {
   return (
-    <div className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1', variantClasses[variant], className)}>
-      <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">{label}</span>
+    <div
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-3 py-1',
+        variantClasses[variant],
+        className
+      )}
+    >
+      <span className="text-[10px] font-medium tracking-wider uppercase opacity-70">{label}</span>
       <span className="text-xs font-semibold">{value}</span>
     </div>
   );

@@ -40,8 +40,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
   const pathname = usePathname();
   const locale = useLocale();
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   const navLinkClass = (href: string) =>
     cn(
@@ -56,19 +55,22 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
     <aside
       aria-label={locale === 'id' ? 'Navigasi utama' : 'Main navigation'}
       className={cn(
-        'flex flex-col border-r border-border bg-card/50 backdrop-blur-sm transition-all duration-300',
+        'border-border bg-card/50 flex flex-col border-r backdrop-blur-sm transition-all duration-300',
         collapsed ? 'w-[72px]' : 'w-[260px]',
         className
       )}
     >
       {/* Logo */}
-      <div className={cn('flex h-14 items-center gap-3 border-b border-border', collapsed ? 'justify-center px-2' : 'px-5')}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm">
-          <span className="text-xs font-bold text-primary-foreground">FT</span>
-        </div>
-        {!collapsed && (
-          <span className="truncate text-sm font-semibold">Financial Tracker</span>
+      <div
+        className={cn(
+          'border-border flex h-14 items-center gap-3 border-b',
+          collapsed ? 'justify-center px-2' : 'px-5'
         )}
+      >
+        <div className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm">
+          <span className="text-primary-foreground text-xs font-bold">FT</span>
+        </div>
+        {!collapsed && <span className="truncate text-sm font-semibold">Financial Tracker</span>}
       </div>
 
       {/* Quick Add */}
@@ -76,7 +78,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
         <Link
           href="/transactions/new"
           className={cn(
-            'flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md',
+            'bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium shadow-sm transition-all hover:shadow-md',
             collapsed && 'px-0'
           )}
         >
@@ -88,12 +90,18 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
       {/* Main Navigation */}
       <nav className="flex-1 space-y-1 px-3" aria-label={t(locale, 'menu')}>
         {!collapsed && (
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          <p className="text-muted-foreground/60 mb-2 px-3 text-[10px] font-semibold tracking-wider uppercase">
             {t(locale, 'menu')}
           </p>
         )}
         {NAV_MAIN.map(({ href, key, icon: Icon }) => (
-          <Link key={href} href={href} className={navLinkClass(href)} title={collapsed ? t(locale, key) : undefined} aria-current={isActive(href) ? 'page' : undefined}>
+          <Link
+            key={href}
+            href={href}
+            className={navLinkClass(href)}
+            title={collapsed ? t(locale, key) : undefined}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
             <Icon className="h-[18px] w-[18px] shrink-0" />
             {!collapsed && <span>{t(locale, key)}</span>}
           </Link>
@@ -101,14 +109,20 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
       </nav>
 
       {/* Bottom section */}
-      <div className="space-y-1 border-t border-border p-3">
+      <div className="border-border space-y-1 border-t p-3">
         {!collapsed && (
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          <p className="text-muted-foreground/60 mb-2 px-3 text-[10px] font-semibold tracking-wider uppercase">
             {locale === 'id' ? 'Sistem' : 'System'}
           </p>
         )}
         {NAV_BOTTOM.map(({ href, key, icon: Icon }) => (
-          <Link key={href} href={href} className={navLinkClass(href)} title={collapsed ? t(locale, key) : undefined} aria-current={isActive(href) ? 'page' : undefined}>
+          <Link
+            key={href}
+            href={href}
+            className={navLinkClass(href)}
+            title={collapsed ? t(locale, key) : undefined}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
             <Icon className="h-[18px] w-[18px] shrink-0" />
             {!collapsed && <span>{t(locale, key)}</span>}
           </Link>
@@ -118,7 +132,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
           onClick={onToggleCollapse}
           aria-label={t(locale, 'collapse')}
           className={cn(
-            'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground',
+            'text-muted-foreground/60 hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors',
             collapsed && 'justify-center px-0'
           )}
         >

@@ -30,11 +30,11 @@ interface UseUploadReturn {
 }
 
 export function useUpload(): UseUploadReturn {
-  const addTransaction = useStore(s => s.addTransaction);
-  const categories = useStore(s => s.categories);
-  const paymentMethods = useStore(s => s.paymentMethods);
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
+  const addTransaction = useStore((s) => s.addTransaction);
+  const categories = useStore((s) => s.categories);
+  const paymentMethods = useStore((s) => s.paymentMethods);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
 
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState('');

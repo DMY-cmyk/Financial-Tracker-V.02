@@ -1,21 +1,14 @@
 import { cn } from '@/lib/utils';
 
 function Shimmer({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        'animate-pulse rounded-lg bg-muted',
-        className
-      )}
-    />
-  );
+  return <div className={cn('bg-muted animate-pulse rounded-lg', className)} />;
 }
 
 // --- Summary Card Skeleton ---
 
 export function SummaryCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-border bg-card p-5', className)}>
+    <div className={cn('border-border bg-card rounded-2xl border p-5', className)}>
       <div className="flex items-center gap-2.5">
         <Shimmer className="h-9 w-9 rounded-lg" />
         <Shimmer className="h-3 w-20" />
@@ -29,7 +22,7 @@ export function SummaryCardSkeleton({ className }: { className?: string }) {
 
 export function ChartCardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-border bg-card p-6', className)}>
+    <div className={cn('border-border bg-card rounded-2xl border p-6', className)}>
       <div className="mb-4 flex items-start justify-between">
         <div className="space-y-1.5">
           <Shimmer className="h-4 w-28" />
@@ -43,17 +36,11 @@ export function ChartCardSkeleton({ className }: { className?: string }) {
 
 // --- List / Table Skeleton ---
 
-export function ListSkeleton({
-  rows = 5,
-  className,
-}: {
-  rows?: number;
-  className?: string;
-}) {
+export function ListSkeleton({ rows = 5, className }: { rows?: number; className?: string }) {
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 rounded-xl bg-card p-3">
+        <div key={i} className="bg-card flex items-center gap-3 rounded-xl p-3">
           <Shimmer className="h-8 w-8 rounded-full" />
           <div className="flex-1 space-y-1.5">
             <Shimmer className="h-3.5 w-3/5" />
@@ -70,7 +57,7 @@ export function ListSkeleton({
 
 export function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-2xl border border-border bg-card p-6', className)}>
+    <div className={cn('border-border bg-card rounded-2xl border p-6', className)}>
       <Shimmer className="mb-4 h-4 w-24" />
       <div className="space-y-3">
         <Shimmer className="h-3 w-full" />
@@ -107,8 +94,8 @@ export function PageSkeleton() {
 
 export function TransactionRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-card p-3">
-      <div className="flex-1 min-w-0 space-y-1.5">
+    <div className="bg-card flex items-center gap-3 rounded-xl p-3">
+      <div className="min-w-0 flex-1 space-y-1.5">
         <Shimmer className="h-3.5 w-2/3" />
         <div className="flex items-center gap-2">
           <Shimmer className="h-5 w-16 rounded-full" />

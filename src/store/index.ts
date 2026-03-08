@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
-import { FinancialStore, Transaction, Category, PaymentMethod, Bill, SavingsGoal } from '@/lib/types';
+import {
+  FinancialStore,
+  Transaction,
+  Category,
+  PaymentMethod,
+  Bill,
+  SavingsGoal,
+} from '@/lib/types';
 
 const currentDate = new Date();
 
@@ -29,14 +36,12 @@ export const useStore = create<FinancialStore>()(
 
       updateTransaction: (id: string, updates: Partial<Transaction>) =>
         set((state) => ({
-          transactions: state.transactions.map(t =>
-            t.id === id ? { ...t, ...updates } : t
-          ),
+          transactions: state.transactions.map((t) => (t.id === id ? { ...t, ...updates } : t)),
         })),
 
       deleteTransaction: (id: string) =>
         set((state) => ({
-          transactions: state.transactions.filter(t => t.id !== id),
+          transactions: state.transactions.filter((t) => t.id !== id),
         })),
 
       // Category actions
@@ -47,14 +52,12 @@ export const useStore = create<FinancialStore>()(
 
       updateCategory: (id: string, updates: Partial<Category>) =>
         set((state) => ({
-          categories: state.categories.map(c =>
-            c.id === id ? { ...c, ...updates } : c
-          ),
+          categories: state.categories.map((c) => (c.id === id ? { ...c, ...updates } : c)),
         })),
 
       deleteCategory: (id: string) =>
         set((state) => ({
-          categories: state.categories.filter(c => c.id !== id),
+          categories: state.categories.filter((c) => c.id !== id),
         })),
 
       // Payment method actions
@@ -65,14 +68,12 @@ export const useStore = create<FinancialStore>()(
 
       updatePaymentMethod: (id: string, updates: Partial<PaymentMethod>) =>
         set((state) => ({
-          paymentMethods: state.paymentMethods.map(p =>
-            p.id === id ? { ...p, ...updates } : p
-          ),
+          paymentMethods: state.paymentMethods.map((p) => (p.id === id ? { ...p, ...updates } : p)),
         })),
 
       deletePaymentMethod: (id: string) =>
         set((state) => ({
-          paymentMethods: state.paymentMethods.filter(p => p.id !== id),
+          paymentMethods: state.paymentMethods.filter((p) => p.id !== id),
         })),
 
       // Bill actions
@@ -83,21 +84,17 @@ export const useStore = create<FinancialStore>()(
 
       updateBill: (id: string, updates: Partial<Bill>) =>
         set((state) => ({
-          bills: state.bills.map(b =>
-            b.id === id ? { ...b, ...updates } : b
-          ),
+          bills: state.bills.map((b) => (b.id === id ? { ...b, ...updates } : b)),
         })),
 
       deleteBill: (id: string) =>
         set((state) => ({
-          bills: state.bills.filter(b => b.id !== id),
+          bills: state.bills.filter((b) => b.id !== id),
         })),
 
       toggleBillPaid: (id: string) =>
         set((state) => ({
-          bills: state.bills.map(b =>
-            b.id === id ? { ...b, isPaid: !b.isPaid } : b
-          ),
+          bills: state.bills.map((b) => (b.id === id ? { ...b, isPaid: !b.isPaid } : b)),
         })),
 
       // Savings actions
@@ -108,28 +105,23 @@ export const useStore = create<FinancialStore>()(
 
       updateSavingsGoal: (id: string, updates: Partial<SavingsGoal>) =>
         set((state) => ({
-          savingsGoals: state.savingsGoals.map(s =>
-            s.id === id ? { ...s, ...updates } : s
-          ),
+          savingsGoals: state.savingsGoals.map((s) => (s.id === id ? { ...s, ...updates } : s)),
         })),
 
       deleteSavingsGoal: (id: string) =>
         set((state) => ({
-          savingsGoals: state.savingsGoals.filter(s => s.id !== id),
+          savingsGoals: state.savingsGoals.filter((s) => s.id !== id),
         })),
 
       // UI actions
-      setMonth: (month: number) =>
-        set((state) => ({ ui: { ...state.ui, selectedMonth: month } })),
+      setMonth: (month: number) => set((state) => ({ ui: { ...state.ui, selectedMonth: month } })),
 
-      setYear: (year: number) =>
-        set((state) => ({ ui: { ...state.ui, selectedYear: year } })),
+      setYear: (year: number) => set((state) => ({ ui: { ...state.ui, selectedYear: year } })),
 
       setTheme: (theme: 'light' | 'dark' | 'system') =>
         set((state) => ({ ui: { ...state.ui, theme } })),
 
-      setLocale: (locale: 'en' | 'id') =>
-        set((state) => ({ ui: { ...state.ui, locale } })),
+      setLocale: (locale: 'en' | 'id') => set((state) => ({ ui: { ...state.ui, locale } })),
 
       // Data actions
       initialize: (data) =>

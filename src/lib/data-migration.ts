@@ -1,6 +1,10 @@
 import { Transaction, Category, Bill, SavingsGoal, PaymentMethod } from './types';
 import { nanoid } from 'nanoid';
-import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_PAYMENT_METHODS } from './constants';
+import {
+  DEFAULT_EXPENSE_CATEGORIES,
+  DEFAULT_INCOME_CATEGORIES,
+  DEFAULT_PAYMENT_METHODS,
+} from './constants';
 
 interface WorkbookCell {
   raw: string;
@@ -20,8 +24,18 @@ interface Workbook {
 }
 
 const SHEET_MONTH_MAP: Record<string, number> = {
-  JAN: 0, FEB: 1, MAR: 2, APR: 3, MEI: 4, JUN: 5,
-  JUL: 6, AGU: 7, SEP: 8, OKT: 9, NOV: 10, DES: 11,
+  JAN: 0,
+  FEB: 1,
+  MAR: 2,
+  APR: 3,
+  MEI: 4,
+  JUN: 5,
+  JUL: 6,
+  AGU: 7,
+  SEP: 8,
+  OKT: 9,
+  NOV: 10,
+  DES: 11,
 };
 
 function getCell(cells: Record<string, WorkbookCell>, row: number, col: number): string {
@@ -149,11 +163,11 @@ export function migrateWorkbook(workbook: Workbook): {
   }
 
   const categories: Category[] = [
-    ...DEFAULT_EXPENSE_CATEGORIES.map(c => ({ ...c, id: nanoid() })),
-    ...DEFAULT_INCOME_CATEGORIES.map(c => ({ ...c, id: nanoid() })),
+    ...DEFAULT_EXPENSE_CATEGORIES.map((c) => ({ ...c, id: nanoid() })),
+    ...DEFAULT_INCOME_CATEGORIES.map((c) => ({ ...c, id: nanoid() })),
   ];
 
-  const paymentMethods: PaymentMethod[] = DEFAULT_PAYMENT_METHODS.map(p => ({
+  const paymentMethods: PaymentMethod[] = DEFAULT_PAYMENT_METHODS.map((p) => ({
     ...p,
     id: nanoid(),
   }));

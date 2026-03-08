@@ -19,7 +19,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
 
   if (transactions.length === 0) {
     return (
-      <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex h-40 items-center justify-center text-sm">
         {t(locale, 'noData')}
       </div>
     );
@@ -27,7 +27,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
 
   // Group by date
   const grouped: Record<string, Transaction[]> = {};
-  transactions.forEach(tx => {
+  transactions.forEach((tx) => {
     const key = tx.date;
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(tx);
@@ -39,20 +39,20 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
     <div className="space-y-4">
       {sortedDates.map((date) => (
         <div key={date}>
-          <div className="mb-2 text-xs font-medium text-muted-foreground">
+          <div className="text-muted-foreground mb-2 text-xs font-medium">
             {formatDate(date, locale)}
           </div>
           <div className="space-y-1">
             {grouped[date].map((tx) => (
               <div
                 key={tx.id}
-                className="group flex items-center gap-3 rounded-xl border border-transparent bg-card p-3 transition-colors hover:border-border hover:bg-muted/30"
+                className="group bg-card hover:border-border hover:bg-muted/30 flex items-center gap-3 rounded-xl border border-transparent p-3 transition-colors"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{tx.description}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{tx.description}</p>
                   <div className="mt-1 flex items-center gap-2">
                     <CategoryChip category={tx.category} />
-                    <span className="text-[10px] text-muted-foreground">{tx.paymentMethod}</span>
+                    <span className="text-muted-foreground text-[10px]">{tx.paymentMethod}</span>
                   </div>
                 </div>
                 <span
@@ -63,13 +63,24 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                       : 'text-red-600 dark:text-red-400'
                   )}
                 >
-                  {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
+                  {tx.type === 'income' ? '+' : '-'}
+                  {formatCurrency(tx.amount)}
                 </span>
                 <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(tx)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => onEdit(tx)}
+                  >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => onDelete(tx.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-7 w-7"
+                    onClick={() => onDelete(tx.id)}
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>

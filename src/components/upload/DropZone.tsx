@@ -15,20 +15,26 @@ export function DropZone({ onFileSelect, accept = 'image/*', className, disabled
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    if (disabled) return;
-    const f = e.dataTransfer.files[0];
-    if (f && f.type.startsWith('image/')) {
-      onFileSelect(f);
-    }
-  }, [onFileSelect, disabled]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      if (disabled) return;
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) {
+        onFileSelect(f);
+      }
+    },
+    [onFileSelect, disabled]
+  );
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) setIsDragOver(true);
-  }, [disabled]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!disabled) setIsDragOver(true);
+    },
+    [disabled]
+  );
 
   const handleDragLeave = useCallback(() => {
     setIsDragOver(false);
@@ -57,15 +63,15 @@ export function DropZone({ onFileSelect, accept = 'image/*', className, disabled
     >
       {isDragOver ? (
         <>
-          <ImagePlus className="mb-3 h-10 w-10 text-primary" />
-          <p className="text-sm font-medium text-primary">Drop to upload</p>
+          <ImagePlus className="text-primary mb-3 h-10 w-10" />
+          <p className="text-primary text-sm font-medium">Drop to upload</p>
         </>
       ) : (
         <>
-          <Upload className="mb-3 h-10 w-10 text-muted-foreground" />
+          <Upload className="text-muted-foreground mb-3 h-10 w-10" />
           <p className="text-sm font-medium">Drop receipt image here</p>
-          <p className="mt-1 text-xs text-muted-foreground">or click to browse</p>
-          <p className="mt-2 text-[10px] text-muted-foreground/60">PNG, JPG, WebP up to 10MB</p>
+          <p className="text-muted-foreground mt-1 text-xs">or click to browse</p>
+          <p className="text-muted-foreground/60 mt-2 text-[10px]">PNG, JPG, WebP up to 10MB</p>
         </>
       )}
       <input

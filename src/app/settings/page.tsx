@@ -17,11 +17,11 @@ import { LANGUAGE_OPTIONS } from '@/lib/mock-data';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
-  const theme = useStore(s => s.ui.theme);
-  const setTheme = useStore(s => s.setTheme);
+  const theme = useStore((s) => s.ui.theme);
+  const setTheme = useStore((s) => s.setTheme);
   const locale = useLocale();
-  const setLocale = useStore(s => s.setLocale);
-  const clearAllData = useStore(s => s.clearAllData);
+  const setLocale = useStore((s) => s.setLocale);
+  const clearAllData = useStore((s) => s.clearAllData);
 
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -55,9 +55,15 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'appearance')}
-            description={locale === 'id' ? 'Sesuaikan tampilan aplikasi' : 'Customize how the app looks'}
+            description={
+              locale === 'id' ? 'Sesuaikan tampilan aplikasi' : 'Customize how the app looks'
+            }
           >
-            <div className="grid grid-cols-3 gap-2 sm:gap-3" role="radiogroup" aria-label={t(locale, 'theme')}>
+            <div
+              className="grid grid-cols-3 gap-2 sm:gap-3"
+              role="radiogroup"
+              aria-label={t(locale, 'theme')}
+            >
               {themes.map(({ value, label, icon: Icon }) => (
                 <button
                   key={value}
@@ -68,7 +74,7 @@ export default function SettingsPage() {
                     'flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors sm:p-4',
                     theme === value
                       ? 'border-primary bg-primary/5'
-                      : 'border-transparent bg-muted/50 hover:bg-muted'
+                      : 'bg-muted/50 hover:bg-muted border-transparent'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -96,13 +102,13 @@ export default function SettingsPage() {
                     'flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-colors sm:p-4',
                     locale === opt.code
                       ? 'border-primary bg-primary/5'
-                      : 'border-transparent bg-muted/50 hover:bg-muted'
+                      : 'bg-muted/50 hover:bg-muted border-transparent'
                   )}
                 >
                   <Globe className="h-4 w-4 shrink-0" />
                   <div>
                     <span className="text-sm font-medium">{opt.nativeLabel}</span>
-                    <span className="ml-2 text-xs text-muted-foreground">{opt.flag}</span>
+                    <span className="text-muted-foreground ml-2 text-xs">{opt.flag}</span>
                   </div>
                 </button>
               ))}
@@ -114,12 +120,18 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'categories')}
-            description={locale === 'id' ? 'Kelola kategori dan metode pembayaran' : 'Manage categories and payment methods'}
+            description={
+              locale === 'id'
+                ? 'Kelola kategori dan metode pembayaran'
+                : 'Manage categories and payment methods'
+            }
           >
             <Link href="/settings/categories">
               <Button variant="outline" className="w-full gap-2">
                 <FolderOpen className="h-4 w-4" />
-                {locale === 'id' ? 'Kelola Kategori & Metode Pembayaran' : 'Manage Categories & Payment Methods'}
+                {locale === 'id'
+                  ? 'Kelola Kategori & Metode Pembayaran'
+                  : 'Manage Categories & Payment Methods'}
               </Button>
             </Link>
           </SettingsSection>
@@ -129,7 +141,11 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'dataManagement')}
-            description={locale === 'id' ? 'Ekspor, impor, atau hapus data' : 'Export, import, or clear your data'}
+            description={
+              locale === 'id'
+                ? 'Ekspor, impor, atau hapus data'
+                : 'Export, import, or clear your data'
+            }
           >
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -149,7 +165,7 @@ export default function SettingsPage() {
                 </Button>
               </div>
 
-              <div className="border-t border-border pt-3">
+              <div className="border-border border-t pt-3">
                 <Button
                   variant="destructive"
                   className="w-full gap-2"

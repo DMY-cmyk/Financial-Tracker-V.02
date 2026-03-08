@@ -41,8 +41,8 @@ export function useTransactions(): UseTransactionsReturn {
   const allTransactions = useMonthlyTransactions();
   const income = useMonthlyIncome();
   const expense = useMonthlyExpense();
-  const deleteTx = useStore(s => s.deleteTransaction);
-  const initialized = useStore(s => s.initialized);
+  const deleteTx = useStore((s) => s.deleteTransaction);
+  const initialized = useStore((s) => s.initialized);
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
@@ -51,14 +51,16 @@ export function useTransactions(): UseTransactionsReturn {
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
   const filtered = useMemo(() => {
-    return allTransactions.filter(tx => {
+    return allTransactions.filter((tx) => {
       if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
       if (categoryFilter && tx.category !== categoryFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        return tx.description.toLowerCase().includes(q) ||
-               tx.category.toLowerCase().includes(q) ||
-               tx.notes.toLowerCase().includes(q);
+        return (
+          tx.description.toLowerCase().includes(q) ||
+          tx.category.toLowerCase().includes(q) ||
+          tx.notes.toLowerCase().includes(q)
+        );
       }
       return true;
     });

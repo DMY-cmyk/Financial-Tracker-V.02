@@ -19,7 +19,7 @@ interface UseImportReturn {
 }
 
 export function useImport(): UseImportReturn {
-  const addTransaction = useStore(s => s.addTransaction);
+  const addTransaction = useStore((s) => s.addTransaction);
 
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [result, setResult] = useState<ImportResult | null>(null);
@@ -66,7 +66,8 @@ export function useImport(): UseImportReturn {
 
     let count = 0;
     for (const tx of result.transactions) {
-      const { id: _id, ...rest } = tx;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, ...rest } = tx;
       addTransaction(rest);
       count++;
     }

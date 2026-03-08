@@ -10,9 +10,7 @@ export function ExportPreview({ transactions }: ExportPreviewProps) {
 
   if (preview.length === 0) {
     return (
-      <p className="py-4 text-center text-sm text-muted-foreground">
-        No transactions to preview
-      </p>
+      <p className="text-muted-foreground py-4 text-center text-sm">No transactions to preview</p>
     );
   }
 
@@ -20,28 +18,31 @@ export function ExportPreview({ transactions }: ExportPreviewProps) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b text-left text-xs text-muted-foreground">
-            <th className="pb-2 pr-4">Date</th>
-            <th className="pb-2 pr-4">Description</th>
-            <th className="pb-2 pr-4">Category</th>
+          <tr className="text-muted-foreground border-b text-left text-xs">
+            <th className="pr-4 pb-2">Date</th>
+            <th className="pr-4 pb-2">Description</th>
+            <th className="pr-4 pb-2">Category</th>
             <th className="pb-2 text-right">Amount</th>
           </tr>
         </thead>
         <tbody>
           {preview.map((tx) => (
-            <tr key={tx.id} className="border-b border-border/50">
-              <td className="py-2 pr-4 text-muted-foreground">{formatDateShort(tx.date)}</td>
+            <tr key={tx.id} className="border-border/50 border-b">
+              <td className="text-muted-foreground py-2 pr-4">{formatDateShort(tx.date)}</td>
               <td className="py-2 pr-4">{tx.description}</td>
-              <td className="py-2 pr-4 text-muted-foreground">{tx.category}</td>
-              <td className={`py-2 text-right font-mono ${tx.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
-                {tx.type === 'expense' ? '-' : '+'}{formatCurrency(tx.amount)}
+              <td className="text-muted-foreground py-2 pr-4">{tx.category}</td>
+              <td
+                className={`py-2 text-right font-mono ${tx.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}
+              >
+                {tx.type === 'expense' ? '-' : '+'}
+                {formatCurrency(tx.amount)}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {transactions.length > 5 && (
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-2 text-xs">
           ...and {transactions.length - 5} more rows
         </p>
       )}

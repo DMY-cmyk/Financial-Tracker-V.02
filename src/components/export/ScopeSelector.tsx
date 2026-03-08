@@ -7,7 +7,12 @@ interface ScopeSelectorProps {
   transactionCount: number;
 }
 
-export function ScopeSelector({ scope, onScopeChange, monthLabel, transactionCount }: ScopeSelectorProps) {
+export function ScopeSelector({
+  scope,
+  onScopeChange,
+  monthLabel,
+  transactionCount,
+}: ScopeSelectorProps) {
   return (
     <div className="grid grid-cols-2 gap-3">
       <button
@@ -16,11 +21,11 @@ export function ScopeSelector({ scope, onScopeChange, monthLabel, transactionCou
           'rounded-xl border-2 p-4 text-left transition-colors',
           scope === 'current'
             ? 'border-primary bg-primary/5'
-            : 'border-transparent bg-muted/50 hover:bg-muted'
+            : 'bg-muted/50 hover:bg-muted border-transparent'
         )}
       >
         <p className="text-sm font-semibold">This Month</p>
-        <p className="text-xs text-muted-foreground">{monthLabel}</p>
+        <p className="text-muted-foreground text-xs">{monthLabel}</p>
       </button>
       <button
         onClick={() => onScopeChange('all')}
@@ -28,11 +33,11 @@ export function ScopeSelector({ scope, onScopeChange, monthLabel, transactionCou
           'rounded-xl border-2 p-4 text-left transition-colors',
           scope === 'all'
             ? 'border-primary bg-primary/5'
-            : 'border-transparent bg-muted/50 hover:bg-muted'
+            : 'bg-muted/50 hover:bg-muted border-transparent'
         )}
       >
         <p className="text-sm font-semibold">All Data</p>
-        <p className="text-xs text-muted-foreground">{transactionCount} transactions</p>
+        <p className="text-muted-foreground text-xs">{transactionCount} transactions</p>
       </button>
     </div>
   );

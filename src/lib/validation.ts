@@ -58,7 +58,8 @@ export function validateOcrFields(data: {
   const amount = parseInt(data.amount.replace(/[^\d]/g, ''), 10) || 0;
 
   if (amount <= 0) errors.push({ field: 'amount', message: 'Enter a valid amount' });
-  if (!data.description.trim()) errors.push({ field: 'description', message: 'Description is required' });
+  if (!data.description.trim())
+    errors.push({ field: 'description', message: 'Description is required' });
   if (!data.date) errors.push({ field: 'date', message: 'Date is required' });
   if (!data.category) errors.push({ field: 'category', message: 'Select a category' });
 
@@ -84,5 +85,5 @@ const MESSAGES_ID = {
 };
 
 export function getFieldError(errors: FieldError[], field: string): string | undefined {
-  return errors.find(e => e.field === field)?.message;
+  return errors.find((e) => e.field === field)?.message;
 }

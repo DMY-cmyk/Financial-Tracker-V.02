@@ -16,7 +16,11 @@ export function parseJsonImport(content: string): ImportResult {
   try {
     const data = JSON.parse(content);
     if (!Array.isArray(data)) {
-      return { transactions: [], errors: ['File must contain a JSON array of transactions'], skipped: 0 };
+      return {
+        transactions: [],
+        errors: ['File must contain a JSON array of transactions'],
+        skipped: 0,
+      };
     }
 
     const transactions: Transaction[] = [];
@@ -49,7 +53,11 @@ export function parseCsvImport(content: string): ImportResult {
 
   const lines = content.trim().split('\n');
   if (lines.length < 2) {
-    return { transactions: [], errors: ['CSV must have a header row and at least one data row'], skipped: 0 };
+    return {
+      transactions: [],
+      errors: ['CSV must have a header row and at least one data row'],
+      skipped: 0,
+    };
   }
 
   const header = lines[0].toLowerCase();
@@ -59,13 +67,13 @@ export function parseCsvImport(content: string): ImportResult {
 
   const headers = parseCSVLine(lines[0]);
   const colMap = {
-    date: headers.findIndex(h => h.toLowerCase() === 'date'),
-    description: headers.findIndex(h => h.toLowerCase() === 'description'),
-    category: headers.findIndex(h => h.toLowerCase() === 'category'),
-    type: headers.findIndex(h => h.toLowerCase() === 'type'),
-    amount: headers.findIndex(h => h.toLowerCase() === 'amount'),
-    paymentMethod: headers.findIndex(h => h.toLowerCase().includes('payment')),
-    notes: headers.findIndex(h => h.toLowerCase() === 'notes'),
+    date: headers.findIndex((h) => h.toLowerCase() === 'date'),
+    description: headers.findIndex((h) => h.toLowerCase() === 'description'),
+    category: headers.findIndex((h) => h.toLowerCase() === 'category'),
+    type: headers.findIndex((h) => h.toLowerCase() === 'type'),
+    amount: headers.findIndex((h) => h.toLowerCase() === 'amount'),
+    paymentMethod: headers.findIndex((h) => h.toLowerCase().includes('payment')),
+    notes: headers.findIndex((h) => h.toLowerCase() === 'notes'),
   };
 
   const transactions: Transaction[] = [];
@@ -76,7 +84,9 @@ export function parseCsvImport(content: string): ImportResult {
     const date = cols[colMap.date]?.trim() || '';
     const amount = parseInt((cols[colMap.amount] || '0').replace(/[^\d]/g, ''), 10);
     const description = cols[colMap.description]?.trim() || '';
-    const type = (cols[colMap.type]?.trim().toLowerCase() === 'income' ? 'income' : 'expense') as 'income' | 'expense';
+    const type = (cols[colMap.type]?.trim().toLowerCase() === 'income' ? 'income' : 'expense') as
+      | 'income'
+      | 'expense';
 
     if (!date || !amount || !description) {
       skipped++;

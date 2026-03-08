@@ -6,8 +6,8 @@ interface CategoryChipProps {
 }
 
 export function CategoryChip({ category }: CategoryChipProps) {
-  const categories = useStore(s => s.categories);
-  const cat = categories.find(c => c.name === category);
+  const categories = useStore((s) => s.categories);
+  const cat = categories.find((c) => c.name === category);
   const color = cat?.color || CATEGORY_COLORS[category] || '#6B7280';
 
   return (
@@ -18,10 +18,7 @@ export function CategoryChip({ category }: CategoryChipProps) {
         color: color,
       }}
     >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: color }}
-      />
+      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
       {category}
     </span>
   );

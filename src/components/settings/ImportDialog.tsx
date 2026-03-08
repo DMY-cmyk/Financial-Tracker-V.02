@@ -30,7 +30,9 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   const handleFile = (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext !== 'json' && ext !== 'csv') {
-      toast.error(locale === 'id' ? 'Gunakan file .json atau .csv' : 'Please use a .json or .csv file');
+      toast.error(
+        locale === 'id' ? 'Gunakan file .json atau .csv' : 'Please use a .json or .csv file'
+      );
       return;
     }
     importFile(file);
@@ -58,9 +60,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
     <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {locale === 'id' ? 'Impor Data' : 'Import Data'}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{locale === 'id' ? 'Impor Data' : 'Import Data'}</AlertDialogTitle>
           <AlertDialogDescription>
             {locale === 'id'
               ? 'Unggah file JSON atau CSV berisi transaksi'
@@ -72,7 +72,10 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
           {/* Drop zone */}
           {status === 'idle' && (
             <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => {
                 e.preventDefault();
@@ -87,12 +90,12 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
                   : 'border-border hover:border-primary/50 hover:bg-muted/50'
               }`}
             >
-              <Upload className="h-8 w-8 text-muted-foreground" />
+              <Upload className="text-muted-foreground h-8 w-8" />
               <div className="text-center">
                 <p className="text-sm font-medium">
                   {locale === 'id' ? 'Pilih atau seret file' : 'Choose or drag a file'}
                 </p>
-                <p className="text-xs text-muted-foreground">.json, .csv</p>
+                <p className="text-muted-foreground text-xs">.json, .csv</p>
               </div>
               <input
                 ref={inputRef}
@@ -110,20 +113,24 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
           {/* Loading */}
           {(status === 'reading' || status === 'validating') && (
             <div className="flex flex-col items-center gap-3 py-6">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground">
+              <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+              <p className="text-muted-foreground text-sm">
                 {status === 'reading'
-                  ? (locale === 'id' ? 'Membaca file...' : 'Reading file...')
-                  : (locale === 'id' ? 'Memvalidasi data...' : 'Validating data...')}
+                  ? locale === 'id'
+                    ? 'Membaca file...'
+                    : 'Reading file...'
+                  : locale === 'id'
+                    ? 'Memvalidasi data...'
+                    : 'Validating data...'}
               </p>
             </div>
           )}
 
           {/* Error */}
           {status === 'error' && (
-            <div className="flex flex-col items-center gap-3 rounded-xl bg-destructive/10 p-6">
-              <AlertTriangle className="h-8 w-8 text-destructive" />
-              <p className="text-center text-sm text-destructive">{error}</p>
+            <div className="bg-destructive/10 flex flex-col items-center gap-3 rounded-xl p-6">
+              <AlertTriangle className="text-destructive h-8 w-8" />
+              <p className="text-destructive text-center text-sm">{error}</p>
               <Button variant="outline" size="sm" onClick={reset}>
                 {locale === 'id' ? 'Coba Lagi' : 'Try Again'}
               </Button>
@@ -142,7 +149,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
                       : `${result.transactions.length} transaction(s) found`}
                   </p>
                   {result.skipped > 0 && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {locale === 'id'
                         ? `${result.skipped} baris dilewati`
                         : `${result.skipped} row(s) skipped`}
@@ -154,8 +161,11 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
               {/* Preview first 3 transactions */}
               <div className="space-y-1.5">
                 {result.transactions.slice(0, 3).map((tx, i) => (
-                  <div key={i} className="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-xs">
-                    <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <div
+                    key={i}
+                    className="bg-muted/50 flex items-center gap-2 rounded-lg px-3 py-2 text-xs"
+                  >
+                    <FileText className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{tx.description}</span>
                     <span className="ml-auto shrink-0 font-mono">
                       {tx.type === 'income' ? '+' : '-'}Rp {tx.amount.toLocaleString('id-ID')}
@@ -163,7 +173,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
                   </div>
                 ))}
                 {result.transactions.length > 3 && (
-                  <p className="px-3 text-xs text-muted-foreground">
+                  <p className="text-muted-foreground px-3 text-xs">
                     {locale === 'id'
                       ? `...dan ${result.transactions.length - 3} lainnya`
                       : `...and ${result.transactions.length - 3} more`}

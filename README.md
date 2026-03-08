@@ -110,6 +110,17 @@ npm run dev        # http://localhost:3000
 npm run build      # Static export to out/
 ```
 
+### Quality Scripts
+
+```bash
+npm run typecheck    # TypeScript type checking
+npm run lint         # ESLint
+npm run format       # Prettier auto-format
+npm run format:check # Verify formatting
+npm run validate     # typecheck + lint + build
+npm run preflight    # Full CI-equivalent check
+```
+
 On first load, the app seeds sample data from `data/workbook.json` (12 months of transactions, bills, and savings goals).
 
 ## Project Structure
@@ -147,6 +158,8 @@ src/
 | [WIREFRAMES.md](./WIREFRAMES.md) | Wireframe definitions, ASCII wireframes, component map (37 components), folder tree, build recommendations |
 | [Plan.md](./Plan.md) | Implementation checklist with phase-by-phase status tracking |
 | [CLAUDE.md](./CLAUDE.md) | Project instructions for Claude Code — product goals, UX constraints, coding conventions, anti-patterns |
+| [docs/RELEASE.md](./docs/RELEASE.md) | Release guide — deployment, environment variables, QA checklists |
+| [docs/QA-CHECKLIST.md](./docs/QA-CHECKLIST.md) | QA checklist — responsive, dark mode, cross-browser, smoke tests |
 
 ## Data Pipeline
 
@@ -159,10 +172,13 @@ pip install openpyxl
 python scripts/extract_xlsx.py
 ```
 
-## Deployment
+## CI/CD
 
-GitHub Actions (`.github/workflows/deploy-pages.yml`):
-`npm ci` -> `npm run build` -> Deploy `out/` to GitHub Pages
+### PR Validation (`.github/workflows/ci.yml`)
+Runs on pushes to `redesign` and PRs: `npm ci` -> typecheck -> lint -> format check -> build -> verify export
+
+### Deployment (`.github/workflows/deploy-pages.yml`)
+Runs on pushes to `main`: `npm ci` -> typecheck -> lint -> build -> Deploy `out/` to GitHub Pages
 
 ## Branch Strategy
 

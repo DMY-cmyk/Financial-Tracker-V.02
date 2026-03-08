@@ -13,7 +13,14 @@ import { ExportActionBar } from '@/components/export/ExportActionBar';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MONTH_NAMES } from '@/lib/constants';
 import { useStore } from '@/store';
-import { FileSpreadsheet, FileText, FileDown, FileBarChart, type LucideIcon, FileX } from 'lucide-react';
+import {
+  FileSpreadsheet,
+  FileText,
+  FileDown,
+  FileBarChart,
+  type LucideIcon,
+  FileX,
+} from 'lucide-react';
 import { type ExportFormat } from '@/lib/types';
 import { toast } from 'sonner';
 
@@ -33,23 +40,29 @@ const FORMAT_OPTIONS: { value: ExportFormat; label: string; description: string 
 
 export default function ExportPage() {
   const locale = useLocale();
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
-  const allTransactions = useStore(s => s.transactions);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
+  const allTransactions = useStore((s) => s.transactions);
 
   const {
-    format, setFormat,
-    scope, setScope,
-    options, setOptions,
-    scopedTransactions, scopeLabel,
-    handleExport, isExporting,
+    format,
+    setFormat,
+    scope,
+    setScope,
+    options,
+    setOptions,
+    scopedTransactions,
+    handleExport,
+    isExporting,
   } = useExport();
 
   const onExport = async () => {
     try {
       await handleExport();
       toast.success(
-        locale === 'id' ? `Berhasil diekspor sebagai ${format.toUpperCase()}` : `Exported as ${format.toUpperCase()}`
+        locale === 'id'
+          ? `Berhasil diekspor sebagai ${format.toUpperCase()}`
+          : `Exported as ${format.toUpperCase()}`
       );
     } catch {
       toast.error(locale === 'id' ? 'Ekspor gagal' : 'Export failed');
@@ -69,7 +82,10 @@ export default function ExportPage() {
         className="space-y-4 sm:space-y-6"
       >
         {/* Format Selection */}
-        <motion.div variants={staggerItem} className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+        <motion.div
+          variants={staggerItem}
+          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+        >
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportFormat')}</h3>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {FORMAT_OPTIONS.map(({ value, label, description }) => (
@@ -86,7 +102,10 @@ export default function ExportPage() {
         </motion.div>
 
         {/* Scope */}
-        <motion.div variants={staggerItem} className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+        <motion.div
+          variants={staggerItem}
+          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+        >
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportScope')}</h3>
           <ScopeSelector
             scope={scope}
@@ -97,20 +116,30 @@ export default function ExportPage() {
         </motion.div>
 
         {/* Options */}
-        <motion.div variants={staggerItem} className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+        <motion.div
+          variants={staggerItem}
+          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+        >
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportOptions')}</h3>
           <ExportOptions options={options} onChange={setOptions} />
         </motion.div>
 
         {/* Preview */}
-        <motion.div variants={staggerItem} className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+        <motion.div
+          variants={staggerItem}
+          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+        >
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportPreview')}</h3>
           {scopedTransactions.length > 0 ? (
             <ExportPreview transactions={scopedTransactions} />
           ) : (
             <EmptyState
               title={locale === 'id' ? 'Tidak ada data untuk diekspor' : 'No data to export'}
-              description={locale === 'id' ? 'Tambahkan transaksi terlebih dahulu' : 'Add some transactions first'}
+              description={
+                locale === 'id'
+                  ? 'Tambahkan transaksi terlebih dahulu'
+                  : 'Add some transactions first'
+              }
               icon={<FileX className="h-10 w-10" />}
             />
           )}

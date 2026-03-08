@@ -4,13 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import {
-  LayoutDashboard,
-  Receipt,
-  Upload,
-  Download,
-  Settings,
-} from 'lucide-react';
+import { LayoutDashboard, Receipt, Upload, Download, Settings } from 'lucide-react';
 
 type NavKey = 'dashboard' | 'transactions' | 'upload' | 'export' | 'settings';
 
@@ -29,12 +23,11 @@ export function BottomNav() {
   return (
     <nav
       aria-label={locale === 'id' ? 'Navigasi bawah' : 'Bottom navigation'}
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md lg:hidden"
+      className="border-border bg-card/95 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-md lg:hidden"
     >
       <div className="flex items-center justify-around py-2">
         {items.map(({ href, key, icon: Icon }) => {
-          const isActive =
-            href === '/' ? pathname === '/' : pathname.startsWith(href);
+          const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
 
           return (
             <Link

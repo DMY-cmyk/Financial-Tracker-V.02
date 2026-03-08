@@ -13,7 +13,7 @@ export function AppShell({ children }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="bg-background flex h-screen overflow-hidden">
       {/* Desktop sidebar */}
       <Sidebar
         collapsed={collapsed}
@@ -25,9 +25,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar />
         <main id="main-content" className="flex-1 overflow-y-auto">
-          <div className="p-4 pb-20 sm:p-6 lg:pb-6">
-            {children}
-          </div>
+          <div className="p-4 pb-20 sm:p-6 lg:pb-6">{children}</div>
         </main>
       </div>
 

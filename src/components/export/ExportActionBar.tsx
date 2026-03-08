@@ -11,19 +11,23 @@ interface ExportActionBarProps {
   className?: string;
 }
 
-export function ExportActionBar({ format, transactionCount, onExport, disabled, className }: ExportActionBarProps) {
+export function ExportActionBar({
+  format,
+  transactionCount,
+  onExport,
+  disabled,
+  className,
+}: ExportActionBarProps) {
   const formatLabel = format.toUpperCase();
 
   return (
-    <div className={cn('rounded-2xl border border-border bg-card p-6', className)}>
+    <div className={cn('border-border bg-card rounded-2xl border p-6', className)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium">
             Ready to export <span className="font-semibold">{transactionCount}</span> transactions
           </p>
-          <p className="text-xs text-muted-foreground">
-            Format: {formatLabel}
-          </p>
+          <p className="text-muted-foreground text-xs">Format: {formatLabel}</p>
         </div>
         <Button
           size="lg"

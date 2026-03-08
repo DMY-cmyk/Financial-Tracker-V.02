@@ -14,10 +14,10 @@ import {
 } from '@/store/selectors';
 
 export function useDashboardData() {
-  const month = useStore(s => s.ui.selectedMonth);
-  const year = useStore(s => s.ui.selectedYear);
-  const initialized = useStore(s => s.initialized);
-  const savingsGoals = useStore(s => s.savingsGoals);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
+  const initialized = useStore((s) => s.initialized);
+  const savingsGoals = useStore((s) => s.savingsGoals);
 
   const balance = useMonthlyBalance();
   const income = useMonthlyIncome();
@@ -31,7 +31,7 @@ export function useDashboardData() {
   const bills = useMonthlyBills();
 
   const savingsRate = useMemo(
-    () => income > 0 ? Math.round(((income - expense) / income) * 100) : 0,
+    () => (income > 0 ? Math.round(((income - expense) / income) * 100) : 0),
     [income, expense]
   );
 
