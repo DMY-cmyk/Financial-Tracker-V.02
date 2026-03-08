@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useImport } from '@/hooks/useImport';
-import { useLocale } from '@/lib/i18n';
+import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -30,9 +30,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   const handleFile = (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext !== 'json' && ext !== 'csv') {
-      toast.error(
-        locale === 'id' ? 'Gunakan file .json atau .csv' : 'Please use a .json or .csv file'
-      );
+      toast.error(t(locale, 'supportedFormats'));
       return;
     }
     importFile(file);
@@ -41,11 +39,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   const handleConfirm = () => {
     const count = confirmImport();
     if (count > 0) {
-      toast.success(
-        locale === 'id'
-          ? `${count} transaksi berhasil diimpor`
-          : `${count} transaction(s) imported successfully`
-      );
+      toast.success(`${count} ${t(locale, 'transactionsFound')}`);
       reset();
       onOpenChange(false);
     }
@@ -60,7 +54,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
     <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>{locale === 'id' ? 'Impor Data' : 'Import Data'}</AlertDialogTitle>
+          <AlertDialogTitle>{t(locale, 'importData')}</AlertDialogTitle>
           <AlertDialogDescription>
             {locale === 'id'
               ? 'Unggah file JSON atau CSV berisi transaksi'
@@ -92,10 +86,8 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
             >
               <Upload className="text-muted-foreground h-8 w-8" />
               <div className="text-center">
-                <p className="text-sm font-medium">
-                  {locale === 'id' ? 'Pilih atau seret file' : 'Choose or drag a file'}
-                </p>
-                <p className="text-muted-foreground text-xs">.json, .csv</p>
+                <p className="text-sm font-medium">{t(locale, 'selectFile')}</p>
+                <p className="text-muted-foreground text-xs">{t(locale, 'supportedFormats')}</p>
               </div>
               <input
                 ref={inputRef}
@@ -114,15 +106,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
           {(status === 'reading' || status === 'validating') && (
             <div className="flex flex-col items-center gap-3 py-6">
               <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
-              <p className="text-muted-foreground text-sm">
-                {status === 'reading'
-                  ? locale === 'id'
-                    ? 'Membaca file...'
-                    : 'Reading file...'
-                  : locale === 'id'
-                    ? 'Memvalidasi data...'
-                    : 'Validating data...'}
-              </p>
+              <p className="text-muted-foreground text-sm">{t(locale, 'processing')}</p>
             </div>
           )}
 
@@ -132,7 +116,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
               <AlertTriangle className="text-destructive h-8 w-8" />
               <p className="text-destructive text-center text-sm">{error}</p>
               <Button variant="outline" size="sm" onClick={reset}>
-                {locale === 'id' ? 'Coba Lagi' : 'Try Again'}
+                {t(locale, 'tryAgain')}
               </Button>
             </div>
           )}
@@ -144,15 +128,11 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
                 <CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-600" />
                 <div>
                   <p className="text-sm font-medium">
-                    {locale === 'id'
-                      ? `${result.transactions.length} transaksi ditemukan`
-                      : `${result.transactions.length} transaction(s) found`}
+                    {result.transactions.length} {t(locale, 'transactionsFound')}
                   </p>
                   {result.skipped > 0 && (
                     <p className="text-muted-foreground text-xs">
-                      {locale === 'id'
-                        ? `${result.skipped} baris dilewati`
-                        : `${result.skipped} row(s) skipped`}
+                      {result.skipped} {t(locale, 'rowsSkipped')}
                     </p>
                   )}
                 </div>
@@ -174,9 +154,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
                 ))}
                 {result.transactions.length > 3 && (
                   <p className="text-muted-foreground px-3 text-xs">
-                    {locale === 'id'
-                      ? `...dan ${result.transactions.length - 3} lainnya`
-                      : `...and ${result.transactions.length - 3} more`}
+                    ...{t(locale, 'and')} {result.transactions.length - 3} {t(locale, 'more')}
                   </p>
                 )}
               </div>
@@ -185,13 +163,9 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleClose}>
-            {locale === 'id' ? 'Batal' : 'Cancel'}
-          </AlertDialogCancel>
+          <AlertDialogCancel onClick={handleClose}>{t(locale, 'cancel')}</AlertDialogCancel>
           {status === 'complete' && (
-            <Button onClick={handleConfirm}>
-              {locale === 'id' ? 'Impor Sekarang' : 'Import Now'}
-            </Button>
+            <Button onClick={handleConfirm}>{t(locale, 'importNow')}</Button>
           )}
         </AlertDialogFooter>
       </AlertDialogContent>

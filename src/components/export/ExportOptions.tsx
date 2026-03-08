@@ -2,6 +2,7 @@
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { t, useLocale } from '@/lib/i18n';
 
 export interface ExportOptionsState {
   includeSummary: boolean;
@@ -14,6 +15,8 @@ interface ExportOptionsProps {
 }
 
 export function ExportOptions({ options, onChange }: ExportOptionsProps) {
+  const locale = useLocale();
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
@@ -23,7 +26,7 @@ export function ExportOptions({ options, onChange }: ExportOptionsProps) {
           onCheckedChange={(checked) => onChange({ ...options, includeSummary: checked === true })}
         />
         <Label htmlFor="include-summary" className="cursor-pointer text-sm">
-          Include summary totals
+          {t(locale, 'includeSummary')}
         </Label>
       </div>
       <div className="flex items-center gap-3">
@@ -33,7 +36,7 @@ export function ExportOptions({ options, onChange }: ExportOptionsProps) {
           onCheckedChange={(checked) => onChange({ ...options, groupByDate: checked === true })}
         />
         <Label htmlFor="group-by-date" className="cursor-pointer text-sm">
-          Group by date
+          {t(locale, 'groupByDate')}
         </Label>
       </div>
     </div>

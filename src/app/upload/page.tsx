@@ -37,11 +37,9 @@ export default function UploadPage() {
   const onSave = () => {
     const success = handleSave();
     if (success) {
-      toast.success(locale === 'id' ? 'Transaksi disimpan' : 'Transaction saved from receipt');
+      toast.success(t(locale, 'savedFromReceipt'));
     } else if (errors.length > 0) {
-      toast.error(
-        locale === 'id' ? 'Periksa data yang diekstrak' : 'Please fix extracted data errors'
-      );
+      toast.error(t(locale, 'fixExtractedErrors'));
     }
   };
 
@@ -88,15 +86,15 @@ export default function UploadPage() {
                 {status === 'saved' && (
                   <Button variant="outline" onClick={handleClear} className="w-full gap-2">
                     <RotateCcw className="h-4 w-4" />
-                    {locale === 'id' ? 'Unggah Lagi' : 'Upload Another'}
+                    {t(locale, 'uploadAnother')}
                   </Button>
                 )}
 
                 {status === 'error' && (
                   <InlineError
-                    message={locale === 'id' ? 'Gagal mengekstrak teks' : 'Failed to extract text'}
+                    message={t(locale, 'failedExtract')}
                     onRetry={processOcr}
-                    retryLabel={locale === 'id' ? 'Coba lagi' : 'Try again'}
+                    retryLabel={t(locale, 'tryAgain')}
                   />
                 )}
               </div>
@@ -146,7 +144,7 @@ export default function UploadPage() {
                 <p className="text-muted-foreground text-sm font-medium">
                   {locale === 'id'
                     ? 'Unggah dan ekstrak struk untuk melihat data'
-                    : 'Upload and extract a receipt to see data here'}
+                    : 'Upload and extract a receipt to see data'}
                 </p>
               </div>
             )}

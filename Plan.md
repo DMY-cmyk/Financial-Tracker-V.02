@@ -260,6 +260,40 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Responsive breakpoint pass (mobile card sizing, typography, padding)
 - [x] Cross-browser readiness documented (QA-CHECKLIST.md)
 
+### Final Cleanup & Audit
+
+#### i18n Consistency
+- [x] Added 25+ new i18n keys (delete, edit, add, name, transactionType, previousYear, nextYear, etc.)
+- [x] Replaced 30+ inline `locale === 'id' ? ... : ...` ternaries with `t()` calls
+- [x] All toast messages now use i18n keys
+- [x] Export components (ExportActionBar, ScopeSelector, ExportOptions, ExportPreview) fully translated
+- [x] ImportDialog fully translated using existing i18n keys
+- [x] OcrPreview save button and select placeholder translated
+- [x] Error page translated using i18n keys
+- [x] i18n dictionary expanded to ~140+ keys
+
+#### Accessibility
+- [x] All icon-only buttons have `aria-label` (TransactionTable edit/delete, MonthSelector year nav, UploadedFileCard clear, Categories delete)
+- [x] TransactionForm type radiogroup aria-label translated
+- [x] DropZone converted to keyboard-accessible (role="button", tabIndex, onKeyDown, aria-label)
+- [x] Transaction table action buttons visible on keyboard focus (`group-focus-within:opacity-100`)
+- [x] TransactionFilters category select has `aria-label`
+- [x] Decorative icons marked with `aria-hidden="true"` in DropZone
+
+#### Dead Code Removal
+- [x] Removed 15 unused files:
+  - Components: NetBalanceCard, AnimatedCounter, LoadingSkeleton, LanguageSwitcher, AmountDisplay, StatBadge, FilterBar, Navbar, MotionWrapper, StaggerList, ChartCard, SectionCard
+  - Lib: design-tokens.ts, storage.ts, env.ts
+- [x] Zero broken imports after removal
+- [x] Build verified (9 HTML files, all routes present)
+
+#### Codebase Consistency
+- [x] Card styling pattern consistent (`rounded-2xl border p-6`)
+- [x] Hook usage consistent (custom hooks for complex logic, direct store for simple UI state)
+- [x] Type safety verified (no `any` types except justified JSON import)
+- [x] Zero lint warnings/errors
+- [x] All files formatted with Prettier
+
 ---
 
 ## Project Structure
@@ -282,23 +316,21 @@ src/
       categories/page.tsx     # Category & payment method management
   components/
     ui/                       # shadcn/ui primitives (16 components incl. alert-dialog, sonner)
-    layout/                   # AppShell, Sidebar, Topbar, BottomNav, Navbar, PageHeader
-    dashboard/                # 9 bento widgets
+    layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
+    dashboard/                # 8 bento widgets (MonthSelector, CashFlowChart, CategoryBreakdown, BudgetProgress, PaymentMethods, BillsChecklist, SavingsGoals, RecentTransactions)
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
     export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
     settings/                 # SettingsSection, ImportDialog
-    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, StaggerList, MotionWrapper, LanguageSwitcher, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
+    shared/                   # SummaryCard, EmptyState, NoResults, InlineError, Skeletons, ConfirmDialog, QuickActionButton, ProgressRing
     providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
     constants.ts              # Colors, defaults, nav items
     formatters.ts             # Currency/date formatting (IDR)
     calculations.ts           # Financial computation functions
-    storage.ts                # localStorage helpers
     data-migration.ts         # workbook.json -> typed objects
     i18n.ts                   # EN/ID translations + context
-    design-tokens.ts          # Design token constants (colors, motion, typography)
     mock-data.ts              # Quick actions, empty messages, language options, export formats, upload constants
     motion.ts                 # Framer Motion animation presets (fadeIn, stagger, spring, ease)
     export-utils.ts           # CSV/Excel/PDF generation

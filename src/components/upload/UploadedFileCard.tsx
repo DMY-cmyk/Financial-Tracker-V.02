@@ -1,6 +1,7 @@
 import { X, FileImage } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProcessingOverlay } from './ProcessingOverlay';
+import { t, useLocale } from '@/lib/i18n';
 
 interface UploadedFileCardProps {
   fileName: string;
@@ -15,6 +16,8 @@ export function UploadedFileCard({
   isProcessing,
   onClear,
 }: UploadedFileCardProps) {
+  const locale = useLocale();
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -28,6 +31,7 @@ export function UploadedFileCard({
           className="text-muted-foreground h-7 w-7"
           onClick={onClear}
           disabled={isProcessing}
+          aria-label={t(locale, 'clearFile')}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -36,7 +40,7 @@ export function UploadedFileCard({
         {/* eslint-disable-next-line @next/next/no-img-element -- blob URL from user upload, not optimizable */}
         <img
           src={previewUrl}
-          alt="Receipt preview"
+          alt={t(locale, 'receiptPreview')}
           className="w-full object-contain"
           style={{ maxHeight: '320px' }}
         />

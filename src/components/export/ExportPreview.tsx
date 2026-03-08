@@ -1,17 +1,17 @@
 import { Transaction } from '@/lib/types';
 import { formatCurrency, formatDateShort } from '@/lib/formatters';
+import { t, useLocale } from '@/lib/i18n';
 
 interface ExportPreviewProps {
   transactions: Transaction[];
 }
 
 export function ExportPreview({ transactions }: ExportPreviewProps) {
+  const locale = useLocale();
   const preview = transactions.slice(0, 5);
 
   if (preview.length === 0) {
-    return (
-      <p className="text-muted-foreground py-4 text-center text-sm">No transactions to preview</p>
-    );
+    return <p className="text-muted-foreground py-4 text-center text-sm">{t(locale, 'noData')}</p>;
   }
 
   return (
@@ -19,10 +19,10 @@ export function ExportPreview({ transactions }: ExportPreviewProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="text-muted-foreground border-b text-left text-xs">
-            <th className="pr-4 pb-2">Date</th>
-            <th className="pr-4 pb-2">Description</th>
-            <th className="pr-4 pb-2">Category</th>
-            <th className="pb-2 text-right">Amount</th>
+            <th className="pr-4 pb-2">{t(locale, 'date')}</th>
+            <th className="pr-4 pb-2">{t(locale, 'description')}</th>
+            <th className="pr-4 pb-2">{t(locale, 'category')}</th>
+            <th className="pb-2 text-right">{t(locale, 'amount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@ export function ExportPreview({ transactions }: ExportPreviewProps) {
       </table>
       {transactions.length > 5 && (
         <p className="text-muted-foreground mt-2 text-xs">
-          ...and {transactions.length - 5} more rows
+          ...{t(locale, 'and')} {transactions.length - 5} {t(locale, 'more')}
         </p>
       )}
     </div>

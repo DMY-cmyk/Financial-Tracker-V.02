@@ -59,13 +59,9 @@ export default function ExportPage() {
   const onExport = async () => {
     try {
       await handleExport();
-      toast.success(
-        locale === 'id'
-          ? `Berhasil diekspor sebagai ${format.toUpperCase()}`
-          : `Exported as ${format.toUpperCase()}`
-      );
+      toast.success(`${t(locale, 'exportSuccess')} (${format.toUpperCase()})`);
     } catch {
-      toast.error(locale === 'id' ? 'Ekspor gagal' : 'Export failed');
+      toast.error(t(locale, 'exportFailed'));
     }
   };
 

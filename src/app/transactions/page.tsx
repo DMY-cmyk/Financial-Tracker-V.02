@@ -53,7 +53,7 @@ export default function TransactionsPage() {
   const confirmDelete = () => {
     if (deleteId) {
       deleteTransaction(deleteId);
-      toast.success(locale === 'id' ? 'Transaksi dihapus' : 'Transaction deleted');
+      toast.success(t(locale, 'transactionDeleted'));
       setDeleteId(null);
     }
   };
@@ -72,12 +72,12 @@ export default function TransactionsPage() {
       <motion.div {...fadeInUp}>
         <PageHeader
           title={t(locale, 'transactions')}
-          description={`${filtered.length} ${filtered.length === 1 ? 'transaction' : 'transactions'} this month`}
+          description={`${filtered.length} ${t(locale, 'transactionCount')}`}
         >
           <Button onClick={openAdd} className="gap-2 shadow-sm">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">{t(locale, 'addTransaction')}</span>
-            <span className="sm:hidden">Add</span>
+            <span className="sm:hidden">{t(locale, 'add')}</span>
           </Button>
         </PageHeader>
       </motion.div>
@@ -118,9 +118,9 @@ export default function TransactionsPage() {
         ) : hasNoResults ? (
           <motion.div key="no-results" {...fadeInUp}>
             <NoResults
-              message={locale === 'id' ? 'Tidak ada hasil' : 'No transactions match your filters'}
+              message={t(locale, 'noTransactionsMatch')}
               onClear={clearFilters}
-              clearLabel={locale === 'id' ? 'Hapus filter' : 'Clear filters'}
+              clearLabel={t(locale, 'clearFilters')}
             />
           </motion.div>
         ) : (
@@ -154,7 +154,7 @@ export default function TransactionsPage() {
             ? 'Transaksi ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
             : 'This transaction will be permanently deleted. This action cannot be undone.'
         }
-        confirmLabel={locale === 'id' ? 'Hapus' : 'Delete'}
+        confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
       />

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { type ExportFormat } from '@/lib/types';
@@ -18,6 +19,7 @@ export function ExportActionBar({
   disabled,
   className,
 }: ExportActionBarProps) {
+  const locale = useLocale();
   const formatLabel = format.toUpperCase();
 
   return (
@@ -25,9 +27,12 @@ export function ExportActionBar({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium">
-            Ready to export <span className="font-semibold">{transactionCount}</span> transactions
+            {t(locale, 'downloadReady')}: <span className="font-semibold">{transactionCount}</span>{' '}
+            {t(locale, 'transactions').toLowerCase()}
           </p>
-          <p className="text-muted-foreground text-xs">Format: {formatLabel}</p>
+          <p className="text-muted-foreground text-xs">
+            {t(locale, 'exportFormat')}: {formatLabel}
+          </p>
         </div>
         <Button
           size="lg"
@@ -36,7 +41,7 @@ export function ExportActionBar({
           className="gap-2 shadow-sm"
         >
           <Download className="h-4 w-4" />
-          Download {formatLabel}
+          {t(locale, 'exportData')} {formatLabel}
         </Button>
       </div>
     </div>

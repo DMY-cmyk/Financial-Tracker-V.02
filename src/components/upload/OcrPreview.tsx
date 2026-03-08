@@ -63,7 +63,7 @@ export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewPro
           onChange={(e) => onChange({ ...data, category: e.target.value })}
           className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm"
         >
-          <option value="">Select...</option>
+          <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
           {expenseCategories.map((c) => (
             <option key={c.id} value={c.name}>
               {c.name}
@@ -72,7 +72,7 @@ export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewPro
         </select>
       </div>
       <Button onClick={onSave} className="w-full">
-        {t(locale, 'save')} Transaction
+        {t(locale, 'saveTransaction')}
       </Button>
     </div>
   );

@@ -66,12 +66,13 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                   {tx.type === 'income' ? '+' : '-'}
                   {formatCurrency(tx.amount)}
                 </span>
-                <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => onEdit(tx)}
+                    aria-label={t(locale, 'edit')}
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
@@ -80,6 +81,7 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
                     size="icon"
                     className="text-destructive h-7 w-7"
                     onClick={() => onDelete(tx.id)}
+                    aria-label={t(locale, 'delete')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
