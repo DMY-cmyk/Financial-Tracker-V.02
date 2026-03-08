@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/components/providers/StoreProvider';
 import { AppShell } from '@/components/layout/AppShell';
+import { Toaster } from '@/components/ui/sonner';
 
 const jakarta = Plus_Jakarta_Sans({
   variable: '--font-sans',
@@ -33,6 +34,7 @@ export default function RootLayout({
           <AppShell>
             {children}
           </AppShell>
+          <Toaster position="top-right" duration={3000} />
         </StoreProvider>
       </body>
     </html>

@@ -1,15 +1,19 @@
 'use client';
 
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
+import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SettingsSection } from '@/components/settings/SettingsSection';
-import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Moon, Sun, Monitor, Globe, Trash2, FolderOpen, Download, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LANGUAGE_OPTIONS } from '@/lib/mock-data';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
   const theme = useStore(s => s.ui.theme);
@@ -18,118 +22,152 @@ export default function SettingsPage() {
   const setLocale = useStore(s => s.setLocale);
   const clearAllData = useStore(s => s.clearAllData);
 
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+
   const themes = [
     { value: 'light' as const, label: t(locale, 'light'), icon: Sun },
     { value: 'dark' as const, label: t(locale, 'dark'), icon: Moon },
     { value: 'system' as const, label: t(locale, 'system'), icon: Monitor },
   ];
 
+  const handleClearData = () => {
+    clearAllData();
+    toast.success(locale === 'id' ? 'Semua data dihapus' : 'All data cleared');
+    setClearDialogOpen(false);
+    window.location.reload();
+  };
+
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <PageHeader title={t(locale, 'settings')} />
+    <div className="mx-auto max-w-2xl space-y-4 sm:space-y-6">
+      <motion.div {...fadeInUp}>
+        <PageHeader title={t(locale, 'settings')} />
+      </motion.div>
 
-      {/* Appearance */}
-      <SettingsSection
-        title={t(locale, 'appearance')}
-        description={locale === 'id' ? 'Sesuaikan tampilan aplikasi' : 'Customize how the app looks'}
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="space-y-4 sm:space-y-6"
       >
-        <div className="grid grid-cols-3 gap-3">
-          {themes.map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              onClick={() => setTheme(value)}
-              className={cn(
-                'flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-colors',
-                theme === value
-                  ? 'border-primary bg-primary/5'
-                  : 'border-transparent bg-muted/50 hover:bg-muted'
-              )}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium">{label}</span>
-            </button>
-          ))}
-        </div>
-      </SettingsSection>
+        {/* Appearance */}
+        <motion.div variants={staggerItem}>
+          <SettingsSection
+            title={t(locale, 'appearance')}
+            description={locale === 'id' ? 'Sesuaikan tampilan aplikasi' : 'Customize how the app looks'}
+          >
+            <div className="grid grid-cols-3 gap-2 sm:gap-3" role="radiogroup" aria-label={t(locale, 'theme')}>
+              {themes.map(({ value, label, icon: Icon }) => (
+                <button
+                  key={value}
+                  role="radio"
+                  aria-checked={theme === value}
+                  onClick={() => setTheme(value)}
+                  className={cn(
+                    'flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors sm:p-4',
+                    theme === value
+                      ? 'border-primary bg-primary/5'
+                      : 'border-transparent bg-muted/50 hover:bg-muted'
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-xs font-medium">{label}</span>
+                </button>
+              ))}
+            </div>
+          </SettingsSection>
+        </motion.div>
 
-      {/* Language */}
-      <SettingsSection
-        title={t(locale, 'language')}
-        description={locale === 'id' ? 'Pilih bahasa tampilan' : 'Choose display language'}
-      >
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            {LANGUAGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.code}
-                onClick={() => setLocale(opt.code)}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-colors',
-                  locale === opt.code
-                    ? 'border-primary bg-primary/5'
-                    : 'border-transparent bg-muted/50 hover:bg-muted'
-                )}
-              >
-                <Globe className="h-4 w-4 shrink-0" />
-                <div>
-                  <span className="text-sm font-medium">{opt.nativeLabel}</span>
-                  <span className="ml-2 text-xs text-muted-foreground">{opt.flag}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </SettingsSection>
+        {/* Language */}
+        <motion.div variants={staggerItem}>
+          <SettingsSection
+            title={t(locale, 'language')}
+            description={locale === 'id' ? 'Pilih bahasa tampilan' : 'Choose display language'}
+          >
+            <div className="space-y-2" role="radiogroup" aria-label={t(locale, 'language')}>
+              {LANGUAGE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.code}
+                  role="radio"
+                  aria-checked={locale === opt.code}
+                  onClick={() => setLocale(opt.code)}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-colors sm:p-4',
+                    locale === opt.code
+                      ? 'border-primary bg-primary/5'
+                      : 'border-transparent bg-muted/50 hover:bg-muted'
+                  )}
+                >
+                  <Globe className="h-4 w-4 shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium">{opt.nativeLabel}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">{opt.flag}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </SettingsSection>
+        </motion.div>
 
-      {/* Categories & Payment Methods */}
-      <SettingsSection
-        title={t(locale, 'categories')}
-        description={locale === 'id' ? 'Kelola kategori dan metode pembayaran' : 'Manage categories and payment methods'}
-      >
-        <Link href="/settings/categories">
-          <Button variant="outline" className="w-full gap-2">
-            <FolderOpen className="h-4 w-4" />
-            {locale === 'id' ? 'Kelola Kategori & Metode Pembayaran' : 'Manage Categories & Payment Methods'}
-          </Button>
-        </Link>
-      </SettingsSection>
-
-      {/* Data Management */}
-      <SettingsSection
-        title={t(locale, 'dataManagement')}
-        description={locale === 'id' ? 'Ekspor, impor, atau hapus data' : 'Export, import, or clear your data'}
-      >
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/export">
+        {/* Categories & Payment Methods */}
+        <motion.div variants={staggerItem}>
+          <SettingsSection
+            title={t(locale, 'categories')}
+            description={locale === 'id' ? 'Kelola kategori dan metode pembayaran' : 'Manage categories and payment methods'}
+          >
+            <Link href="/settings/categories">
               <Button variant="outline" className="w-full gap-2">
-                <Download className="h-4 w-4" />
-                {t(locale, 'exportData')}
+                <FolderOpen className="h-4 w-4" />
+                {locale === 'id' ? 'Kelola Kategori & Metode Pembayaran' : 'Manage Categories & Payment Methods'}
               </Button>
             </Link>
-            <Button variant="outline" className="w-full gap-2" disabled>
-              <Upload className="h-4 w-4" />
-              {t(locale, 'importData')}
-            </Button>
-          </div>
+          </SettingsSection>
+        </motion.div>
 
-          <div className="border-t border-border pt-3">
-            <Button
-              variant="destructive"
-              className="w-full gap-2"
-              onClick={() => {
-                if (confirm(t(locale, 'confirmDelete'))) {
-                  clearAllData();
-                  window.location.reload();
-                }
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t(locale, 'clearData')}
-            </Button>
-          </div>
-        </div>
-      </SettingsSection>
+        {/* Data Management */}
+        <motion.div variants={staggerItem}>
+          <SettingsSection
+            title={t(locale, 'dataManagement')}
+            description={locale === 'id' ? 'Ekspor, impor, atau hapus data' : 'Export, import, or clear your data'}
+          >
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <Link href="/export">
+                  <Button variant="outline" className="w-full gap-2">
+                    <Download className="h-4 w-4" />
+                    {t(locale, 'exportData')}
+                  </Button>
+                </Link>
+                <Button variant="outline" className="w-full gap-2" disabled>
+                  <Upload className="h-4 w-4" />
+                  {t(locale, 'importData')}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-3">
+                <Button
+                  variant="destructive"
+                  className="w-full gap-2"
+                  onClick={() => setClearDialogOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t(locale, 'clearData')}
+                </Button>
+              </div>
+            </div>
+          </SettingsSection>
+        </motion.div>
+      </motion.div>
+
+      {/* Clear data confirmation */}
+      <ConfirmDialog
+        open={clearDialogOpen}
+        onOpenChange={setClearDialogOpen}
+        title={locale === 'id' ? 'Hapus Semua Data' : 'Clear All Data'}
+        description={t(locale, 'confirmDelete')}
+        confirmLabel={locale === 'id' ? 'Hapus Semua' : 'Clear All'}
+        cancelLabel={t(locale, 'cancel')}
+        onConfirm={handleClearData}
+      />
     </div>
   );
 }
