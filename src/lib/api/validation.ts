@@ -1,0 +1,92 @@
+import { z } from 'zod';
+
+export const createTransactionSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
+  description: z.string().min(1, 'Description is required').max(200),
+  category: z.string().min(1, 'Category is required'),
+  type: z.enum(['income', 'expense']),
+  amount: z.number().positive('Amount must be positive'),
+  paymentMethod: z.string().min(1, 'Payment method is required'),
+  notes: z.string().max(500).optional().default(''),
+});
+
+export const updateTransactionSchema = createTransactionSchema.partial();
+
+export const listTransactionsQuerySchema = z.object({
+  month: z.number().int().min(0).max(11).optional(),
+  year: z.number().int().min(2000).max(2100).optional(),
+  type: z.enum(['income', 'expense']).optional(),
+  category: z.string().optional(),
+  search: z.string().optional(),
+});
+
+export const dashboardSummaryQuerySchema = z.object({
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().min(2000).max(2100),
+});
+
+// === Category schemas ===
+
+export const createCategorySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  type: z.enum(['income', 'expense']),
+  color: z.string().min(1, 'Color is required').max(20),
+  icon: z.string().max(50).optional().default('circle'),
+  budget: z.number().min(0, 'Budget must be non-negative').optional().default(0),
+});
+
+export const updateCategorySchema = createCategorySchema.partial();
+
+// === Payment method schemas ===
+
+export const createPaymentMethodSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  icon: z.string().max(50).optional().default('wallet'),
+  type: z.enum(['bank', 'cash', 'ewallet']),
+});
+
+export const updatePaymentMethodSchema = createPaymentMethodSchema.partial();
+
+// === Settings schema ===
+
+export const updateSettingsSchema = z.record(z.string(), z.string()).refine(
+  (obj) => Object.keys(obj).length > 0,
+  { message: 'At least one setting is required' }
+);
+
+// === Upload schemas ===
+
+export const createUploadSchema = z.object({
+  filename: z.string().min(1, 'Filename is required').max(255),
+  fileSize: z.number().int().min(0).optional().default(0),
+  mimeType: z.string().max(100).optional().default(''),
+});
+
+export const updateUploadSchema = z.object({
+  status: z.enum(['pending', 'processing', 'extracted', 'saved', 'error']).optional(),
+  extractedData: z.string().optional(),
+});
+
+// === Export job schema ===
+
+export const createExportJobSchema = z.object({
+  format: z.enum(['csv', 'json', 'xlsx', 'pdf']),
+  scope: z.enum(['current', 'all']),
+  filters: z.string().optional(),
+  options: z.string().optional(),
+  recordCount: z.number().int().min(0).optional().default(0),
+});
+
+// === Inferred types ===
+
+export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
+export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type ListTransactionsQuery = z.infer<typeof listTransactionsQuerySchema>;
+export type DashboardSummaryQuery = z.infer<typeof dashboardSummaryQuerySchema>;
+export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
+export type CreatePaymentMethodInput = z.infer<typeof createPaymentMethodSchema>;
+export type UpdatePaymentMethodInput = z.infer<typeof updatePaymentMethodSchema>;
+export type CreateUploadInput = z.infer<typeof createUploadSchema>;
+export type UpdateUploadInput = z.infer<typeof updateUploadSchema>;
+export type CreateExportJobInput = z.infer<typeof createExportJobSchema>;
