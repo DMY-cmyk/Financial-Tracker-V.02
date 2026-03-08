@@ -32,14 +32,21 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Back navigation on add transaction page
 
 ### Upload & OCR
-- [x] Drag-and-drop receipt image upload
+- [x] Drag-and-drop receipt image upload (enhanced DropZone with drag state feedback)
 - [x] Client-side OCR via Tesseract.js (lazy-loaded)
 - [x] Auto-extract amount, date, description
 - [x] Review and correct extracted fields before saving
+- [x] Status-driven flow (idle -> processing -> extracted -> saved)
+- [x] Confidence indicator bar (High/Medium/Low)
+- [x] Modular components (DropZone, UploadedFileCard, ExtractionStatusBadge, ConfidenceBar, OcrPreview)
 
 ### Export
 - [x] CSV and JSON export
 - [x] Scope: current month or all data
+- [x] Format selection with "Coming soon" indicators for xlsx/pdf
+- [x] Export options (include summary, group by date)
+- [x] Transaction preview table
+- [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
 - [ ] Excel (.xlsx) export
 - [ ] PDF export
 - [ ] Custom date range
@@ -48,13 +55,18 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
 - [x] Category & payment method management (CRUD, color picker, budget)
-- [x] Data clear/reset
+- [x] Data management section (export link, import placeholder, clear/reset)
+- [x] SaaS-style sectioned layout with SettingsSection component
+- [x] Compact LanguageSwitcher pill toggle
 
 ### Design System
 - [x] Custom color palette (Blue primary, Emerald income, Red expense, Amber warning)
 - [x] Plus Jakarta Sans (UI) + JetBrains Mono (currency)
 - [x] Light and dark mode with CSS variable theming
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
+- [x] Motion presets library (fadeIn, stagger, spring, ease curves)
+- [x] MotionWrapper component for reusable Framer Motion animations
+- [x] i18n dictionary with ~80+ keys (EN/ID bilingual)
 
 ## Tech Stack
 
@@ -94,13 +106,14 @@ src/
   components/
     dashboard/                # 9 bento widgets
     transactions/             # Table, form, filters, category chip
-    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
-    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
+    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
+    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
+    settings/                 # SettingsSection
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
-    shared/                   # SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay
+    shared/                   # SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, AnimatedCounter, ProgressRing, AmountDisplay, MotionWrapper, LanguageSwitcher
     providers/                # StoreProvider (state + theme + locale)
     ui/                       # 14 shadcn/ui primitives
-  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens, mock-data
+  lib/                        # Types, formatters, calculations, i18n, migration, design-tokens, mock-data, motion
   store/                      # Zustand store + memoized selectors
 ```
 

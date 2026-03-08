@@ -106,13 +106,17 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Date extraction (DD/MM/YYYY patterns)
 - [x] Extracted fields review form (amount, description, date, category)
 - [x] Save as transaction
-- [x] Extract DropZone into separate component
+- [x] Extract DropZone into separate component (enhanced with drag state feedback)
 - [x] Extract OcrPreview into separate component
 - [x] ProcessingOverlay component (spinner on image)
 - [x] ConfidenceBar component (green/amber/red)
+- [x] ExtractionStatusBadge component (idle/uploading/processing/extracted/saved/error)
+- [x] UploadedFileCard component (file name, preview, clear, processing overlay)
+- [x] Upload page rewrite using modular components
+- [x] Status-driven UI flow (idle -> processing -> extracted -> saved)
+- [x] Error/empty states with contextual messaging
 - [ ] Category auto-suggestion from merchant text matching
 - [ ] Upload history list
-- [ ] Error state with retry button
 - [ ] Progress percentage display during OCR
 
 ### Phase 5: Export System
@@ -122,14 +126,17 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Scope selector (current month / all data)
 - [x] Format selection cards (click to select, blue border)
 - [x] Direct browser download trigger
+- [x] Export options toggles (include summary, group by date)
+- [x] Export preview table (first 5 rows with "and N more" indicator)
+- [x] Extract into FormatCard/ScopeSelector/ExportOptions/ExportPreview components
+- [x] ExportActionBar component (transaction count, format label, download button)
+- [x] Export page rewrite using modular components with full pipeline
+- [x] "Coming soon" overlay for unavailable formats (xlsx, pdf)
 - [ ] Install SheetJS (xlsx) for Excel export
 - [ ] Excel export with formatted headers and number columns
 - [ ] Install jspdf + jspdf-autotable for PDF export
 - [ ] PDF export with styled table and totals
 - [ ] Custom date range picker (start/end)
-- [x] Export options toggles (include summary, categories, group by date)
-- [x] Export preview table (first 5 rows)
-- [x] Extract into FormatCard/ScopeSelector/ExportOptions components
 
 ### Phase 6: Categories & Settings
 
@@ -142,10 +149,24 @@ data/workbook.json  -->  data-migration.ts  -->  Zustand Store  -->  React Dashb
 - [x] Theme selector (Light/Dark/System cards)
 - [x] Language toggle (English/Bahasa Indonesia cards)
 - [x] Clear all data with confirmation
+- [x] SettingsSection component (reusable settings group wrapper)
+- [x] LanguageSwitcher component (compact EN/ID pill toggle)
+- [x] Settings page rewrite with SaaS-style sectioned layout
+- [x] Data management section (export link, import placeholder, clear)
+- [x] Expanded i18n coverage (~80+ translation keys covering all pages)
 - [ ] Category icon selection
 - [ ] Drag-to-reorder categories
-- [ ] Quick language switcher in desktop navbar (EN/ID pill toggle)
-- [ ] Expanded i18n coverage (validation messages, toasts, empty states)
+- [ ] Quick language switcher in sidebar
+
+### Cross-cutting: Motion & Localization Foundations (Batch 2)
+
+- [x] Motion presets library (`src/lib/motion.ts`) — fadeIn, fadeInUp, stagger, tapScale, counterSpring, DURATION, EASE
+- [x] MotionWrapper component (reusable Framer Motion animation wrapper with delay)
+- [x] ExtractionStatus, ExtractionField, ExtractionResult types
+- [x] ExportFormat, ExportScope, ExportState types
+- [x] LanguageOption type
+- [x] LANGUAGE_OPTIONS, EXPORT_FORMATS, UPLOAD constants in mock-data
+- [x] i18n expanded to ~80+ keys (navigation, dashboard, actions, states, settings, export, upload, validation)
 
 ### Phase 7: Polish & Production
 
@@ -183,9 +204,10 @@ src/
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, Navbar, PageHeader
     dashboard/                # 9 bento widgets
     transactions/             # Table, Form, Filters, CategoryChip, TransactionSummary
-    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
-    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview
-    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar
+    upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar, ExtractionStatusBadge, UploadedFileCard
+    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
+    settings/                 # SettingsSection
+    shared/                   # AmountDisplay, AnimatedCounter, ProgressRing, EmptyState, SummaryCard, ChartCard, SectionCard, StatBadge, QuickActionButton, FilterBar, MotionWrapper, LanguageSwitcher
     providers/                # StoreProvider
   lib/
     types.ts                  # TypeScript interfaces
@@ -196,7 +218,8 @@ src/
     data-migration.ts         # workbook.json -> typed objects
     i18n.ts                   # EN/ID translations + context
     design-tokens.ts          # Design token constants (colors, motion, typography)
-    mock-data.ts              # Quick actions, empty state messages
+    mock-data.ts              # Quick actions, empty messages, language options, export formats, upload constants
+    motion.ts                 # Framer Motion animation presets (fadeIn, stagger, spring, ease)
     export-utils.ts           # CSV/Excel/PDF generation (to add)
     utils.ts                  # cn() utility (shadcn)
   store/

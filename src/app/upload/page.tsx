@@ -4,11 +4,15 @@ import { useState, useCallback } from 'react';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { DropZone } from '@/components/upload/DropZone';
+import { UploadedFileCard } from '@/components/upload/UploadedFileCard';
+import { ExtractionStatusBadge } from '@/components/upload/ExtractionStatusBadge';
+import { ConfidenceBar } from '@/components/upload/ConfidenceBar';
+import { OcrPreview, type OcrData } from '@/components/upload/OcrPreview';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { parseCurrencyInput, formatCurrencyInput } from '@/lib/formatters';
+import { ScanLine, CheckCircle2, RotateCcw } from 'lucide-react';
+import { type ExtractionStatus } from '@/lib/types';
+import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 
 export default function UploadPage() {
   const locale = useLocale();
@@ -19,42 +23,39 @@ export default function UploadPage() {
   const year = useStore(s => s.ui.selectedYear);
 
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>('');
-  const [processing, setProcessing] = useState(false);
-  const [ocrResult, setOcrResult] = useState<{
-    amount: string;
-    description: string;
-    date: string;
-    category: string;
-  } | null>(null);
+  const [preview, setPreview] = useState('');
+  const [status, setStatus] = useState<ExtractionStatus>('idle');
+  const [confidence, setConfidence] = useState(0);
+  const [ocrResult, setOcrResult] = useState<OcrData | null>(null);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files[0];
-    if (f && f.type.startsWith('image/')) {
-      setFile(f);
-      setPreview(URL.createObjectURL(f));
-    }
+  const handleFileSelect = useCallback((f: File) => {
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+    setStatus('idle');
+    setOcrResult(null);
+    setConfidence(0);
   }, []);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) {
-      setFile(f);
-      setPreview(URL.createObjectURL(f));
-    }
-  };
+  const handleClear = useCallback(() => {
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(null);
+    setPreview('');
+    setStatus('idle');
+    setOcrResult(null);
+    setConfidence(0);
+  }, [preview]);
 
   const processOcr = async () => {
     if (!file) return;
-    setProcessing(true);
+    setStatus('processing');
 
     try {
       const Tesseract = await import('tesseract.js');
       const result = await Tesseract.recognize(file, 'eng+ind');
       const text = result.data.text;
+      const conf = result.data.confidence;
 
-      // Extract amount patterns like Rp 100.000 or 100,000 or just numbers
+      // Extract amount patterns like Rp 100.000 or 100,000
       const amountMatch = text.match(/(?:Rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})*)/);
       const amount = amountMatch ? amountMatch[1].replace(/[.,]/g, '') : '';
 
@@ -72,10 +73,17 @@ export default function UploadPage() {
         date: dateStr,
         category: '',
       });
+      setConfidence(conf);
+      setStatus('extracted');
     } catch {
-      setOcrResult({ amount: '', description: '', date: `${year}-${String(month + 1).padStart(2, '0')}-01`, category: '' });
-    } finally {
-      setProcessing(false);
+      setOcrResult({
+        amount: '',
+        description: '',
+        date: `${year}-${String(month + 1).padStart(2, '0')}-01`,
+        category: '',
+      });
+      setConfidence(0);
+      setStatus('error');
     }
   };
 
@@ -94,118 +102,93 @@ export default function UploadPage() {
       notes: 'Added via OCR',
     });
 
-    setFile(null);
-    setPreview('');
-    setOcrResult(null);
+    setStatus('saved');
   };
+
+  const isProcessing = status === 'processing';
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <PageHeader title={t(locale, 'uploadReceipt')} />
+      <PageHeader title={t(locale, 'uploadReceipt')}>
+        <ExtractionStatusBadge status={status} />
+      </PageHeader>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Upload Zone */}
         <div className="rounded-2xl border border-border bg-card p-6">
-          {!preview ? (
-            <div
-              onDrop={handleDrop}
-              onDragOver={(e) => e.preventDefault()}
-              className="flex h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border transition-colors hover:border-primary/50 hover:bg-primary/5"
-              onClick={() => document.getElementById('file-input')?.click()}
-            >
-              <Upload className="mb-3 h-10 w-10 text-muted-foreground" />
-              <p className="text-sm font-medium">Drop receipt image here</p>
-              <p className="mt-1 text-xs text-muted-foreground">or click to browse</p>
-              <input
-                id="file-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-            </div>
+          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'uploadImage')}</h3>
+
+          {!file ? (
+            <DropZone
+              onFileSelect={handleFileSelect}
+              accept="image/png,image/jpeg,image/webp,image/heic"
+            />
           ) : (
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-xl">
-                <img src={preview} alt="Receipt" className="w-full rounded-xl" />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={processOcr}
-                  disabled={processing}
-                  className="flex-1 gap-2"
-                >
-                  {processing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ImageIcon className="h-4 w-4" />
-                  )}
-                  {processing ? 'Processing...' : 'Extract Text'}
+              <UploadedFileCard
+                fileName={file.name}
+                previewUrl={preview}
+                isProcessing={isProcessing}
+                onClear={handleClear}
+              />
+
+              {status === 'idle' && (
+                <Button onClick={processOcr} className="w-full gap-2">
+                  <ScanLine className="h-4 w-4" />
+                  {t(locale, 'extractText')}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => { setFile(null); setPreview(''); setOcrResult(null); }}
-                >
-                  Clear
+              )}
+
+              {status === 'saved' && (
+                <Button variant="outline" onClick={handleClear} className="w-full gap-2">
+                  <RotateCcw className="h-4 w-4" />
+                  Upload Another
                 </Button>
-              </div>
+              )}
             </div>
           )}
         </div>
 
         {/* OCR Result Form */}
         <div className="rounded-2xl border border-border bg-card p-6">
-          <h3 className="mb-4 text-sm font-semibold">Extracted Data</h3>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">{t(locale, 'extractedData')}</h3>
+            {status === 'saved' && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {t(locale, 'success')}
+              </span>
+            )}
+          </div>
+
           {ocrResult ? (
             <div className="space-y-4">
-              <div>
-                <Label>{t(locale, 'amount')}</Label>
-                <div className="relative mt-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-mono">Rp</span>
-                  <Input
-                    value={ocrResult.amount}
-                    onChange={(e) => setOcrResult({ ...ocrResult, amount: e.target.value })}
-                    className="pl-10 font-mono"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label>{t(locale, 'description')}</Label>
-                <Input
-                  value={ocrResult.description}
-                  onChange={(e) => setOcrResult({ ...ocrResult, description: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>{t(locale, 'date')}</Label>
-                <Input
-                  type="date"
-                  value={ocrResult.date}
-                  onChange={(e) => setOcrResult({ ...ocrResult, date: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>{t(locale, 'category')}</Label>
-                <select
-                  value={ocrResult.category}
-                  onChange={(e) => setOcrResult({ ...ocrResult, category: e.target.value })}
-                  className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">Select...</option>
-                  {categories.filter(c => c.type === 'expense').map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-              <Button onClick={handleSave} className="w-full">
-                {t(locale, 'save')} Transaction
-              </Button>
+              {confidence > 0 && <ConfidenceBar confidence={confidence} />}
+
+              <p className="text-xs text-muted-foreground">
+                {t(locale, 'reviewExtracted')}
+              </p>
+
+              <OcrPreview
+                data={ocrResult}
+                onChange={setOcrResult}
+                onSave={handleSave}
+                categories={categories}
+              />
             </div>
           ) : (
-            <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
-              Upload and process a receipt to see extracted data
+            <div className="flex h-64 flex-col items-center justify-center text-center">
+              <ScanLine className="mb-3 h-10 w-10 text-muted-foreground/40" />
+              <p className="text-sm font-medium text-muted-foreground">
+                {status === 'error'
+                  ? t(locale, 'error')
+                  : 'Upload and extract a receipt to see data here'}
+              </p>
+              {status === 'error' && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Try uploading a clearer image
+                </p>
+              )}
             </div>
           )}
         </div>
