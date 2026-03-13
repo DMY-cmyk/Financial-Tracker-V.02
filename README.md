@@ -208,7 +208,7 @@ python scripts/extract_xlsx.py
 ## CI/CD
 
 ### PR Validation (`.github/workflows/ci.yml`)
-Runs on pushes to `redesign` and PRs: `npm ci` → typecheck → lint → format check → test → build
+Runs on pushes to `main` and PRs to `main`: `npm ci` → typecheck → lint → format check → test → build
 
 ### Deployment
 Deploy via **Vercel** — connects to the GitHub repo and auto-deploys on push. Set `DATABASE_URL` in Vercel environment variables pointing to your Neon Postgres instance.

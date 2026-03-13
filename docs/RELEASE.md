@@ -50,8 +50,8 @@ The app uses server-side API routes backed by Neon Postgres. A Node.js runtime i
 ### CI Pipeline
 
 `.github/workflows/ci.yml` runs on:
-- Every push to `redesign` branch
-- Every pull request to `main` or `redesign`
+- Every push to `main` branch
+- Every pull request to `main`
 
 Steps: install → typecheck → lint → format check → test (84 Vitest tests) → build
 

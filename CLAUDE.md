@@ -97,7 +97,7 @@ src/store/        — Zustand store (UI state only) and memoized selectors
 - Prettier for formatting (`npm run format`)
 - ESLint for linting (`npm run lint`)
 - `npm run preflight` runs format check + typecheck + lint + build
-- CI runs on every push to `redesign` and every PR
+- CI runs on every push to `main` and every PR
 
 ## Responsiveness Expectations
 

@@ -7,29 +7,36 @@ A modern, premium financial tracking dashboard using a **Modular Bento Grid** la
 ## Architecture
 
 ```
-data/workbook.json  -->  data-migration.ts  -->  Server In-Memory Store  -->  API Routes
-                                                      |                         |
-                                                 Zustand Store  <---  API Client  -->  React UI
-                                                      |
-                                                 localStorage (categories, bills, savings, UI)
+data/workbook.json  -->  seed script  -->  Database (Neon Postgres / SQLite)
+                                                |
+                                           Repositories  -->  Services  -->  API Routes (/api/*)
+                                                                                  |
+                                           Zustand (UI only)  <---  API Client  -->  React UI
+                                                |
+                                           localStorage (theme, locale, month/year)
 ```
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 16 (App Router, API routes + static pages) |
+| Framework | Next.js 16 (App Router, server-rendered) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 + shadcn/ui (base-nova) |
-| State | Zustand (UI/categories/bills/savings) + API (transactions) |
+| Database | Neon Postgres (production) / SQLite (dev/tests) |
+| State | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | Validation | Zod (API request/response validation) |
-| Testing | Vitest (validation, services, dashboard) |
+| Testing | Vitest (84 tests: validation, all services) |
 | Charts | Recharts (area, pie, bars) |
 | Animations | Framer Motion (spring counters, stagger, transitions) |
 | Fonts | Plus Jakarta Sans + JetBrains Mono |
 | OCR | Tesseract.js (client-side, lazy-loaded) |
 | Export | CSV (native) + xlsx (SheetJS) + PDF (jspdf) |
-| Hosting | Vercel, Railway, or any Node.js host (API routes require server) |
+| Hosting | Vercel (auto-deploys from GitHub, Neon Postgres via DATABASE_URL) |
+
+## Status: ✅ DEPLOYED
+
+The app is live on Vercel with Neon Postgres. All implementation phases complete.
 
 ---
 
