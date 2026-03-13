@@ -6,8 +6,9 @@ This is a modern personal finance tracking dashboard designed for Indonesian Rup
 
 - Card-based, widget-driven UI inspired by Mercury, Copilot Money, and Wise
 - Bilingual: English and Bahasa Indonesia (EN/ID toggle)
-- Fully client-side — static export via Next.js `output: 'export'` deployed to GitHub Pages
-- Data persisted in localStorage via Zustand
+- Server-rendered Next.js app with API routes, deployed to Vercel
+- Database: Neon Postgres in production, SQLite for dev/tests
+- Zustand manages UI state only (theme, locale, month/year); all data via REST API
 
 ## UX Constraints
 
@@ -53,7 +54,8 @@ This is a modern personal finance tracking dashboard designed for Indonesian Rup
 
 ### File Organization
 ```
-src/app/          — Page routes (App Router)
+src/app/          — Page routes (App Router) + API routes (/api/*)
+src/server/       — Database connection, repositories, services
 src/components/   — UI components by domain
   ui/             — shadcn/ui primitives (do not edit)
   layout/         — AppShell, Sidebar, Topbar, BottomNav, PageHeader
@@ -65,8 +67,8 @@ src/components/   — UI components by domain
   shared/         — Reusable: SummaryCard, EmptyState, Skeletons, ConfirmDialog, etc.
   providers/      — StoreProvider
 src/hooks/        — Custom hooks (useDashboardData, useTransactions, useUpload, useExport)
-src/lib/          — Utilities, types, constants, formatters, i18n, validation, motion, services
-src/store/        — Zustand store and memoized selectors
+src/lib/          — Utilities, types, constants, formatters, i18n, validation, motion
+src/store/        — Zustand store (UI state only) and memoized selectors
 ```
 
 ### Component Conventions
@@ -81,6 +83,7 @@ src/store/        — Zustand store and memoized selectors
 - Zustand store at `src/store/index.ts` with localStorage persistence
 - Memoized selectors in `src/store/selectors.ts`
 - UI state (month, year, theme, locale) in store's `ui` slice
+- All data (transactions, categories, bills, savings, etc.) fetched from REST API (`/api/*`)
 - Derived/computed values via custom hooks or selectors, not in components
 
 ### Internationalization
@@ -111,7 +114,7 @@ src/store/        — Zustand store and memoized selectors
 - **No browser dialogs**: Use `ConfirmDialog` component, not `window.confirm()`
 - **No untyped props**: Always define TypeScript interfaces
 - **No inline animation configs**: Use presets from `src/lib/motion.ts`
-- **No raw localStorage**: Use Zustand store with persist middleware
+- **No raw localStorage for data**: Use REST API for all data; Zustand only for UI state
 - **No monolithic pages**: Extract logic into hooks, UI into components
 - **No hardcoded strings**: Use i18n `t()` function for user-facing text
 - **No unhandled states**: Every data view needs loading, empty, and error states
@@ -119,25 +122,29 @@ src/store/        — Zustand store and memoized selectors
 ## Build & Deploy
 
 ```bash
-npm run dev          # Local development
-npm run build        # Static export to out/
+npm run dev          # Local development (SQLite if no DATABASE_URL)
+npm run build        # Production build (server-rendered)
 npm run typecheck    # TypeScript check
 npm run lint         # ESLint
 npm run format       # Prettier auto-format
 npm run format:check # Prettier verify
 npm run validate     # typecheck + lint + build
 npm run preflight    # Full CI check locally
+npm run test         # Vitest (84 tests)
 ```
 
-GitHub Actions CI runs on pushes to `redesign` and PRs.
-Deploy workflow builds from `main` branch and deploys `out/` to GitHub Pages.
+Deploy to **Vercel** with `DATABASE_URL` env var pointing to Neon Postgres.
+GitHub Actions CI runs on pushes to `redesign` and PRs (typecheck, lint, format, test, build).
 
 ## Key Dependencies
 
 | Package | Purpose |
 |---------|---------|
-| next | App framework (static export) |
-| zustand | State management |
+| next | App framework (server-rendered) |
+| @neondatabase/serverless | Neon Postgres driver (production) |
+| better-sqlite3 | SQLite driver (dev/tests) |
+| zustand | UI state management |
+| zod | API validation schemas |
 | recharts | Charts (area, pie) |
 | framer-motion | Animations |
 | lucide-react | Icons |

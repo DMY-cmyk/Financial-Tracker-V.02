@@ -92,17 +92,18 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 
 | | |
 |---|---|
-| **Framework** | Next.js 16 (App Router, API routes + static pages) |
+| **Framework** | Next.js 16 (App Router, server-rendered) |
 | **Language** | TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
-| **State** | Zustand (UI/bills/savings) + SQLite API (transactions, categories, payment methods, settings) |
-| **Database** | SQLite via better-sqlite3 (WAL mode, 8 tables) |
+| **State** | Zustand (UI only: theme, locale, month/year) — all data via REST API |
+| **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Testing** | Vitest (84 tests: validation, all services) |
 | **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
 | **Export** | SheetJS (xlsx), jsPDF (pdf), native CSV/JSON |
+| **Deploy** | Vercel (auto-deploys from GitHub) |
 | **Toasts** | Sonner |
 | **Fonts** | Plus Jakarta Sans + JetBrains Mono |
 
@@ -110,14 +111,23 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
-npm run build      # Production build
+cp .env.example .env.local   # Configure DATABASE_URL for Neon Postgres (optional)
+npm run dev                  # http://localhost:3000 (uses SQLite if no DATABASE_URL)
+npm run build                # Production build
 ```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Production | Neon Postgres connection string. Leave empty to use SQLite (dev/tests). |
+| `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
+| `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
 
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest)
+npm run test         # Run tests (Vitest, 84 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -135,7 +145,7 @@ On first load, the app seeds sample data from `data/workbook.json` (12 months of
 src/
   app/
     page.tsx                  # Dashboard (bento grid)
-    api/
+    api/                      # REST API routes (all data is API-backed)
       transactions/           # GET (list) + POST (create), [id] PATCH/DELETE
       categories/             # GET (list) + POST, [id] PATCH/DELETE
       payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
@@ -145,12 +155,14 @@ src/
       dashboard/summary/      # GET (aggregated summary)
     transactions/page.tsx     # Transaction list + filters
     transactions/new/page.tsx # Add transaction form
+    bills/page.tsx            # Bills management
+    savings/page.tsx          # Savings goals
     upload/page.tsx           # OCR receipt upload
-    export/page.tsx           # CSV/JSON export
+    export/page.tsx           # Multi-format export
     settings/page.tsx         # Theme, language, data
     settings/categories/      # Category & payment method CRUD
   server/
-    db/                       # SQLite connection + seed (better-sqlite3)
+    db/                       # Database connection (Neon Postgres or SQLite) + seed
     repositories/             # CRUD repositories (transaction, category, payment-method, settings, upload, export-job)
     services/                 # Business logic (transaction, dashboard, category, payment-method, settings, upload, export-job)
   components/
@@ -167,7 +179,7 @@ src/
     api/                      # Contracts, validation (Zod), API client
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
-  store/                      # Zustand store + memoized selectors
+  store/                      # Zustand store (UI state only) + memoized selectors
   __tests__/                  # Vitest tests (84 tests: validation, transaction, dashboard, category, payment-method, settings, export-job)
 ```
 
@@ -185,7 +197,7 @@ src/
 ## Data Pipeline
 
 ```
-Financial Tracker.xlsx  -->  extract_xlsx.py  -->  workbook.json  -->  data-migration.ts  -->  Zustand Store
+Financial Tracker.xlsx  -->  extract_xlsx.py  -->  workbook.json  -->  seed script  -->  Database
 ```
 
 ```bash
@@ -196,14 +208,14 @@ python scripts/extract_xlsx.py
 ## CI/CD
 
 ### PR Validation (`.github/workflows/ci.yml`)
-Runs on pushes to `redesign` and PRs: `npm ci` -> typecheck -> lint -> format check -> build -> verify export
+Runs on pushes to `redesign` and PRs: `npm ci` → typecheck → lint → format check → test → build
 
-### Deployment (`.github/workflows/deploy-pages.yml`)
-Runs on pushes to `main`: `npm ci` -> typecheck -> lint -> build -> Deploy `out/` to GitHub Pages
+### Deployment
+Deploy via **Vercel** — connects to the GitHub repo and auto-deploys on push. Set `DATABASE_URL` in Vercel environment variables pointing to your Neon Postgres instance.
 
 ## Branch Strategy
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Production (original spreadsheet clone preserved) |
-| `redesign` | Modular Bento Grid redesign (active development) |
+| `main` | Production (deployed to Vercel) |
+| `redesign` | Active development |

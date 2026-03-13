@@ -79,7 +79,7 @@
 | **Purpose** | App preferences and data management |
 | **User actions** | Switch theme, switch language, clear data, import data |
 | **Key UI blocks** | Theme Cards, Language Cards, Data Management Section, Category Management Link |
-| **Outputs** | Updated preferences persisted to localStorage |
+| **Outputs** | Updated preferences persisted to database |
 
 ### 2.8 Language / Localization
 | Attribute | Detail |
@@ -997,7 +997,7 @@ components/providers/
 financial-tracker/
   .github/
     workflows/
-      deploy-pages.yml              # GitHub Pages CI/CD
+      ci.yml                            # CI pipeline (typecheck, lint, test, build)
   data/
     workbook.json                    # Source spreadsheet data (12 months)
   public/
@@ -1066,7 +1066,9 @@ financial-tracker/
       constants.ts                   # Colors, defaults, nav items
       formatters.ts                  # Currency/date/number formatting
       calculations.ts                # Financial computation functions
-      storage.ts                     # localStorage helpers
+      db.ts                          # Database connection (Neon Postgres / SQLite)
+      repositories/                  # CRUD data access layer
+      services/                      # Business logic layer
       data-migration.ts              # workbook.json -> typed objects
       i18n.ts                        # EN/ID translations + context
       export-utils.ts                # CSV/Excel/PDF generation (to add)
@@ -1078,7 +1080,7 @@ financial-tracker/
       sample-data.ts                 # Workbook migration entry point
   components.json                    # shadcn/ui config
   eslint.config.mjs
-  next.config.ts                     # output: 'export'
+  next.config.ts                     # Server-rendered config
   package.json
   postcss.config.mjs
   tsconfig.json
@@ -1096,7 +1098,7 @@ financial-tracker/
 
 | Deliverable | Status | Priority |
 |-------------|--------|----------|
-| Next.js 16 + TypeScript + Tailwind v4 + static export | Done | P0 |
+| Next.js 16 + TypeScript + Tailwind v4 + server runtime | Done | P0 |
 | shadcn/ui initialization + base components | Done | P0 |
 | Plus Jakarta Sans + JetBrains Mono fonts | Done | P0 |
 | Custom color palette in globals.css | Done | P0 |

@@ -24,32 +24,28 @@ Copy `.env.example` to `.env.local` for local overrides.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NEXT_PUBLIC_BASE_PATH` | No | Base path for GitHub Pages (e.g., `/Financial-Tracker-V.02`) |
+| `DATABASE_URL` | Production | Neon Postgres connection string (`postgresql://...`). Leave empty to use SQLite for local dev/tests. |
+| `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
 | `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
-| `NEXT_PUBLIC_API_URL` | No | Backend API URL (placeholder — currently unused) |
 
-The app is fully client-side. No secrets or server-side env vars are needed.
+In production (Vercel), `DATABASE_URL` must point to a Neon Postgres instance.
 
 ## Build & Deploy
 
-### Static Export
+### Production Build
 
 ```bash
 npm run build
-# Output: out/ directory with static HTML/CSS/JS
+# Produces a server-rendered Next.js app (NOT a static export)
 ```
 
-The app uses `output: 'export'` in `next.config.ts` for fully static deployment.
-All pages are pre-rendered at build time. No Node.js server is needed at runtime.
+The app uses server-side API routes backed by Neon Postgres. A Node.js runtime is required.
 
-### GitHub Pages Deployment
+### Vercel Deployment (Recommended)
 
-Automated via `.github/workflows/deploy-pages.yml`:
-
-1. Push to `main` branch triggers deployment
-2. CI runs: install -> typecheck -> lint -> build
-3. `out/` directory is uploaded as GitHub Pages artifact
-4. GitHub Pages serves the static files
+1. Connect the GitHub repo to Vercel
+2. Set `DATABASE_URL` in Vercel environment variables (Neon Postgres connection string)
+3. Vercel auto-deploys on push to `main`
 
 ### CI Pipeline
 
@@ -57,15 +53,7 @@ Automated via `.github/workflows/deploy-pages.yml`:
 - Every push to `redesign` branch
 - Every pull request to `main` or `redesign`
 
-Steps: install -> typecheck -> lint -> format check -> build -> verify static export
-
-### Deploying to Other Platforms
-
-The `out/` directory is a standard static site. Compatible with:
-- **Vercel**: Auto-detected (but consider switching to server mode for best experience)
-- **Netlify**: Set build command to `npm run build`, publish directory to `out`
-- **Cloudflare Pages**: Same as Netlify
-- **Any static host**: Just serve the `out/` directory
+Steps: install → typecheck → lint → format check → test (84 Vitest tests) → build
 
 ## Pre-Release Checklist
 
@@ -108,46 +96,45 @@ The `out/` directory is a standard static site. Compatible with:
 - [ ] ARIA: dialogs, radiogroups, navigation landmarks labeled
 
 ### Data Safety
-- [ ] localStorage persistence works across page reloads
+- [ ] Database persistence works across requests
 - [ ] Import doesn't duplicate existing data
 - [ ] Clear data truly removes everything
 - [ ] No PII is sent to external services
+- [ ] SQLite fallback works when DATABASE_URL is unset
 
 ## Post-Launch Monitoring
 
 ### What to Watch
-- [ ] GitHub Pages deployment status
+- [ ] Vercel deployment status and function logs
+- [ ] Database connection pool health (Neon dashboard)
 - [ ] Browser console errors (via manual spot-check)
-- [ ] localStorage quota issues on heavy use
 - [ ] OCR accuracy with different receipt formats
 
 ### Known Limitations
 - OCR is client-side only — quality depends on image clarity
-- No cloud sync — data lives in browser localStorage only
-- Large datasets (1000+ transactions) may slow down the app
+- Large datasets (1000+ transactions) may slow down API responses
 - PDF export quality depends on browser PDF rendering
 
 ## Architecture Notes
 
 ### What is Production-Ready
-- Full CRUD for transactions
+- Full CRUD for transactions, bills, savings, categories, payment methods
+- REST API routes at `/api/*` backed by Neon Postgres (production) or SQLite (dev)
 - 4-format export (CSV, JSON, Excel, PDF)
 - Import from JSON/CSV
 - OCR receipt scanning
 - Bilingual UI (EN/ID)
 - Dark mode
 - Responsive design
-- Static deployment
+- Vercel deployment with Neon Postgres
+- 84 Vitest tests covering validation and all services
 
 ### What is Placeholder-Only
-- `src/lib/services.ts` — API boundary stubs (returns local data, no real HTTP calls)
-- `src/lib/env.ts` — NEXT_PUBLIC_API_URL is defined but unused
 - Analytics integration — no tracking code installed
 - Error reporting — errors log to console only
 
 ### What Should Be Connected Next
-1. **Backend API** — Replace localStorage with server persistence
-2. **Authentication** — Add user accounts and data isolation
-3. **Error reporting** — Integrate Sentry or similar
-4. **Analytics** — Add privacy-respecting usage tracking
-5. **Cloud backup** — Sync data across devices
+1. **Authentication** — Add user accounts and data isolation
+2. **Error reporting** — Integrate Sentry or similar
+3. **Analytics** — Add privacy-respecting usage tracking
+4. **Cloud backup** — Multi-device data sync
