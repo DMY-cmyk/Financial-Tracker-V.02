@@ -1,5 +1,7 @@
 # Financial Tracker V.02
 
+🔗 **[Live Demo → financial-tracker-v-02.vercel.app](https://financial-tracker-v-02.vercel.app/)**
+
 A modern personal finance tracking dashboard using a **Modular Bento Grid** layout. Built with Next.js 16, featuring animated widgets, interactive charts, and full transaction management. Designed for Indonesian Rupiah (IDR) budgeting with bilingual support (EN/ID).
 
 ## Concept
