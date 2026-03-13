@@ -25,6 +25,7 @@ interface UseExportReturn {
   scopedTransactions: Transaction[];
   scopeLabel: string;
   totalCount: number;
+  allTransactionCount: number;
 
   // Export jobs history
   exportJobs: ExportJobResponse[];
@@ -150,6 +151,7 @@ export function useExport(): UseExportReturn {
     scopedTransactions,
     scopeLabel,
     totalCount: scopedTransactions.length,
+    allTransactionCount: allTransactions.length,
     exportJobs,
     jobsLoading,
     handleExport,

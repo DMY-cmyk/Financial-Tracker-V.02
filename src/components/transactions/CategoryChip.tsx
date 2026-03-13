@@ -1,14 +1,12 @@
 import { CATEGORY_COLORS } from '@/lib/constants';
-import { useStore } from '@/store';
 
 interface CategoryChipProps {
   category: string;
+  color?: string;
 }
 
-export function CategoryChip({ category }: CategoryChipProps) {
-  const categories = useStore((s) => s.categories);
-  const cat = categories.find((c) => c.name === category);
-  const color = cat?.color || CATEGORY_COLORS[category] || '#6B7280';
+export function CategoryChip({ category, color: colorProp }: CategoryChipProps) {
+  const color = colorProp || CATEGORY_COLORS[category] || '#6B7280';
 
   return (
     <span

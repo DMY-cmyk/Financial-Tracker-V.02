@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
-import { useStore } from '@/store';
 import {
   parseJsonImport,
   parseCsvImport,
   readFileAsText,
   type ImportResult,
 } from '@/lib/import-utils';
+import { api } from '@/lib/api/client';
 
 type ImportStatus = 'idle' | 'reading' | 'validating' | 'complete' | 'error';
 
@@ -14,13 +14,11 @@ interface UseImportReturn {
   result: ImportResult | null;
   error: string | null;
   importFile: (file: File) => Promise<void>;
-  confirmImport: () => number;
+  confirmImport: () => Promise<number>;
   reset: () => void;
 }
 
 export function useImport(): UseImportReturn {
-  const addTransaction = useStore((s) => s.addTransaction);
-
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [result, setResult] = useState<ImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -61,19 +59,19 @@ export function useImport(): UseImportReturn {
     }
   }, []);
 
-  const confirmImport = useCallback((): number => {
+  const confirmImport = useCallback(async (): Promise<number> => {
     if (!result || result.transactions.length === 0) return 0;
 
     let count = 0;
     for (const tx of result.transactions) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, ...rest } = tx;
-      addTransaction(rest);
-      count++;
+      const apiResult = await api.transactions.create(rest);
+      if (apiResult.data) count++;
     }
 
     return count;
-  }, [result, addTransaction]);
+  }, [result]);
 
   const reset = useCallback(() => {
     setStatus('idle');

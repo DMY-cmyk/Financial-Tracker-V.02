@@ -36,8 +36,8 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
     importFile(file);
   };
 
-  const handleConfirm = () => {
-    const count = confirmImport();
+  const handleConfirm = async () => {
+    const count = await confirmImport();
     if (count > 0) {
       toast.success(`${count} ${t(locale, 'transactionsFound')}`);
       reset();

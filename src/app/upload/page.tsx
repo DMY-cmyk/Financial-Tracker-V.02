@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { useUpload } from '@/hooks/useUpload';
-import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -18,7 +17,6 @@ import { toast } from 'sonner';
 
 export default function UploadPage() {
   const locale = useLocale();
-  const categories = useStore((s) => s.categories);
   const {
     file,
     preview,
@@ -32,6 +30,7 @@ export default function UploadPage() {
     handleSave,
     isProcessing,
     errors,
+    categories,
   } = useUpload();
 
   const onSave = async () => {

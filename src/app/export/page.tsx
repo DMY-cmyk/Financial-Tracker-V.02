@@ -42,7 +42,6 @@ export default function ExportPage() {
   const locale = useLocale();
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
-  const allTransactions = useStore((s) => s.transactions);
 
   const {
     format,
@@ -52,6 +51,7 @@ export default function ExportPage() {
     options,
     setOptions,
     scopedTransactions,
+    allTransactionCount,
     handleExport,
     isExporting,
   } = useExport();
@@ -107,7 +107,7 @@ export default function ExportPage() {
             scope={scope}
             onScopeChange={setScope}
             monthLabel={`${MONTH_NAMES[month]} ${year}`}
-            transactionCount={allTransactions.length}
+            transactionCount={allTransactionCount}
           />
         </motion.div>
 

@@ -112,39 +112,8 @@ export interface LanguageOption {
 }
 
 export interface FinancialStore {
-  transactions: Transaction[];
-  categories: Category[];
-  paymentMethods: PaymentMethod[];
-  bills: Bill[];
-  savingsGoals: SavingsGoal[];
   ui: UIState;
   initialized: boolean;
-
-  // Transaction actions
-  addTransaction: (t: Omit<Transaction, 'id'>) => void;
-  updateTransaction: (id: string, t: Partial<Transaction>) => void;
-  deleteTransaction: (id: string) => void;
-
-  // Category actions
-  addCategory: (c: Omit<Category, 'id'>) => void;
-  updateCategory: (id: string, c: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
-
-  // Payment method actions
-  addPaymentMethod: (p: Omit<PaymentMethod, 'id'>) => void;
-  updatePaymentMethod: (id: string, p: Partial<PaymentMethod>) => void;
-  deletePaymentMethod: (id: string) => void;
-
-  // Bill actions
-  addBill: (b: Omit<Bill, 'id'>) => void;
-  updateBill: (id: string, b: Partial<Bill>) => void;
-  deleteBill: (id: string) => void;
-  toggleBillPaid: (id: string) => void;
-
-  // Savings actions
-  addSavingsGoal: (s: Omit<SavingsGoal, 'id'>) => void;
-  updateSavingsGoal: (id: string, s: Partial<SavingsGoal>) => void;
-  deleteSavingsGoal: (id: string) => void;
 
   // UI actions
   setMonth: (month: number) => void;
@@ -152,14 +121,7 @@ export interface FinancialStore {
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setLocale: (locale: 'en' | 'id') => void;
 
-  // Data actions
-  initialize: (data: {
-    transactions: Transaction[];
-    categories: Category[];
-    paymentMethods: PaymentMethod[];
-    bills: Bill[];
-    savingsGoals: SavingsGoal[];
-  }) => void;
-  setTransactions: (transactions: Transaction[]) => void;
+  // Lifecycle
+  initialize: () => void;
   clearAllData: () => void;
 }

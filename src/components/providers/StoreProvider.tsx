@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useStore } from '@/store';
-import { getSampleData } from '@/data/sample-data';
 import { LocaleContext } from '@/lib/i18n';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -13,10 +12,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!initialized) {
-      // Seed bills, savings goals, and UI defaults from sample data
-      // Categories, payment methods, and transactions are now API-backed (SQLite)
-      const sampleData = getSampleData();
-      initialize(sampleData);
+      initialize();
     }
   }, [initialized, initialize]);
 
