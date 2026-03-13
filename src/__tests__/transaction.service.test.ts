@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetDb } from '@/server/db/sqlite';
+import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import {
   listTransactions,
@@ -8,8 +8,8 @@ import {
   deleteTransaction,
 } from '@/server/services/transaction.service';
 
-beforeEach(() => {
-  resetDb();
+beforeEach(async () => {
+  await resetDb();
   resetSeeded();
   markSeeded();
 });
@@ -25,8 +25,8 @@ describe('createTransaction', () => {
     notes: '',
   };
 
-  it('creates a transaction with valid input', () => {
-    const result = createTransaction(validInput);
+  it('creates a transaction with valid input', async () => {
+    const result = await createTransaction(validInput);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -34,8 +34,8 @@ describe('createTransaction', () => {
     expect(result.data!.description).toBe('Monthly Salary');
   });
 
-  it('returns validation error for invalid input', () => {
-    const result = createTransaction({
+  it('returns validation error for invalid input', async () => {
+    const result = await createTransaction({
       ...validInput,
       amount: -100,
     });
@@ -44,16 +44,16 @@ describe('createTransaction', () => {
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns validation error for missing fields', () => {
-    const result = createTransaction({});
+  it('returns validation error for missing fields', async () => {
+    const result = await createTransaction({});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('listTransactions', () => {
-  beforeEach(() => {
-    createTransaction({
+  beforeEach(async () => {
+    await createTransaction({
       date: '2025-01-15',
       description: 'Salary',
       category: 'Salary',
@@ -62,7 +62,7 @@ describe('listTransactions', () => {
       paymentMethod: 'Bank BCA',
       notes: '',
     });
-    createTransaction({
+    await createTransaction({
       date: '2025-01-20',
       description: 'Groceries',
       category: 'Food',
@@ -71,7 +71,7 @@ describe('listTransactions', () => {
       paymentMethod: 'Cash',
       notes: '',
     });
-    createTransaction({
+    await createTransaction({
       date: '2025-02-10',
       description: 'Rent',
       category: 'Utilities',
@@ -82,45 +82,45 @@ describe('listTransactions', () => {
     });
   });
 
-  it('returns all transactions without filters', () => {
-    const result = listTransactions({});
+  it('returns all transactions without filters', async () => {
+    const result = await listTransactions({});
     expect(result.data).toBeDefined();
     expect(result.data!.total).toBe(3);
   });
 
-  it('filters by month and year', () => {
-    const result = listTransactions({ month: 0, year: 2025 });
+  it('filters by month and year', async () => {
+    const result = await listTransactions({ month: 0, year: 2025 });
     expect(result.data!.total).toBe(2);
   });
 
-  it('filters by type', () => {
-    const result = listTransactions({ type: 'expense' });
+  it('filters by type', async () => {
+    const result = await listTransactions({ type: 'expense' });
     expect(result.data!.total).toBe(2);
     expect(result.data!.expense).toBe(3500000);
   });
 
-  it('filters by search term', () => {
-    const result = listTransactions({ search: 'Groceries' });
+  it('filters by search term', async () => {
+    const result = await listTransactions({ search: 'Groceries' });
     expect(result.data!.total).toBe(1);
     expect(result.data!.transactions[0].description).toBe('Groceries');
   });
 
-  it('calculates income and expense totals', () => {
-    const result = listTransactions({ month: 0, year: 2025 });
+  it('calculates income and expense totals', async () => {
+    const result = await listTransactions({ month: 0, year: 2025 });
     expect(result.data!.income).toBe(8500000);
     expect(result.data!.expense).toBe(500000);
   });
 
-  it('returns sorted by date descending', () => {
-    const result = listTransactions({ month: 0, year: 2025 });
+  it('returns sorted by date descending', async () => {
+    const result = await listTransactions({ month: 0, year: 2025 });
     expect(result.data!.transactions[0].date).toBe('2025-01-20');
     expect(result.data!.transactions[1].date).toBe('2025-01-15');
   });
 });
 
 describe('updateTransaction', () => {
-  it('updates an existing transaction', () => {
-    const created = createTransaction({
+  it('updates an existing transaction', async () => {
+    const created = await createTransaction({
       date: '2025-01-15',
       description: 'Original',
       category: 'Food',
@@ -130,7 +130,7 @@ describe('updateTransaction', () => {
       notes: '',
     });
 
-    const result = updateTransaction(created.data!.id, {
+    const result = await updateTransaction(created.data!.id, {
       description: 'Updated',
       amount: 200000,
     });
@@ -140,8 +140,8 @@ describe('updateTransaction', () => {
     expect(result.data!.amount).toBe(200000);
   });
 
-  it('returns NOT_FOUND for nonexistent ID', () => {
-    const result = updateTransaction('nonexistent', {
+  it('returns NOT_FOUND for nonexistent ID', async () => {
+    const result = await updateTransaction('nonexistent', {
       description: 'Test',
     });
     expect(result.error).toBeDefined();
@@ -150,8 +150,8 @@ describe('updateTransaction', () => {
 });
 
 describe('deleteTransaction', () => {
-  it('deletes an existing transaction', () => {
-    const created = createTransaction({
+  it('deletes an existing transaction', async () => {
+    const created = await createTransaction({
       date: '2025-01-15',
       description: 'To Delete',
       category: 'Food',
@@ -161,16 +161,16 @@ describe('deleteTransaction', () => {
       notes: '',
     });
 
-    const result = deleteTransaction(created.data!.id);
+    const result = await deleteTransaction(created.data!.id);
     expect(result.data).toEqual({ success: true });
 
     // Verify it's actually gone
-    const list = listTransactions({});
+    const list = await listTransactions({});
     expect(list.data!.total).toBe(0);
   });
 
-  it('returns NOT_FOUND for nonexistent ID', () => {
-    const result = deleteTransaction('nonexistent');
+  it('returns NOT_FOUND for nonexistent ID', async () => {
+    const result = await deleteTransaction('nonexistent');
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
   });

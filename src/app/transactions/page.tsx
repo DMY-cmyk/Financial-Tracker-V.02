@@ -30,6 +30,9 @@ export default function TransactionsPage() {
     setTypeFilter,
     categoryFilter,
     setCategoryFilter,
+    paymentMethodFilter,
+    setPaymentMethodFilter,
+    paymentMethods,
     clearFilters,
     formOpen,
     setFormOpen,
@@ -94,6 +97,9 @@ export default function TransactionsPage() {
           onTypeChange={setTypeFilter}
           categoryFilter={categoryFilter}
           onCategoryChange={setCategoryFilter}
+          paymentMethodFilter={paymentMethodFilter}
+          onPaymentMethodChange={setPaymentMethodFilter}
+          paymentMethods={paymentMethods}
         />
       </motion.div>
 
@@ -102,11 +108,7 @@ export default function TransactionsPage() {
           <motion.div key="empty" {...fadeInUp}>
             <EmptyState
               title={t(locale, 'noData')}
-              description={
-                locale === 'id'
-                  ? 'Tambahkan transaksi pertama Anda.'
-                  : 'Start by adding your first transaction.'
-              }
+              description={t(locale, 'addFirstTransaction')}
               icon={<Receipt className="h-12 w-12" />}
             >
               <Button onClick={openAdd} className="gap-2">

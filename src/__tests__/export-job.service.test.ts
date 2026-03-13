@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetDb } from '@/server/db/sqlite';
+import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { listExportJobs, createExportJob } from '@/server/services/export-job.service';
 
-beforeEach(() => {
-  resetDb();
+beforeEach(async () => {
+  await resetDb();
   resetSeeded();
   markSeeded();
 });
 
 describe('createExportJob', () => {
-  it('creates an export job and marks as completed', () => {
-    const result = createExportJob({ format: 'csv', scope: 'current' });
+  it('creates an export job and marks as completed', async () => {
+    const result = await createExportJob({ format: 'csv', scope: 'current' });
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -21,8 +21,8 @@ describe('createExportJob', () => {
     expect(result.data!.filename).toContain('.csv');
   });
 
-  it('creates an export job with all options', () => {
-    const result = createExportJob({
+  it('creates an export job with all options', async () => {
+    const result = await createExportJob({
       format: 'json',
       scope: 'all',
       filters: '{"month":0}',
@@ -35,37 +35,37 @@ describe('createExportJob', () => {
     expect(result.data!.recordCount).toBe(42);
   });
 
-  it('returns validation error for invalid format', () => {
-    const result = createExportJob({ format: 'docx', scope: 'current' });
+  it('returns validation error for invalid format', async () => {
+    const result = await createExportJob({ format: 'docx', scope: 'current' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns validation error for invalid scope', () => {
-    const result = createExportJob({ format: 'csv', scope: 'monthly' });
+  it('returns validation error for invalid scope', async () => {
+    const result = await createExportJob({ format: 'csv', scope: 'monthly' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
-  it('returns validation error for missing fields', () => {
-    const result = createExportJob({});
+  it('returns validation error for missing fields', async () => {
+    const result = await createExportJob({});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('listExportJobs', () => {
-  it('returns all export jobs', () => {
-    createExportJob({ format: 'csv', scope: 'current' });
-    createExportJob({ format: 'json', scope: 'all' });
+  it('returns all export jobs', async () => {
+    await createExportJob({ format: 'csv', scope: 'current' });
+    await createExportJob({ format: 'json', scope: 'all' });
 
-    const result = listExportJobs();
+    const result = await listExportJobs();
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(2);
   });
 
-  it('returns empty array when no jobs', () => {
-    const result = listExportJobs();
+  it('returns empty array when no jobs', async () => {
+    const result = await listExportJobs();
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(0);
   });

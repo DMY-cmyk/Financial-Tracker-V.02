@@ -1,22 +1,21 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '@/store';
-import { useMonthlyBills } from '@/store/selectors';
 import { api } from '@/lib/api/client';
 import type { DashboardSummaryResponse } from '@/lib/api/contracts';
+import type { Bill, Category, SavingsGoal } from '@/lib/types';
 
 export function useDashboardData() {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
-  const savingsGoals = useStore((s) => s.savingsGoals);
-  const categories = useStore((s) => s.categories);
-  const bills = useMonthlyBills();
 
   const [summary, setSummary] = useState<DashboardSummaryResponse | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
 
-  // Derive loading from comparing requested vs loaded data key
   const [loadedKey, setLoadedKey] = useState('');
   const targetKey = `${month}-${year}`;
   const isApiLoading = loadedKey !== targetKey;
@@ -26,11 +25,17 @@ export function useDashboardData() {
 
     let cancelled = false;
 
-    api.dashboard.summary(month, year).then((result) => {
+    Promise.all([
+      api.dashboard.summary(month, year),
+      api.categories.list(),
+      api.bills.list({ month, year }),
+      api.savings.list(),
+    ]).then(([summaryResult, catResult, billsResult, savingsResult]) => {
       if (cancelled) return;
-      if (result.data) {
-        setSummary(result.data);
-      }
+      if (summaryResult.data) setSummary(summaryResult.data);
+      if (catResult.data) setCategories(catResult.data.categories);
+      if (billsResult.data) setBills(billsResult.data.bills);
+      if (savingsResult.data) setSavingsGoals(savingsResult.data.goals);
       setLoadedKey(`${month}-${year}`);
     });
 
@@ -39,7 +44,21 @@ export function useDashboardData() {
     };
   }, [month, year, initialized]);
 
-  // Compute budget status from API categoryTotals + Zustand categories
+  const onToggleBill = useCallback(
+    async (id: string) => {
+      const bill = bills.find((b) => b.id === id);
+      if (!bill) return;
+      // Optimistic update
+      setBills((prev) => prev.map((b) => (b.id === id ? { ...b, isPaid: !b.isPaid } : b)));
+      const result = await api.bills.update(id, { isPaid: !bill.isPaid });
+      if (result.error) {
+        // Revert on failure
+        setBills((prev) => prev.map((b) => (b.id === id ? { ...b, isPaid: bill.isPaid } : b)));
+      }
+    },
+    [bills]
+  );
+
   const budgetStatus = useMemo(() => {
     if (!summary) return [];
     return categories
@@ -48,14 +67,7 @@ export function useDashboardData() {
         const spent = summary.categoryTotals[c.name] || 0;
         const remaining = c.budget - spent;
         const percentage = c.budget > 0 ? Math.min((spent / c.budget) * 100, 100) : 0;
-        return {
-          category: c.name,
-          budget: c.budget,
-          spent,
-          remaining,
-          color: c.color,
-          percentage,
-        };
+        return { category: c.name, budget: c.budget, spent, remaining, color: c.color, percentage };
       });
   }, [summary, categories]);
 
@@ -77,7 +89,9 @@ export function useDashboardData() {
     bills,
     savingsGoals,
     categories,
+    onToggleBill,
     isLoading,
     isEmpty: !isLoading && summary?.transactionCount === 0,
   };
 }
+

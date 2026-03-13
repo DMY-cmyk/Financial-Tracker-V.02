@@ -1,9 +1,11 @@
 'use client';
 
-import { useStore } from '@/store';
+import { useState, useEffect } from 'react';
+import { api } from '@/lib/api/client';
 import { Input } from '@/components/ui/input';
 import { t, useLocale } from '@/lib/i18n';
 import { Search } from 'lucide-react';
+import type { Category, PaymentMethod } from '@/lib/types';
 
 interface TransactionFiltersProps {
   search: string;
@@ -12,6 +14,9 @@ interface TransactionFiltersProps {
   onTypeChange: (v: 'all' | 'income' | 'expense') => void;
   categoryFilter: string;
   onCategoryChange: (v: string) => void;
+  paymentMethodFilter?: string;
+  onPaymentMethodChange?: (v: string) => void;
+  paymentMethods?: PaymentMethod[];
 }
 
 export function TransactionFilters({
@@ -21,9 +26,18 @@ export function TransactionFilters({
   onTypeChange,
   categoryFilter,
   onCategoryChange,
+  paymentMethodFilter = '',
+  onPaymentMethodChange,
+  paymentMethods = [],
 }: TransactionFiltersProps) {
-  const categories = useStore((s) => s.categories);
+  const [categories, setCategories] = useState<Category[]>([]);
   const locale = useLocale();
+
+  useEffect(() => {
+    api.categories.list().then((result) => {
+      if (result.data) setCategories(result.data.categories);
+    });
+  }, []);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -68,6 +82,22 @@ export function TransactionFilters({
           </option>
         ))}
       </select>
+
+      {onPaymentMethodChange && paymentMethods.length > 0 && (
+        <select
+          value={paymentMethodFilter}
+          onChange={(e) => onPaymentMethodChange(e.target.value)}
+          className="border-border bg-card rounded-lg border px-3 py-1.5 text-xs"
+          aria-label={`${t(locale, 'filter')} ${t(locale, 'paymentMethod')}`}
+        >
+          <option value="">{t(locale, 'all')} {t(locale, 'paymentMethod')}</option>
+          {paymentMethods.map((pm) => (
+            <option key={pm.id} value={pm.name}>
+              {pm.name}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 }

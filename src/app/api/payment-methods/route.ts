@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { listPaymentMethods, createPaymentMethod } from '@/server/services/payment-method.service';
 
 export async function GET() {
-  const result = listPaymentMethods();
+  const result = await listPaymentMethods();
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
@@ -12,7 +12,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const result = createPaymentMethod(body);
+  const result = await createPaymentMethod(body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

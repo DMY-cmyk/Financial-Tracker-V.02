@@ -1,33 +1,43 @@
-import { getDb } from '@/server/db/sqlite';
+import { getDb } from '@/server/db/client';
 
 export function createSettingsRepository() {
   return {
-    get(key: string): string | undefined {
-      const row = getDb().prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
-      return row?.value;
+    async get(key: string): Promise<string | undefined> {
+      const db = await getDb();
+      const result = await db.query<{ value: string }>('SELECT value FROM settings WHERE key = ?', [key]);
+      return result.rows[0]?.value;
     },
 
-    getAll(): Record<string, string> {
-      const rows = getDb().prepare('SELECT key, value FROM settings').all() as { key: string; value: string }[];
-      const result: Record<string, string> = {};
-      for (const r of rows) result[r.key] = r.value;
-      return result;
+    async getAll(): Promise<Record<string, string>> {
+      const db = await getDb();
+      const result = await db.query<{ key: string; value: string }>('SELECT key, value FROM settings');
+      const out: Record<string, string> = {};
+      for (const r of result.rows) out[r.key] = r.value;
+      return out;
     },
 
-    set(key: string, value: string): void {
-      getDb().prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
+    async set(key: string, value: string): Promise<void> {
+      const db = await getDb();
+      await db.query(
+        'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+        [key, value]
+      );
     },
 
-    setMany(entries: Record<string, string>): void {
-      const stmt = getDb().prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-      const tx = getDb().transaction(() => {
-        for (const [k, v] of Object.entries(entries)) stmt.run(k, v);
-      });
-      tx();
+    async setMany(entries: Record<string, string>): Promise<void> {
+      const db = await getDb();
+      for (const [k, v] of Object.entries(entries)) {
+        await db.query(
+          'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+          [k, v]
+        );
+      }
     },
 
-    delete(key: string): boolean {
-      return getDb().prepare('DELETE FROM settings WHERE key = ?').run(key).changes > 0;
+    async delete(key: string): Promise<boolean> {
+      const db = await getDb();
+      const result = await db.query('DELETE FROM settings WHERE key = ?', [key]);
+      return result.rowCount > 0;
     },
   };
 }

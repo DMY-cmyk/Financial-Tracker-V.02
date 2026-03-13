@@ -13,32 +13,32 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
 
 interface ServiceResult<T> { data?: T; error?: { message: string; code: string; details?: Record<string, string[]> } }
 
-export function listCategories(query?: { type?: string }): ServiceResult<Category[]> {
-  ensureSeeded();
+export async function listCategories(query?: { type?: string }): Promise<ServiceResult<Category[]>> {
+  await ensureSeeded();
   if (query?.type === 'income' || query?.type === 'expense') {
-    return { data: repo.findByType(query.type) };
+    return { data: await repo.findByType(query.type) };
   }
-  return { data: repo.findAll() };
+  return { data: await repo.findAll() };
 }
 
-export function createCategory(body: unknown): ServiceResult<Category> {
-  ensureSeeded();
+export async function createCategory(body: unknown): Promise<ServiceResult<Category>> {
+  await ensureSeeded();
   const parsed = createCategorySchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  return { data: repo.create(parsed.data) };
+  return { data: await repo.create(parsed.data) };
 }
 
-export function updateCategory(id: string, body: unknown): ServiceResult<Category> {
-  ensureSeeded();
+export async function updateCategory(id: string, body: unknown): Promise<ServiceResult<Category>> {
+  await ensureSeeded();
   const parsed = updateCategorySchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  const result = repo.update(id, parsed.data);
+  const result = await repo.update(id, parsed.data);
   if (!result) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
 
-export function deleteCategory(id: string): ServiceResult<{ success: boolean }> {
-  ensureSeeded();
-  if (!repo.delete(id)) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
+export async function deleteCategory(id: string): Promise<ServiceResult<{ success: boolean }>> {
+  await ensureSeeded();
+  if (!(await repo.delete(id))) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
 }

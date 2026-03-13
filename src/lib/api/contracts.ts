@@ -125,3 +125,63 @@ export interface ExportJobResponse {
 export interface ExportJobListResponse {
   jobs: ExportJobResponse[];
 }
+
+// === Bill contracts ===
+
+export interface BillResponse {
+  id: string;
+  name: string;
+  amount: number;
+  dueDate: number;
+  isPaid: boolean;
+  month: number;
+  year: number;
+}
+
+export interface BillListResponse {
+  bills: BillResponse[];
+}
+
+export interface CreateBillRequest {
+  name: string;
+  amount: number;
+  dueDate: number;
+  isPaid?: boolean;
+  month: number;
+  year: number;
+}
+
+export interface UpdateBillRequest {
+  name?: string;
+  amount?: number;
+  dueDate?: number;
+  isPaid?: boolean;
+}
+
+// === Savings goal contracts ===
+
+export interface SavingsGoalResponse {
+  id: string;
+  name: string;
+  targetAmount: number;
+  savedAmount: number;
+  color: string;
+}
+
+export interface SavingsGoalListResponse {
+  goals: SavingsGoalResponse[];
+}
+
+export interface CreateSavingsGoalRequest {
+  name: string;
+  targetAmount: number;
+  savedAmount?: number;
+  color: string;
+}
+
+export interface UpdateSavingsGoalRequest {
+  name?: string;
+  targetAmount?: number;
+  savedAmount?: number;
+  color?: string;
+}

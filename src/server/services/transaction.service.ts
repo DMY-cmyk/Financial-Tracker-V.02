@@ -51,8 +51,8 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export function listTransactions(rawQuery: Record<string, unknown>): ServiceResult<TransactionListResponse> {
-  ensureSeeded();
+export async function listTransactions(rawQuery: Record<string, unknown>): Promise<ServiceResult<TransactionListResponse>> {
+  await ensureSeeded();
 
   const parsed = listTransactionsQuerySchema.safeParse(rawQuery);
   if (!parsed.success) {
@@ -68,8 +68,8 @@ export function listTransactions(rawQuery: Record<string, unknown>): ServiceResu
   const query = parsed.data;
   const base =
     query.month !== undefined && query.year !== undefined
-      ? repo.findByMonth(query.month, query.year)
-      : repo.findAll();
+      ? await repo.findByMonth(query.month, query.year)
+      : await repo.findAll();
 
   const transactions = applyFilters(base, query);
   const income = transactions
@@ -84,8 +84,8 @@ export function listTransactions(rawQuery: Record<string, unknown>): ServiceResu
   };
 }
 
-export function createTransaction(body: unknown): ServiceResult<Transaction> {
-  ensureSeeded();
+export async function createTransaction(body: unknown): Promise<ServiceResult<Transaction>> {
+  await ensureSeeded();
 
   const parsed = createTransactionSchema.safeParse(body);
   if (!parsed.success) {
@@ -98,15 +98,15 @@ export function createTransaction(body: unknown): ServiceResult<Transaction> {
     };
   }
 
-  const transaction = repo.create(parsed.data);
+  const transaction = await repo.create(parsed.data);
   return { data: transaction };
 }
 
-export function updateTransaction(
+export async function updateTransaction(
   id: string,
   body: unknown
-): ServiceResult<Transaction> {
-  ensureSeeded();
+): Promise<ServiceResult<Transaction>> {
+  await ensureSeeded();
 
   const parsed = updateTransactionSchema.safeParse(body);
   if (!parsed.success) {
@@ -119,7 +119,7 @@ export function updateTransaction(
     };
   }
 
-  const transaction = repo.update(id, parsed.data);
+  const transaction = await repo.update(id, parsed.data);
   if (!transaction) {
     return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
   }
@@ -127,10 +127,10 @@ export function updateTransaction(
   return { data: transaction };
 }
 
-export function deleteTransaction(id: string): ServiceResult<{ success: boolean }> {
-  ensureSeeded();
+export async function deleteTransaction(id: string): Promise<ServiceResult<{ success: boolean }>> {
+  await ensureSeeded();
 
-  const deleted = repo.delete(id);
+  const deleted = await repo.delete(id);
   if (!deleted) {
     return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
   }

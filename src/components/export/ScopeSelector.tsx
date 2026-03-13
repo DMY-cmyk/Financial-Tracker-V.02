@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
+import type { ExportScope } from '@/lib/types';
 
 interface ScopeSelectorProps {
-  scope: 'current' | 'all';
-  onScopeChange: (scope: 'current' | 'all') => void;
+  scope: ExportScope;
+  onScopeChange: (scope: ExportScope) => void;
   monthLabel: string;
   transactionCount: number;
 }

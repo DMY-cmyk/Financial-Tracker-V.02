@@ -1,4 +1,4 @@
-import { getDb } from '@/server/db/sqlite';
+import { getDb } from '@/server/db/client';
 import { nanoid } from 'nanoid';
 
 export interface ExportJobRecord {
@@ -31,32 +31,42 @@ function rowToJob(r: JobRow): ExportJobRecord {
 
 export function createExportJobRepository() {
   return {
-    findAll(): ExportJobRecord[] {
-      return (getDb().prepare('SELECT * FROM export_jobs ORDER BY created_at DESC').all() as JobRow[]).map(rowToJob);
+    async findAll(): Promise<ExportJobRecord[]> {
+      const db = await getDb();
+      const result = await db.query<JobRow>('SELECT * FROM export_jobs ORDER BY created_at DESC');
+      return result.rows.map(rowToJob);
     },
 
-    findById(id: string): ExportJobRecord | undefined {
-      const r = getDb().prepare('SELECT * FROM export_jobs WHERE id = ?').get(id) as JobRow | undefined;
-      return r ? rowToJob(r) : undefined;
+    async findById(id: string): Promise<ExportJobRecord | undefined> {
+      const db = await getDb();
+      const result = await db.query<JobRow>('SELECT * FROM export_jobs WHERE id = ?', [id]);
+      return result.rows[0] ? rowToJob(result.rows[0]) : undefined;
     },
 
-    create(data: { format: string; scope: string; filters?: string; options?: string; recordCount?: number }): ExportJobRecord {
+    async create(data: { format: string; scope: string; filters?: string; options?: string; recordCount?: number }): Promise<ExportJobRecord> {
       const id = nanoid();
-      getDb().prepare(
-        'INSERT INTO export_jobs (id, format, scope, filters, options, record_count) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run(id, data.format, data.scope, data.filters || null, data.options || null, data.recordCount || 0);
-      return this.findById(id)!;
+      const db = await getDb();
+      await db.query(
+        'INSERT INTO export_jobs (id, format, scope, filters, options, record_count) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, data.format, data.scope, data.filters || null, data.options || null, data.recordCount || 0]
+      );
+      const record = await this.findById(id);
+      return record!;
     },
 
-    updateStatus(id: string, status: string, filename?: string): ExportJobRecord | undefined {
-      const existing = this.findById(id);
+    async updateStatus(id: string, status: string, filename?: string): Promise<ExportJobRecord | undefined> {
+      const existing = await this.findById(id);
       if (!existing) return undefined;
+      const db = await getDb();
       if (status === 'completed') {
-        getDb().prepare(`UPDATE export_jobs SET status=?, filename=?, completed_at=datetime('now') WHERE id=?`).run(status, filename || null, id);
+        await db.query(
+          'UPDATE export_jobs SET status=?, filename=?, completed_at=CURRENT_TIMESTAMP WHERE id=?',
+          [status, filename || null, id]
+        );
       } else {
-        getDb().prepare('UPDATE export_jobs SET status=? WHERE id=?').run(status, id);
+        await db.query('UPDATE export_jobs SET status=? WHERE id=?', [status, id]);
       }
-      return this.findById(id)!;
+      return this.findById(id).then((r) => r!);
     },
   };
 }

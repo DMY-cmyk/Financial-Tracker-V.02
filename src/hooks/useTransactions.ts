@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
-import { type Transaction } from '@/lib/types';
+import { type Transaction, type PaymentMethod } from '@/lib/types';
 
 interface UseTransactionsReturn {
   // Data
@@ -19,8 +19,13 @@ interface UseTransactionsReturn {
   setTypeFilter: (v: 'all' | 'income' | 'expense') => void;
   categoryFilter: string;
   setCategoryFilter: (v: string) => void;
+  paymentMethodFilter: string;
+  setPaymentMethodFilter: (v: string) => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
+
+  // Reference data
+  paymentMethods: PaymentMethod[];
 
   // Form
   formOpen: boolean;
@@ -48,8 +53,8 @@ export function useTransactions(): UseTransactionsReturn {
   const [income, setIncome] = useState(0);
   const [expense, setExpense] = useState(0);
   const [fetchKey, setFetchKey] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
-  // Derive loading from comparing requested vs loaded data key
   const [loadedKey, setLoadedKey] = useState('');
   const targetKey = `${month}-${year}-${fetchKey}`;
   const isApiLoading = loadedKey !== targetKey;
@@ -57,10 +62,17 @@ export function useTransactions(): UseTransactionsReturn {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
-  // Fetch transactions from API
+  useEffect(() => {
+    if (!initialized) return;
+    api.paymentMethods.list().then((result) => {
+      if (result.data) setPaymentMethods(result.data.paymentMethods);
+    });
+  }, [initialized]);
+
   useEffect(() => {
     if (!initialized) return;
 
@@ -83,11 +95,11 @@ export function useTransactions(): UseTransactionsReturn {
 
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
 
-  // Client-side filtering
   const filtered = useMemo(() => {
     return allTransactions.filter((tx) => {
       if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
       if (categoryFilter && tx.category !== categoryFilter) return false;
+      if (paymentMethodFilter && tx.paymentMethod !== paymentMethodFilter) return false;
       if (search) {
         const q = search.toLowerCase();
         return (
@@ -98,14 +110,15 @@ export function useTransactions(): UseTransactionsReturn {
       }
       return true;
     });
-  }, [allTransactions, typeFilter, categoryFilter, search]);
+  }, [allTransactions, typeFilter, categoryFilter, paymentMethodFilter, search]);
 
-  const hasActiveFilters = search !== '' || typeFilter !== 'all' || categoryFilter !== '';
+  const hasActiveFilters = search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '';
 
   const clearFilters = useCallback(() => {
     setSearch('');
     setTypeFilter('all');
     setCategoryFilter('');
+    setPaymentMethodFilter('');
   }, []);
 
   const openAdd = useCallback(() => {
@@ -124,15 +137,10 @@ export function useTransactions(): UseTransactionsReturn {
     refetch();
   }, [refetch]);
 
-  const deleteTransaction = useCallback(
-    (id: string) => {
-      // Optimistic update: remove from local state immediately
-      setAllTransactions((prev) => prev.filter((t) => t.id !== id));
-      // Fire API call in background
-      api.transactions.delete(id);
-    },
-    []
-  );
+  const deleteTransaction = useCallback((id: string) => {
+    setAllTransactions((prev) => prev.filter((t) => t.id !== id));
+    api.transactions.delete(id);
+  }, []);
 
   const isLoading = !initialized || isApiLoading;
 
@@ -147,8 +155,11 @@ export function useTransactions(): UseTransactionsReturn {
     setTypeFilter,
     categoryFilter,
     setCategoryFilter,
+    paymentMethodFilter,
+    setPaymentMethodFilter,
     hasActiveFilters,
     clearFilters,
+    paymentMethods,
     formOpen,
     setFormOpen,
     editingTx,

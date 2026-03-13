@@ -34,8 +34,8 @@ export default function UploadPage() {
     errors,
   } = useUpload();
 
-  const onSave = () => {
-    const success = handleSave();
+  const onSave = async () => {
+    const success = await handleSave();
     if (success) {
       toast.success(t(locale, 'savedFromReceipt'));
     } else if (errors.length > 0) {

@@ -13,29 +13,29 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
 
 interface ServiceResult<T> { data?: T; error?: { message: string; code: string; details?: Record<string, string[]> } }
 
-export function listPaymentMethods(): ServiceResult<PaymentMethod[]> {
-  ensureSeeded();
-  return { data: repo.findAll() };
+export async function listPaymentMethods(): Promise<ServiceResult<PaymentMethod[]>> {
+  await ensureSeeded();
+  return { data: await repo.findAll() };
 }
 
-export function createPaymentMethod(body: unknown): ServiceResult<PaymentMethod> {
-  ensureSeeded();
+export async function createPaymentMethod(body: unknown): Promise<ServiceResult<PaymentMethod>> {
+  await ensureSeeded();
   const parsed = createPaymentMethodSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  return { data: repo.create(parsed.data) };
+  return { data: await repo.create(parsed.data) };
 }
 
-export function updatePaymentMethod(id: string, body: unknown): ServiceResult<PaymentMethod> {
-  ensureSeeded();
+export async function updatePaymentMethod(id: string, body: unknown): Promise<ServiceResult<PaymentMethod>> {
+  await ensureSeeded();
   const parsed = updatePaymentMethodSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  const result = repo.update(id, parsed.data);
+  const result = await repo.update(id, parsed.data);
   if (!result) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
 
-export function deletePaymentMethod(id: string): ServiceResult<{ success: boolean }> {
-  ensureSeeded();
-  if (!repo.delete(id)) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
+export async function deletePaymentMethod(id: string): Promise<ServiceResult<{ success: boolean }>> {
+  await ensureSeeded();
+  if (!(await repo.delete(id))) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
 }

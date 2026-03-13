@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
-import { type ExtractionStatus } from '@/lib/types';
+import { type ExtractionStatus, type Category, type PaymentMethod } from '@/lib/types';
 import { type OcrData } from '@/components/upload/OcrPreview';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { validateOcrFields, type FieldError } from '@/lib/validation';
 import { suggestCategory } from '@/lib/category-suggest';
+import { api } from '@/lib/api/client';
 
 interface UseUploadReturn {
   // File state
@@ -16,13 +17,18 @@ interface UseUploadReturn {
   // Extraction
   status: ExtractionStatus;
   confidence: number;
+  progress: number;
   ocrResult: OcrData | null;
   setOcrResult: (data: OcrData | null) => void;
   processOcr: () => Promise<void>;
-  handleSave: () => boolean;
+  handleSave: () => Promise<boolean>;
 
   // Validation
   errors: FieldError[];
+
+  // Data
+  categories: Category[];
+  paymentMethods: PaymentMethod[];
 
   // Derived
   isProcessing: boolean;
@@ -30,9 +36,6 @@ interface UseUploadReturn {
 }
 
 export function useUpload(): UseUploadReturn {
-  const addTransaction = useStore((s) => s.addTransaction);
-  const categories = useStore((s) => s.categories);
-  const paymentMethods = useStore((s) => s.paymentMethods);
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
 
@@ -40,17 +43,40 @@ export function useUpload(): UseUploadReturn {
   const [preview, setPreview] = useState('');
   const [status, setStatus] = useState<ExtractionStatus>('idle');
   const [confidence, setConfidence] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [ocrResult, setOcrResult] = useState<OcrData | null>(null);
   const [errors, setErrors] = useState<FieldError[]>([]);
+  const [uploadId, setUploadId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
-  const handleFileSelect = useCallback((f: File) => {
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
-    setStatus('idle');
-    setOcrResult(null);
-    setConfidence(0);
-    setErrors([]);
+  useEffect(() => {
+    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(([catRes, pmRes]) => {
+      if (catRes.data) setCategories(catRes.data.categories);
+      if (pmRes.data) setPaymentMethods(pmRes.data.paymentMethods);
+    });
   }, []);
+
+  const handleFileSelect = useCallback(
+    async (f: File) => {
+      setFile(f);
+      setPreview(URL.createObjectURL(f));
+      setStatus('idle');
+      setOcrResult(null);
+      setConfidence(0);
+      setProgress(0);
+      setErrors([]);
+
+      // Persist upload metadata
+      const result = await api.uploads.create({
+        filename: f.name,
+        fileSize: f.size,
+        mimeType: f.type,
+      });
+      if (result.data) setUploadId(result.data.id);
+    },
+    []
+  );
 
   const handleClear = useCallback(() => {
     if (preview) URL.revokeObjectURL(preview);
@@ -59,16 +85,23 @@ export function useUpload(): UseUploadReturn {
     setStatus('idle');
     setOcrResult(null);
     setConfidence(0);
+    setProgress(0);
     setErrors([]);
+    setUploadId(null);
   }, [preview]);
 
   const processOcr = async () => {
     if (!file) return;
     setStatus('processing');
+    if (uploadId) await api.uploads.update(uploadId, { status: 'processing' });
 
     try {
       const Tesseract = await import('tesseract.js');
-      const result = await Tesseract.recognize(file, 'eng+ind');
+      const result = await Tesseract.recognize(file, 'eng+ind', {
+        logger: (m: { status: string; progress: number }) => {
+          if (m.status === 'recognizing text') setProgress(Math.round(m.progress * 100));
+        },
+      });
       const text = result.data.text;
       const conf = result.data.confidence;
 
@@ -85,14 +118,22 @@ export function useUpload(): UseUploadReturn {
       const desc = text.split('\n')[0]?.trim().substring(0, 50) || '';
       const suggestion = suggestCategory(text, categories);
 
-      setOcrResult({
+      const extracted: OcrData = {
         amount: amount ? formatCurrencyInput(parseInt(amount)) : '',
         description: desc,
         date: dateStr,
         category: suggestion?.name || '',
-      });
+      };
+
+      setOcrResult(extracted);
       setConfidence(conf);
       setStatus('extracted');
+      if (uploadId) {
+        await api.uploads.update(uploadId, {
+          status: 'extracted',
+          extractedData: JSON.stringify(extracted),
+        });
+      }
     } catch {
       setOcrResult({
         amount: '',
@@ -102,10 +143,11 @@ export function useUpload(): UseUploadReturn {
       });
       setConfidence(0);
       setStatus('error');
+      if (uploadId) await api.uploads.update(uploadId, { status: 'error' });
     }
   };
 
-  const handleSave = (): boolean => {
+  const handleSave = async (): Promise<boolean> => {
     if (!ocrResult) return false;
 
     const validationErrors = validateOcrFields(ocrResult);
@@ -115,7 +157,7 @@ export function useUpload(): UseUploadReturn {
     }
 
     const amount = parseCurrencyInput(ocrResult.amount);
-    addTransaction({
+    const result = await api.transactions.create({
       date: ocrResult.date,
       description: ocrResult.description,
       category: ocrResult.category,
@@ -125,6 +167,12 @@ export function useUpload(): UseUploadReturn {
       notes: 'Added via OCR',
     });
 
+    if (result.error) {
+      setErrors([{ field: 'root', message: result.error.message }]);
+      return false;
+    }
+
+    if (uploadId) await api.uploads.update(uploadId, { status: 'saved' });
     setStatus('saved');
     setErrors([]);
     return true;
@@ -137,11 +185,14 @@ export function useUpload(): UseUploadReturn {
     handleClear,
     status,
     confidence,
+    progress,
     ocrResult,
     setOcrResult,
     processOcr,
     handleSave,
     errors,
+    categories,
+    paymentMethods,
     isProcessing: status === 'processing',
     canSave: status === 'extracted' && !!ocrResult,
   };

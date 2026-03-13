@@ -27,10 +27,10 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export function getDashboardSummary(
+export async function getDashboardSummary(
   rawQuery: Record<string, unknown>
-): ServiceResult<DashboardSummaryResponse> {
-  ensureSeeded();
+): Promise<ServiceResult<DashboardSummaryResponse>> {
+  await ensureSeeded();
 
   const parsed = dashboardSummaryQuerySchema.safeParse(rawQuery);
   if (!parsed.success) {
@@ -44,7 +44,7 @@ export function getDashboardSummary(
   }
 
   const { month, year } = parsed.data;
-  const transactions = repo.findByMonth(month, year);
+  const transactions = await repo.findByMonth(month, year);
 
   const income = totalIncome(transactions);
   const expense = totalExpense(transactions);

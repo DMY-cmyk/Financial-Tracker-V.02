@@ -11,6 +11,14 @@ import type {
   UploadResponse,
   ExportJobListResponse,
   ExportJobResponse,
+  BillListResponse,
+  BillResponse,
+  CreateBillRequest,
+  UpdateBillRequest,
+  SavingsGoalListResponse,
+  SavingsGoalResponse,
+  CreateSavingsGoalRequest,
+  UpdateSavingsGoalRequest,
   ApiResult,
 } from './contracts';
 
@@ -183,6 +191,62 @@ export const api = {
       return fetchApi<ExportJobResponse>('/export-jobs', {
         method: 'POST',
         body: JSON.stringify(data),
+      });
+    },
+  },
+
+  bills: {
+    list(params?: { month?: number; year?: number }) {
+      const query = new URLSearchParams();
+      if (params?.month !== undefined) query.set('month', String(params.month));
+      if (params?.year !== undefined) query.set('year', String(params.year));
+      const qs = query.toString();
+      return fetchApi<BillListResponse>(`/bills${qs ? `?${qs}` : ''}`);
+    },
+
+    create(data: CreateBillRequest) {
+      return fetchApi<BillResponse>('/bills', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    update(id: string, data: UpdateBillRequest) {
+      return fetchApi<BillResponse>(`/bills/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+
+    delete(id: string) {
+      return fetchApi<{ success: boolean }>(`/bills/${id}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
+  savings: {
+    list() {
+      return fetchApi<SavingsGoalListResponse>('/savings');
+    },
+
+    create(data: CreateSavingsGoalRequest) {
+      return fetchApi<SavingsGoalResponse>('/savings', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    update(id: string, data: UpdateSavingsGoalRequest) {
+      return fetchApi<SavingsGoalResponse>(`/savings/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+
+    delete(id: string) {
+      return fetchApi<{ success: boolean }>(`/savings/${id}`, {
+        method: 'DELETE',
       });
     },
   },

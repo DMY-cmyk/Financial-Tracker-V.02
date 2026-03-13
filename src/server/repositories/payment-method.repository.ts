@@ -1,5 +1,5 @@
 import type { PaymentMethod } from '@/lib/types';
-import { getDb } from '@/server/db/sqlite';
+import { getDb } from '@/server/db/client';
 import { nanoid } from 'nanoid';
 
 interface PmRow { id: string; name: string; icon: string; type: string; }
@@ -10,31 +10,44 @@ function rowToPm(row: PmRow): PaymentMethod {
 
 export function createPaymentMethodRepository() {
   return {
-    findAll(): PaymentMethod[] {
-      return (getDb().prepare('SELECT * FROM payment_methods ORDER BY name').all() as PmRow[]).map(rowToPm);
+    async findAll(): Promise<PaymentMethod[]> {
+      const db = await getDb();
+      const result = await db.query<PmRow>('SELECT * FROM payment_methods ORDER BY name');
+      return result.rows.map(rowToPm);
     },
 
-    findById(id: string): PaymentMethod | undefined {
-      const row = getDb().prepare('SELECT * FROM payment_methods WHERE id = ?').get(id) as PmRow | undefined;
-      return row ? rowToPm(row) : undefined;
+    async findById(id: string): Promise<PaymentMethod | undefined> {
+      const db = await getDb();
+      const result = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
+      return result.rows[0] ? rowToPm(result.rows[0]) : undefined;
     },
 
-    create(data: Omit<PaymentMethod, 'id'>): PaymentMethod {
+    async create(data: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
       const id = nanoid();
-      getDb().prepare('INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?)').run(id, data.name, data.icon, data.type);
+      const db = await getDb();
+      await db.query(
+        'INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?)',
+        [id, data.name, data.icon, data.type]
+      );
       return { ...data, id };
     },
 
-    update(id: string, data: Partial<PaymentMethod>): PaymentMethod | undefined {
-      const existing = getDb().prepare('SELECT * FROM payment_methods WHERE id = ?').get(id) as PmRow | undefined;
-      if (!existing) return undefined;
-      const updated = { ...rowToPm(existing), ...data };
-      getDb().prepare('UPDATE payment_methods SET name=?, icon=?, type=? WHERE id=?').run(updated.name, updated.icon, updated.type, id);
+    async update(id: string, data: Partial<PaymentMethod>): Promise<PaymentMethod | undefined> {
+      const db = await getDb();
+      const existing = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
+      if (!existing.rows[0]) return undefined;
+      const updated = { ...rowToPm(existing.rows[0]), ...data };
+      await db.query(
+        'UPDATE payment_methods SET name=?, icon=?, type=? WHERE id=?',
+        [updated.name, updated.icon, updated.type, id]
+      );
       return updated;
     },
 
-    delete(id: string): boolean {
-      return getDb().prepare('DELETE FROM payment_methods WHERE id = ?').run(id).changes > 0;
+    async delete(id: string): Promise<boolean> {
+      const db = await getDb();
+      const result = await db.query('DELETE FROM payment_methods WHERE id = ?', [id]);
+      return result.rowCount > 0;
     },
   };
 }

@@ -12,23 +12,23 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
 
 interface ServiceResult<T> { data?: T; error?: { message: string; code: string; details?: Record<string, string[]> } }
 
-export function listUploads(): ServiceResult<UploadRecord[]> {
-  ensureSeeded();
-  return { data: repo.findAll() };
+export async function listUploads(): Promise<ServiceResult<UploadRecord[]>> {
+  await ensureSeeded();
+  return { data: await repo.findAll() };
 }
 
-export function createUpload(body: unknown): ServiceResult<UploadRecord> {
-  ensureSeeded();
+export async function createUpload(body: unknown): Promise<ServiceResult<UploadRecord>> {
+  await ensureSeeded();
   const parsed = createUploadSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  return { data: repo.create(parsed.data) };
+  return { data: await repo.create(parsed.data) };
 }
 
-export function updateUpload(id: string, body: unknown): ServiceResult<UploadRecord> {
-  ensureSeeded();
+export async function updateUpload(id: string, body: unknown): Promise<ServiceResult<UploadRecord>> {
+  await ensureSeeded();
   const parsed = updateUploadSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  const result = repo.update(id, parsed.data);
+  const result = await repo.update(id, parsed.data);
   if (!result) return { error: { message: 'Upload not found', code: 'NOT_FOUND' } };
   return { data: result };
 }

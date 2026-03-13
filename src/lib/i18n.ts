@@ -166,6 +166,7 @@ type TranslationKeys = {
   uploadAnother: string;
   failedExtract: string;
   noTransactionsMatch: string;
+  addFirstTransaction: string;
   backToTransactions: string;
   recordTransaction: string;
   transactionCount: string;
@@ -315,6 +316,7 @@ const translations: Record<Locale, TranslationKeys> = {
     uploadAnother: 'Upload Another',
     failedExtract: 'Failed to extract text',
     noTransactionsMatch: 'No transactions match your filters',
+    addFirstTransaction: 'Start by adding your first transaction.',
     backToTransactions: 'Back to Transactions',
     recordTransaction: 'Record a new income or expense transaction',
     transactionCount: 'transactions this month',
@@ -462,6 +464,7 @@ const translations: Record<Locale, TranslationKeys> = {
     uploadAnother: 'Unggah Lagi',
     failedExtract: 'Gagal mengekstrak teks',
     noTransactionsMatch: 'Tidak ada transaksi yang cocok dengan filter',
+    addFirstTransaction: 'Tambahkan transaksi pertama Anda.',
     backToTransactions: 'Kembali ke Transaksi',
     recordTransaction: 'Catat transaksi baru',
     transactionCount: 'transaksi bulan ini',

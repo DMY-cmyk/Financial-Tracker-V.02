@@ -12,17 +12,17 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
 
 interface ServiceResult<T> { data?: T; error?: { message: string; code: string; details?: Record<string, string[]> } }
 
-export function listExportJobs(): ServiceResult<ExportJobRecord[]> {
-  ensureSeeded();
-  return { data: repo.findAll() };
+export async function listExportJobs(): Promise<ServiceResult<ExportJobRecord[]>> {
+  await ensureSeeded();
+  return { data: await repo.findAll() };
 }
 
-export function createExportJob(body: unknown): ServiceResult<ExportJobRecord> {
-  ensureSeeded();
+export async function createExportJob(body: unknown): Promise<ServiceResult<ExportJobRecord>> {
+  await ensureSeeded();
   const parsed = createExportJobSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  const job = repo.create(parsed.data);
+  const job = await repo.create(parsed.data);
   // Mark as completed immediately (actual file generation is client-side for now)
-  const completed = repo.updateStatus(job.id, 'completed', `export-${job.id}.${parsed.data.format}`);
+  const completed = await repo.updateStatus(job.id, 'completed', `export-${job.id}.${parsed.data.format}`);
   return { data: completed! };
 }

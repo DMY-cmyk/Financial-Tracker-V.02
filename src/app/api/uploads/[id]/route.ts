@@ -7,7 +7,7 @@ export async function PATCH(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const result = updateUpload(id, body);
+  const result = await updateUpload(id, body);
 
   if (result.error) {
     const status = result.error.code === 'NOT_FOUND' ? 404 : 400;

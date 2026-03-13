@@ -1,4 +1,4 @@
-import { getDb } from '@/server/db/sqlite';
+import { getDb } from '@/server/db/client';
 import { nanoid } from 'nanoid';
 
 export interface UploadRecord {
@@ -33,27 +33,40 @@ function rowToUpload(r: UploadRow): UploadRecord {
 
 export function createUploadRepository() {
   return {
-    findAll(): UploadRecord[] {
-      return (getDb().prepare('SELECT * FROM uploads ORDER BY created_at DESC').all() as UploadRow[]).map(rowToUpload);
+    async findAll(): Promise<UploadRecord[]> {
+      const db = await getDb();
+      const result = await db.query<UploadRow>('SELECT * FROM uploads ORDER BY created_at DESC');
+      return result.rows.map(rowToUpload);
     },
 
-    findById(id: string): UploadRecord | undefined {
-      const r = getDb().prepare('SELECT * FROM uploads WHERE id = ?').get(id) as UploadRow | undefined;
-      return r ? rowToUpload(r) : undefined;
+    async findById(id: string): Promise<UploadRecord | undefined> {
+      const db = await getDb();
+      const result = await db.query<UploadRow>('SELECT * FROM uploads WHERE id = ?', [id]);
+      return result.rows[0] ? rowToUpload(result.rows[0]) : undefined;
     },
 
-    create(data: { filename: string; fileSize: number; mimeType: string }): UploadRecord {
+    async create(data: { filename: string; fileSize: number; mimeType: string }): Promise<UploadRecord> {
       const id = nanoid();
-      getDb().prepare('INSERT INTO uploads (id, filename, file_size, mime_type) VALUES (?, ?, ?, ?)').run(id, data.filename, data.fileSize, data.mimeType);
-      return this.findById(id)!;
+      const db = await getDb();
+      await db.query(
+        'INSERT INTO uploads (id, filename, file_size, mime_type) VALUES (?, ?, ?, ?)',
+        [id, data.filename, data.fileSize, data.mimeType]
+      );
+      const record = await this.findById(id);
+      return record!;
     },
 
-    update(id: string, data: { status?: string; extractedData?: string }): UploadRecord | undefined {
-      const existing = this.findById(id);
+    async update(id: string, data: { status?: string; extractedData?: string }): Promise<UploadRecord | undefined> {
+      const existing = await this.findById(id);
       if (!existing) return undefined;
-      if (data.status) getDb().prepare(`UPDATE uploads SET status=?, updated_at=datetime('now') WHERE id=?`).run(data.status, id);
-      if (data.extractedData !== undefined) getDb().prepare(`UPDATE uploads SET extracted_data=?, updated_at=datetime('now') WHERE id=?`).run(data.extractedData, id);
-      return this.findById(id)!;
+      const db = await getDb();
+      if (data.status) {
+        await db.query('UPDATE uploads SET status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', [data.status, id]);
+      }
+      if (data.extractedData !== undefined) {
+        await db.query('UPDATE uploads SET extracted_data=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', [data.extractedData, id]);
+      }
+      return this.findById(id).then((r) => r!);
     },
   };
 }

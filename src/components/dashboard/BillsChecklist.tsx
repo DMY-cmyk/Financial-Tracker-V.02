@@ -1,6 +1,5 @@
 'use client';
 
-import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,10 +9,10 @@ import type { Bill } from '@/lib/types';
 
 interface BillsChecklistProps {
   bills: Bill[];
+  onToggle?: (id: string) => void;
 }
 
-export function BillsChecklist({ bills }: BillsChecklistProps) {
-  const toggleBillPaid = useStore((s) => s.toggleBillPaid);
+export function BillsChecklist({ bills, onToggle }: BillsChecklistProps) {
   const locale = useLocale();
 
   return (
@@ -36,7 +35,11 @@ export function BillsChecklist({ bills }: BillsChecklistProps) {
               key={bill.id}
               className="hover:bg-muted/50 flex items-center gap-3 rounded-lg p-2 transition-colors"
             >
-              <Checkbox checked={bill.isPaid} onCheckedChange={() => toggleBillPaid(bill.id)} />
+              <Checkbox
+                checked={bill.isPaid}
+                onCheckedChange={() => onToggle?.(bill.id)}
+                disabled={!onToggle}
+              />
               <div className="min-w-0 flex-1">
                 <p
                   className={cn(
@@ -65,3 +68,4 @@ export function BillsChecklist({ bills }: BillsChecklistProps) {
     </motion.div>
   );
 }
+

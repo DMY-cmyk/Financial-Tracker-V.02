@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search');
   if (search) query.search = search;
 
-  const result = listTransactions(query);
+  const result = await listTransactions(query);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const result = createTransaction(body);
+  const result = await createTransaction(body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

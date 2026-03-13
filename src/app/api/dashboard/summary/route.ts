@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   if (monthStr) query.month = parseInt(monthStr, 10);
   if (yearStr) query.year = parseInt(yearStr, 10);
 
-  const result = getDashboardSummary(query);
+  const result = await getDashboardSummary(query);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });

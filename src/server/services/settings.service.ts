@@ -12,15 +12,15 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
 
 interface ServiceResult<T> { data?: T; error?: { message: string; code: string; details?: Record<string, string[]> } }
 
-export function getSettings(): ServiceResult<Record<string, string>> {
-  ensureSeeded();
-  return { data: repo.getAll() };
+export async function getSettings(): Promise<ServiceResult<Record<string, string>>> {
+  await ensureSeeded();
+  return { data: await repo.getAll() };
 }
 
-export function updateSettings(body: unknown): ServiceResult<Record<string, string>> {
-  ensureSeeded();
+export async function updateSettings(body: unknown): Promise<ServiceResult<Record<string, string>>> {
+  await ensureSeeded();
   const parsed = updateSettingsSchema.safeParse(body);
   if (!parsed.success) return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
-  repo.setMany(parsed.data);
-  return { data: repo.getAll() };
+  await repo.setMany(parsed.data);
+  return { data: await repo.getAll() };
 }

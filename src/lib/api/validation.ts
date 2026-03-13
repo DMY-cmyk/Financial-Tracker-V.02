@@ -67,11 +67,35 @@ export const updateUploadSchema = z.object({
   extractedData: z.string().optional(),
 });
 
+// === Bill schemas ===
+
+export const createBillSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  amount: z.number().positive('Amount must be positive'),
+  dueDate: z.number().int().min(1).max(31),
+  isPaid: z.boolean().optional().default(false),
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().min(2000).max(2100),
+});
+
+export const updateBillSchema = createBillSchema.partial();
+
+// === Savings goal schemas ===
+
+export const createSavingsGoalSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  targetAmount: z.number().positive('Target amount must be positive'),
+  savedAmount: z.number().min(0, 'Saved amount must be non-negative').optional().default(0),
+  color: z.string().min(1, 'Color is required').max(20),
+});
+
+export const updateSavingsGoalSchema = createSavingsGoalSchema.partial();
+
 // === Export job schema ===
 
 export const createExportJobSchema = z.object({
   format: z.enum(['csv', 'json', 'xlsx', 'pdf']),
-  scope: z.enum(['current', 'all']),
+  scope: z.enum(['current', 'all', 'range']),
   filters: z.string().optional(),
   options: z.string().optional(),
   recordCount: z.number().int().min(0).optional().default(0),
@@ -90,3 +114,7 @@ export type UpdatePaymentMethodInput = z.infer<typeof updatePaymentMethodSchema>
 export type CreateUploadInput = z.infer<typeof createUploadSchema>;
 export type UpdateUploadInput = z.infer<typeof updateUploadSchema>;
 export type CreateExportJobInput = z.infer<typeof createExportJobSchema>;
+export type CreateBillInput = z.infer<typeof createBillSchema>;
+export type UpdateBillInput = z.infer<typeof updateBillSchema>;
+export type CreateSavingsGoalInput = z.infer<typeof createSavingsGoalSchema>;
+export type UpdateSavingsGoalInput = z.infer<typeof updateSavingsGoalSchema>;

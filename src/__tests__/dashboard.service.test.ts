@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetDb } from '@/server/db/sqlite';
+import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { createTransaction } from '@/server/services/transaction.service';
 import { getDashboardSummary } from '@/server/services/dashboard.service';
 
-beforeEach(() => {
-  resetDb();
+beforeEach(async () => {
+  await resetDb();
   resetSeeded();
   markSeeded();
 });
 
-function seedJanuary() {
-  createTransaction({
+async function seedJanuary() {
+  await createTransaction({
     date: '2025-01-05',
     description: 'Salary',
     category: 'Salary',
@@ -20,7 +20,7 @@ function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  createTransaction({
+  await createTransaction({
     date: '2025-01-10',
     description: 'Freelance Project',
     category: 'Freelance',
@@ -29,7 +29,7 @@ function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  createTransaction({
+  await createTransaction({
     date: '2025-01-12',
     description: 'Groceries',
     category: 'Food',
@@ -38,7 +38,7 @@ function seedJanuary() {
     paymentMethod: 'Cash',
     notes: '',
   });
-  createTransaction({
+  await createTransaction({
     date: '2025-01-15',
     description: 'Electric Bill',
     category: 'Utilities',
@@ -47,7 +47,7 @@ function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  createTransaction({
+  await createTransaction({
     date: '2025-01-20',
     description: 'Movie Tickets',
     category: 'Entertainment',
@@ -59,9 +59,9 @@ function seedJanuary() {
 }
 
 describe('getDashboardSummary', () => {
-  it('returns correct summary for a month', () => {
-    seedJanuary();
-    const result = getDashboardSummary({ month: 0, year: 2025 });
+  it('returns correct summary for a month', async () => {
+    await seedJanuary();
+    const result = await getDashboardSummary({ month: 0, year: 2025 });
 
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
@@ -74,9 +74,9 @@ describe('getDashboardSummary', () => {
     expect(data.savingsRate).toBe(86); // (10500000 - 1500000) / 10500000 * 100
   });
 
-  it('returns category totals', () => {
-    seedJanuary();
-    const result = getDashboardSummary({ month: 0, year: 2025 });
+  it('returns category totals', async () => {
+    await seedJanuary();
+    const result = await getDashboardSummary({ month: 0, year: 2025 });
     const data = result.data!;
 
     expect(data.categoryTotals['Food']).toBe(500000);
@@ -84,9 +84,9 @@ describe('getDashboardSummary', () => {
     expect(data.categoryTotals['Entertainment']).toBe(200000);
   });
 
-  it('returns payment method totals', () => {
-    seedJanuary();
-    const result = getDashboardSummary({ month: 0, year: 2025 });
+  it('returns payment method totals', async () => {
+    await seedJanuary();
+    const result = await getDashboardSummary({ month: 0, year: 2025 });
     const data = result.data!;
 
     expect(data.paymentMethodTotals['Cash']).toBe(500000);
@@ -94,18 +94,18 @@ describe('getDashboardSummary', () => {
     expect(data.paymentMethodTotals['GoPay']).toBe(200000);
   });
 
-  it('returns recent transactions (max 5, sorted by date desc)', () => {
-    seedJanuary();
-    const result = getDashboardSummary({ month: 0, year: 2025 });
+  it('returns recent transactions (max 5, sorted by date desc)', async () => {
+    await seedJanuary();
+    const result = await getDashboardSummary({ month: 0, year: 2025 });
     const data = result.data!;
 
     expect(data.recentTransactions.length).toBe(5);
     expect(data.recentTransactions[0].date).toBe('2025-01-20');
   });
 
-  it('returns cash flow data with all days of month', () => {
-    seedJanuary();
-    const result = getDashboardSummary({ month: 0, year: 2025 });
+  it('returns cash flow data with all days of month', async () => {
+    await seedJanuary();
+    const result = await getDashboardSummary({ month: 0, year: 2025 });
     const data = result.data!;
 
     expect(data.cashFlow.length).toBe(31); // January has 31 days
@@ -113,8 +113,8 @@ describe('getDashboardSummary', () => {
     expect(day5?.income).toBe(8500000);
   });
 
-  it('returns zeros for empty month', () => {
-    const result = getDashboardSummary({ month: 6, year: 2025 });
+  it('returns zeros for empty month', async () => {
+    const result = await getDashboardSummary({ month: 6, year: 2025 });
     const data = result.data!;
 
     expect(data.income).toBe(0);
@@ -124,8 +124,8 @@ describe('getDashboardSummary', () => {
     expect(data.transactionCount).toBe(0);
   });
 
-  it('returns error for invalid query', () => {
-    const result = getDashboardSummary({});
+  it('returns error for invalid query', async () => {
+    const result = await getDashboardSummary({});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });

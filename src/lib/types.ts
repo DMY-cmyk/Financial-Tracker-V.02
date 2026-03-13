@@ -93,13 +93,15 @@ export interface ExtractionResult {
 }
 
 export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf';
-export type ExportScope = 'current' | 'all';
+export type ExportScope = 'current' | 'all' | 'range';
 
 export interface ExportState {
   format: ExportFormat;
   scope: ExportScope;
   includeSummary: boolean;
   groupByDate: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface LanguageOption {
