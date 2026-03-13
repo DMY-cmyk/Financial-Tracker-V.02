@@ -11,7 +11,9 @@ import type { TransactionListResponse } from '@/lib/api/contracts';
 
 const repo = createTransactionRepository();
 
-function formatZodError(error: { issues: { path: PropertyKey[]; message: string }[] }): Record<string, string[]> {
+function formatZodError(error: {
+  issues: { path: PropertyKey[]; message: string }[];
+}): Record<string, string[]> {
   const fieldErrors: Record<string, string[]> = {};
   for (const issue of error.issues) {
     const path = issue.path.join('.') || '_root';
@@ -21,10 +23,7 @@ function formatZodError(error: { issues: { path: PropertyKey[]; message: string 
   return fieldErrors;
 }
 
-function applyFilters(
-  transactions: Transaction[],
-  query: ListTransactionsQuery
-): Transaction[] {
+function applyFilters(transactions: Transaction[], query: ListTransactionsQuery): Transaction[] {
   let filtered = transactions;
 
   if (query.type) {
@@ -51,7 +50,9 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listTransactions(rawQuery: Record<string, unknown>): Promise<ServiceResult<TransactionListResponse>> {
+export async function listTransactions(
+  rawQuery: Record<string, unknown>
+): Promise<ServiceResult<TransactionListResponse>> {
   await ensureSeeded();
 
   const parsed = listTransactionsQuerySchema.safeParse(rawQuery);
@@ -72,9 +73,7 @@ export async function listTransactions(rawQuery: Record<string, unknown>): Promi
       : await repo.findAll();
 
   const transactions = applyFilters(base, query);
-  const income = transactions
-    .filter((t) => t.type === 'income')
-    .reduce((s, t) => s + t.amount, 0);
+  const income = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const expense = transactions
     .filter((t) => t.type === 'expense')
     .reduce((s, t) => s + t.amount, 0);

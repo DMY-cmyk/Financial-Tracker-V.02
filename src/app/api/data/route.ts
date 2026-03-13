@@ -18,7 +18,12 @@ export async function DELETE() {
     return NextResponse.json({ data: { success: true } });
   } catch (error) {
     return NextResponse.json(
-      { error: { message: error instanceof Error ? error.message : 'Failed to clear data', code: 'CLEAR_FAILED' } },
+      {
+        error: {
+          message: error instanceof Error ? error.message : 'Failed to clear data',
+          code: 'CLEAR_FAILED',
+        },
+      },
       { status: 500 }
     );
   }

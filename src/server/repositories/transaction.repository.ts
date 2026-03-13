@@ -55,7 +55,16 @@ export function createTransactionRepository() {
       const db = await getDb();
       await db.query(
         'INSERT INTO transactions (id, date, description, category, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [id, data.date, data.description, data.category, data.type, data.amount, data.paymentMethod, data.notes]
+        [
+          id,
+          data.date,
+          data.description,
+          data.category,
+          data.type,
+          data.amount,
+          data.paymentMethod,
+          data.notes,
+        ]
       );
       return { ...data, id };
     },
@@ -68,7 +77,16 @@ export function createTransactionRepository() {
       const updated = { ...rowToTransaction(existing.rows[0]), ...data };
       await db.query(
         'UPDATE transactions SET date=?, description=?, category=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
-        [updated.date, updated.description, updated.category, updated.type, updated.amount, updated.paymentMethod, updated.notes, id]
+        [
+          updated.date,
+          updated.description,
+          updated.category,
+          updated.type,
+          updated.amount,
+          updated.paymentMethod,
+          updated.notes,
+          id,
+        ]
       );
       return updated;
     },

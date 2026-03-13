@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateUpload } from '@/server/services/upload.service';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await request.json();
   const result = await updateUpload(id, body);

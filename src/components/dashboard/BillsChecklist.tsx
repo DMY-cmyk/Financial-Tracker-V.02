@@ -68,4 +68,3 @@ export function BillsChecklist({ bills, onToggle }: BillsChecklistProps) {
     </motion.div>
   );
 }
-

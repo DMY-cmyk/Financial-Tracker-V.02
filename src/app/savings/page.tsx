@@ -15,19 +15,20 @@ import { ProgressRing } from '@/components/shared/ProgressRing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Plus, Pencil, Trash2, PiggyBank } from 'lucide-react';
 import { toast } from 'sonner';
 import type { SavingsGoal } from '@/lib/types';
 
 const COLOR_OPTIONS = [
-  '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-  '#EC4899', '#06B6D4', '#F97316',
+  '#2563EB',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+  '#EC4899',
+  '#06B6D4',
+  '#F97316',
 ];
 
 export default function SavingsPage() {
@@ -177,10 +178,7 @@ export default function SavingsPage() {
         <PageHeader title={t(locale, 'savingsPage')} />
         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-border bg-card h-40 animate-pulse rounded-2xl border"
-            />
+            <div key={i} className="border-border bg-card h-40 animate-pulse rounded-2xl border" />
           ))}
         </div>
       </div>
@@ -193,9 +191,7 @@ export default function SavingsPage() {
         <PageHeader
           title={t(locale, 'savingsPage')}
           description={
-            goals.length > 0
-              ? `${goals.length} ${locale === 'id' ? 'target' : 'goals'}`
-              : undefined
+            goals.length > 0 ? `${goals.length} ${locale === 'id' ? 'target' : 'goals'}` : undefined
           }
         >
           <Button onClick={openAdd} className="gap-2 shadow-sm">
@@ -238,15 +234,10 @@ export default function SavingsPage() {
                   <motion.div
                     key={goal.id}
                     variants={staggerGridItem}
-                    className="border-border bg-card group rounded-2xl border p-5 transition-colors hover:bg-muted/50"
+                    className="border-border bg-card group hover:bg-muted/50 rounded-2xl border p-5 transition-colors"
                   >
                     <div className="flex items-start gap-4">
-                      <ProgressRing
-                        percentage={pct}
-                        size={56}
-                        strokeWidth={6}
-                        color={goal.color}
-                      >
+                      <ProgressRing percentage={pct} size={56} strokeWidth={6} color={goal.color}>
                         <span className="text-[10px] font-bold">{pct}%</span>
                       </ProgressRing>
                       <div className="min-w-0 flex-1">
@@ -342,9 +333,7 @@ export default function SavingsPage() {
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder={locale === 'id' ? 'cth. Dana Darurat' : 'e.g. Emergency Fund'}
               />
-              {formErrors.name && (
-                <p className="text-destructive text-xs">{formErrors.name}</p>
-              )}
+              {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="goal-target">{t(locale, 'targetAmount')}</Label>
@@ -356,9 +345,7 @@ export default function SavingsPage() {
                 placeholder="10000000"
                 min={0}
               />
-              {formErrors.target && (
-                <p className="text-destructive text-xs">{formErrors.target}</p>
-              )}
+              {formErrors.target && <p className="text-destructive text-xs">{formErrors.target}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="goal-saved">{t(locale, 'savedAmount')}</Label>
@@ -370,9 +357,7 @@ export default function SavingsPage() {
                 placeholder="0"
                 min={0}
               />
-              {formErrors.saved && (
-                <p className="text-destructive text-xs">{formErrors.saved}</p>
-              )}
+              {formErrors.saved && <p className="text-destructive text-xs">{formErrors.saved}</p>}
             </div>
             <div className="space-y-2">
               <Label>{t(locale, 'goalColor')}</Label>
@@ -385,7 +370,7 @@ export default function SavingsPage() {
                     className={cn(
                       'h-8 w-8 rounded-full border-2 transition-transform',
                       formColor === color
-                        ? 'scale-110 border-foreground'
+                        ? 'border-foreground scale-110'
                         : 'border-transparent hover:scale-105'
                     )}
                     style={{ backgroundColor: color }}

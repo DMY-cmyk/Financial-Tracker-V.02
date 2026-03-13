@@ -49,10 +49,9 @@ export const updatePaymentMethodSchema = createPaymentMethodSchema.partial();
 
 // === Settings schema ===
 
-export const updateSettingsSchema = z.record(z.string(), z.string()).refine(
-  (obj) => Object.keys(obj).length > 0,
-  { message: 'At least one setting is required' }
-);
+export const updateSettingsSchema = z
+  .record(z.string(), z.string())
+  .refine((obj) => Object.keys(obj).length > 0, { message: 'At least one setting is required' });
 
 // === Upload schemas ===
 

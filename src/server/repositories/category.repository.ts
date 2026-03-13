@@ -12,7 +12,14 @@ interface CatRow {
 }
 
 function rowToCategory(row: CatRow): Category {
-  return { id: row.id, name: row.name, type: row.type as 'income' | 'expense', color: row.color, icon: row.icon, budget: row.budget };
+  return {
+    id: row.id,
+    name: row.name,
+    type: row.type as 'income' | 'expense',
+    color: row.color,
+    icon: row.icon,
+    budget: row.budget,
+  };
 }
 
 export function createCategoryRepository() {
@@ -31,7 +38,10 @@ export function createCategoryRepository() {
 
     async findByType(type: 'income' | 'expense'): Promise<Category[]> {
       const db = await getDb();
-      const result = await db.query<CatRow>('SELECT * FROM categories WHERE type = ? ORDER BY name', [type]);
+      const result = await db.query<CatRow>(
+        'SELECT * FROM categories WHERE type = ? ORDER BY name',
+        [type]
+      );
       return result.rows.map(rowToCategory);
     },
 
@@ -50,10 +60,14 @@ export function createCategoryRepository() {
       const existing = await db.query<CatRow>('SELECT * FROM categories WHERE id = ?', [id]);
       if (!existing.rows[0]) return undefined;
       const updated = { ...rowToCategory(existing.rows[0]), ...data };
-      await db.query(
-        'UPDATE categories SET name=?, type=?, color=?, icon=?, budget=? WHERE id=?',
-        [updated.name, updated.type, updated.color, updated.icon, updated.budget, id]
-      );
+      await db.query('UPDATE categories SET name=?, type=?, color=?, icon=?, budget=? WHERE id=?', [
+        updated.name,
+        updated.type,
+        updated.color,
+        updated.icon,
+        updated.budget,
+        id,
+      ]);
       return updated;
     },
 

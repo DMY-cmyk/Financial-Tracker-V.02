@@ -28,8 +28,12 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   useEffect(() => {
-    api.categories.list().then((r) => { if (r.data) setCategories(r.data.categories); });
-    api.paymentMethods.list().then((r) => { if (r.data) setPaymentMethods(r.data.paymentMethods); });
+    api.categories.list().then((r) => {
+      if (r.data) setCategories(r.data.categories);
+    });
+    api.paymentMethods.list().then((r) => {
+      if (r.data) setPaymentMethods(r.data.paymentMethods);
+    });
   }, []);
 
   const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense');

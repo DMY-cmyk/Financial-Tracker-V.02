@@ -94,4 +94,3 @@ export function useDashboardData() {
     isEmpty: !isLoading && summary?.transactionCount === 0,
   };
 }
-

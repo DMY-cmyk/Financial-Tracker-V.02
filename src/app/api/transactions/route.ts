@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  listTransactions,
-  createTransaction,
-} from '@/server/services/transaction.service';
+import { listTransactions, createTransaction } from '@/server/services/transaction.service';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

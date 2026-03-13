@@ -15,12 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Plus, Pencil, Trash2, CalendarCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Bill } from '@/lib/types';
@@ -141,9 +136,7 @@ export default function BillsPage() {
   const handleTogglePaid = async (bill: Bill) => {
     const result = await api.bills.update(bill.id, { isPaid: !bill.isPaid });
     if (result.data) {
-      setBills((prev) =>
-        prev.map((b) => (b.id === bill.id ? { ...b, isPaid: !bill.isPaid } : b))
-      );
+      setBills((prev) => prev.map((b) => (b.id === bill.id ? { ...b, isPaid: !bill.isPaid } : b)));
     }
   };
 
@@ -167,10 +160,7 @@ export default function BillsPage() {
         <PageHeader title={t(locale, 'bills')} />
         <div className="mx-auto max-w-2xl space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-border bg-card h-20 animate-pulse rounded-2xl border"
-            />
+            <div key={i} className="border-border bg-card h-20 animate-pulse rounded-2xl border" />
           ))}
         </div>
       </div>
@@ -222,7 +212,7 @@ export default function BillsPage() {
                 <motion.div
                   key={bill.id}
                   variants={staggerItem}
-                  className="border-border bg-card group flex items-center gap-3 rounded-2xl border p-4 transition-colors hover:bg-muted/50"
+                  className="border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors"
                 >
                   <Checkbox
                     checked={bill.isPaid}
@@ -245,9 +235,7 @@ export default function BillsPage() {
                   <span
                     className={cn(
                       'font-mono text-sm font-medium',
-                      bill.isPaid
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-foreground'
+                      bill.isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
                     )}
                   >
                     {formatCurrency(bill.amount)}
@@ -283,9 +271,7 @@ export default function BillsPage() {
       <Sheet open={formOpen} onOpenChange={setFormOpen}>
         <SheetContent className="overflow-y-auto" aria-describedby={undefined}>
           <SheetHeader>
-            <SheetTitle>
-              {editingBill ? t(locale, 'editBill') : t(locale, 'addBill')}
-            </SheetTitle>
+            <SheetTitle>{editingBill ? t(locale, 'editBill') : t(locale, 'addBill')}</SheetTitle>
           </SheetHeader>
           <div className="mt-6 space-y-4">
             <div className="space-y-2">
@@ -296,9 +282,7 @@ export default function BillsPage() {
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder={locale === 'id' ? 'cth. Listrik' : 'e.g. Electricity'}
               />
-              {formErrors.name && (
-                <p className="text-destructive text-xs">{formErrors.name}</p>
-              )}
+              {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="bill-amount">{t(locale, 'billAmount')}</Label>
@@ -310,9 +294,7 @@ export default function BillsPage() {
                 placeholder="500000"
                 min={0}
               />
-              {formErrors.amount && (
-                <p className="text-destructive text-xs">{formErrors.amount}</p>
-              )}
+              {formErrors.amount && <p className="text-destructive text-xs">{formErrors.amount}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="bill-due">{t(locale, 'billDueDate')}</Label>

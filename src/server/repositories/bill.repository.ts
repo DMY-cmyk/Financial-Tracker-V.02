@@ -65,7 +65,15 @@ export function createBillRepository() {
       const updated: Bill = { ...current, ...data };
       await db.query(
         'UPDATE bills SET name=?, amount=?, due_date=?, is_paid=?, month=?, year=? WHERE id=?',
-        [updated.name, updated.amount, updated.dueDate, updated.isPaid ? 1 : 0, updated.month, updated.year, id]
+        [
+          updated.name,
+          updated.amount,
+          updated.dueDate,
+          updated.isPaid ? 1 : 0,
+          updated.month,
+          updated.year,
+          id,
+        ]
       );
       return updated;
     },

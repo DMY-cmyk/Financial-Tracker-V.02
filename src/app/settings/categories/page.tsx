@@ -35,13 +35,17 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(([catResult, pmResult]) => {
-      if (cancelled) return;
-      if (catResult.data) setCategories(catResult.data.categories);
-      if (pmResult.data) setPaymentMethods(pmResult.data.paymentMethods);
-      setLoadedCount(fetchCount);
-    });
-    return () => { cancelled = true; };
+    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(
+      ([catResult, pmResult]) => {
+        if (cancelled) return;
+        if (catResult.data) setCategories(catResult.data.categories);
+        if (pmResult.data) setPaymentMethods(pmResult.data.paymentMethods);
+        setLoadedCount(fetchCount);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
   }, [fetchCount]);
 
   const expenseCategories = categories.filter((c) => c.type === 'expense');
@@ -141,7 +145,9 @@ export default function CategoriesPage() {
                   placeholder={t(locale, 'budget')}
                   onChange={(e) => {
                     const budget = parseCurrencyInput(e.target.value);
-                    setCategories((prev) => prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat)));
+                    setCategories((prev) =>
+                      prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat))
+                    );
                     handleUpdateBudget(c.id, budget);
                   }}
                 />
@@ -229,7 +235,11 @@ export default function CategoriesPage() {
             </div>
           )}
           <Button onClick={handleAddCategory} className="gap-1" disabled={addingCat}>
-            {addingCat ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            {addingCat ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
             {t(locale, 'add')}
           </Button>
         </div>
@@ -275,7 +285,11 @@ export default function CategoriesPage() {
             <option value="ewallet">E-Wallet</option>
           </select>
           <Button onClick={handleAddMethod} className="gap-1" disabled={addingMethod}>
-            {addingMethod ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            {addingMethod ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
             {t(locale, 'add')}
           </Button>
         </div>

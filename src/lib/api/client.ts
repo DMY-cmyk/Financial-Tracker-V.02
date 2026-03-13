@@ -24,10 +24,7 @@ import type {
 
 const BASE_URL = '/api';
 
-async function fetchApi<T>(
-  url: string,
-  options?: RequestInit
-): Promise<ApiResult<T>> {
+async function fetchApi<T>(url: string, options?: RequestInit): Promise<ApiResult<T>> {
   const response = await fetch(`${BASE_URL}${url}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
@@ -62,9 +59,7 @@ export const api = {
         });
       }
       const qs = query.toString();
-      return fetchApi<TransactionListResponse>(
-        `/transactions${qs ? `?${qs}` : ''}`
-      );
+      return fetchApi<TransactionListResponse>(`/transactions${qs ? `?${qs}` : ''}`);
     },
 
     create(data: CreateTransactionRequest) {
@@ -90,9 +85,7 @@ export const api = {
 
   dashboard: {
     summary(month: number, year: number) {
-      return fetchApi<DashboardSummaryResponse>(
-        `/dashboard/summary?month=${month}&year=${year}`
-      );
+      return fetchApi<DashboardSummaryResponse>(`/dashboard/summary?month=${month}&year=${year}`);
     },
   },
 
@@ -187,7 +180,13 @@ export const api = {
       return fetchApi<ExportJobListResponse>('/export-jobs');
     },
 
-    create(data: { format: string; scope: string; filters?: string; options?: string; recordCount?: number }) {
+    create(data: {
+      format: string;
+      scope: string;
+      filters?: string;
+      options?: string;
+      recordCount?: number;
+    }) {
       return fetchApi<ExportJobResponse>('/export-jobs', {
         method: 'POST',
         body: JSON.stringify(data),

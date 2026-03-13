@@ -66,9 +66,27 @@ describe('createCategory', () => {
 
 describe('listCategories', () => {
   beforeEach(async () => {
-    await createCategory({ name: 'Food', type: 'expense', color: '#F59E0B', icon: 'circle', budget: 500000 });
-    await createCategory({ name: 'Transport', type: 'expense', color: '#3B82F6', icon: 'circle', budget: 300000 });
-    await createCategory({ name: 'Salary', type: 'income', color: '#10B981', icon: 'circle', budget: 0 });
+    await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
+    await createCategory({
+      name: 'Transport',
+      type: 'expense',
+      color: '#3B82F6',
+      icon: 'circle',
+      budget: 300000,
+    });
+    await createCategory({
+      name: 'Salary',
+      type: 'income',
+      color: '#10B981',
+      icon: 'circle',
+      budget: 0,
+    });
   });
 
   it('returns all categories', async () => {
@@ -92,7 +110,13 @@ describe('listCategories', () => {
 
 describe('updateCategory', () => {
   it('updates an existing category', async () => {
-    const created = await createCategory({ name: 'Food', type: 'expense', color: '#F59E0B', icon: 'circle', budget: 500000 });
+    const created = await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
     const result = await updateCategory(created.data!.id, { name: 'Food & Drink', budget: 700000 });
 
     expect(result.error).toBeUndefined();
@@ -110,7 +134,13 @@ describe('updateCategory', () => {
 
 describe('deleteCategory', () => {
   it('deletes an existing category', async () => {
-    const created = await createCategory({ name: 'Food', type: 'expense', color: '#F59E0B', icon: 'circle', budget: 500000 });
+    const created = await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
     const result = await deleteCategory(created.data!.id);
     expect(result.data).toEqual({ success: true });
 

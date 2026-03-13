@@ -172,11 +172,15 @@ describe('createCategorySchema', () => {
   });
 
   it('rejects empty name', () => {
-    expect(createCategorySchema.safeParse({ name: '', type: 'expense', color: '#000' }).success).toBe(false);
+    expect(
+      createCategorySchema.safeParse({ name: '', type: 'expense', color: '#000' }).success
+    ).toBe(false);
   });
 
   it('rejects invalid type', () => {
-    expect(createCategorySchema.safeParse({ name: 'X', type: 'transfer', color: '#000' }).success).toBe(false);
+    expect(
+      createCategorySchema.safeParse({ name: 'X', type: 'transfer', color: '#000' }).success
+    ).toBe(false);
   });
 });
 
@@ -228,10 +232,14 @@ describe('createExportJobSchema', () => {
   });
 
   it('rejects invalid format', () => {
-    expect(createExportJobSchema.safeParse({ format: 'docx', scope: 'current' }).success).toBe(false);
+    expect(createExportJobSchema.safeParse({ format: 'docx', scope: 'current' }).success).toBe(
+      false
+    );
   });
 
   it('rejects invalid scope', () => {
-    expect(createExportJobSchema.safeParse({ format: 'csv', scope: 'monthly' }).success).toBe(false);
+    expect(createExportJobSchema.safeParse({ format: 'csv', scope: 'monthly' }).success).toBe(
+      false
+    );
   });
 });

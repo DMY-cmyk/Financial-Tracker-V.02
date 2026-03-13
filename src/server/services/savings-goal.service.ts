@@ -5,7 +5,9 @@ import type { SavingsGoal } from '@/lib/types';
 
 const repo = createSavingsGoalRepository();
 
-function formatZodError(error: { issues: { path: PropertyKey[]; message: string }[] }): Record<string, string[]> {
+function formatZodError(error: {
+  issues: { path: PropertyKey[]; message: string }[];
+}): Record<string, string[]> {
   const f: Record<string, string[]> = {};
   for (const i of error.issues) {
     const p = String(i.path.join('.') || '_root');
@@ -36,7 +38,13 @@ export async function createSavingsGoal(body: unknown): Promise<ServiceResult<Sa
   await ensureSeeded();
   const parsed = createSavingsGoalSchema.safeParse(body);
   if (!parsed.success) {
-    return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
+    return {
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: formatZodError(parsed.error),
+      },
+    };
   }
   const data = parsed.data;
   return {
@@ -49,11 +57,20 @@ export async function createSavingsGoal(body: unknown): Promise<ServiceResult<Sa
   };
 }
 
-export async function updateSavingsGoal(id: string, body: unknown): Promise<ServiceResult<SavingsGoal>> {
+export async function updateSavingsGoal(
+  id: string,
+  body: unknown
+): Promise<ServiceResult<SavingsGoal>> {
   await ensureSeeded();
   const parsed = updateSavingsGoalSchema.safeParse(body);
   if (!parsed.success) {
-    return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR', details: formatZodError(parsed.error) } };
+    return {
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: formatZodError(parsed.error),
+      },
+    };
   }
   const result = await repo.update(id, parsed.data);
   if (!result) return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
@@ -62,6 +79,7 @@ export async function updateSavingsGoal(id: string, body: unknown): Promise<Serv
 
 export async function deleteSavingsGoal(id: string): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id))) return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
+  if (!(await repo.delete(id)))
+    return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
 }

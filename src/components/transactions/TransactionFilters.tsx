@@ -90,7 +90,9 @@ export function TransactionFilters({
           className="border-border bg-card rounded-lg border px-3 py-1.5 text-xs"
           aria-label={`${t(locale, 'filter')} ${t(locale, 'paymentMethod')}`}
         >
-          <option value="">{t(locale, 'all')} {t(locale, 'paymentMethod')}</option>
+          <option value="">
+            {t(locale, 'all')} {t(locale, 'paymentMethod')}
+          </option>
           {paymentMethods.map((pm) => (
             <option key={pm.id} value={pm.name}>
               {pm.name}

@@ -31,10 +31,22 @@ import {
 export default function DashboardPage() {
   const locale = useLocale();
   const {
-    month, year, balance, income, expense, savingsRate,
-    cashFlow, categoryTotals, budgetStatus, paymentMethodTotals,
-    recentTransactions, bills, savingsGoals, categories,
-    isLoading, isEmpty,
+    month,
+    year,
+    balance,
+    income,
+    expense,
+    savingsRate,
+    cashFlow,
+    categoryTotals,
+    budgetStatus,
+    paymentMethodTotals,
+    recentTransactions,
+    bills,
+    savingsGoals,
+    categories,
+    isLoading,
+    isEmpty,
   } = useDashboardData();
 
   if (isLoading) {

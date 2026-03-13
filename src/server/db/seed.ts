@@ -56,14 +56,14 @@ export async function ensureSeeded() {
   }
 
   // Default settings
-  await db.query(
-    'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING',
-    ['theme', 'system']
-  );
-  await db.query(
-    'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING',
-    ['locale', 'en']
-  );
+  await db.query('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING', [
+    'theme',
+    'system',
+  ]);
+  await db.query('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING', [
+    'locale',
+    'en',
+  ]);
 
   seeded = true;
 }

@@ -30,7 +30,9 @@ export function createSavingsGoalRepository() {
 
     async findById(id: string): Promise<SavingsGoal | undefined> {
       const db = await getDb();
-      const result = await db.query<SavingsGoalRow>('SELECT * FROM savings_goals WHERE id = ?', [id]);
+      const result = await db.query<SavingsGoalRow>('SELECT * FROM savings_goals WHERE id = ?', [
+        id,
+      ]);
       return result.rows[0] ? rowToSavingsGoal(result.rows[0]) : undefined;
     },
 
@@ -44,9 +46,14 @@ export function createSavingsGoalRepository() {
       return { ...data, id };
     },
 
-    async update(id: string, data: Partial<Omit<SavingsGoal, 'id'>>): Promise<SavingsGoal | undefined> {
+    async update(
+      id: string,
+      data: Partial<Omit<SavingsGoal, 'id'>>
+    ): Promise<SavingsGoal | undefined> {
       const db = await getDb();
-      const existing = await db.query<SavingsGoalRow>('SELECT * FROM savings_goals WHERE id = ?', [id]);
+      const existing = await db.query<SavingsGoalRow>('SELECT * FROM savings_goals WHERE id = ?', [
+        id,
+      ]);
       if (!existing.rows[0]) return undefined;
       const current = rowToSavingsGoal(existing.rows[0]);
       const updated: SavingsGoal = { ...current, ...data };

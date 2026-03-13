@@ -57,26 +57,23 @@ export function useUpload(): UseUploadReturn {
     });
   }, []);
 
-  const handleFileSelect = useCallback(
-    async (f: File) => {
-      setFile(f);
-      setPreview(URL.createObjectURL(f));
-      setStatus('idle');
-      setOcrResult(null);
-      setConfidence(0);
-      setProgress(0);
-      setErrors([]);
+  const handleFileSelect = useCallback(async (f: File) => {
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+    setStatus('idle');
+    setOcrResult(null);
+    setConfidence(0);
+    setProgress(0);
+    setErrors([]);
 
-      // Persist upload metadata
-      const result = await api.uploads.create({
-        filename: f.name,
-        fileSize: f.size,
-        mimeType: f.type,
-      });
-      if (result.data) setUploadId(result.data.id);
-    },
-    []
-  );
+    // Persist upload metadata
+    const result = await api.uploads.create({
+      filename: f.name,
+      fileSize: f.size,
+      mimeType: f.type,
+    });
+    if (result.data) setUploadId(result.data.id);
+  }, []);
 
   const handleClear = useCallback(() => {
     if (preview) URL.revokeObjectURL(preview);

@@ -12,7 +12,9 @@ import type { DashboardSummaryResponse } from '@/lib/api/contracts';
 
 const repo = createTransactionRepository();
 
-function formatZodError(error: { issues: { path: PropertyKey[]; message: string }[] }): Record<string, string[]> {
+function formatZodError(error: {
+  issues: { path: PropertyKey[]; message: string }[];
+}): Record<string, string[]> {
   const fieldErrors: Record<string, string[]> = {};
   for (const issue of error.issues) {
     const path = issue.path.join('.') || '_root';

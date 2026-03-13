@@ -92,8 +92,8 @@ export function useExport(): UseExportReturn {
         scope === 'current'
           ? `${MONTH_NAMES[month]}-${year}`
           : scope === 'range' && startDate
-          ? `${startDate}-to-${endDate}`
-          : 'all';
+            ? `${startDate}-to-${endDate}`
+            : 'all';
       return `transactions-${tag}.${ext}`;
     },
     [scope, month, year, startDate, endDate]
@@ -113,10 +113,20 @@ export function useExport(): UseExportReturn {
           exportJSON(scopedTransactions, buildFilename('json'));
           break;
         case 'xlsx':
-          await exportExcel(scopedTransactions, buildFilename('xlsx'), scopeLabel, options.includeSummary);
+          await exportExcel(
+            scopedTransactions,
+            buildFilename('xlsx'),
+            scopeLabel,
+            options.includeSummary
+          );
           break;
         case 'pdf':
-          await exportPDF(scopedTransactions, buildFilename('pdf'), scopeLabel, options.includeSummary);
+          await exportPDF(
+            scopedTransactions,
+            buildFilename('pdf'),
+            scopeLabel,
+            options.includeSummary
+          );
           break;
       }
 
@@ -128,14 +138,26 @@ export function useExport(): UseExportReturn {
         recordCount: scopedTransactions.length,
       });
       if (jobResult.data) {
-        setExportJobs((prev) => [{ ...jobResult.data!, status: 'completed', completedAt: new Date().toISOString() }, ...prev]);
+        setExportJobs((prev) => [
+          { ...jobResult.data!, status: 'completed', completedAt: new Date().toISOString() },
+          ...prev,
+        ]);
       }
     } catch (err) {
       setExportError(err instanceof Error ? err.message : 'Export failed');
     } finally {
       setIsExporting(false);
     }
-  }, [format, scopedTransactions, buildFilename, scopeLabel, options.includeSummary, scope, startDate, endDate]);
+  }, [
+    format,
+    scopedTransactions,
+    buildFilename,
+    scopeLabel,
+    options.includeSummary,
+    scope,
+    startDate,
+    endDate,
+  ]);
 
   return {
     format,

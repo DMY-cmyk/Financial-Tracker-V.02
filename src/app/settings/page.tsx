@@ -93,10 +93,7 @@ export default function SettingsPage() {
 
         {/* Language */}
         <motion.div variants={staggerItem}>
-          <SettingsSection
-            title={t(locale, 'language')}
-            description={t(locale, 'languageDesc')}
-          >
+          <SettingsSection title={t(locale, 'language')} description={t(locale, 'languageDesc')}>
             <div className="space-y-2" role="radiogroup" aria-label={t(locale, 'language')}>
               {LANGUAGE_OPTIONS.map((opt) => (
                 <button

@@ -112,7 +112,8 @@ export function useTransactions(): UseTransactionsReturn {
     });
   }, [allTransactions, typeFilter, categoryFilter, paymentMethodFilter, search]);
 
-  const hasActiveFilters = search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '';
+  const hasActiveFilters =
+    search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '';
 
   const clearFilters = useCallback(() => {
     setSearch('');
