@@ -149,6 +149,39 @@ type TranslationKeys = {
 
   // Misc
   type: string;
+
+  // Bulk Import
+  bulkImport: string;
+  bulkImportDesc: string;
+  receiptScan: string;
+  downloadTemplate: string;
+  uploadExcel: string;
+  uploadImageBulk: string;
+  parsingFile: string;
+  validatingData: string;
+  importingData: string;
+  previewTransactions: string;
+  validRows: string;
+  invalidRows: string;
+  importAll: string;
+  importValid: string;
+  removeInvalid: string;
+  importComplete: string;
+  transactionsCreated: string;
+  transactionsFailed: string;
+  invalidHeaders: string;
+  emptyFile: string;
+  tooManyRows: string;
+  noTransactionsInFile: string;
+  reviewBeforeImport: string;
+  importMore: string;
+  viewTransactions: string;
+  dropExcelOrImage: string;
+  supportedBulkFormats: string;
+  row: string;
+  totalIncomeLabel: string;
+  totalExpenseLabel: string;
+  autoDescription: string;
   net: string;
   noResults: string;
   clearFilters: string;
@@ -330,6 +363,39 @@ const translations: Record<Locale, TranslationKeys> = {
     backToDashboard: 'Back to Dashboard',
 
     type: 'Type',
+
+    // Bulk Import
+    bulkImport: 'Bulk Import',
+    bulkImportDesc: 'Import multiple transactions from Excel or image',
+    receiptScan: 'Receipt Scan',
+    downloadTemplate: 'Download Template',
+    uploadExcel: 'Upload Excel File',
+    uploadImageBulk: 'Upload Image',
+    parsingFile: 'Parsing file...',
+    validatingData: 'Validating data...',
+    importingData: 'Importing transactions...',
+    previewTransactions: 'Preview Transactions',
+    validRows: 'valid',
+    invalidRows: 'invalid',
+    importAll: 'Import All',
+    importValid: 'Import Valid Rows',
+    removeInvalid: 'Remove Invalid',
+    importComplete: 'Import Complete',
+    transactionsCreated: 'transactions created',
+    transactionsFailed: 'transactions failed',
+    invalidHeaders: 'Invalid file headers. Please use the template.',
+    emptyFile: 'No data found in file',
+    tooManyRows: 'Too many rows. Maximum 500 per import.',
+    noTransactionsInFile: 'No valid transactions found in file',
+    reviewBeforeImport: 'Review transactions before importing',
+    importMore: 'Import More',
+    viewTransactions: 'View Transactions',
+    dropExcelOrImage: 'Drop Excel file or image here',
+    supportedBulkFormats: '.xlsx, .png, .jpg, .jpeg',
+    row: 'Row',
+    totalIncomeLabel: 'Total Income',
+    totalExpenseLabel: 'Total Expense',
+    autoDescription: 'Bulk import',
     net: 'Net',
     noResults: 'No results found',
     clearFilters: 'Clear Filters',
@@ -509,6 +575,39 @@ const translations: Record<Locale, TranslationKeys> = {
     backToDashboard: 'Kembali ke Dasbor',
 
     type: 'Tipe',
+
+    // Bulk Import
+    bulkImport: 'Impor Massal',
+    bulkImportDesc: 'Impor banyak transaksi dari Excel atau gambar',
+    receiptScan: 'Scan Struk',
+    downloadTemplate: 'Unduh Template',
+    uploadExcel: 'Unggah File Excel',
+    uploadImageBulk: 'Unggah Gambar',
+    parsingFile: 'Membaca file...',
+    validatingData: 'Memvalidasi data...',
+    importingData: 'Mengimpor transaksi...',
+    previewTransactions: 'Pratinjau Transaksi',
+    validRows: 'valid',
+    invalidRows: 'tidak valid',
+    importAll: 'Impor Semua',
+    importValid: 'Impor Baris Valid',
+    removeInvalid: 'Hapus Tidak Valid',
+    importComplete: 'Impor Selesai',
+    transactionsCreated: 'transaksi dibuat',
+    transactionsFailed: 'transaksi gagal',
+    invalidHeaders: 'Header file tidak valid. Gunakan template yang disediakan.',
+    emptyFile: 'Tidak ada data dalam file',
+    tooManyRows: 'Terlalu banyak baris. Maksimal 500 per impor.',
+    noTransactionsInFile: 'Tidak ada transaksi valid dalam file',
+    reviewBeforeImport: 'Periksa transaksi sebelum mengimpor',
+    importMore: 'Impor Lagi',
+    viewTransactions: 'Lihat Transaksi',
+    dropExcelOrImage: 'Letakkan file Excel atau gambar di sini',
+    supportedBulkFormats: '.xlsx, .png, .jpg, .jpeg',
+    row: 'Baris',
+    totalIncomeLabel: 'Total Pemasukan',
+    totalExpenseLabel: 'Total Pengeluaran',
+    autoDescription: 'Impor massal',
     net: 'Bersih',
     noResults: 'Tidak ada hasil',
     clearFilters: 'Hapus Filter',

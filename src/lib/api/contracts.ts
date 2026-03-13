@@ -12,6 +12,16 @@ export interface CreateTransactionRequest {
   notes: string;
 }
 
+export interface BulkCreateTransactionRequest {
+  transactions: CreateTransactionRequest[];
+}
+
+export interface BulkCreateTransactionResponse {
+  created: number;
+  failed: number;
+  errors: { index: number; message: string }[];
+}
+
 export interface UpdateTransactionRequest {
   date?: string;
   description?: string;

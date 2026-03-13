@@ -12,6 +12,13 @@ export const createTransactionSchema = z.object({
 
 export const updateTransactionSchema = createTransactionSchema.partial();
 
+export const bulkCreateTransactionSchema = z.object({
+  transactions: z
+    .array(createTransactionSchema)
+    .min(1, 'At least one transaction is required')
+    .max(500, 'Maximum 500 transactions per import'),
+});
+
 export const listTransactionsQuerySchema = z.object({
   month: z.number().int().min(0).max(11).optional(),
   year: z.number().int().min(2000).max(2100).optional(),
@@ -104,6 +111,7 @@ export const createExportJobSchema = z.object({
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type BulkCreateTransactionInput = z.infer<typeof bulkCreateTransactionSchema>;
 export type ListTransactionsQuery = z.infer<typeof listTransactionsQuerySchema>;
 export type DashboardSummaryQuery = z.infer<typeof dashboardSummaryQuerySchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;

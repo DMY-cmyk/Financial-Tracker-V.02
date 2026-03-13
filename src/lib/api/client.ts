@@ -1,6 +1,8 @@
 import type { Transaction, Category, PaymentMethod } from '@/lib/types';
 import type {
   CreateTransactionRequest,
+  BulkCreateTransactionRequest,
+  BulkCreateTransactionResponse,
   UpdateTransactionRequest,
   TransactionListResponse,
   DashboardSummaryResponse,
@@ -79,6 +81,13 @@ export const api = {
     delete(id: string) {
       return fetchApi<{ success: boolean }>(`/transactions/${id}`, {
         method: 'DELETE',
+      });
+    },
+
+    bulkCreate(data: BulkCreateTransactionRequest) {
+      return fetchApi<BulkCreateTransactionResponse>('/transactions/bulk', {
+        method: 'POST',
+        body: JSON.stringify(data),
       });
     },
   },

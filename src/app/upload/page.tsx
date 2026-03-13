@@ -5,6 +5,7 @@ import { useUpload } from '@/hooks/useUpload';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { BulkImportTabs } from '@/components/upload/BulkImportTabs';
 import { DropZone } from '@/components/upload/DropZone';
 import { UploadedFileCard } from '@/components/upload/UploadedFileCard';
 import { ExtractionStatusBadge } from '@/components/upload/ExtractionStatusBadge';
@@ -46,7 +47,7 @@ export default function UploadPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <motion.div {...fadeInUp}>
         <PageHeader title={t(locale, 'uploadReceipt')}>
-          <ExtractionStatusBadge status={status} />
+          <BulkImportTabs activeTab="receipt" />
         </PageHeader>
       </motion.div>
 
@@ -59,7 +60,10 @@ export default function UploadPage() {
         {/* Upload Zone */}
         <motion.div variants={staggerItem}>
           <div className="border-border bg-card rounded-2xl border p-4 sm:p-6">
-            <h3 className="mb-4 text-sm font-semibold">{t(locale, 'uploadImage')}</h3>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold">{t(locale, 'uploadImage')}</h3>
+              <ExtractionStatusBadge status={status} />
+            </div>
 
             {!file ? (
               <DropZone

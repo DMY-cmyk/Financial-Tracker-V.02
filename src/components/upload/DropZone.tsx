@@ -17,17 +17,29 @@ export function DropZone({ onFileSelect, accept = 'image/*', className, disabled
   const inputRef = useRef<HTMLInputElement>(null);
   const locale = useLocale();
 
+  const matchesAccept = useCallback(
+    (file: File): boolean => {
+      const tokens = accept.split(',').map((s) => s.trim());
+      return tokens.some((token) => {
+        if (token.startsWith('.')) return file.name.toLowerCase().endsWith(token.toLowerCase());
+        if (token.endsWith('/*')) return file.type.startsWith(token.replace('/*', '/'));
+        return file.type === token;
+      });
+    },
+    [accept]
+  );
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragOver(false);
       if (disabled) return;
       const f = e.dataTransfer.files[0];
-      if (f && f.type.startsWith('image/')) {
+      if (f && matchesAccept(f)) {
         onFileSelect(f);
       }
     },
-    [onFileSelect, disabled]
+    [onFileSelect, disabled, matchesAccept]
   );
 
   const handleDragOver = useCallback(

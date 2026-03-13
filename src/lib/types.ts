@@ -92,6 +92,39 @@ export interface ExtractionResult {
   status: ExtractionStatus;
 }
 
+// === Bulk Import Types ===
+
+export interface BulkImportRow {
+  rowIndex: number;
+  date: string;
+  amount: number;
+  category: string;
+  type: 'income' | 'expense';
+  paymentMethod: string;
+  description: string;
+  notes: string;
+  isValid: boolean;
+  errors: string[];
+}
+
+export interface BulkImportResult {
+  rows: BulkImportRow[];
+  validCount: number;
+  invalidCount: number;
+  totalIncome: number;
+  totalExpense: number;
+}
+
+export type BulkImportSource = 'excel' | 'image';
+
+export type BulkImportStatus =
+  | 'idle'
+  | 'parsing'
+  | 'preview'
+  | 'importing'
+  | 'complete'
+  | 'error';
+
 export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf';
 export type ExportScope = 'current' | 'all' | 'range';
 
