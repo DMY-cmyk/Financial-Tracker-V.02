@@ -14,13 +14,25 @@ import {
   PanelLeftClose,
   PanelLeft,
   Tag,
+  CalendarCheck,
+  PiggyBank,
 } from 'lucide-react';
 
-type NavKey = 'dashboard' | 'transactions' | 'upload' | 'export' | 'settings' | 'categories';
+type NavKey =
+  | 'dashboard'
+  | 'transactions'
+  | 'bills'
+  | 'savingsPage'
+  | 'upload'
+  | 'export'
+  | 'settings'
+  | 'categories';
 
 const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
+  { href: '/bills', key: 'bills', icon: CalendarCheck },
+  { href: '/savings', key: 'savingsPage', icon: PiggyBank },
   { href: '/upload', key: 'upload', icon: Upload },
   { href: '/export', key: 'export', icon: Download },
 ];

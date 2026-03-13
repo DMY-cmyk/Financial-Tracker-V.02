@@ -186,6 +186,32 @@ type TranslationKeys = {
   categoriesDesc: string;
   manageCategoriesMethods: string;
   dataManagementDesc: string;
+
+  // Bills page
+  bills: string;
+  addBill: string;
+  editBill: string;
+  billName: string;
+  billAmount: string;
+  billDueDate: string;
+  billSaved: string;
+  billDeleted: string;
+  noBills: string;
+  deleteBill: string;
+
+  // Savings page
+  savingsPage: string;
+  addSavingsGoal: string;
+  editSavingsGoal: string;
+  goalName: string;
+  targetAmount: string;
+  savedAmount: string;
+  goalColor: string;
+  goalSaved: string;
+  goalDeleted: string;
+  noSavingsGoals: string;
+  deleteSavingsGoal: string;
+  updateSaved: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -341,6 +367,32 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesDesc: 'Manage categories and payment methods',
     manageCategoriesMethods: 'Manage Categories & Payment Methods',
     dataManagementDesc: 'Export, import, or clear your data',
+
+    // Bills page
+    bills: 'Bills',
+    addBill: 'Add Bill',
+    editBill: 'Edit Bill',
+    billName: 'Bill Name',
+    billAmount: 'Amount',
+    billDueDate: 'Due Date (day)',
+    billSaved: 'Bill saved',
+    billDeleted: 'Bill deleted',
+    noBills: 'No bills for this month',
+    deleteBill: 'Delete Bill',
+
+    // Savings page
+    savingsPage: 'Savings Goals',
+    addSavingsGoal: 'Add Savings Goal',
+    editSavingsGoal: 'Edit Savings Goal',
+    goalName: 'Goal Name',
+    targetAmount: 'Target Amount',
+    savedAmount: 'Saved Amount',
+    goalColor: 'Color',
+    goalSaved: 'Goal saved',
+    goalDeleted: 'Goal deleted',
+    noSavingsGoals: 'No savings goals yet',
+    deleteSavingsGoal: 'Delete Savings Goal',
+    updateSaved: 'Update Saved',
   },
   id: {
     dashboard: 'Dasbor',
@@ -494,6 +546,32 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesDesc: 'Kelola kategori dan metode pembayaran',
     manageCategoriesMethods: 'Kelola Kategori & Metode Pembayaran',
     dataManagementDesc: 'Ekspor, impor, atau hapus data',
+
+    // Bills page
+    bills: 'Tagihan',
+    addBill: 'Tambah Tagihan',
+    editBill: 'Edit Tagihan',
+    billName: 'Nama Tagihan',
+    billAmount: 'Jumlah',
+    billDueDate: 'Tanggal Jatuh Tempo',
+    billSaved: 'Tagihan disimpan',
+    billDeleted: 'Tagihan dihapus',
+    noBills: 'Tidak ada tagihan bulan ini',
+    deleteBill: 'Hapus Tagihan',
+
+    // Savings page
+    savingsPage: 'Target Tabungan',
+    addSavingsGoal: 'Tambah Target Tabungan',
+    editSavingsGoal: 'Edit Target Tabungan',
+    goalName: 'Nama Target',
+    targetAmount: 'Jumlah Target',
+    savedAmount: 'Jumlah Tersimpan',
+    goalColor: 'Warna',
+    goalSaved: 'Target disimpan',
+    goalDeleted: 'Target dihapus',
+    noSavingsGoals: 'Belum ada target tabungan',
+    deleteSavingsGoal: 'Hapus Target Tabungan',
+    updateSaved: 'Perbarui Tersimpan',
   },
 };
 
