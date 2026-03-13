@@ -32,7 +32,15 @@ export default function SettingsPage() {
     { value: 'system' as const, label: t(locale, 'system'), icon: Monitor },
   ];
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
+    try {
+      const res = await fetch('/api/data', { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to clear database');
+    } catch {
+      toast.error(t(locale, 'exportFailed'));
+      setClearDialogOpen(false);
+      return;
+    }
     clearAllData();
     toast.success(t(locale, 'dataClearedToast'));
     setClearDialogOpen(false);
@@ -55,9 +63,7 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'appearance')}
-            description={
-              locale === 'id' ? 'Sesuaikan tampilan aplikasi' : 'Customize how the app looks'
-            }
+            description={t(locale, 'appearanceDesc')}
           >
             <div
               className="grid grid-cols-3 gap-2 sm:gap-3"
@@ -89,7 +95,7 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'language')}
-            description={locale === 'id' ? 'Pilih bahasa tampilan' : 'Choose display language'}
+            description={t(locale, 'languageDesc')}
           >
             <div className="space-y-2" role="radiogroup" aria-label={t(locale, 'language')}>
               {LANGUAGE_OPTIONS.map((opt) => (
@@ -120,18 +126,12 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'categories')}
-            description={
-              locale === 'id'
-                ? 'Kelola kategori dan metode pembayaran'
-                : 'Manage categories and payment methods'
-            }
+            description={t(locale, 'categoriesDesc')}
           >
             <Link href="/settings/categories">
               <Button variant="outline" className="w-full gap-2">
                 <FolderOpen className="h-4 w-4" />
-                {locale === 'id'
-                  ? 'Kelola Kategori & Metode Pembayaran'
-                  : 'Manage Categories & Payment Methods'}
+                {t(locale, 'manageCategoriesMethods')}
               </Button>
             </Link>
           </SettingsSection>
@@ -141,11 +141,7 @@ export default function SettingsPage() {
         <motion.div variants={staggerItem}>
           <SettingsSection
             title={t(locale, 'dataManagement')}
-            description={
-              locale === 'id'
-                ? 'Ekspor, impor, atau hapus data'
-                : 'Export, import, or clear your data'
-            }
+            description={t(locale, 'dataManagementDesc')}
           >
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2 sm:gap-3">

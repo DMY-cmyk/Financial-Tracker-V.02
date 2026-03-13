@@ -181,6 +181,11 @@ type TranslationKeys = {
   exportFailed: string;
   fixExtractedErrors: string;
   savedFromReceipt: string;
+  appearanceDesc: string;
+  languageDesc: string;
+  categoriesDesc: string;
+  manageCategoriesMethods: string;
+  dataManagementDesc: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -331,6 +336,11 @@ const translations: Record<Locale, TranslationKeys> = {
     exportFailed: 'Export failed',
     fixExtractedErrors: 'Please fix extracted data errors',
     savedFromReceipt: 'Transaction saved from receipt',
+    appearanceDesc: 'Customize how the app looks',
+    languageDesc: 'Choose display language',
+    categoriesDesc: 'Manage categories and payment methods',
+    manageCategoriesMethods: 'Manage Categories & Payment Methods',
+    dataManagementDesc: 'Export, import, or clear your data',
   },
   id: {
     dashboard: 'Dasbor',
@@ -479,6 +489,11 @@ const translations: Record<Locale, TranslationKeys> = {
     exportFailed: 'Ekspor gagal',
     fixExtractedErrors: 'Periksa data yang diekstrak',
     savedFromReceipt: 'Transaksi disimpan dari struk',
+    appearanceDesc: 'Sesuaikan tampilan aplikasi',
+    languageDesc: 'Pilih bahasa tampilan',
+    categoriesDesc: 'Kelola kategori dan metode pembayaran',
+    manageCategoriesMethods: 'Kelola Kategori & Metode Pembayaran',
+    dataManagementDesc: 'Ekspor, impor, atau hapus data',
   },
 };
 
