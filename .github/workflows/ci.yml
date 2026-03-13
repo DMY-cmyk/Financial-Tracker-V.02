@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, redesign]
+    branches: [main]
   push:
-    branches: [redesign]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, Typecheck & Build
+    name: Lint, Typecheck, Test & Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,11 +36,13 @@ jobs:
       - name: Format check
         run: npm run format:check
 
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
 
-      - name: Verify static export
+      - name: Verify build output
         run: |
-          test -d out || (echo "ERROR: out/ directory not found" && exit 1)
-          test -f out/index.html || (echo "ERROR: out/index.html not found" && exit 1)
-          echo "Static export verified: $(find out -name '*.html' | wc -l) HTML files"
+          test -d .next || (echo "ERROR: .next/ directory not found" && exit 1)
+          echo "Build verified: .next/ directory exists"
