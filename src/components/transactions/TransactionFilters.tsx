@@ -17,6 +17,8 @@ interface TransactionFiltersProps {
   paymentMethodFilter?: string;
   onPaymentMethodChange?: (v: string) => void;
   paymentMethods?: PaymentMethod[];
+  allMonths?: boolean;
+  onAllMonthsChange?: (v: boolean) => void;
 }
 
 export function TransactionFilters({
@@ -29,6 +31,8 @@ export function TransactionFilters({
   paymentMethodFilter = '',
   onPaymentMethodChange,
   paymentMethods = [],
+  allMonths = false,
+  onAllMonthsChange,
 }: TransactionFiltersProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const locale = useLocale();
@@ -99,6 +103,19 @@ export function TransactionFilters({
             </option>
           ))}
         </select>
+      )}
+
+      {onAllMonthsChange && (
+        <button
+          onClick={() => onAllMonthsChange(!allMonths)}
+          className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+            allMonths
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border text-muted-foreground hover:bg-muted'
+          }`}
+        >
+          {t(locale, 'allMonths')}
+        </button>
       )}
     </div>
   );

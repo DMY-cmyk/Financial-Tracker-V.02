@@ -47,6 +47,8 @@ export default function TransactionsPage() {
     setCategoryFilter,
     paymentMethodFilter,
     setPaymentMethodFilter,
+    allMonths,
+    setAllMonths,
     paymentMethods,
     clearFilters,
     formOpen,
@@ -147,6 +149,8 @@ export default function TransactionsPage() {
           paymentMethodFilter={paymentMethodFilter}
           onPaymentMethodChange={setPaymentMethodFilter}
           paymentMethods={paymentMethods}
+          allMonths={allMonths}
+          onAllMonthsChange={setAllMonths}
         />
       </motion.div>
 

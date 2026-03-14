@@ -49,6 +49,7 @@ type TranslationKeys = {
   cancel: string;
   search: string;
   filter: string;
+  allMonths: string;
   ok: string;
   back: string;
   clear: string;
@@ -350,6 +351,7 @@ const translations: Record<Locale, TranslationKeys> = {
     cancel: 'Cancel',
     search: 'Search',
     filter: 'Filter',
+    allMonths: 'All Months',
     ok: 'OK',
     back: 'Back',
     clear: 'Clear',
@@ -616,6 +618,7 @@ const translations: Record<Locale, TranslationKeys> = {
     cancel: 'Batal',
     search: 'Cari',
     filter: 'Filter',
+    allMonths: 'Semua Bulan',
     ok: 'OK',
     back: 'Kembali',
     clear: 'Hapus',

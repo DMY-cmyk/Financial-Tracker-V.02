@@ -27,6 +27,8 @@ interface UseTransactionsReturn {
   setCategoryFilter: (v: string) => void;
   paymentMethodFilter: string;
   setPaymentMethodFilter: (v: string) => void;
+  allMonths: boolean;
+  setAllMonths: (v: boolean) => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
 
@@ -71,11 +73,12 @@ export function useTransactions(): UseTransactionsReturn {
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
+  const [allMonths, setAllMonthsState] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
   const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `${month}-${year}-${fetchKey}-${page}-${typeFilter}-${categoryFilter}-${paymentMethodFilter}-${search}`;
+  const targetKey = `${allMonths ? 'all' : `${month}-${year}`}-${fetchKey}-${page}-${typeFilter}-${categoryFilter}-${paymentMethodFilter}-${search}`;
   const isApiLoading = loadedKey !== targetKey;
 
   // Reset page when filters change
@@ -83,6 +86,7 @@ export function useTransactions(): UseTransactionsReturn {
   const setTypeFilterWithReset = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilter(v); setPage(1); }, []);
   const setCategoryFilterWithReset = useCallback((v: string) => { setCategoryFilter(v); setPage(1); }, []);
   const setPaymentMethodFilterWithReset = useCallback((v: string) => { setPaymentMethodFilter(v); setPage(1); }, []);
+  const setAllMonthsWithReset = useCallback((v: boolean) => { setAllMonthsState(v); setPage(1); }, []);
 
   useEffect(() => {
     if (!initialized) return;
@@ -95,7 +99,11 @@ export function useTransactions(): UseTransactionsReturn {
     if (!initialized) return;
 
     let cancelled = false;
-    const params: Record<string, unknown> = { month, year, page, pageSize };
+    const params: Record<string, unknown> = { page, pageSize };
+    if (!allMonths) {
+      params.month = month;
+      params.year = year;
+    }
     if (typeFilter !== 'all') params.type = typeFilter;
     if (categoryFilter) params.categoryId = categoryFilter;
     if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
@@ -116,18 +124,19 @@ export function useTransactions(): UseTransactionsReturn {
     return () => {
       cancelled = true;
     };
-  }, [month, year, fetchKey, initialized, page, typeFilter, categoryFilter, paymentMethodFilter, search, targetKey]);
+  }, [month, year, fetchKey, initialized, page, typeFilter, categoryFilter, paymentMethodFilter, search, allMonths, targetKey]);
 
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
 
   const hasActiveFilters =
-    search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '';
+    search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '' || allMonths;
 
   const clearFilters = useCallback(() => {
     setSearch('');
     setTypeFilter('all');
     setCategoryFilter('');
     setPaymentMethodFilter('');
+    setAllMonthsState(false);
     setPage(1);
   }, []);
 
@@ -184,6 +193,8 @@ export function useTransactions(): UseTransactionsReturn {
     setCategoryFilter: setCategoryFilterWithReset,
     paymentMethodFilter,
     setPaymentMethodFilter: setPaymentMethodFilterWithReset,
+    allMonths,
+    setAllMonths: setAllMonthsWithReset,
     hasActiveFilters,
     clearFilters,
     paymentMethods,
