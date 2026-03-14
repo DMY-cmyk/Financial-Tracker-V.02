@@ -50,6 +50,10 @@ export default function ExportPage() {
     setScope,
     options,
     setOptions,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
     scopedTransactions,
     allTransactionCount,
     handleExport,
@@ -108,6 +112,10 @@ export default function ExportPage() {
             onScopeChange={setScope}
             monthLabel={`${MONTH_NAMES[month]} ${year}`}
             transactionCount={allTransactionCount}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
           />
         </motion.div>
 

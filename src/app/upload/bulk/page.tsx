@@ -76,18 +76,11 @@ export default function BulkImportPage() {
 
             {status === 'idle' && (
               <>
-                <DropZone
-                  onFileSelect={onFileSelect}
-                  accept=".xlsx,.xls,image/png,image/jpeg"
-                />
+                <DropZone onFileSelect={onFileSelect} accept=".xlsx,.xls,image/png,image/jpeg" />
                 <p className="text-muted-foreground text-center text-xs">
                   {t(locale, 'supportedBulkFormats')}
                 </p>
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={downloadTemplate}
-                >
+                <Button variant="outline" className="w-full gap-2" onClick={downloadTemplate}>
                   <Download className="h-4 w-4" />
                   {t(locale, 'downloadTemplate')}
                 </Button>
@@ -111,9 +104,7 @@ export default function BulkImportPage() {
                     <p className="text-sm font-medium text-red-700 dark:text-red-400">
                       {t(locale, 'importError')}
                     </p>
-                    <p className="mt-1 text-xs text-red-600 dark:text-red-500">
-                      {error}
-                    </p>
+                    <p className="mt-1 text-xs text-red-600 dark:text-red-500">{error}</p>
                   </div>
                 </div>
                 <Button variant="outline" onClick={reset} className="w-full gap-2">
@@ -136,11 +127,7 @@ export default function BulkImportPage() {
                   )}
                 </div>
                 {status === 'preview' && (
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2"
-                    onClick={downloadTemplate}
-                  >
+                  <Button variant="outline" className="w-full gap-2" onClick={downloadTemplate}>
                     <Download className="h-4 w-4" />
                     {t(locale, 'downloadTemplate')}
                   </Button>
@@ -180,10 +167,7 @@ export default function BulkImportPage() {
           )}
 
           {status === 'importing' && (
-            <ImportProgress
-              current={importProgress.current}
-              total={importProgress.total}
-            />
+            <ImportProgress current={importProgress.current} total={importProgress.total} />
           )}
 
           {status === 'complete' && createResult && (

@@ -28,14 +28,34 @@ export function generateBulkTemplate(
 
   // Row 0 – section titles
   sheetData.push([
-    'No', null, 'P E M A S U K A N', null, null, null,
-    null, 'P E N G E L U A R A N', null, null, null, null,
+    'No',
+    null,
+    'P E M A S U K A N',
+    null,
+    null,
+    null,
+    null,
+    'P E N G E L U A R A N',
+    null,
+    null,
+    null,
+    null,
   ]);
 
   // Row 1 – column headers
   sheetData.push([
-    'No', null, 'Tanggal', 'Jumlah', 'Kategori', 'Method',
-    null, 'Tanggal', 'Jumlah', 'Kategori', 'account', 'Notes',
+    'No',
+    null,
+    'Tanggal',
+    'Jumlah',
+    'Kategori',
+    'Method',
+    null,
+    'Tanggal',
+    'Jumlah',
+    'Kategori',
+    'account',
+    'Notes',
   ]);
 
   // Rows 2-51 – pre-numbered data rows
@@ -55,13 +75,13 @@ export function generateBulkTemplate(
 
   // Column widths
   ws['!cols'] = [
-    colWidth(5),  // A: No
-    colWidth(3),  // B: spacer
+    colWidth(5), // A: No
+    colWidth(3), // B: spacer
     colWidth(15), // C: Tanggal
     colWidth(18), // D: Jumlah
     colWidth(18), // E: Kategori
     colWidth(18), // F: Method
-    colWidth(3),  // G: separator
+    colWidth(3), // G: separator
     colWidth(15), // H: Tanggal
     colWidth(18), // I: Jumlah
     colWidth(18), // J: Kategori
@@ -121,9 +141,7 @@ export function generateBulkTemplate(
   // Payment methods
   helpData.push(['PAYMENT METHODS']);
   if (paymentMethods.length > 0) {
-    paymentMethods.forEach((pm) =>
-      helpData.push([`  • ${pm.name} (${pm.type})`])
-    );
+    paymentMethods.forEach((pm) => helpData.push([`  • ${pm.name} (${pm.type})`]));
   } else {
     helpData.push(['  (no payment methods defined)']);
   }

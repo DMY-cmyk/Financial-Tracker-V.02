@@ -63,10 +63,23 @@ function parseDate(value: CellValue): string | null {
 
   // "1 Mar 2026" style
   const monthNames: Record<string, number> = {
-    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+    jan: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    may: 5,
+    jun: 6,
+    jul: 7,
+    aug: 8,
+    sep: 9,
+    oct: 10,
+    nov: 11,
+    dec: 12,
     // Indonesian month abbreviations
-    mei: 5, agt: 8, okt: 10, des: 12,
+    mei: 5,
+    agt: 8,
+    okt: 10,
+    des: 12,
   };
   const textMatch = str.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
   if (textMatch) {
@@ -191,11 +204,7 @@ function findSections(headerRow: SheetRow): {
   return { income, expense };
 }
 
-function findColumnAfter(
-  headers: string[],
-  afterIndex: number,
-  names: string[]
-): number {
+function findColumnAfter(headers: string[], afterIndex: number, names: string[]): number {
   for (let i = afterIndex; i < headers.length; i++) {
     if (names.includes(headers[i])) return i;
   }
@@ -298,18 +307,14 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
   }
 
   if (headerRowIndex === -1) {
-    return emptyResult(
-      'Could not find header row. Expected columns: Tanggal, Jumlah, Kategori'
-    );
+    return emptyResult('Could not find header row. Expected columns: Tanggal, Jumlah, Kategori');
   }
 
   const headerRow = data[headerRowIndex];
   const { income, expense } = findSections(headerRow);
 
   if (!income && !expense) {
-    return emptyResult(
-      'Could not detect income or expense sections in the header row'
-    );
+    return emptyResult('Could not detect income or expense sections in the header row');
   }
 
   const dataStartRow = headerRowIndex + 1;
@@ -334,7 +339,12 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
       const tanggal = row[income.tanggal];
       const jumlah = row[income.jumlah];
 
-      if (tanggal != null && String(tanggal).trim() !== '' && jumlah != null && String(jumlah).trim() !== '') {
+      if (
+        tanggal != null &&
+        String(tanggal).trim() !== '' &&
+        jumlah != null &&
+        String(jumlah).trim() !== ''
+      ) {
         const kategori = row[income.kategori];
         const method = row[income.methodOrAccount];
         const categoryStr = kategori != null ? String(kategori).trim() : '';
@@ -346,7 +356,8 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
           amount: parseAmount(jumlah),
           category: categoryStr,
           type: 'income',
-          paymentMethod: method != null && String(method).trim() !== '' ? String(method).trim() : 'Cash',
+          paymentMethod:
+            method != null && String(method).trim() !== '' ? String(method).trim() : 'Cash',
           description: categoryStr ? `${categoryStr} - Income` : 'Income',
           notes: '',
           isValid: true,
@@ -362,7 +373,12 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
       const tanggal = row[expense.tanggal];
       const jumlah = row[expense.jumlah];
 
-      if (tanggal != null && String(tanggal).trim() !== '' && jumlah != null && String(jumlah).trim() !== '') {
+      if (
+        tanggal != null &&
+        String(tanggal).trim() !== '' &&
+        jumlah != null &&
+        String(jumlah).trim() !== ''
+      ) {
         const kategori = row[expense.kategori];
         const account = row[expense.methodOrAccount];
         const notes = expense.notes !== -1 ? row[expense.notes] : null;
@@ -375,7 +391,8 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
           amount: parseAmount(jumlah),
           category: categoryStr,
           type: 'expense',
-          paymentMethod: account != null && String(account).trim() !== '' ? String(account).trim() : 'Cash',
+          paymentMethod:
+            account != null && String(account).trim() !== '' ? String(account).trim() : 'Cash',
           description: categoryStr ? `${categoryStr} - Expense` : 'Expense',
           notes: notes != null ? String(notes).trim() : '',
           isValid: true,
@@ -415,8 +432,7 @@ export async function parseExcelFile(file: File): Promise<BulkImportResult> {
     const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
     return parseExcelWorkbook(workbook);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Failed to read Excel file';
+    const message = error instanceof Error ? error.message : 'Failed to read Excel file';
     return emptyResult(message);
   }
 }

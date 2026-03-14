@@ -19,10 +19,7 @@ export function ImportSummary({ created, failed, errors, onReset }: ImportSummar
   const hasSuccess = created > 0;
 
   return (
-    <motion.div
-      {...fadeInUp}
-      className="border-border bg-card rounded-2xl border p-8"
-    >
+    <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-8">
       <div className="flex flex-col items-center gap-4">
         {/* Status Icon */}
         <motion.div {...scaleIn}>

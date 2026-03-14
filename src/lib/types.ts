@@ -117,13 +117,7 @@ export interface BulkImportResult {
 
 export type BulkImportSource = 'excel' | 'image';
 
-export type BulkImportStatus =
-  | 'idle'
-  | 'parsing'
-  | 'preview'
-  | 'importing'
-  | 'complete'
-  | 'error';
+export type BulkImportStatus = 'idle' | 'parsing' | 'preview' | 'importing' | 'complete' | 'error';
 
 export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf';
 export type ExportScope = 'current' | 'all' | 'range';

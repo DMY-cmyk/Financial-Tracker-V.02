@@ -2,14 +2,10 @@ import type { Category, BulkImportRow, BulkImportResult } from './types';
 import { suggestCategory } from './category-suggest';
 
 // Date patterns: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, YYYY-MM-DD
-const DATE_PATTERNS = [
-  /(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})/,
-  /(\d{4})-(\d{1,2})-(\d{1,2})/,
-];
+const DATE_PATTERNS = [/(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})/, /(\d{4})-(\d{1,2})-(\d{1,2})/];
 
 // Amount patterns: optional Rp prefix, digits with optional dots/commas
-const AMOUNT_PATTERN =
-  /(?:Rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?|\d+)/gi;
+const AMOUNT_PATTERN = /(?:Rp\.?\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?|\d+)/gi;
 
 const INCOME_KEYWORDS = [
   'income',
@@ -50,11 +46,7 @@ function formatIso(year: number, month: number, day: number): string | null {
     return null;
   }
   const date = new Date(year, month - 1, day);
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
     return null;
   }
   const mm = String(month).padStart(2, '0');
@@ -182,10 +174,9 @@ function validateRow(row: BulkImportRow): BulkImportRow {
   };
 }
 
-function calculateTotals(rows: BulkImportRow[]): Pick<
-  BulkImportResult,
-  'validCount' | 'invalidCount' | 'totalIncome' | 'totalExpense'
-> {
+function calculateTotals(
+  rows: BulkImportRow[]
+): Pick<BulkImportResult, 'validCount' | 'invalidCount' | 'totalIncome' | 'totalExpense'> {
   let validCount = 0;
   let invalidCount = 0;
   let totalIncome = 0;
@@ -204,10 +195,7 @@ function calculateTotals(rows: BulkImportRow[]): Pick<
   return { validCount, invalidCount, totalIncome, totalExpense };
 }
 
-export function parseOcrTextToTransactions(
-  text: string,
-  categories: Category[]
-): BulkImportResult {
+export function parseOcrTextToTransactions(text: string, categories: Category[]): BulkImportResult {
   const lines = text
     .split(/\r?\n/)
     .map((l) => l.trim())
@@ -230,10 +218,7 @@ export function parseOcrTextToTransactions(
     const description = extractDescription(line, dateResult.matched, amountMatches);
     const type = detectType(line);
 
-    const categorySuggestion = suggestCategory(
-      description || line,
-      categories
-    );
+    const categorySuggestion = suggestCategory(description || line, categories);
     const category = categorySuggestion?.name ?? '';
 
     const row: BulkImportRow = {

@@ -1,5 +1,6 @@
 import { ensureSeeded } from '@/server/db/seed';
 import { createPaymentMethodRepository } from '@/server/repositories/payment-method.repository';
+import { createTransactionRepository } from '@/server/repositories/transaction.repository';
 import { createPaymentMethodSchema, updatePaymentMethodSchema } from '@/lib/api/validation';
 import type { PaymentMethod } from '@/lib/types';
 
@@ -64,7 +65,20 @@ export async function deletePaymentMethod(
   id: string
 ): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id)))
-    return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
+  const method = await repo.findById(id);
+  if (!method) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
+
+  const txRepo = createTransactionRepository();
+  const count = await txRepo.countByPaymentMethod(method.name);
+  if (count > 0) {
+    return {
+      error: {
+        message: `Cannot delete "${method.name}" — ${count} transaction(s) still use it`,
+        code: 'CONFLICT',
+      },
+    };
+  }
+
+  await repo.delete(id);
   return { data: { success: true } };
 }

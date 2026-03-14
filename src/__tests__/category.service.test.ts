@@ -7,6 +7,7 @@ import {
   updateCategory,
   deleteCategory,
 } from '@/server/services/category.service';
+import { createTransactionRepository } from '@/server/repositories/transaction.repository';
 
 beforeEach(async () => {
   await resetDb();
@@ -152,5 +153,48 @@ describe('deleteCategory', () => {
     const result = await deleteCategory('nonexistent');
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
+  });
+
+  it('blocks deletion when transactions reference the category', async () => {
+    const cat = await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
+    const txRepo = createTransactionRepository();
+    await txRepo.create({
+      date: '2026-03-01',
+      description: 'Lunch',
+      category: 'Food',
+      type: 'expense',
+      amount: 50000,
+      paymentMethod: 'Cash',
+      notes: '',
+    });
+
+    const result = await deleteCategory(cat.data!.id);
+    expect(result.error).toBeDefined();
+    expect(result.error!.code).toBe('CONFLICT');
+
+    const list = await listCategories();
+    expect(list.data!.length).toBe(1);
+  });
+
+  it('allows deletion when no transactions reference the category', async () => {
+    const cat = await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
+
+    const result = await deleteCategory(cat.data!.id);
+    expect(result.data).toEqual({ success: true });
+
+    const list = await listCategories();
+    expect(list.data!.length).toBe(0);
   });
 });

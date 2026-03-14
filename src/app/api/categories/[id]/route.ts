@@ -21,7 +21,9 @@ export async function DELETE(
   const result = await deleteCategory(id);
 
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 404 });
+    const status =
+      result.error.code === 'NOT_FOUND' ? 404 : result.error.code === 'CONFLICT' ? 409 : 400;
+    return NextResponse.json({ error: result.error }, { status });
   }
   return NextResponse.json({ data: result.data });
 }

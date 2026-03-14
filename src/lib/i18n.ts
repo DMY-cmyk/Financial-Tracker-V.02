@@ -232,6 +232,26 @@ type TranslationKeys = {
   noBills: string;
   deleteBill: string;
 
+  // Cascade guards
+  cannotDeleteInUse: string;
+
+  // Export custom range
+  customRange: string;
+  selectDateRange: string;
+  startDate: string;
+  endDate: string;
+
+  // Budget page
+  budgetPage: string;
+  totalBudget: string;
+  totalSpent: string;
+  setBudget: string;
+  unbudgeted: string;
+  budgetUpdated: string;
+  noBudgetCategories: string;
+  budgetOverview: string;
+  percentUsed: string;
+
   // Savings page
   savingsPage: string;
   addSavingsGoal: string;
@@ -446,6 +466,26 @@ const translations: Record<Locale, TranslationKeys> = {
     noBills: 'No bills for this month',
     deleteBill: 'Delete Bill',
 
+    // Cascade guards
+    cannotDeleteInUse: 'Cannot delete — still in use by transactions',
+
+    // Export custom range
+    customRange: 'Custom Range',
+    selectDateRange: 'Select date range',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+
+    // Budget page
+    budgetPage: 'Budget',
+    totalBudget: 'Total Budget',
+    totalSpent: 'Total Spent',
+    setBudget: 'Set Budget',
+    unbudgeted: 'Unbudgeted',
+    budgetUpdated: 'Budget updated',
+    noBudgetCategories: 'No budget set for any category',
+    budgetOverview: 'Budget Overview',
+    percentUsed: 'used',
+
     // Savings page
     savingsPage: 'Savings Goals',
     addSavingsGoal: 'Add Savings Goal',
@@ -657,6 +697,26 @@ const translations: Record<Locale, TranslationKeys> = {
     billDeleted: 'Tagihan dihapus',
     noBills: 'Tidak ada tagihan bulan ini',
     deleteBill: 'Hapus Tagihan',
+
+    // Cascade guards
+    cannotDeleteInUse: 'Tidak dapat dihapus — masih digunakan oleh transaksi',
+
+    // Export custom range
+    customRange: 'Rentang Kustom',
+    selectDateRange: 'Pilih rentang tanggal',
+    startDate: 'Tanggal Mulai',
+    endDate: 'Tanggal Akhir',
+
+    // Budget page
+    budgetPage: 'Anggaran',
+    totalBudget: 'Total Anggaran',
+    totalSpent: 'Total Terpakai',
+    setBudget: 'Atur Anggaran',
+    unbudgeted: 'Belum Dianggarkan',
+    budgetUpdated: 'Anggaran diperbarui',
+    noBudgetCategories: 'Belum ada anggaran untuk kategori',
+    budgetOverview: 'Ringkasan Anggaran',
+    percentUsed: 'terpakai',
 
     // Savings page
     savingsPage: 'Target Tabungan',

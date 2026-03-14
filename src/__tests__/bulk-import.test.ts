@@ -2,10 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as XLSX from 'xlsx';
 import { parseExcelWorkbook } from '@/lib/excel-import';
 import { parseOcrTextToTransactions } from '@/lib/ocr-import';
-import {
-  bulkCreateTransactionSchema,
-  createTransactionSchema,
-} from '@/lib/api/validation';
+import { bulkCreateTransactionSchema, createTransactionSchema } from '@/lib/api/validation';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { bulkCreateTransactions } from '@/server/services/transaction.service';
@@ -20,22 +17,10 @@ import type { Category } from '@/lib/types';
 //   Col 6: empty separator
 //   Col 7: Expense Tanggal  Col 8: Expense Jumlah  Col 9: Expense Kategori  Col 10: Expense Account  Col 11: Expense Notes
 
-function createTestWorkbook(
-  incomeRows: unknown[][],
-  expenseRows: unknown[][]
-): XLSX.WorkBook {
+function createTestWorkbook(incomeRows: unknown[][], expenseRows: unknown[][]): XLSX.WorkBook {
   const data: unknown[][] = [];
   // Row 0: section titles
-  data.push([
-    null,
-    null,
-    'P E M A S U K A N',
-    null,
-    null,
-    null,
-    null,
-    'P E N G E L U A R A N',
-  ]);
+  data.push([null, null, 'P E M A S U K A N', null, null, null, null, 'P E N G E L U A R A N']);
   // Row 1: headers
   data.push([
     null,
@@ -168,37 +153,25 @@ describe('parseExcelWorkbook', () => {
   // --- Date format variations ---
 
   it('handles DD/MM/YYYY date strings', () => {
-    const wb = createTestWorkbook(
-      [['15/06/2025', 1000000, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['15/06/2025', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].date).toBe('2025-06-15');
   });
 
   it('handles ISO YYYY-MM-DD date strings', () => {
-    const wb = createTestWorkbook(
-      [['2025-06-15', 1000000, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['2025-06-15', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].date).toBe('2025-06-15');
   });
 
   it('handles DD-MM-YYYY date strings (dash separator)', () => {
-    const wb = createTestWorkbook(
-      [['15-06-2025', 1000000, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['15-06-2025', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].date).toBe('2025-06-15');
   });
 
   it('handles text dates like "1 Mar 2026"', () => {
-    const wb = createTestWorkbook(
-      [['1 Mar 2026', 1000000, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['1 Mar 2026', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].date).toBe('2026-03-01');
   });
@@ -206,37 +179,25 @@ describe('parseExcelWorkbook', () => {
   // --- Amount format variations ---
 
   it('handles plain number amounts', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', 5000000, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', 5000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Indonesian dot separators (5.000.000)', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', '5.000.000', 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', '5.000.000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Rp prefix', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', 'Rp 2.500.000', 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', 'Rp 2.500.000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(2500000);
   });
 
   it('handles amounts with western comma separators (5,000,000)', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', '5,000,000', 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', '5,000,000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
@@ -244,10 +205,7 @@ describe('parseExcelWorkbook', () => {
   // --- Validation ---
 
   it('marks row with missing category as invalid', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', 1000000, '', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', 1000000, '', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].isValid).toBe(false);
     expect(result.rows[0].errors).toContain('Category is required');
@@ -255,27 +213,19 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('marks row with zero amount as invalid', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', 0, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', 0, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     // Zero amount rows have both tanggal and jumlah, but jumlah is 0
     // The parser checks `jumlah != null && String(jumlah).trim() !== ''`
     // "0" is truthy for that check, so the row IS parsed, then validateRow flags it
     if (result.rows.length > 0) {
       expect(result.rows[0].isValid).toBe(false);
-      expect(result.rows[0].errors).toContain(
-        'Amount must be a positive number'
-      );
+      expect(result.rows[0].errors).toContain('Amount must be a positive number');
     }
   });
 
   it('marks row with negative amount as invalid', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', -500, 'Salary', 'Cash']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', -500, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     // parseAmount uses Math.abs, so -500 becomes 500 — row should be valid
     // Verify the parser's behavior with negative numbers
@@ -303,10 +253,7 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('defaults paymentMethod to Cash when empty', () => {
-    const wb = createTestWorkbook(
-      [['01/01/2025', 1000000, 'Salary', '']],
-      []
-    );
+    const wb = createTestWorkbook([['01/01/2025', 1000000, 'Salary', '']], []);
     const result = parseExcelWorkbook(wb);
     if (result.rows.length > 0) {
       expect(result.rows[0].paymentMethod).toBe('Cash');

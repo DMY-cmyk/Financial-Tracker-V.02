@@ -1,5 +1,6 @@
 import { ensureSeeded } from '@/server/db/seed';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
+import { createTransactionRepository } from '@/server/repositories/transaction.repository';
 import { createCategorySchema, updateCategorySchema } from '@/lib/api/validation';
 import type { Category } from '@/lib/types';
 
@@ -64,7 +65,20 @@ export async function updateCategory(id: string, body: unknown): Promise<Service
 
 export async function deleteCategory(id: string): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id)))
-    return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
+  const category = await repo.findById(id);
+  if (!category) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
+
+  const txRepo = createTransactionRepository();
+  const count = await txRepo.countByCategory(category.name);
+  if (count > 0) {
+    return {
+      error: {
+        message: `Cannot delete "${category.name}" — ${count} transaction(s) still use it`,
+        code: 'CONFLICT',
+      },
+    };
+  }
+
+  await repo.delete(id);
   return { data: { success: true } };
 }

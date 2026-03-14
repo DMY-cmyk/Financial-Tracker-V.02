@@ -112,12 +112,7 @@ export function ImportPreview({
       </motion.div>
 
       {/* Transaction List */}
-      <motion.div
-        variants={staggerList}
-        initial="hidden"
-        animate="show"
-        className="space-y-2"
-      >
+      <motion.div variants={staggerList} initial="hidden" animate="show" className="space-y-2">
         {rows.map((row) => (
           <motion.div
             key={row.rowIndex}
@@ -183,7 +178,10 @@ export function ImportPreview({
             {!row.isValid && row.errors.length > 0 && (
               <div className="mt-2 space-y-0.5 pl-8">
                 {row.errors.map((err, i) => (
-                  <p key={i} className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+                  <p
+                    key={i}
+                    className="flex items-center gap-1 text-xs text-red-600 dark:text-red-400"
+                  >
                     <AlertCircle className="h-3 w-3 shrink-0" />
                     {err}
                   </p>

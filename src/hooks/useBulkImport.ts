@@ -107,12 +107,10 @@ export function useBulkImport(): UseBulkImportReturn {
 
   // Fetch categories and payment methods on mount
   useEffect(() => {
-    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(
-      ([catRes, pmRes]) => {
-        if (catRes.data) setCategories(catRes.data.categories);
-        if (pmRes.data) setPaymentMethods(pmRes.data.paymentMethods);
-      }
-    );
+    Promise.all([api.categories.list(), api.paymentMethods.list()]).then(([catRes, pmRes]) => {
+      if (catRes.data) setCategories(catRes.data.categories);
+      if (pmRes.data) setPaymentMethods(pmRes.data.paymentMethods);
+    });
   }, []);
 
   const handleFileSelect = useCallback(
@@ -142,8 +140,7 @@ export function useBulkImport(): UseBulkImportReturn {
           setStatus('error');
         }
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to parse file';
+        const message = err instanceof Error ? err.message : 'Failed to parse file';
         setError(message);
         setStatus('error');
       }
@@ -218,8 +215,7 @@ export function useBulkImport(): UseBulkImportReturn {
           setStatus('error');
         }
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to import transactions';
+        const message = err instanceof Error ? err.message : 'Failed to import transactions';
         setError(message);
         setStatus('error');
       }

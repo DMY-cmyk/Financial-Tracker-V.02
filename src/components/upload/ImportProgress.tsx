@@ -16,10 +16,7 @@ export function ImportProgress({ current, total }: ImportProgressProps) {
   const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
 
   return (
-    <motion.div
-      {...fadeInUp}
-      className="border-border bg-card rounded-2xl border p-8"
-    >
+    <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-8">
       <div className="flex flex-col items-center gap-5">
         <motion.div
           animate={{ rotate: 360 }}

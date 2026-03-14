@@ -7,6 +7,7 @@ import {
   updatePaymentMethod,
   deletePaymentMethod,
 } from '@/server/services/payment-method.service';
+import { createTransactionRepository } from '@/server/repositories/transaction.repository';
 
 beforeEach(async () => {
   await resetDb();
@@ -100,5 +101,36 @@ describe('deletePaymentMethod', () => {
     const result = await deletePaymentMethod('nonexistent');
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
+  });
+
+  it('blocks deletion when transactions reference the payment method', async () => {
+    const pm = await createPaymentMethod({ name: 'Cash', icon: 'wallet', type: 'cash' });
+    const txRepo = createTransactionRepository();
+    await txRepo.create({
+      date: '2026-03-01',
+      description: 'Lunch',
+      category: 'Food',
+      type: 'expense',
+      amount: 50000,
+      paymentMethod: 'Cash',
+      notes: '',
+    });
+
+    const result = await deletePaymentMethod(pm.data!.id);
+    expect(result.error).toBeDefined();
+    expect(result.error!.code).toBe('CONFLICT');
+
+    const list = await listPaymentMethods();
+    expect(list.data!.length).toBe(1);
+  });
+
+  it('allows deletion when no transactions reference the payment method', async () => {
+    const pm = await createPaymentMethod({ name: 'Cash', icon: 'wallet', type: 'cash' });
+
+    const result = await deletePaymentMethod(pm.data!.id);
+    expect(result.data).toEqual({ success: true });
+
+    const list = await listPaymentMethods();
+    expect(list.data!.length).toBe(0);
   });
 });

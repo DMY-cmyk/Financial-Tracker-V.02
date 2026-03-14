@@ -16,11 +16,13 @@ import {
   Tag,
   CalendarCheck,
   PiggyBank,
+  Target,
 } from 'lucide-react';
 
 type NavKey =
   | 'dashboard'
   | 'transactions'
+  | 'budgetPage'
   | 'bills'
   | 'savingsPage'
   | 'upload'
@@ -31,6 +33,7 @@ type NavKey =
 const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
+  { href: '/budget', key: 'budgetPage', icon: Target },
   { href: '/bills', key: 'bills', icon: CalendarCheck },
   { href: '/savings', key: 'savingsPage', icon: PiggyBank },
   { href: '/upload', key: 'upload', icon: Upload },

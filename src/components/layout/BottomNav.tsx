@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { LayoutDashboard, Receipt, Upload, Download, Settings } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Download, Settings } from 'lucide-react';
 
-type NavKey = 'dashboard' | 'transactions' | 'upload' | 'export' | 'settings';
+type NavKey = 'dashboard' | 'transactions' | 'budgetPage' | 'export' | 'settings';
 
 const items: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
-  { href: '/upload', key: 'upload', icon: Upload },
+  { href: '/budget', key: 'budgetPage', icon: Target },
   { href: '/export', key: 'export', icon: Download },
   { href: '/settings', key: 'settings', icon: Settings },
 ];

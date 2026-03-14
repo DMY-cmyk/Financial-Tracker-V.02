@@ -132,5 +132,23 @@ export function createTransactionRepository() {
       const result = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
       return result.rowCount > 0;
     },
+
+    async countByCategory(categoryName: string): Promise<number> {
+      const db = await getDb();
+      const result = await db.query<{ cnt: number }>(
+        'SELECT COUNT(*) as cnt FROM transactions WHERE category = ?',
+        [categoryName]
+      );
+      return result.rows[0]?.cnt ?? 0;
+    },
+
+    async countByPaymentMethod(paymentMethodName: string): Promise<number> {
+      const db = await getDb();
+      const result = await db.query<{ cnt: number }>(
+        'SELECT COUNT(*) as cnt FROM transactions WHERE payment_method = ?',
+        [paymentMethodName]
+      );
+      return result.rows[0]?.cnt ?? 0;
+    },
   };
 }
