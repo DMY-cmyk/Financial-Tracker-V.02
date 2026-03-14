@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
@@ -7,11 +8,14 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { useReportsData } from '@/hooks/useReportsData';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/components/reports/TrendChart';
-import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
+import { AnnualSummary } from '@/components/reports/AnnualSummary';
+import { TrendingUp, TrendingDown, Wallet, PiggyBank, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function ReportsPage() {
   const locale = useLocale();
   const { trends, isLoading, monthCount, setMonthCount } = useReportsData();
+  const [annualYear, setAnnualYear] = useState(new Date().getFullYear());
 
   const latest = trends[trends.length - 1];
   const totalIncome = trends.reduce((s, m) => s + m.income, 0);
@@ -172,6 +176,40 @@ export default function ReportsPage() {
             </div>
           </motion.div>
         )}
+
+        {/* Annual Report Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-base font-semibold">{t(locale, 'annualReport')}</h2>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setAnnualYear((y) => y - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[4rem] text-center font-mono text-sm font-semibold">
+                {annualYear}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setAnnualYear((y) => y + 1)}
+                disabled={annualYear >= new Date().getFullYear()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <AnnualSummary year={annualYear} />
+        </motion.div>
       </div>
     </div>
   );

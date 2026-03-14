@@ -305,6 +305,9 @@ type TranslationKeys = {
   last12Months: string;
   avgSavingsRate: string;
   month: string;
+  annualReport: string;
+  topCategories: string;
+  totalTransactions: string;
 
   // Language switcher
   switchLanguage: string;
@@ -590,6 +593,9 @@ const translations: Record<Locale, TranslationKeys> = {
     last12Months: '12 months',
     avgSavingsRate: 'Savings Rate',
     month: 'Month',
+    annualReport: 'Annual Report',
+    topCategories: 'Top Expense Categories',
+    totalTransactions: 'Transactions',
     switchLanguage: 'Switch Language',
     uploadHistory: 'Upload History',
     noUploadHistory: 'No uploads yet',
@@ -865,6 +871,9 @@ const translations: Record<Locale, TranslationKeys> = {
     last12Months: '12 bulan',
     avgSavingsRate: 'Rasio Tabungan',
     month: 'Bulan',
+    annualReport: 'Laporan Tahunan',
+    topCategories: 'Kategori Pengeluaran Teratas',
+    totalTransactions: 'Transaksi',
     switchLanguage: 'Ganti Bahasa',
     uploadHistory: 'Riwayat Unggahan',
     noUploadHistory: 'Belum ada unggahan',
