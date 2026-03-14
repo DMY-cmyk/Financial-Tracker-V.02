@@ -1,0 +1,178 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { t, useLocale } from '@/lib/i18n';
+import { formatCurrency } from '@/lib/formatters';
+import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
+import { useReportsData } from '@/hooks/useReportsData';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { TrendChart } from '@/components/reports/TrendChart';
+import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
+
+export default function ReportsPage() {
+  const locale = useLocale();
+  const { trends, isLoading, monthCount, setMonthCount } = useReportsData();
+
+  const latest = trends[trends.length - 1];
+  const totalIncome = trends.reduce((s, m) => s + m.income, 0);
+  const totalExpense = trends.reduce((s, m) => s + m.expense, 0);
+  const totalBalance = totalIncome - totalExpense;
+  const avgSavingsRate = trends.length > 0
+    ? Math.round(trends.reduce((s, m) => s + m.savingsRate, 0) / trends.length)
+    : 0;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t(locale, 'reports')} />
+        <div className="mx-auto max-w-5xl space-y-4">
+          <div className="border-border bg-card h-80 animate-pulse rounded-2xl border" />
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="border-border bg-card h-24 animate-pulse rounded-2xl border" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const summaryCards = [
+    {
+      label: t(locale, 'totalIncome'),
+      value: formatCurrency(totalIncome),
+      icon: TrendingUp,
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    },
+    {
+      label: t(locale, 'totalExpense'),
+      value: formatCurrency(totalExpense),
+      icon: TrendingDown,
+      color: 'text-red-600 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-950/30',
+    },
+    {
+      label: t(locale, 'netBalance'),
+      value: formatCurrency(totalBalance),
+      icon: Wallet,
+      color: totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400',
+      bg: totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
+    },
+    {
+      label: t(locale, 'avgSavingsRate'),
+      value: `${avgSavingsRate}%`,
+      icon: PiggyBank,
+      color: avgSavingsRate >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
+      bg: avgSavingsRate >= 20 ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30',
+    },
+  ];
+
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <motion.div {...fadeInUp}>
+        <PageHeader
+          title={t(locale, 'reports')}
+          description={t(locale, 'financialTrends')}
+        >
+          <div className="border-border flex rounded-lg border">
+            {[6, 12].map((n) => (
+              <button
+                key={n}
+                onClick={() => setMonthCount(n)}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
+                  monthCount === n
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {n === 6 ? t(locale, 'last6Months') : t(locale, 'last12Months')}
+              </button>
+            ))}
+          </div>
+        </PageHeader>
+      </motion.div>
+
+      <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6">
+        {/* Summary Cards */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+        >
+          {summaryCards.map((card) => (
+            <motion.div
+              key={card.label}
+              variants={staggerItem}
+              className="border-border bg-card rounded-2xl border p-4"
+            >
+              <div className="flex items-center gap-2">
+                <div className={`rounded-lg p-1.5 ${card.bg}`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
+                </div>
+              </div>
+              <p className="text-muted-foreground mt-2 text-[11px]">{card.label}</p>
+              <p className="font-mono text-sm font-semibold">{card.value}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Income vs Expense Trend */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="border-border bg-card rounded-2xl border p-6"
+        >
+          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'incomeVsExpense')}</h3>
+          <TrendChart data={trends} />
+        </motion.div>
+
+        {/* Monthly Breakdown Table */}
+        {trends.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="border-border bg-card rounded-2xl border p-6"
+          >
+            <h3 className="mb-4 text-sm font-semibold">{t(locale, 'monthlyBreakdown')}</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-muted-foreground border-border border-b">
+                    <th className="py-2 text-left font-medium">{t(locale, 'month')}</th>
+                    <th className="py-2 text-right font-medium">{t(locale, 'income')}</th>
+                    <th className="py-2 text-right font-medium">{t(locale, 'expense')}</th>
+                    <th className="py-2 text-right font-medium">{t(locale, 'netBalance')}</th>
+                    <th className="py-2 text-right font-medium">{t(locale, 'avgSavingsRate')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trends.map((row) => (
+                    <tr key={row.monthKey} className="border-border border-b last:border-0">
+                      <td className="py-2 font-medium">{row.monthKey}</td>
+                      <td className="py-2 text-right font-mono text-emerald-600 dark:text-emerald-400">
+                        {formatCurrency(row.income)}
+                      </td>
+                      <td className="py-2 text-right font-mono text-red-600 dark:text-red-400">
+                        {formatCurrency(row.expense)}
+                      </td>
+                      <td className={`py-2 text-right font-mono ${row.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {formatCurrency(row.balance)}
+                      </td>
+                      <td className="py-2 text-right font-mono">
+                        {row.savingsRate}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}

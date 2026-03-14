@@ -19,6 +19,7 @@ import {
   PiggyBank,
   Target,
   Repeat,
+  BarChart3,
   Languages,
 } from 'lucide-react';
 
@@ -29,6 +30,7 @@ type NavKey =
   | 'bills'
   | 'recurringTransactions'
   | 'savingsPage'
+  | 'reports'
   | 'upload'
   | 'export'
   | 'settings'
@@ -41,6 +43,7 @@ const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = 
   { href: '/budget', key: 'budgetPage', icon: Target },
   { href: '/bills', key: 'bills', icon: CalendarCheck },
   { href: '/savings', key: 'savingsPage', icon: PiggyBank },
+  { href: '/reports', key: 'reports', icon: BarChart3 },
   { href: '/upload', key: 'upload', icon: Upload },
   { href: '/export', key: 'export', icon: Download },
 ];

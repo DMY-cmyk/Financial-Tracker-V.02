@@ -296,6 +296,16 @@ type TranslationKeys = {
   noRecurring: string;
   indefinite: string;
 
+  // Reports
+  reports: string;
+  financialTrends: string;
+  incomeVsExpense: string;
+  monthlyBreakdown: string;
+  last6Months: string;
+  last12Months: string;
+  avgSavingsRate: string;
+  month: string;
+
   // Language switcher
   switchLanguage: string;
 
@@ -572,6 +582,14 @@ const translations: Record<Locale, TranslationKeys> = {
     generated: 'Generated',
     noRecurring: 'No recurring transactions yet',
     indefinite: 'Indefinite',
+    reports: 'Reports',
+    financialTrends: 'Financial trends across months',
+    incomeVsExpense: 'Income vs Expense',
+    monthlyBreakdown: 'Monthly Breakdown',
+    last6Months: '6 months',
+    last12Months: '12 months',
+    avgSavingsRate: 'Savings Rate',
+    month: 'Month',
     switchLanguage: 'Switch Language',
     uploadHistory: 'Upload History',
     noUploadHistory: 'No uploads yet',
@@ -839,6 +857,14 @@ const translations: Record<Locale, TranslationKeys> = {
     generated: 'Dibuat',
     noRecurring: 'Belum ada transaksi berulang',
     indefinite: 'Tidak terbatas',
+    reports: 'Laporan',
+    financialTrends: 'Tren keuangan lintas bulan',
+    incomeVsExpense: 'Pemasukan vs Pengeluaran',
+    monthlyBreakdown: 'Rincian Bulanan',
+    last6Months: '6 bulan',
+    last12Months: '12 bulan',
+    avgSavingsRate: 'Rasio Tabungan',
+    month: 'Bulan',
     switchLanguage: 'Ganti Bahasa',
     uploadHistory: 'Riwayat Unggahan',
     noUploadHistory: 'Belum ada unggahan',
