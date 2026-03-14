@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import {
@@ -56,11 +56,6 @@ export function BottomNav() {
   const locale = useLocale();
   const [moreOpen, setMoreOpen] = useState(false);
 
-  // Auto-close on route change
-  useEffect(() => {
-    setMoreOpen(false);
-  }, [pathname]);
-
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   const isMoreActive = moreItems.some((item) => isActive(item.href));
@@ -109,6 +104,7 @@ export function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                onClick={() => setMoreOpen(false)}
                 className={cn(
                   'flex flex-col items-center gap-2 rounded-xl p-3 text-xs transition-colors',
                   isActive(href)
