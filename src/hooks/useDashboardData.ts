@@ -67,11 +67,27 @@ export function useDashboardData() {
         const spent = summary.categoryTotals[c.id] || 0;
         const remaining = c.budget - spent;
         const percentage = c.budget > 0 ? Math.min((spent / c.budget) * 100, 100) : 0;
-        return { category: c.name, budget: c.budget, spent, remaining, color: c.color, percentage };
+        return { id: c.id, category: c.name, budget: c.budget, spent, remaining, color: c.color, percentage };
       });
   }, [summary, categories]);
 
   const isLoading = !initialized || isApiLoading;
+
+  const updateBudget = useCallback(
+    async (categoryId: string, budget: number) => {
+      setCategories((prev) => prev.map((c) => (c.id === categoryId ? { ...c, budget } : c)));
+      const result = await api.categories.update(categoryId, { budget });
+      if (result.error) {
+        // Revert — re-fetch categories
+        api.categories.list().then((r) => {
+          if (r.data) setCategories(r.data.categories);
+        });
+        return false;
+      }
+      return true;
+    },
+    []
+  );
 
   return {
     month,
@@ -90,6 +106,7 @@ export function useDashboardData() {
     savingsGoals,
     categories,
     onToggleBill,
+    updateBudget,
     isLoading,
     isEmpty: !isLoading && summary?.transactionCount === 0,
   };

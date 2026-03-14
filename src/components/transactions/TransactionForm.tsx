@@ -117,7 +117,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     };
 
     try {
-      if (transaction) {
+      if (transaction?.id) {
         const result = await api.transactions.update(transaction.id, data);
         if (result.error) throw new Error(result.error.message);
         toast.success(t(locale, 'transactionUpdated'));

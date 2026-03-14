@@ -69,6 +69,7 @@ export default function DashboardPage() {
     categories,
     isLoading,
     isEmpty,
+    updateBudget,
   } = useDashboardData();
 
   if (isLoading) {
@@ -189,7 +190,7 @@ export default function DashboardPage() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BudgetProgress budgets={budgetStatus} />
+              <BudgetProgress budgets={budgetStatus} onUpdateBudget={updateBudget} />
             </motion.div>
             <motion.div variants={staggerItem}>
               <RecentTransactions transactions={recentTransactions} categories={categories} />

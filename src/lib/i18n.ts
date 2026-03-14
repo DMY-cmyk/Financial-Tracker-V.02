@@ -188,7 +188,11 @@ type TranslationKeys = {
   and: string;
   more: string;
   delete: string;
+  duplicate: string;
   edit: string;
+  editBudget: string;
+  exportFiltered: string;
+  dueSoon: string;
   add: string;
   name: string;
   transactionType: string;
@@ -437,7 +441,11 @@ const translations: Record<Locale, TranslationKeys> = {
     and: 'and',
     more: 'more',
     delete: 'Delete',
+    duplicate: 'Duplicate',
     edit: 'Edit',
+    editBudget: 'Edit Budget',
+    exportFiltered: 'Export',
+    dueSoon: 'Due soon',
     add: 'Add',
     name: 'Name',
     transactionType: 'Transaction type',
@@ -676,7 +684,11 @@ const translations: Record<Locale, TranslationKeys> = {
     and: 'dan',
     more: 'lainnya',
     delete: 'Hapus',
+    duplicate: 'Duplikat',
     edit: 'Edit',
+    editBudget: 'Edit Anggaran',
+    exportFiltered: 'Ekspor',
+    dueSoon: 'Segera jatuh tempo',
     add: 'Tambah',
     name: 'Nama',
     transactionType: 'Tipe transaksi',

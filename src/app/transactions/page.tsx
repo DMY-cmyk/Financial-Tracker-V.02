@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
@@ -14,12 +16,21 @@ import { EmptyState, NoResults } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ListSkeleton } from '@/components/shared/Skeletons';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Receipt } from 'lucide-react';
+import { Plus, Receipt, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { exportCSV, exportExcel } from '@/lib/export-utils';
 
 export default function TransactionsPage() {
   const locale = useLocale();
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
   const {
     transactions,
     income,
@@ -43,6 +54,7 @@ export default function TransactionsPage() {
     editingTx,
     openAdd,
     openEdit,
+    openDuplicate,
     closeForm,
     deleteTransaction,
     isLoading,
@@ -81,11 +93,42 @@ export default function TransactionsPage() {
           title={t(locale, 'transactions')}
           description={`${total} ${t(locale, 'transactionCount')}`}
         >
-          <Button onClick={openAdd} className="gap-2 shadow-sm">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">{t(locale, 'addTransaction')}</span>
-            <span className="sm:hidden">{t(locale, 'add')}</span>
-          </Button>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium whitespace-nowrap shadow-sm transition-colors disabled:pointer-events-none disabled:opacity-50',
+                  transactions.length === 0 && 'pointer-events-none opacity-50'
+                )}
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">{t(locale, 'exportFiltered')}</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    exportCSV(transactions, `transactions-${year}-${String(month + 1).padStart(2, '0')}`);
+                    toast.success(t(locale, 'exportSuccess'));
+                  }}
+                >
+                  CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await exportExcel(transactions, `transactions-${year}-${String(month + 1).padStart(2, '0')}`, t(locale, 'transactions'), false);
+                    toast.success(t(locale, 'exportSuccess'));
+                  }}
+                >
+                  Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button onClick={openAdd} className="gap-2 shadow-sm">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">{t(locale, 'addTransaction')}</span>
+              <span className="sm:hidden">{t(locale, 'add')}</span>
+            </Button>
+          </div>
         </PageHeader>
       </motion.div>
 
@@ -135,6 +178,7 @@ export default function TransactionsPage() {
               transactions={transactions}
               onEdit={openEdit}
               onDelete={handleDelete}
+              onDuplicate={openDuplicate}
               page={page}
               totalPages={totalPages}
               onPageChange={setPage}

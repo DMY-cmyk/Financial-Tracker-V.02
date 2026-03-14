@@ -5,7 +5,7 @@ import { formatCurrency, formatDate } from '@/lib/formatters';
 import { CategoryChip } from './CategoryChip';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Pencil, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +13,7 @@ interface TransactionTableProps {
   transactions: Transaction[];
   onEdit: (tx: Transaction) => void;
   onDelete: (id: string) => void;
+  onDuplicate?: (tx: Transaction) => void;
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
@@ -28,6 +29,7 @@ export function TransactionTable({
   transactions,
   onEdit,
   onDelete,
+  onDuplicate,
   page = 1,
   totalPages = 1,
   onPageChange,
@@ -99,6 +101,17 @@ export function TransactionTable({
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
+                    {onDuplicate && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => onDuplicate(tx)}
+                        aria-label={t(locale, 'duplicate')}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"

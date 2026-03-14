@@ -1,11 +1,15 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { t, useLocale } from '@/lib/i18n';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BudgetItem {
+  id: string;
   category: string;
   budget: number;
   spent: number;
@@ -16,10 +20,39 @@ interface BudgetItem {
 
 interface BudgetProgressProps {
   budgets: BudgetItem[];
+  onUpdateBudget?: (categoryId: string, budget: number) => Promise<boolean>;
 }
 
-export function BudgetProgress({ budgets }: BudgetProgressProps) {
+export function BudgetProgress({ budgets, onUpdateBudget }: BudgetProgressProps) {
   const locale = useLocale();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingId && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingId]);
+
+  const startEdit = (b: BudgetItem) => {
+    if (!onUpdateBudget) return;
+    setEditingId(b.id);
+    setEditValue(formatCurrencyInput(b.budget));
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !onUpdateBudget) return;
+    const amount = parseCurrencyInput(editValue);
+    if (amount > 0) {
+      const ok = await onUpdateBudget(editingId, amount);
+      if (ok) toast.success(t(locale, 'budgetUpdated'));
+    }
+    setEditingId(null);
+  };
+
+  const cancelEdit = () => setEditingId(null);
 
   return (
     <motion.div
@@ -39,9 +72,10 @@ export function BudgetProgress({ budgets }: BudgetProgressProps) {
           {budgets.map((b) => {
             const isOver = b.percentage >= 100;
             const isWarning = b.percentage >= 80 && !isOver;
+            const isEditing = editingId === b.id;
 
             return (
-              <div key={b.category}>
+              <div key={b.id}>
                 <div className="mb-1.5 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <div
@@ -50,9 +84,37 @@ export function BudgetProgress({ budgets }: BudgetProgressProps) {
                     />
                     <span className="font-medium">{b.category}</span>
                   </div>
-                  <span className="text-muted-foreground font-mono">
-                    {formatCurrency(b.spent)} / {formatCurrency(b.budget)}
-                  </span>
+                  {isEditing ? (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      className="border-border bg-background w-28 rounded border px-1.5 py-0.5 text-right font-mono text-xs"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveEdit();
+                        if (e.key === 'Escape') cancelEdit();
+                      }}
+                      onBlur={saveEdit}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEdit(b)}
+                      className={cn(
+                        'text-muted-foreground font-mono',
+                        onUpdateBudget &&
+                          'hover:text-foreground group/budget inline-flex cursor-pointer items-center gap-1 rounded px-1 transition-colors hover:bg-muted'
+                      )}
+                      disabled={!onUpdateBudget}
+                      title={onUpdateBudget ? t(locale, 'editBudget') : undefined}
+                    >
+                      {formatCurrency(b.spent)} / {formatCurrency(b.budget)}
+                      {onUpdateBudget && (
+                        <Pencil className="h-2.5 w-2.5 opacity-0 transition-opacity group-hover/budget:opacity-100" />
+                      )}
+                    </button>
+                  )}
                 </div>
                 <div className="bg-muted h-2 overflow-hidden rounded-full">
                   <div

@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Pencil, Trash2, CalendarCheck } from 'lucide-react';
+import { Plus, Pencil, Trash2, CalendarCheck, AlertCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Bill } from '@/lib/types';
 
@@ -154,6 +154,21 @@ export default function BillsPage() {
   const totalAmount = bills.reduce((sum, b) => sum + b.amount, 0);
   const paidAmount = bills.filter((b) => b.isPaid).reduce((sum, b) => sum + b.amount, 0);
 
+  const now = new Date();
+  const currentDay = now.getDate();
+  const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
+  const isPastMonth =
+    year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth());
+
+  const getBillStatus = (bill: Bill): 'overdue' | 'dueSoon' | null => {
+    if (bill.isPaid) return null;
+    if (isPastMonth) return 'overdue';
+    if (!isCurrentMonth) return null;
+    if (currentDay > bill.dueDate) return 'overdue';
+    if (bill.dueDate - currentDay <= 3 && bill.dueDate - currentDay > 0) return 'dueSoon';
+    return null;
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -208,11 +223,17 @@ export default function BillsPage() {
               animate="show"
               className="space-y-2.5"
             >
-              {bills.map((bill) => (
+              {bills.map((bill) => {
+                const status = getBillStatus(bill);
+                return (
                 <motion.div
                   key={bill.id}
                   variants={staggerItem}
-                  className="border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors"
+                  className={cn(
+                    'border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors',
+                    status === 'overdue' && 'border-red-400 dark:border-red-500/60',
+                    status === 'dueSoon' && 'border-amber-400 dark:border-amber-500/60'
+                  )}
                 >
                   <Checkbox
                     checked={bill.isPaid}
@@ -220,14 +241,28 @@ export default function BillsPage() {
                     aria-label={bill.isPaid ? t(locale, 'paid') : t(locale, 'unpaid')}
                   />
                   <div className="min-w-0 flex-1">
-                    <p
-                      className={cn(
-                        'truncate text-sm font-medium',
-                        bill.isPaid && 'text-muted-foreground line-through'
+                    <div className="flex items-center gap-2">
+                      <p
+                        className={cn(
+                          'truncate text-sm font-medium',
+                          bill.isPaid && 'text-muted-foreground line-through'
+                        )}
+                      >
+                        {bill.name}
+                      </p>
+                      {status === 'overdue' && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                          <AlertCircle className="h-3 w-3" />
+                          {t(locale, 'overdue')}
+                        </span>
                       )}
-                    >
-                      {bill.name}
-                    </p>
+                      {status === 'dueSoon' && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                          <Clock className="h-3 w-3" />
+                          {t(locale, 'dueSoon')}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-muted-foreground text-xs">
                       {t(locale, 'dueDate')}: {bill.dueDate}
                     </p>
@@ -261,7 +296,8 @@ export default function BillsPage() {
                     </Button>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>

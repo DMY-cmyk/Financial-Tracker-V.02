@@ -39,6 +39,7 @@ interface UseTransactionsReturn {
   editingTx: Transaction | undefined;
   openAdd: () => void;
   openEdit: (tx: Transaction) => void;
+  openDuplicate: (tx: Transaction) => void;
   closeForm: () => void;
 
   // Actions
@@ -140,6 +141,19 @@ export function useTransactions(): UseTransactionsReturn {
     setFormOpen(true);
   }, []);
 
+  const openDuplicate = useCallback(
+    (tx: Transaction) => {
+      const today = `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+      setEditingTx({
+        ...tx,
+        id: '', // empty ID triggers create mode in the form
+        date: today,
+      });
+      setFormOpen(true);
+    },
+    [month, year]
+  );
+
   const closeForm = useCallback(() => {
     setFormOpen(false);
     setEditingTx(undefined);
@@ -178,6 +192,7 @@ export function useTransactions(): UseTransactionsReturn {
     editingTx,
     openAdd,
     openEdit,
+    openDuplicate,
     closeForm,
     deleteTransaction,
     isLoading,
