@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export default function TransactionsPage() {
   const queryClient = useQueryClient();
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const {
     transactions,
     income,
@@ -66,6 +68,11 @@ export default function TransactionsPage() {
     isEmpty,
     hasNoResults,
   } = useTransactions();
+
+  useKeyboardShortcuts({
+    onNewTransaction: openAdd,
+    onFocusSearch: () => searchInputRef.current?.focus(),
+  });
 
   // Delete confirmation
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -164,19 +171,20 @@ export default function TransactionsPage() {
       </motion.div>
 
       <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
-        <TransactionFilters
-          search={search}
-          onSearchChange={setSearch}
-          typeFilter={typeFilter}
-          onTypeChange={setTypeFilter}
-          categoryFilter={categoryFilter}
-          onCategoryChange={setCategoryFilter}
-          paymentMethodFilter={paymentMethodFilter}
-          onPaymentMethodChange={setPaymentMethodFilter}
-          paymentMethods={paymentMethods}
-          allMonths={allMonths}
-          onAllMonthsChange={setAllMonths}
-        />
+         <TransactionFilters
+           search={search}
+           onSearchChange={setSearch}
+           typeFilter={typeFilter}
+           onTypeChange={setTypeFilter}
+           categoryFilter={categoryFilter}
+           onCategoryChange={setCategoryFilter}
+           paymentMethodFilter={paymentMethodFilter}
+           onPaymentMethodChange={setPaymentMethodFilter}
+           paymentMethods={paymentMethods}
+           allMonths={allMonths}
+           onAllMonthsChange={setAllMonths}
+           searchInputRef={searchInputRef}
+         />
       </motion.div>
 
       <AnimatePresence mode="wait">

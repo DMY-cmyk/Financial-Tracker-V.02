@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type RefObject } from 'react';
 import { api } from '@/lib/api/client';
 import { Input } from '@/components/ui/input';
 import { t, useLocale } from '@/lib/i18n';
@@ -19,6 +19,7 @@ interface TransactionFiltersProps {
   paymentMethods?: PaymentMethod[];
   allMonths?: boolean;
   onAllMonthsChange?: (v: boolean) => void;
+  searchInputRef?: RefObject<HTMLInputElement | null>;
 }
 
 export function TransactionFilters({
@@ -33,6 +34,7 @@ export function TransactionFilters({
   paymentMethods = [],
   allMonths = false,
   onAllMonthsChange,
+  searchInputRef,
 }: TransactionFiltersProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const locale = useLocale();
@@ -48,6 +50,7 @@ export function TransactionFilters({
       <div className="relative min-w-[200px] flex-1">
         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
+          ref={searchInputRef}
           placeholder={`${t(locale, 'search')}...`}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}

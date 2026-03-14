@@ -1,8 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { MONTH_NAMES } from '@/lib/constants';
@@ -52,6 +54,10 @@ const PaymentMethodsSummary = dynamic(
 
 export default function DashboardPage() {
   const locale = useLocale();
+  const router = useRouter();
+  useKeyboardShortcuts({
+    onNewTransaction: () => router.push('/transactions/new'),
+  });
   const {
     month,
     year,
