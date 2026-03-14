@@ -25,10 +25,13 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Plus, Receipt, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api/client';
 import { exportCSV, exportExcel } from '@/lib/export-utils';
 
 export default function TransactionsPage() {
   const locale = useLocale();
+  const queryClient = useQueryClient();
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const {
@@ -73,8 +76,30 @@ export default function TransactionsPage() {
 
   const confirmDelete = () => {
     if (deleteId) {
+      const deletedTx = transactions.find((tx) => tx.id === deleteId);
       deleteTransaction(deleteId);
-      toast.success(t(locale, 'transactionDeleted'));
+      toast.success(t(locale, 'transactionDeleted'), {
+        action: deletedTx
+          ? {
+              label: t(locale, 'undo'),
+              onClick: async () => {
+                await api.transactions.create({
+                  description: deletedTx.description,
+                  amount: deletedTx.amount,
+                  type: deletedTx.type,
+                  category: deletedTx.category,
+                  categoryId: deletedTx.categoryId,
+                  paymentMethod: deletedTx.paymentMethod,
+                  date: deletedTx.date,
+                  notes: deletedTx.notes,
+                });
+                queryClient.invalidateQueries({ queryKey: ['transactions'] });
+                queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+                toast.success(t(locale, 'itemRestored'));
+              },
+            }
+          : undefined,
+      });
       setDeleteId(null);
     }
   };

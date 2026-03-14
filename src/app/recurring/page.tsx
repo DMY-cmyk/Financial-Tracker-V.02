@@ -7,6 +7,8 @@ import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { useRecurringTransactions } from '@/hooks/useRecurringTransactions';
+import { api } from '@/lib/api/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RecurringTransactionForm } from '@/components/transactions/RecurringTransactionForm';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -25,6 +27,7 @@ const FREQUENCY_COLORS: Record<string, string> = {
 
 export default function RecurringTransactionsPage() {
   const locale = useLocale();
+  const queryClient = useQueryClient();
   const {
     recurringTransactions,
     isLoading,
@@ -44,8 +47,33 @@ export default function RecurringTransactionsPage() {
 
   const confirmDelete = async () => {
     if (!deleteId) return;
+    const deletedRT = recurringTransactions.find((rt) => rt.id === deleteId);
     await deleteRecurring(deleteId);
-    toast.success(t(locale, 'recurringDeleted'));
+    toast.success(t(locale, 'recurringDeleted'), {
+      action: deletedRT
+        ? {
+            label: t(locale, 'undo'),
+            onClick: async () => {
+              await api.recurringTransactions.create({
+                description: deletedRT.description,
+                category: deletedRT.category,
+                categoryId: deletedRT.categoryId,
+                type: deletedRT.type,
+                amount: deletedRT.amount,
+                paymentMethod: deletedRT.paymentMethod,
+                notes: deletedRT.notes,
+                frequency: deletedRT.frequency,
+                startDate: deletedRT.startDate,
+                endDate: deletedRT.endDate,
+                nextDueDate: deletedRT.nextDueDate,
+                isActive: deletedRT.isActive,
+              });
+              queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
+              toast.success(t(locale, 'itemRestored'));
+            },
+          }
+        : undefined,
+    });
     setDeleteId(null);
   };
 

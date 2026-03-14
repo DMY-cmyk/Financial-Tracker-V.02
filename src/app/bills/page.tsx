@@ -147,10 +147,30 @@ export default function BillsPage() {
 
   const confirmDelete = async () => {
     if (!deleteId) return;
+    const deletedBill = bills.find((b) => b.id === deleteId);
     const result = await api.bills.delete(deleteId);
     if (result.data) {
       setBills((prev) => prev.filter((b) => b.id !== deleteId));
-      toast.success(t(locale, 'billDeleted'));
+      toast.success(t(locale, 'billDeleted'), {
+        action: deletedBill
+          ? {
+              label: t(locale, 'undo'),
+              onClick: async () => {
+                await api.bills.create({
+                  name: deletedBill.name,
+                  amount: deletedBill.amount,
+                  dueDate: deletedBill.dueDate,
+                  isPaid: deletedBill.isPaid,
+                  month: deletedBill.month,
+                  year: deletedBill.year,
+                  isRecurring: deletedBill.isRecurring,
+                });
+                setFetchKey((k) => k + 1);
+                toast.success(t(locale, 'itemRestored'));
+              },
+            }
+          : undefined,
+      });
     }
     setDeleteId(null);
   };

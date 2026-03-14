@@ -139,6 +139,8 @@ type TranslationKeys = {
   // Toasts
   transactionSaved: string;
   transactionDeleted: string;
+  undo: string;
+  itemRestored: string;
   exportSuccess: string;
   dataClearedToast: string;
 
@@ -433,6 +435,8 @@ const translations: Record<Locale, TranslationKeys> = {
 
     transactionSaved: 'Transaction saved',
     transactionDeleted: 'Transaction deleted',
+    undo: 'Undo',
+    itemRestored: 'Item restored',
     exportSuccess: 'Export successful',
     dataClearedToast: 'All data cleared',
 
@@ -711,6 +715,8 @@ const translations: Record<Locale, TranslationKeys> = {
 
     transactionSaved: 'Transaksi disimpan',
     transactionDeleted: 'Transaksi dihapus',
+    undo: 'Batalkan',
+    itemRestored: 'Item dipulihkan',
     exportSuccess: 'Ekspor berhasil',
     dataClearedToast: 'Semua data dihapus',
 
