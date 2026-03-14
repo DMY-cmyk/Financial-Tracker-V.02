@@ -41,12 +41,22 @@ export async function registerUser(
   const id = crypto.randomUUID();
   const passwordHash = await bcrypt.hash(password, 12);
 
-  await db.query('INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)', [
-    id,
-    email.toLowerCase(),
-    name,
-    passwordHash,
-  ]);
+  try {
+    await db.query('INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)', [
+      id,
+      email.toLowerCase(),
+      name,
+      passwordHash,
+    ]);
+  } catch (err: unknown) {
+    // Handle unique constraint violation (Postgres: 23505, SQLite: UNIQUE constraint)
+    const message = err instanceof Error ? err.message : String(err);
+    const code = (err as { code?: string }).code;
+    if (code === '23505' || message.includes('UNIQUE constraint')) {
+      return { error: 'Email already registered' };
+    }
+    throw err;
+  }
 
   const user: AuthUser = {
     id,

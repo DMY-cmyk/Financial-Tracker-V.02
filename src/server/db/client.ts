@@ -21,7 +21,10 @@ let clientPromise: Promise<DbClient> | null = null;
 
 export async function getDb(): Promise<DbClient> {
   if (!clientPromise) {
-    clientPromise = initClient();
+    clientPromise = initClient().catch((err) => {
+      clientPromise = null;
+      throw err;
+    });
   }
   return clientPromise;
 }

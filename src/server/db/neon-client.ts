@@ -1,9 +1,10 @@
 /**
  * Neon serverless Postgres adapter.
- * Uses Pool-based API for parameterised queries with $1, $2, ... syntax.
+ * Uses the HTTP-based neon() function (recommended for serverless).
+ * Parameterised queries use $1, $2, ... syntax via .query() method.
  */
 
-import { Pool } from '@neondatabase/serverless';
+import { neon } from '@neondatabase/serverless';
 import type { DbClient, QueryResult } from './client';
 
 function convertPlaceholders(sql: string): string {
@@ -12,7 +13,7 @@ function convertPlaceholders(sql: string): string {
 }
 
 export function createNeonClient(connectionString: string): DbClient {
-  const pool = new Pool({ connectionString });
+  const sql = neon(connectionString, { fullResults: true });
 
   return {
     async query<T = Record<string, unknown>>(
@@ -20,12 +21,12 @@ export function createNeonClient(connectionString: string): DbClient {
       params: unknown[] = []
     ): Promise<QueryResult<T>> {
       const pgSql = convertPlaceholders(rawSql);
-      const result = await pool.query(pgSql, params);
+      const result = await sql.query(pgSql, params);
       return { rows: result.rows as T[], rowCount: result.rowCount ?? 0 };
     },
 
     async exec(rawSql: string): Promise<void> {
-      await pool.query(rawSql);
+      await sql.query(rawSql);
     },
   };
 }
