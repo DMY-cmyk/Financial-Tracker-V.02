@@ -87,8 +87,8 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] Dashboard page with sectioned layout (summary cards, charts, budget, activity, quick actions)
 - [x] 4 SummaryCard metrics (balance, income, expense, savings rate) with icon backgrounds
 - [x] Quick Actions section (add transaction, upload receipt, export data)
-- [ ] Decorative background blur circles on hero card
-- [ ] Chart clip-path wipe entrance animation
+- [x] Decorative background blur circles on hero card
+- [x] Chart clip-path wipe entrance animation
 
 ### Phase 3: Transaction Management
 
@@ -106,9 +106,9 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] Form validation with inline field errors and bilingual messages
 - [x] FAB button on mobile for quick add
 - [x] Framer Motion entrance animations on page sections
-- [ ] Payment method filter in filter bar
-- [ ] Description autocomplete from previous entries
-- [ ] AnimatePresence for row add/remove transitions
+- [x] Payment method filter in filter bar
+- [x] Description autocomplete from previous entries
+- [x] AnimatePresence for row add/remove transitions
 
 ### Phase 4: Upload & Extraction (OCR)
 
@@ -129,8 +129,8 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] Status-driven UI flow (idle -> processing -> extracted -> saved)
 - [x] Error/empty states with contextual messaging
 - [x] Category auto-suggestion from merchant text matching
-- [ ] Upload history list
-- [ ] Progress percentage display during OCR
+- [x] Upload history list
+- [x] Progress percentage display during OCR
 
 ### Phase 5: Export System
 
@@ -153,7 +153,7 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] All 4 formats working (CSV, JSON, Excel, PDF)
 - [x] Toast feedback for export success/failure
 - [x] Framer Motion entrance animations on export sections
-- [ ] Custom date range picker (start/end)
+- [x] Custom date range picker (start/end)
 
 ### Phase 6: Categories & Settings
 
@@ -172,9 +172,9 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] Data management section (export link, import, clear)
 - [x] Import data dialog (JSON/CSV file upload with validation and preview)
 - [x] Expanded i18n coverage (~110+ translation keys covering all pages)
-- [ ] Category icon selection
-- [ ] Drag-to-reorder categories
-- [ ] Quick language switcher in sidebar
+- [x] Category icon selection
+- [x] Drag-to-reorder categories
+- [x] Quick language switcher in sidebar
 
 ### Cross-cutting: Motion & Localization Foundations (Batch 2)
 

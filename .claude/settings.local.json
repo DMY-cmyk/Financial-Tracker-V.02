@@ -16,7 +16,8 @@
       "Bash(npx eslint:*)",
       "Bash(npx vitest:*)",
       "Bash(mkdir:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(cat:*)"
     ]
   }
 }

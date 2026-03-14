@@ -15,6 +15,7 @@ async function seedJanuary() {
     date: '2025-01-05',
     description: 'Salary',
     category: 'Salary',
+    categoryId: 'cat-salary',
     type: 'income',
     amount: 8500000,
     paymentMethod: 'Bank BCA',
@@ -24,6 +25,7 @@ async function seedJanuary() {
     date: '2025-01-10',
     description: 'Freelance Project',
     category: 'Freelance',
+    categoryId: 'cat-freelance',
     type: 'income',
     amount: 2000000,
     paymentMethod: 'Bank BCA',
@@ -33,6 +35,7 @@ async function seedJanuary() {
     date: '2025-01-12',
     description: 'Groceries',
     category: 'Food',
+    categoryId: 'cat-food',
     type: 'expense',
     amount: 500000,
     paymentMethod: 'Cash',
@@ -42,6 +45,7 @@ async function seedJanuary() {
     date: '2025-01-15',
     description: 'Electric Bill',
     category: 'Utilities',
+    categoryId: 'cat-utilities',
     type: 'expense',
     amount: 800000,
     paymentMethod: 'Bank BCA',
@@ -51,6 +55,7 @@ async function seedJanuary() {
     date: '2025-01-20',
     description: 'Movie Tickets',
     category: 'Entertainment',
+    categoryId: 'cat-entertainment',
     type: 'expense',
     amount: 200000,
     paymentMethod: 'GoPay',
@@ -79,9 +84,9 @@ describe('getDashboardSummary', () => {
     const result = await getDashboardSummary({ month: 0, year: 2025 });
     const data = result.data!;
 
-    expect(data.categoryTotals['Food']).toBe(500000);
-    expect(data.categoryTotals['Utilities']).toBe(800000);
-    expect(data.categoryTotals['Entertainment']).toBe(200000);
+    expect(data.categoryTotals['cat-food']).toBe(500000);
+    expect(data.categoryTotals['cat-utilities']).toBe(800000);
+    expect(data.categoryTotals['cat-entertainment']).toBe(200000);
   });
 
   it('returns payment method totals', async () => {

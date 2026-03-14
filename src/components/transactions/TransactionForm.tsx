@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/store';
 import { Transaction, Category, PaymentMethod } from '@/lib/types';
 import { parseCurrencyInput, formatCurrencyInput } from '@/lib/formatters';
@@ -41,7 +41,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   const [amountStr, setAmountStr] = useState(
     transaction ? formatCurrencyInput(transaction.amount) : ''
   );
-  const [category, setCategory] = useState(transaction?.category || '');
+  const [category, setCategory] = useState(transaction?.categoryId || '');
   const [paymentMethod, setPaymentMethod] = useState(transaction?.paymentMethod || '');
   const [date, setDate] = useState(
     transaction?.date || `${year}-${String(month + 1).padStart(2, '0')}-01`
@@ -49,6 +49,40 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   const [notes, setNotes] = useState(transaction?.notes || '');
   const [errors, setErrors] = useState<FieldError[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  const [pastDescriptions, setPastDescriptions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const descriptionRef = useRef<HTMLInputElement>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    api.transactions.list().then((r) => {
+      if (r.data) {
+        const unique = Array.from(
+          new Set(r.data.transactions.map((tx) => tx.description).filter(Boolean))
+        ).sort((a, b) => a.localeCompare(b));
+        setPastDescriptions(unique);
+      }
+    });
+  }, []);
+
+  const descriptionSuggestions =
+    description.trim().length > 0 && showSuggestions
+      ? pastDescriptions
+          .filter((d) => d.toLowerCase().includes(description.toLowerCase()))
+          .slice(0, 5)
+      : [];
+
+  const handleSelectSuggestion = useCallback(
+    (value: string) => {
+      setDescription(value);
+      setShowSuggestions(false);
+      if (fieldError('description'))
+        setErrors((prev) => prev.filter((e) => e.field !== 'description'));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [errors]
+  );
 
   const filteredCategories = categories.filter((c) => c.type === type);
 
@@ -69,7 +103,18 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     setErrors([]);
 
     const amount = parseCurrencyInput(amountStr);
-    const data = { date, description, category, type, amount, paymentMethod, notes };
+    const selectedCategory = categories.find((c) => c.id === category);
+    const categoryName = selectedCategory?.name || '';
+    const data = {
+      date,
+      description,
+      category: categoryName,
+      categoryId: category,
+      type,
+      amount,
+      paymentMethod,
+      notes,
+    };
 
     try {
       if (transaction) {
@@ -189,7 +234,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           >
             <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
             {filteredCategories.map((c) => (
-              <option key={c.id} value={c.name}>
+              <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
@@ -203,17 +248,46 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       {/* Description */}
       <div>
         <Label htmlFor="description">{t(locale, 'description')}</Label>
-        <Input
-          id="description"
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-            if (fieldError('description'))
-              setErrors(errors.filter((e) => e.field !== 'description'));
-          }}
-          className={cn('mt-1', fieldError('description') && 'border-red-500')}
-          aria-invalid={!!fieldError('description')}
-        />
+        <div className="relative">
+          <Input
+            id="description"
+            ref={descriptionRef}
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setShowSuggestions(true);
+              if (fieldError('description'))
+                setErrors(errors.filter((e) => e.field !== 'description'));
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => {
+              blurTimeoutRef.current = setTimeout(() => setShowSuggestions(false), 150);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setShowSuggestions(false);
+            }}
+            className={cn('mt-1', fieldError('description') && 'border-red-500')}
+            aria-invalid={!!fieldError('description')}
+            autoComplete="off"
+          />
+          {descriptionSuggestions.length > 0 && (
+            <div className="border-border bg-card absolute z-10 mt-1 w-full rounded-lg border shadow-lg">
+              {descriptionSuggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className="hover:bg-muted w-full px-3 py-2 text-left text-sm transition-colors"
+                  onMouseDown={() => {
+                    if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
+                  }}
+                  onClick={() => handleSelectSuggestion(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         {fieldError('description') && (
           <p className="mt-1 text-xs text-red-500">{fieldError('description')}</p>
         )}

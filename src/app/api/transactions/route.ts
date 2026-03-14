@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type');
   if (type) query.type = type;
 
-  const category = searchParams.get('category');
-  if (category) query.category = category;
+  const categoryId = searchParams.get('categoryId');
+  if (categoryId) query.categoryId = categoryId;
 
   const search = searchParams.get('search');
   if (search) query.search = search;

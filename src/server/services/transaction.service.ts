@@ -30,8 +30,8 @@ function applyFilters(transactions: Transaction[], query: ListTransactionsQuery)
   if (query.type) {
     filtered = filtered.filter((t) => t.type === query.type);
   }
-  if (query.category) {
-    filtered = filtered.filter((t) => t.category === query.category);
+  if (query.categoryId) {
+    filtered = filtered.filter((t) => t.categoryId === query.categoryId);
   }
   if (query.search) {
     const q = query.search.toLowerCase();

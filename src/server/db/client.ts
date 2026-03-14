@@ -58,6 +58,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       date TEXT NOT NULL,
       description TEXT NOT NULL,
       category TEXT NOT NULL,
+      category_id TEXT NOT NULL DEFAULT '',
       type TEXT NOT NULL,
       amount DOUBLE PRECISION NOT NULL,
       payment_method TEXT NOT NULL,

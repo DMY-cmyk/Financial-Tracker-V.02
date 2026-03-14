@@ -72,6 +72,7 @@ function parseTransactions(sheet: WorkbookSheet, month: number, year: number): T
       date: dateStr,
       description,
       category,
+      categoryId: '',
       type,
       amount,
       paymentMethod: paymentMethod || 'Cash',

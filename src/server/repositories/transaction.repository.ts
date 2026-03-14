@@ -7,6 +7,7 @@ interface TxRow {
   date: string;
   description: string;
   category: string;
+  category_id: string;
   type: string;
   amount: number;
   payment_method: string;
@@ -19,6 +20,7 @@ function rowToTransaction(row: TxRow): Transaction {
     date: row.date,
     description: row.description,
     category: row.category,
+    categoryId: row.category_id || '',
     type: row.type as 'income' | 'expense',
     amount: row.amount,
     paymentMethod: row.payment_method,
@@ -54,12 +56,13 @@ export function createTransactionRepository() {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO transactions (id, date, description, category, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           id,
           data.date,
           data.description,
           data.category,
+          data.categoryId,
           data.type,
           data.amount,
           data.paymentMethod,
@@ -76,11 +79,12 @@ export function createTransactionRepository() {
 
       const updated = { ...rowToTransaction(existing.rows[0]), ...data };
       await db.query(
-        'UPDATE transactions SET date=?, description=?, category=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
+        'UPDATE transactions SET date=?, description=?, category=?, category_id=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
         [
           updated.date,
           updated.description,
           updated.category,
+          updated.categoryId,
           updated.type,
           updated.amount,
           updated.paymentMethod,
@@ -103,12 +107,13 @@ export function createTransactionRepository() {
           const id = nanoid();
           const row = data[i];
           await db.query(
-            'INSERT INTO transactions (id, date, description, category, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
               id,
               row.date,
               row.description,
               row.category,
+              row.categoryId,
               row.type,
               row.amount,
               row.paymentMethod,
@@ -133,11 +138,11 @@ export function createTransactionRepository() {
       return result.rowCount > 0;
     },
 
-    async countByCategory(categoryName: string): Promise<number> {
+    async countByCategory(categoryId: string): Promise<number> {
       const db = await getDb();
       const result = await db.query<{ cnt: number }>(
-        'SELECT COUNT(*) as cnt FROM transactions WHERE category = ?',
-        [categoryName]
+        'SELECT COUNT(*) as cnt FROM transactions WHERE category_id = ?',
+        [categoryId]
       );
       return result.rows[0]?.cnt ?? 0;
     },
@@ -149,6 +154,14 @@ export function createTransactionRepository() {
         [paymentMethodName]
       );
       return result.rows[0]?.cnt ?? 0;
+    },
+
+    async updateCategoryName(categoryId: string, newName: string): Promise<void> {
+      const db = await getDb();
+      await db.query('UPDATE transactions SET category = ? WHERE category_id = ?', [
+        newName,
+        categoryId,
+      ]);
     },
   };
 }

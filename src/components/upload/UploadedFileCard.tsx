@@ -8,6 +8,7 @@ interface UploadedFileCardProps {
   previewUrl: string;
   isProcessing: boolean;
   onClear: () => void;
+  progress?: number;
 }
 
 export function UploadedFileCard({
@@ -15,6 +16,7 @@ export function UploadedFileCard({
   previewUrl,
   isProcessing,
   onClear,
+  progress,
 }: UploadedFileCardProps) {
   const locale = useLocale();
 
@@ -44,7 +46,7 @@ export function UploadedFileCard({
           className="w-full object-contain"
           style={{ maxHeight: '320px' }}
         />
-        <ProcessingOverlay isProcessing={isProcessing} />
+        <ProcessingOverlay isProcessing={isProcessing} progress={progress} />
       </div>
     </div>
   );

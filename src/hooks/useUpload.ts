@@ -154,10 +154,19 @@ export function useUpload(): UseUploadReturn {
     }
 
     const amount = parseCurrencyInput(ocrResult.amount);
+    const matchedCategory = categories.find(
+      (c) => c.name.toLowerCase() === ocrResult.category.toLowerCase()
+    );
+    const categoryId = matchedCategory?.id || '';
+    if (!categoryId) {
+      setErrors([{ field: 'category', message: 'Category not found' }]);
+      return false;
+    }
     const result = await api.transactions.create({
       date: ocrResult.date,
       description: ocrResult.description,
       category: ocrResult.category,
+      categoryId,
       type: 'expense',
       amount,
       paymentMethod: paymentMethods[0]?.name || 'Cash',

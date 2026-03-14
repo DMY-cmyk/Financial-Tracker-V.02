@@ -3,14 +3,71 @@
 import { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PALETTE_COLORS } from '@/lib/constants';
-import { Plus, Trash2, Loader2 } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  Loader2,
+  GripVertical,
+  ShoppingCart,
+  Coffee,
+  Car,
+  Home,
+  Zap,
+  Heart,
+  Music,
+  Gamepad2,
+  GraduationCap,
+  Briefcase,
+  Gift,
+  Utensils,
+  Shirt,
+  Phone,
+  Plane,
+  Stethoscope,
+  Dumbbell,
+  BookOpen,
+  Palette,
+  Wrench,
+  Circle,
+} from 'lucide-react';
+import { Reorder } from 'framer-motion';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { toast } from 'sonner';
 import type { Category, PaymentMethod } from '@/lib/types';
+
+const ICON_OPTIONS: { name: string; icon: typeof Circle }[] = [
+  { name: 'circle', icon: Circle },
+  { name: 'shopping-cart', icon: ShoppingCart },
+  { name: 'coffee', icon: Coffee },
+  { name: 'car', icon: Car },
+  { name: 'home', icon: Home },
+  { name: 'zap', icon: Zap },
+  { name: 'heart', icon: Heart },
+  { name: 'music', icon: Music },
+  { name: 'gamepad', icon: Gamepad2 },
+  { name: 'graduation', icon: GraduationCap },
+  { name: 'briefcase', icon: Briefcase },
+  { name: 'gift', icon: Gift },
+  { name: 'utensils', icon: Utensils },
+  { name: 'shirt', icon: Shirt },
+  { name: 'phone', icon: Phone },
+  { name: 'plane', icon: Plane },
+  { name: 'health', icon: Stethoscope },
+  { name: 'fitness', icon: Dumbbell },
+  { name: 'book', icon: BookOpen },
+  { name: 'art', icon: Palette },
+  { name: 'tools', icon: Wrench },
+];
+
+function getIconComponent(iconName: string) {
+  const match = ICON_OPTIONS.find((o) => o.name === iconName);
+  return match ? match.icon : Circle;
+}
 
 export default function CategoriesPage() {
   const locale = useLocale();
@@ -24,6 +81,7 @@ export default function CategoriesPage() {
   const [newCatName, setNewCatName] = useState('');
   const [newCatType, setNewCatType] = useState<'expense' | 'income'>('expense');
   const [newCatColor, setNewCatColor] = useState(PALETTE_COLORS[0]);
+  const [newCatIcon, setNewCatIcon] = useState('circle');
   const [newCatBudget, setNewCatBudget] = useState('');
   const [addingCat, setAddingCat] = useState(false);
 
@@ -48,8 +106,48 @@ export default function CategoriesPage() {
     };
   }, [fetchCount]);
 
-  const expenseCategories = categories.filter((c) => c.type === 'expense');
-  const incomeCategories = categories.filter((c) => c.type === 'income');
+  const [expenseOrder, setExpenseOrder] = useState<string[]>([]);
+  const [incomeOrder, setIncomeOrder] = useState<string[]>([]);
+
+  const expenseCategories = (() => {
+    const items = categories.filter((c) => c.type === 'expense');
+    if (expenseOrder.length === 0) return items;
+    const map = new Map(items.map((c) => [c.id, c]));
+    const ordered: Category[] = [];
+    for (const id of expenseOrder) {
+      const item = map.get(id);
+      if (item) {
+        ordered.push(item);
+        map.delete(id);
+      }
+    }
+    for (const item of map.values()) ordered.push(item);
+    return ordered;
+  })();
+
+  const incomeCategories = (() => {
+    const items = categories.filter((c) => c.type === 'income');
+    if (incomeOrder.length === 0) return items;
+    const map = new Map(items.map((c) => [c.id, c]));
+    const ordered: Category[] = [];
+    for (const id of incomeOrder) {
+      const item = map.get(id);
+      if (item) {
+        ordered.push(item);
+        map.delete(id);
+      }
+    }
+    for (const item of map.values()) ordered.push(item);
+    return ordered;
+  })();
+
+  const handleReorderExpense = (reordered: Category[]) => {
+    setExpenseOrder(reordered.map((c) => c.id));
+  };
+
+  const handleReorderIncome = (reordered: Category[]) => {
+    setIncomeOrder(reordered.map((c) => c.id));
+  };
 
   const handleAddCategory = async () => {
     if (!newCatName) return;
@@ -58,13 +156,14 @@ export default function CategoriesPage() {
       name: newCatName,
       type: newCatType,
       color: newCatColor,
-      icon: 'circle',
+      icon: newCatIcon,
       budget: parseCurrencyInput(newCatBudget),
     });
     if (result.data) {
       setCategories((prev) => [...prev, result.data!]);
       setNewCatName('');
       setNewCatBudget('');
+      setNewCatIcon('circle');
       toast.success(t(locale, 'saved'));
     } else {
       toast.error(result.error?.message || t(locale, 'failedSave'));
@@ -134,57 +233,83 @@ export default function CategoriesPage() {
         {/* Expense Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'expenseCategories')}</h3>
-          <div className="space-y-2">
-            {expenseCategories.map((c) => (
-              <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
-                <div className="h-4 w-4 rounded-full" style={{ backgroundColor: c.color }} />
-                <span className="flex-1 text-sm">{c.name}</span>
-                <Input
-                  className="w-28 font-mono text-xs"
-                  value={c.budget > 0 ? formatCurrencyInput(c.budget) : ''}
-                  placeholder={t(locale, 'budget')}
-                  onChange={(e) => {
-                    const budget = parseCurrencyInput(e.target.value);
-                    setCategories((prev) =>
-                      prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat))
-                    );
-                    handleUpdateBudget(c.id, budget);
-                  }}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive h-7 w-7"
-                  onClick={() => handleDeleteCategory(c.id)}
-                  aria-label={t(locale, 'delete')}
+          <Reorder.Group
+            axis="y"
+            values={expenseCategories}
+            onReorder={handleReorderExpense}
+            className="space-y-2"
+          >
+            {expenseCategories.map((c) => {
+              const Icon = getIconComponent(c.icon);
+              return (
+                <Reorder.Item
+                  value={c}
+                  key={c.id}
+                  className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
+                  <Icon className="h-4 w-4" style={{ color: c.color }} />
+                  <span className="flex-1 text-sm">{c.name}</span>
+                  <Input
+                    className="w-28 font-mono text-xs"
+                    value={c.budget > 0 ? formatCurrencyInput(c.budget) : ''}
+                    placeholder={t(locale, 'budget')}
+                    onChange={(e) => {
+                      const budget = parseCurrencyInput(e.target.value);
+                      setCategories((prev) =>
+                        prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat))
+                      );
+                      handleUpdateBudget(c.id, budget);
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-7 w-7"
+                    onClick={() => handleDeleteCategory(c.id)}
+                    aria-label={t(locale, 'delete')}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Reorder.Item>
+              );
+            })}
+          </Reorder.Group>
         </div>
 
         {/* Income Categories */}
         <div className="border-border bg-card rounded-2xl border p-6">
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'incomeSources')}</h3>
-          <div className="space-y-2">
-            {incomeCategories.map((c) => (
-              <div key={c.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
-                <div className="h-4 w-4 rounded-full" style={{ backgroundColor: c.color }} />
-                <span className="flex-1 text-sm">{c.name}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive h-7 w-7"
-                  onClick={() => handleDeleteCategory(c.id)}
-                  aria-label={t(locale, 'delete')}
+          <Reorder.Group
+            axis="y"
+            values={incomeCategories}
+            onReorder={handleReorderIncome}
+            className="space-y-2"
+          >
+            {incomeCategories.map((c) => {
+              const Icon = getIconComponent(c.icon);
+              return (
+                <Reorder.Item
+                  value={c}
+                  key={c.id}
+                  className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
+                  <Icon className="h-4 w-4" style={{ color: c.color }} />
+                  <span className="flex-1 text-sm">{c.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-7 w-7"
+                    onClick={() => handleDeleteCategory(c.id)}
+                    aria-label={t(locale, 'delete')}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </Reorder.Item>
+              );
+            })}
+          </Reorder.Group>
         </div>
       </div>
 
@@ -220,6 +345,31 @@ export default function CategoriesPage() {
                 style={{ backgroundColor: color }}
               />
             ))}
+          </div>
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">
+              {t(locale, 'selectIcon')}
+            </label>
+            <div className="flex max-w-[240px] flex-wrap gap-1">
+              {ICON_OPTIONS.map((opt) => {
+                const OptIcon = opt.icon;
+                return (
+                  <button
+                    key={opt.name}
+                    type="button"
+                    onClick={() => setNewCatIcon(opt.name)}
+                    className={cn(
+                      'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+                      newCatIcon === opt.name
+                        ? 'bg-primary/10 text-primary ring-primary ring-1'
+                        : 'text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    <OptIcon className="h-3.5 w-3.5" />
+                  </button>
+                );
+              })}
+            </div>
           </div>
           {newCatType === 'expense' && (
             <div className="w-28">

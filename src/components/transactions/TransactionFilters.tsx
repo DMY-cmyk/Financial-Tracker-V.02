@@ -77,7 +77,7 @@ export function TransactionFilters({
           {t(locale, 'all')} {t(locale, 'categories')}
         </option>
         {categories.map((c) => (
-          <option key={c.id} value={c.name}>
+          <option key={c.id} value={c.id}>
             {c.name}
           </option>
         ))}

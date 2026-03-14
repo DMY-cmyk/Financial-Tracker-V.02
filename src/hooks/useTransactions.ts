@@ -98,7 +98,7 @@ export function useTransactions(): UseTransactionsReturn {
   const filtered = useMemo(() => {
     return allTransactions.filter((tx) => {
       if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
-      if (categoryFilter && tx.category !== categoryFilter) return false;
+      if (categoryFilter && tx.categoryId !== categoryFilter) return false;
       if (paymentMethodFilter && tx.paymentMethod !== paymentMethodFilter) return false;
       if (search) {
         const q = search.toLowerCase();

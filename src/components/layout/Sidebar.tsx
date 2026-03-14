@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
+import { useStore } from '@/store';
 import {
   LayoutDashboard,
   Receipt,
@@ -17,6 +18,7 @@ import {
   CalendarCheck,
   PiggyBank,
   Target,
+  Languages,
 } from 'lucide-react';
 
 type NavKey =
@@ -54,6 +56,7 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
+  const setLocale = useStore((s) => s.setLocale);
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
@@ -142,6 +145,56 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
             {!collapsed && <span>{t(locale, key)}</span>}
           </Link>
         ))}
+
+        {/* Language Switcher */}
+        {collapsed ? (
+          <button
+            onClick={() => setLocale(locale === 'en' ? 'id' : 'en')}
+            aria-label={t(locale, 'switchLanguage')}
+            title={t(locale, 'switchLanguage')}
+            className={cn(
+              'text-muted-foreground/60 hover:bg-muted hover:text-foreground flex w-full items-center justify-center gap-3 rounded-xl px-0 py-2 text-sm transition-colors'
+            )}
+          >
+            <Languages className="h-[18px] w-[18px]" />
+          </button>
+        ) : (
+          <div className="flex items-center gap-3 rounded-xl px-3 py-2">
+            <Languages className="text-muted-foreground/60 h-[18px] w-[18px] shrink-0" />
+            <div
+              className="bg-muted flex flex-1 items-center rounded-lg p-0.5"
+              role="radiogroup"
+              aria-label={t(locale, 'switchLanguage')}
+            >
+              <button
+                role="radio"
+                aria-checked={locale === 'en'}
+                onClick={() => setLocale('en')}
+                className={cn(
+                  'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
+                  locale === 'en'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                EN
+              </button>
+              <button
+                role="radio"
+                aria-checked={locale === 'id'}
+                onClick={() => setLocale('id')}
+                className={cn(
+                  'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
+                  locale === 'id'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                ID
+              </button>
+            </div>
+          </div>
+        )}
 
         <button
           onClick={onToggleCollapse}

@@ -110,6 +110,7 @@ describe('deletePaymentMethod', () => {
       date: '2026-03-01',
       description: 'Lunch',
       category: 'Food',
+      categoryId: 'test-cat-id',
       type: 'expense',
       amount: 50000,
       paymentMethod: 'Cash',

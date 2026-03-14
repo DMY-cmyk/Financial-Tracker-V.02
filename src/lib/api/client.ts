@@ -49,7 +49,7 @@ export const api = {
       month?: number;
       year?: number;
       type?: string;
-      category?: string;
+      categoryId?: string;
       search?: string;
     }) {
       const query = new URLSearchParams();

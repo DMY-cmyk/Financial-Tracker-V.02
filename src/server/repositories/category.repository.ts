@@ -36,6 +36,12 @@ export function createCategoryRepository() {
       return result.rows[0] ? rowToCategory(result.rows[0]) : undefined;
     },
 
+    async findByName(name: string): Promise<Category | undefined> {
+      const db = await getDb();
+      const result = await db.query<CatRow>('SELECT * FROM categories WHERE name = ?', [name]);
+      return result.rows[0] ? rowToCategory(result.rows[0]) : undefined;
+    },
+
     async findByType(type: 'income' | 'expense'): Promise<Category[]> {
       const db = await getDb();
       const result = await db.query<CatRow>(

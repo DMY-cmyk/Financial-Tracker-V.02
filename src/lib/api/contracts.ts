@@ -6,6 +6,7 @@ export interface CreateTransactionRequest {
   date: string;
   description: string;
   category: string;
+  categoryId: string;
   type: 'income' | 'expense';
   amount: number;
   paymentMethod: string;
@@ -26,6 +27,7 @@ export interface UpdateTransactionRequest {
   date?: string;
   description?: string;
   category?: string;
+  categoryId?: string;
   type?: 'income' | 'expense';
   amount?: number;
   paymentMethod?: string;
@@ -36,7 +38,7 @@ export interface ListTransactionsParams {
   month?: number;
   year?: number;
   type?: 'income' | 'expense';
-  category?: string;
+  categoryId?: string;
   search?: string;
 }
 

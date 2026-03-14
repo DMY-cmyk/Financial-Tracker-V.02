@@ -189,15 +189,21 @@ export function useBulkImport(): UseBulkImportReturn {
 
       setImportProgress({ current: 0, total: rowsToImport.length });
 
-      const transactions = rowsToImport.map((row) => ({
-        date: row.date,
-        description: row.description,
-        category: row.category,
-        type: row.type,
-        amount: row.amount,
-        paymentMethod: row.paymentMethod,
-        notes: row.notes,
-      }));
+      const transactions = rowsToImport.map((row) => {
+        const matchedCat = categories.find(
+          (c) => c.name.toLowerCase() === row.category.toLowerCase()
+        );
+        return {
+          date: row.date,
+          description: row.description,
+          category: row.category,
+          categoryId: matchedCat?.id || '',
+          type: row.type,
+          amount: row.amount,
+          paymentMethod: row.paymentMethod,
+          notes: row.notes,
+        };
+      });
 
       try {
         const res = await api.transactions.bulkCreate({ transactions });

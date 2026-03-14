@@ -18,24 +18,33 @@ export async function ensureSeeded() {
   const result = await db.query<{ c: number }>('SELECT COUNT(*) as c FROM transactions');
 
   if (result.rows[0]?.c > 0) {
+    // Run migration for existing data that may lack category_id
+    await migrateCategoryIds(db);
     seeded = true;
     return;
   }
 
   const data = getSampleData();
 
-  for (const t of data.transactions) {
-    await db.query(
-      'INSERT INTO transactions (id, date, description, category, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [t.id, t.date, t.description, t.category, t.type, t.amount, t.paymentMethod, t.notes]
-    );
-  }
+  // Seed categories first so we can resolve IDs for transactions
   for (const c of data.categories) {
     await db.query(
       'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
       [c.id, c.name, c.type, c.color, c.icon, c.budget]
     );
   }
+
+  // Build name→id map for category resolution
+  const catMap = new Map(data.categories.map((c) => [c.name, c.id]));
+
+  for (const t of data.transactions) {
+    const categoryId = catMap.get(t.category) || '';
+    await db.query(
+      'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      [t.id, t.date, t.description, t.category, categoryId, t.type, t.amount, t.paymentMethod, t.notes]
+    );
+  }
+
   for (const p of data.paymentMethods) {
     await db.query(
       'INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
@@ -66,4 +75,21 @@ export async function ensureSeeded() {
   ]);
 
   seeded = true;
+}
+
+/** Backfill category_id for any transactions that have an empty category_id */
+async function migrateCategoryIds(db: { query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }> }) {
+  const orphaned = await db.query<{ cnt: number }>(
+    "SELECT COUNT(*) as cnt FROM transactions WHERE category_id = '' OR category_id IS NULL"
+  );
+  if ((orphaned.rows[0]?.cnt ?? 0) === 0) return;
+
+  // Resolve from categories table
+  await db.query(
+    `UPDATE transactions SET category_id = (
+      SELECT id FROM categories WHERE categories.name = transactions.category LIMIT 1
+    ) WHERE (category_id = '' OR category_id IS NULL)
+      AND EXISTS (SELECT 1 FROM categories WHERE categories.name = transactions.category)`,
+    []
+  );
 }

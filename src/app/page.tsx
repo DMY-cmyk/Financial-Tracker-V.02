@@ -1,22 +1,19 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { MONTH_NAMES } from '@/lib/constants';
 import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/lib/motion';
-import { CashFlowChart } from '@/components/dashboard/CashFlowChart';
-import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown';
-import { BudgetProgress } from '@/components/dashboard/BudgetProgress';
-import { PaymentMethodsSummary } from '@/components/dashboard/PaymentMethods';
 import { BillsChecklist } from '@/components/dashboard/BillsChecklist';
 import { SavingsGoals } from '@/components/dashboard/SavingsGoals';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { PageSkeleton } from '@/components/shared/Skeletons';
+import { PageSkeleton, ChartCardSkeleton } from '@/components/shared/Skeletons';
 import {
   Wallet,
   TrendingUp,
@@ -27,6 +24,31 @@ import {
   Download,
   BarChart3,
 } from 'lucide-react';
+
+// Lazy-load heavy chart components (code-splits Recharts out of main bundle)
+const CashFlowChart = dynamic(
+  () => import('@/components/dashboard/CashFlowChart').then((m) => ({ default: m.CashFlowChart })),
+  { loading: () => <ChartCardSkeleton />, ssr: false }
+);
+const CategoryBreakdown = dynamic(
+  () =>
+    import('@/components/dashboard/CategoryBreakdown').then((m) => ({
+      default: m.CategoryBreakdown,
+    })),
+  { loading: () => <ChartCardSkeleton />, ssr: false }
+);
+const BudgetProgress = dynamic(
+  () =>
+    import('@/components/dashboard/BudgetProgress').then((m) => ({ default: m.BudgetProgress })),
+  { loading: () => <ChartCardSkeleton />, ssr: false }
+);
+const PaymentMethodsSummary = dynamic(
+  () =>
+    import('@/components/dashboard/PaymentMethods').then((m) => ({
+      default: m.PaymentMethodsSummary,
+    })),
+  { loading: () => <ChartCardSkeleton />, ssr: false }
+);
 
 export default function DashboardPage() {
   const locale = useLocale();
@@ -75,11 +97,15 @@ export default function DashboardPage() {
 
       {/* Summary Cards */}
       <motion.div
-        className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
+        className="relative grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
         variants={staggerGrid}
         initial="hidden"
         animate="show"
       >
+        {/* Decorative blur circles */}
+        <div className="pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute top-1/2 left-1/3 h-24 w-24 -translate-y-1/2 rounded-full bg-violet-500/8 blur-2xl" />
         <motion.div variants={staggerGridItem}>
           <SummaryCard
             label={t(locale, 'netBalance')}

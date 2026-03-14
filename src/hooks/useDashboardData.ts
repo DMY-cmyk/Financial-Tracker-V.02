@@ -64,7 +64,7 @@ export function useDashboardData() {
     return categories
       .filter((c) => c.type === 'expense' && c.budget > 0)
       .map((c) => {
-        const spent = summary.categoryTotals[c.name] || 0;
+        const spent = summary.categoryTotals[c.id] || 0;
         const remaining = c.budget - spent;
         const percentage = c.budget > 0 ? Math.min((spent / c.budget) * 100, 100) : 0;
         return { category: c.name, budget: c.budget, spent, remaining, color: c.color, percentage };

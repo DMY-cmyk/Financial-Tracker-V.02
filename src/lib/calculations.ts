@@ -31,7 +31,8 @@ export function categoryTotals(
   transactions
     .filter((t) => t.type === type)
     .forEach((t) => {
-      totals[t.category] = (totals[t.category] || 0) + t.amount;
+      const key = t.categoryId || t.category;
+      totals[key] = (totals[key] || 0) + t.amount;
     });
   return totals;
 }
@@ -61,7 +62,7 @@ export function budgetStatus(
   return categories
     .filter((c) => c.type === 'expense' && c.budget > 0)
     .map((c) => {
-      const spent = expenseTotals[c.name] || 0;
+      const spent = expenseTotals[c.id] || 0;
       const remaining = c.budget - spent;
       const percentage = c.budget > 0 ? Math.min((spent / c.budget) * 100, 100) : 0;
       return { category: c.name, budget: c.budget, spent, remaining, color: c.color, percentage };

@@ -1,9 +1,14 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUpload } from '@/hooks/useUpload';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
+import { formatDate } from '@/lib/formatters';
+import { api } from '@/lib/api/client';
+import type { UploadResponse } from '@/lib/api/contracts';
+import type { ExtractionStatus } from '@/lib/types';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BulkImportTabs } from '@/components/upload/BulkImportTabs';
 import { DropZone } from '@/components/upload/DropZone';
@@ -13,8 +18,16 @@ import { ConfidenceBar } from '@/components/upload/ConfidenceBar';
 import { OcrPreview } from '@/components/upload/OcrPreview';
 import { InlineError } from '@/components/shared/EmptyState';
 import { Button } from '@/components/ui/button';
-import { ScanLine, CheckCircle2, RotateCcw } from 'lucide-react';
+import { ScanLine, CheckCircle2, RotateCcw, History } from 'lucide-react';
 import { toast } from 'sonner';
+
+const uploadStatusMap: Record<UploadResponse['status'], ExtractionStatus> = {
+  pending: 'idle',
+  processing: 'processing',
+  extracted: 'extracted',
+  saved: 'saved',
+  error: 'error',
+};
 
 export default function UploadPage() {
   const locale = useLocale();
@@ -25,6 +38,7 @@ export default function UploadPage() {
     handleClear,
     status,
     confidence,
+    progress,
     ocrResult,
     setOcrResult,
     processOcr,
@@ -33,6 +47,18 @@ export default function UploadPage() {
     errors,
     categories,
   } = useUpload();
+
+  const [uploads, setUploads] = useState<UploadResponse[]>([]);
+
+  useEffect(() => {
+    async function fetchUploads() {
+      const result = await api.uploads.list();
+      if (result.data) {
+        setUploads(result.data.uploads.slice(0, 10));
+      }
+    }
+    fetchUploads();
+  }, [status]);
 
   const onSave = async () => {
     const success = await handleSave();
@@ -77,6 +103,7 @@ export default function UploadPage() {
                   previewUrl={preview}
                   isProcessing={isProcessing}
                   onClear={handleClear}
+                  progress={progress}
                 />
 
                 {status === 'idle' && (
@@ -153,6 +180,42 @@ export default function UploadPage() {
             )}
           </div>
         </motion.div>
+      </motion.div>
+
+      {/* Upload History */}
+      <motion.div {...fadeInUp}>
+        <div className="border-border bg-card rounded-2xl border p-4 sm:p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <History className="text-muted-foreground h-4 w-4" />
+            <h3 className="text-sm font-semibold">{t(locale, 'uploadHistory')}</h3>
+          </div>
+
+          {uploads.length === 0 ? (
+            <div className="flex h-32 flex-col items-center justify-center text-center">
+              <ScanLine className="text-muted-foreground/30 mb-3 h-8 w-8" />
+              <p className="text-muted-foreground text-sm">{t(locale, 'noUploadHistory')}</p>
+            </div>
+          ) : (
+            <ul className="divide-border divide-y">
+              {uploads.map((upload) => (
+                <li
+                  key={upload.id}
+                  className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                >
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                    {upload.filename}
+                  </span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <ExtractionStatusBadge status={uploadStatusMap[upload.status]} />
+                    <span className="text-muted-foreground text-xs whitespace-nowrap">
+                      {formatDate(upload.createdAt, locale)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </motion.div>
     </div>
   );

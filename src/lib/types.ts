@@ -2,7 +2,8 @@ export interface Transaction {
   id: string;
   date: string; // ISO date string YYYY-MM-DD
   description: string;
-  category: string;
+  category: string; // denormalized display name
+  categoryId: string; // FK to categories.id
   type: 'income' | 'expense';
   amount: number;
   paymentMethod: string;

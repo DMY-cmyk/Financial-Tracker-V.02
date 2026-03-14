@@ -58,8 +58,16 @@ export async function updateCategory(id: string, body: unknown): Promise<Service
         details: formatZodError(parsed.error),
       },
     };
+
   const result = await repo.update(id, parsed.data);
   if (!result) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
+
+  // Cascade name change to denormalized transaction.category field
+  if (parsed.data.name) {
+    const txRepo = createTransactionRepository();
+    await txRepo.updateCategoryName(id, parsed.data.name);
+  }
+
   return { data: result };
 }
 
@@ -69,7 +77,7 @@ export async function deleteCategory(id: string): Promise<ServiceResult<{ succes
   if (!category) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
 
   const txRepo = createTransactionRepository();
-  const count = await txRepo.countByCategory(category.name);
+  const count = await txRepo.countByCategory(id);
   if (count > 0) {
     return {
       error: {

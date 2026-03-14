@@ -265,6 +265,21 @@ type TranslationKeys = {
   noSavingsGoals: string;
   deleteSavingsGoal: string;
   updateSaved: string;
+
+  // Language switcher
+  switchLanguage: string;
+
+  // Upload history
+  uploadHistory: string;
+  noUploadHistory: string;
+  uploadDate: string;
+  extracted: string;
+
+  // Category icons
+  selectIcon: string;
+
+  // Reorder
+  reorderCategories: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -499,6 +514,13 @@ const translations: Record<Locale, TranslationKeys> = {
     noSavingsGoals: 'No savings goals yet',
     deleteSavingsGoal: 'Delete Savings Goal',
     updateSaved: 'Update Saved',
+    switchLanguage: 'Switch Language',
+    uploadHistory: 'Upload History',
+    noUploadHistory: 'No uploads yet',
+    uploadDate: 'Upload Date',
+    extracted: 'Extracted',
+    selectIcon: 'Select Icon',
+    reorderCategories: 'Reorder Categories',
   },
   id: {
     dashboard: 'Dasbor',
@@ -731,6 +753,13 @@ const translations: Record<Locale, TranslationKeys> = {
     noSavingsGoals: 'Belum ada target tabungan',
     deleteSavingsGoal: 'Hapus Target Tabungan',
     updateSaved: 'Perbarui Tersimpan',
+    switchLanguage: 'Ganti Bahasa',
+    uploadHistory: 'Riwayat Unggahan',
+    noUploadHistory: 'Belum ada unggahan',
+    uploadDate: 'Tanggal Unggah',
+    extracted: 'Diekstrak',
+    selectIcon: 'Pilih Ikon',
+    reorderCategories: 'Urutkan Kategori',
   },
 };
 

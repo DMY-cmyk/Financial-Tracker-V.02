@@ -16,8 +16,9 @@ export function CategoryBreakdown({ categoryTotals, categories }: CategoryBreakd
   const locale = useLocale();
 
   const data = Object.entries(categoryTotals)
-    .map(([name, value]) => {
-      const cat = categories.find((c) => c.name === name);
+    .map(([id, value]) => {
+      const cat = categories.find((c) => c.id === id);
+      const name = cat?.name || id;
       return {
         name,
         value,
