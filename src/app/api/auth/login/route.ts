@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { loginUser } from '@/server/services/auth.service';
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const parsed = loginSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: { message: 'Validation error', details: parsed.error.flatten().fieldErrors } },
+        { status: 400 }
+      );
+    }
+
+    const { email, password } = parsed.data;
+    const result = await loginUser(email, password);
+
+    if ('error' in result) {
+      return NextResponse.json({ error: { message: result.error } }, { status: 401 });
+    }
+
+    const response = NextResponse.json({ data: { user: result.user } });
+    response.cookies.set('auth-token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    });
+
+    return response;
+  } catch {
+    return NextResponse.json({ error: { message: 'Internal server error' } }, { status: 500 });
+  }
+}

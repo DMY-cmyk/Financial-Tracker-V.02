@@ -180,6 +180,7 @@ export function createTransactionRepository() {
     async findFiltered(filters: {
       month?: number;
       year?: number;
+      yearOnly?: boolean;
       type?: string;
       categoryId?: string;
       paymentMethod?: string;
@@ -191,7 +192,11 @@ export function createTransactionRepository() {
       const conditions: string[] = [];
       const params: unknown[] = [];
 
-      if (filters.month !== undefined && filters.year !== undefined) {
+      if (filters.yearOnly && filters.year !== undefined) {
+        // Year-only filter: match all months in the year
+        conditions.push("date LIKE ? || '%'");
+        params.push(`${filters.year}`);
+      } else if (filters.month !== undefined && filters.year !== undefined) {
         const prefix = `${filters.year}-${String(filters.month + 1).padStart(2, '0')}`;
         conditions.push("date LIKE ? || '%'");
         params.push(prefix);

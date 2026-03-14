@@ -16,6 +16,20 @@ interface AnnualData {
   savingsRate: number;
   topExpenseCategories: { category: string; amount: number }[];
   monthlyBreakdown: { monthKey: string; income: number; expense: number; balance: number }[];
+  previousYear?: {
+    year: number;
+    totalIncome: number;
+    totalExpense: number;
+    totalBalance: number;
+    transactionCount: number;
+    savingsRate: number;
+  };
+  comparison?: {
+    incomeChange: number | null;
+    expenseChange: number | null;
+    balanceChange: number | null;
+    savingsRateChange: number | null;
+  };
 }
 
 interface AnnualSummaryProps {
@@ -50,10 +64,32 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     );
   }
 
+  const hasPrevData = data.previousYear && data.previousYear.transactionCount > 0;
+  const comp = data.comparison;
+
+  const changeIndicator = (change: number | null, invertColor?: boolean) => {
+    if (change === null || !hasPrevData) return null;
+    const isPositive = change > 0;
+    const color = invertColor
+      ? isPositive
+        ? 'text-red-500'
+        : 'text-emerald-500'
+      : isPositive
+        ? 'text-emerald-500'
+        : 'text-red-500';
+    return (
+      <span className={`text-[10px] font-medium ${color}`}>
+        {isPositive ? '↑' : '↓'}
+        {Math.abs(change)}% {t(locale, 'vsLastYear')}
+      </span>
+    );
+  };
+
   const statCards = [
     {
       label: t(locale, 'totalIncome'),
       value: formatCurrency(data.totalIncome),
+      change: comp ? changeIndicator(comp.incomeChange) : null,
       icon: TrendingUp,
       color: 'text-emerald-600 dark:text-emerald-400',
       bg: 'bg-emerald-50 dark:bg-emerald-950/30',
@@ -61,6 +97,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     {
       label: t(locale, 'totalExpense'),
       value: formatCurrency(data.totalExpense),
+      change: comp ? changeIndicator(comp.expenseChange, true) : null,
       icon: TrendingDown,
       color: 'text-red-600 dark:text-red-400',
       bg: 'bg-red-50 dark:bg-red-950/30',
@@ -68,6 +105,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     {
       label: t(locale, 'netBalance'),
       value: formatCurrency(data.totalBalance),
+      change: comp ? changeIndicator(comp.balanceChange) : null,
       icon: Wallet,
       color:
         data.totalBalance >= 0
@@ -79,6 +117,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     {
       label: t(locale, 'avgSavingsRate'),
       value: `${data.savingsRate}%`,
+      change: comp ? changeIndicator(comp.savingsRateChange) : null,
       icon: PiggyBank,
       color:
         data.savingsRate >= 20
@@ -92,6 +131,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     {
       label: t(locale, 'totalTransactions'),
       value: String(data.transactionCount),
+      change: null,
       icon: Hash,
       color: 'text-blue-600 dark:text-blue-400',
       bg: 'bg-blue-50 dark:bg-blue-950/30',
@@ -118,6 +158,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
             </div>
             <p className="text-muted-foreground mt-2 text-[11px]">{card.label}</p>
             <p className="font-mono text-sm font-semibold">{card.value}</p>
+            {card.change && <div className="mt-0.5">{card.change}</div>}
           </motion.div>
         ))}
       </motion.div>

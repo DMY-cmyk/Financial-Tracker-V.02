@@ -6,12 +6,7 @@ import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
   LayoutDashboard,
   Receipt,
@@ -70,8 +65,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
     onOpenChange(false);
   }, [pathname, onOpenChange]);
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

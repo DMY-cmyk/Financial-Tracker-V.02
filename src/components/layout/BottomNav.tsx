@@ -61,8 +61,7 @@ export function BottomNav() {
     setMoreOpen(false);
   }, [pathname]);
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   const isMoreActive = moreItems.some((item) => isActive(item.href));
 

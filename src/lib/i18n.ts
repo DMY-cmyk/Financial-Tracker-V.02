@@ -50,6 +50,9 @@ type TranslationKeys = {
   search: string;
   filter: string;
   allMonths: string;
+  viewEntireYear: string;
+  yearOverYear: string;
+  vsLastYear: string;
   ok: string;
   back: string;
   clear: string;
@@ -368,6 +371,9 @@ const translations: Record<Locale, TranslationKeys> = {
     search: 'Search',
     filter: 'Filter',
     allMonths: 'All Months',
+    viewEntireYear: 'View Year',
+    yearOverYear: 'Year-over-Year',
+    vsLastYear: 'vs last year',
     ok: 'OK',
     back: 'Back',
     clear: 'Clear',
@@ -649,6 +655,9 @@ const translations: Record<Locale, TranslationKeys> = {
     search: 'Cari',
     filter: 'Filter',
     allMonths: 'Semua Bulan',
+    viewEntireYear: 'Lihat Tahun',
+    yearOverYear: 'Tahun ke Tahun',
+    vsLastYear: 'vs tahun lalu',
     ok: 'OK',
     back: 'Kembali',
     clear: 'Hapus',

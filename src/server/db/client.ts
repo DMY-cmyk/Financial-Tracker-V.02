@@ -142,6 +142,13 @@ async function initializeSchema(client: DbClient): Promise<void> {
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       updated_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
+    `CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
   ];
 
   for (const ddl of tables) {

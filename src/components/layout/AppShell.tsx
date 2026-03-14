@@ -1,20 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useStore } from '@/store';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { BottomNav } from './BottomNav';
 import { MobileNav } from './MobileNav';
 
+const AUTH_PATHS = ['/login', '/register'];
+
 interface AppShellProps {
   children: React.ReactNode;
 }
 
 export function AppShell({ children }: AppShellProps) {
+  const pathname = usePathname();
   const collapsed = useStore((s) => s.ui.sidebarCollapsed);
   const setSidebarCollapsed = useStore((s) => s.setSidebarCollapsed);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Auth pages render without the shell
+  if (AUTH_PATHS.includes(pathname)) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="bg-background flex h-screen overflow-hidden">

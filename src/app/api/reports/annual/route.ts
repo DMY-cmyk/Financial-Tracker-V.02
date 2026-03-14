@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
   const yearParam = request.nextUrl.searchParams.get('year');
   const year = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
   const prefix = `${year}-`;
+  const prevPrefix = `${year - 1}-`;
 
   // Yearly totals
   const totalsResult = await db.query<{
@@ -37,6 +38,41 @@ export async function GET(request: NextRequest) {
   );
 
   const totals = totalsResult.rows[0] || { total_income: 0, total_expense: 0, tx_count: 0 };
+
+  // Previous year totals for comparison
+  const prevTotalsResult = await db.query<{
+    total_income: number;
+    total_expense: number;
+    tx_count: number;
+  }>(
+    `SELECT
+       COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
+       COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expense,
+       COUNT(*) as tx_count
+     FROM transactions
+     WHERE date LIKE ? || '%'`,
+    [prevPrefix]
+  );
+
+  const prevTotals = prevTotalsResult.rows[0] || {
+    total_income: 0,
+    total_expense: 0,
+    tx_count: 0,
+  };
+
+  const prevBalance = prevTotals.total_income - prevTotals.total_expense;
+  const prevSavingsRate =
+    prevTotals.total_income > 0
+      ? Math.round(
+          ((prevTotals.total_income - prevTotals.total_expense) / prevTotals.total_income) * 100
+        )
+      : 0;
+
+  // Percent change helper (returns null if no previous data)
+  const pctChange = (current: number, previous: number): number | null => {
+    if (previous === 0) return current > 0 ? 100 : null;
+    return Math.round(((current - previous) / Math.abs(previous)) * 100);
+  };
 
   // Top expense categories
   const categoriesResult = await db.query<CategoryTotal>(
@@ -62,17 +98,20 @@ export async function GET(request: NextRequest) {
     [prefix]
   );
 
+  const currentBalance = totals.total_income - totals.total_expense;
+  const currentSavingsRate =
+    totals.total_income > 0
+      ? Math.round(((totals.total_income - totals.total_expense) / totals.total_income) * 100)
+      : 0;
+
   return NextResponse.json({
     data: {
       year,
       totalIncome: totals.total_income,
       totalExpense: totals.total_expense,
-      totalBalance: totals.total_income - totals.total_expense,
+      totalBalance: currentBalance,
       transactionCount: totals.tx_count,
-      savingsRate:
-        totals.total_income > 0
-          ? Math.round(((totals.total_income - totals.total_expense) / totals.total_income) * 100)
-          : 0,
+      savingsRate: currentSavingsRate,
       topExpenseCategories: categoriesResult.rows.map((r) => ({
         category: r.category,
         amount: r.total_amount,
@@ -83,6 +122,21 @@ export async function GET(request: NextRequest) {
         expense: r.total_expense,
         balance: r.total_income - r.total_expense,
       })),
+      previousYear: {
+        year: year - 1,
+        totalIncome: prevTotals.total_income,
+        totalExpense: prevTotals.total_expense,
+        totalBalance: prevBalance,
+        transactionCount: prevTotals.tx_count,
+        savingsRate: prevSavingsRate,
+      },
+      comparison: {
+        incomeChange: pctChange(totals.total_income, prevTotals.total_income),
+        expenseChange: pctChange(totals.total_expense, prevTotals.total_expense),
+        balanceChange: pctChange(currentBalance, prevBalance),
+        savingsRateChange:
+          prevTotals.total_income > 0 ? currentSavingsRate - prevSavingsRate : null,
+      },
     },
   });
 }

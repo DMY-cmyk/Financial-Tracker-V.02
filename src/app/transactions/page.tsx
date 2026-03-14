@@ -54,6 +54,8 @@ export default function TransactionsPage() {
     setPaymentMethodFilter,
     allMonths,
     setAllMonths,
+    yearOnly,
+    setYearOnly,
     paymentMethods,
     clearFilters,
     formOpen,
@@ -191,6 +193,9 @@ export default function TransactionsPage() {
           paymentMethods={paymentMethods}
           allMonths={allMonths}
           onAllMonthsChange={setAllMonths}
+          yearOnly={yearOnly}
+          onYearOnlyChange={setYearOnly}
+          selectedYear={year}
           searchInputRef={searchInputRef}
         />
       </motion.div>

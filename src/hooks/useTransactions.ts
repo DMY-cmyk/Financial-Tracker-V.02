@@ -30,6 +30,8 @@ interface UseTransactionsReturn {
   setPaymentMethodFilter: (v: string) => void;
   allMonths: boolean;
   setAllMonths: (v: boolean) => void;
+  yearOnly: boolean;
+  setYearOnly: (v: boolean) => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
 
@@ -68,6 +70,7 @@ export function useTransactions(): UseTransactionsReturn {
   const [categoryFilter, setCategoryFilterState] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilterState] = useState('');
   const [allMonths, setAllMonthsState] = useState(false);
+  const [yearOnly, setYearOnlyState] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
@@ -90,6 +93,12 @@ export function useTransactions(): UseTransactionsReturn {
   }, []);
   const setAllMonths = useCallback((v: boolean) => {
     setAllMonthsState(v);
+    if (v) setYearOnlyState(false);
+    setPage(1);
+  }, []);
+  const setYearOnly = useCallback((v: boolean) => {
+    setYearOnlyState(v);
+    if (v) setAllMonthsState(false);
     setPage(1);
   }, []);
 
@@ -105,7 +114,7 @@ export function useTransactions(): UseTransactionsReturn {
 
   const txQueryKey = [
     'transactions',
-    allMonths ? 'all' : `${month}-${year}`,
+    allMonths ? 'all' : yearOnly ? `year-${year}` : `${month}-${year}`,
     page,
     typeFilter,
     categoryFilter,
@@ -117,7 +126,10 @@ export function useTransactions(): UseTransactionsReturn {
     queryKey: txQueryKey,
     queryFn: async () => {
       const params: Record<string, unknown> = { page, pageSize };
-      if (!allMonths) {
+      if (yearOnly) {
+        params.year = year;
+        params.yearOnly = true;
+      } else if (!allMonths) {
         params.month = month;
         params.year = year;
       }
@@ -145,7 +157,8 @@ export function useTransactions(): UseTransactionsReturn {
     typeFilter !== 'all' ||
     categoryFilter !== '' ||
     paymentMethodFilter !== '' ||
-    allMonths;
+    allMonths ||
+    yearOnly;
 
   const clearFilters = useCallback(() => {
     setSearchState('');
@@ -153,6 +166,7 @@ export function useTransactions(): UseTransactionsReturn {
     setCategoryFilterState('');
     setPaymentMethodFilterState('');
     setAllMonthsState(false);
+    setYearOnlyState(false);
     setPage(1);
   }, []);
 
@@ -217,6 +231,8 @@ export function useTransactions(): UseTransactionsReturn {
     setPaymentMethodFilter,
     allMonths,
     setAllMonths,
+    yearOnly,
+    setYearOnly,
     hasActiveFilters,
     clearFilters,
     paymentMethods,

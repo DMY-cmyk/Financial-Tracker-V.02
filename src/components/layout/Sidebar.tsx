@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
@@ -76,11 +77,12 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
     );
 
   return (
-    <aside
+    <motion.aside
       aria-label={locale === 'id' ? 'Navigasi utama' : 'Main navigation'}
+      animate={{ width: collapsed ? 72 : 260 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className={cn(
-        'border-border bg-card/50 flex flex-col border-r backdrop-blur-sm transition-all duration-300',
-        collapsed ? 'w-[72px]' : 'w-[260px]',
+        'border-border bg-card/50 flex flex-col overflow-hidden border-r backdrop-blur-sm',
         className
       )}
     >
@@ -94,7 +96,19 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
         <div className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm">
           <span className="text-primary-foreground text-xs font-bold">FT</span>
         </div>
-        {!collapsed && <span className="truncate text-sm font-semibold">Financial Tracker</span>}
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.span
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 'auto' }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.2 }}
+              className="truncate text-sm font-semibold"
+            >
+              Financial Tracker
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Quick Add */}
@@ -107,7 +121,18 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
           )}
         >
           <Plus className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>{t(locale, 'newTransaction')}</span>}
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {t(locale, 'newTransaction')}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Link>
       </div>
 
@@ -127,7 +152,19 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
             aria-current={isActive(href) ? 'page' : undefined}
           >
             <Icon className="h-[18px] w-[18px] shrink-0" />
-            {!collapsed && <span>{t(locale, key)}</span>}
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="whitespace-nowrap"
+                >
+                  {t(locale, key)}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
         ))}
       </nav>
@@ -148,7 +185,19 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
             aria-current={isActive(href) ? 'page' : undefined}
           >
             <Icon className="h-[18px] w-[18px] shrink-0" />
-            {!collapsed && <span>{t(locale, key)}</span>}
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="whitespace-nowrap"
+                >
+                  {t(locale, key)}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
         ))}
 
@@ -215,11 +264,17 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
           ) : (
             <>
               <PanelLeftClose className="h-[18px] w-[18px]" />
-              <span>{t(locale, 'collapse')}</span>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+              >
+                {t(locale, 'collapse')}
+              </motion.span>
             </>
           )}
         </button>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

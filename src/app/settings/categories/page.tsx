@@ -5,6 +5,7 @@ import { t, useLocale } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageTransition } from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PALETTE_COLORS } from '@/lib/constants';
@@ -226,7 +227,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <PageTransition className="mx-auto max-w-4xl space-y-6">
       <PageHeader title={t(locale, 'categories')} />
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -444,6 +445,6 @@ export default function CategoriesPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

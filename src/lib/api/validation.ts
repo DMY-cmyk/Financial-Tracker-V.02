@@ -23,6 +23,7 @@ export const bulkCreateTransactionSchema = z.object({
 export const listTransactionsQuerySchema = z.object({
   month: z.number().int().min(0).max(11).optional(),
   year: z.number().int().min(2000).max(2100).optional(),
+  yearOnly: z.boolean().optional(),
   type: z.enum(['income', 'expense']).optional(),
   categoryId: z.string().optional(),
   paymentMethod: z.string().optional(),

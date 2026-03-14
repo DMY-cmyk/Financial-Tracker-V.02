@@ -7,8 +7,10 @@ export async function GET(request: NextRequest) {
 
   const monthStr = searchParams.get('month');
   const yearStr = searchParams.get('year');
+  const yearOnly = searchParams.get('yearOnly');
   if (monthStr) query.month = parseInt(monthStr, 10);
   if (yearStr) query.year = parseInt(yearStr, 10);
+  if (yearOnly === 'true') query.yearOnly = true;
 
   const type = searchParams.get('type');
   if (type) query.type = type;

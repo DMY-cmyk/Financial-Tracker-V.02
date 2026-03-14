@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SearchX } from 'lucide-react';
 
@@ -11,14 +14,51 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, icon, className, children }: EmptyStateProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center py-12 text-center', className)}>
-      {icon && <div className="text-muted-foreground/40 mb-4">{icon}</div>}
-      <h3 className="text-muted-foreground text-base font-medium">{title}</h3>
-      {description && (
-        <p className="text-muted-foreground/70 mt-1 max-w-sm text-sm">{description}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className={cn('flex flex-col items-center justify-center py-12 text-center', className)}
+    >
+      {icon && (
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1, type: 'spring', stiffness: 200 }}
+          className="text-muted-foreground/40 mb-4"
+        >
+          {icon}
+        </motion.div>
       )}
-      {children && <div className="mt-4">{children}</div>}
-    </div>
+      <motion.h3
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.3 }}
+        className="text-muted-foreground text-base font-medium"
+      >
+        {title}
+      </motion.h3>
+      {description && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          className="text-muted-foreground/70 mt-1 max-w-sm text-sm"
+        >
+          {description}
+        </motion.p>
+      )}
+      {children && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+          className="mt-4"
+        >
+          {children}
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
 

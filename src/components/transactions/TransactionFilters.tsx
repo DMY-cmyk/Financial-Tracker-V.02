@@ -19,6 +19,9 @@ interface TransactionFiltersProps {
   paymentMethods?: PaymentMethod[];
   allMonths?: boolean;
   onAllMonthsChange?: (v: boolean) => void;
+  yearOnly?: boolean;
+  onYearOnlyChange?: (v: boolean) => void;
+  selectedYear?: number;
   searchInputRef?: RefObject<HTMLInputElement | null>;
 }
 
@@ -34,6 +37,9 @@ export function TransactionFilters({
   paymentMethods = [],
   allMonths = false,
   onAllMonthsChange,
+  yearOnly = false,
+  onYearOnlyChange,
+  selectedYear,
   searchInputRef,
 }: TransactionFiltersProps) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -118,6 +124,20 @@ export function TransactionFilters({
           }`}
         >
           {t(locale, 'allMonths')}
+        </button>
+      )}
+
+      {onYearOnlyChange && (
+        <button
+          onClick={() => onYearOnlyChange(!yearOnly)}
+          className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+            yearOnly
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border text-muted-foreground hover:bg-muted'
+          }`}
+        >
+          {t(locale, 'viewEntireYear')}
+          {selectedYear ? ` ${selectedYear}` : ''}
         </button>
       )}
     </div>
