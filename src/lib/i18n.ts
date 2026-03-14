@@ -270,6 +270,27 @@ type TranslationKeys = {
   deleteSavingsGoal: string;
   updateSaved: string;
 
+  // Recurring transactions
+  recurringTransactions: string;
+  addRecurring: string;
+  editRecurring: string;
+  deleteRecurring: string;
+  recurringDeleted: string;
+  recurringAdded: string;
+  recurringUpdated: string;
+  frequency: string;
+  daily: string;
+  weekly: string;
+  monthly: string;
+  yearly: string;
+  nextDueDate: string;
+  active: string;
+  inactive: string;
+  generateNow: string;
+  generated: string;
+  noRecurring: string;
+  indefinite: string;
+
   // Language switcher
   switchLanguage: string;
 
@@ -522,6 +543,25 @@ const translations: Record<Locale, TranslationKeys> = {
     noSavingsGoals: 'No savings goals yet',
     deleteSavingsGoal: 'Delete Savings Goal',
     updateSaved: 'Update Saved',
+    recurringTransactions: 'Recurring Transactions',
+    addRecurring: 'Add Recurring',
+    editRecurring: 'Edit Recurring',
+    deleteRecurring: 'Delete Recurring',
+    recurringDeleted: 'Recurring transaction deleted',
+    recurringAdded: 'Recurring transaction added',
+    recurringUpdated: 'Recurring transaction updated',
+    frequency: 'Frequency',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    yearly: 'Yearly',
+    nextDueDate: 'Next Due',
+    active: 'Active',
+    inactive: 'Inactive',
+    generateNow: 'Generate Now',
+    generated: 'Generated',
+    noRecurring: 'No recurring transactions yet',
+    indefinite: 'Indefinite',
     switchLanguage: 'Switch Language',
     uploadHistory: 'Upload History',
     noUploadHistory: 'No uploads yet',
@@ -765,6 +805,25 @@ const translations: Record<Locale, TranslationKeys> = {
     noSavingsGoals: 'Belum ada target tabungan',
     deleteSavingsGoal: 'Hapus Target Tabungan',
     updateSaved: 'Perbarui Tersimpan',
+    recurringTransactions: 'Transaksi Berulang',
+    addRecurring: 'Tambah Berulang',
+    editRecurring: 'Edit Berulang',
+    deleteRecurring: 'Hapus Berulang',
+    recurringDeleted: 'Transaksi berulang dihapus',
+    recurringAdded: 'Transaksi berulang ditambahkan',
+    recurringUpdated: 'Transaksi berulang diperbarui',
+    frequency: 'Frekuensi',
+    daily: 'Harian',
+    weekly: 'Mingguan',
+    monthly: 'Bulanan',
+    yearly: 'Tahunan',
+    nextDueDate: 'Jatuh Tempo Berikutnya',
+    active: 'Aktif',
+    inactive: 'Nonaktif',
+    generateNow: 'Buat Sekarang',
+    generated: 'Dibuat',
+    noRecurring: 'Belum ada transaksi berulang',
+    indefinite: 'Tidak terbatas',
     switchLanguage: 'Ganti Bahasa',
     uploadHistory: 'Riwayat Unggahan',
     noUploadHistory: 'Belum ada unggahan',

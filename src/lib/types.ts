@@ -44,6 +44,22 @@ export interface SavingsGoal {
   color: string;
 }
 
+export interface RecurringTransaction {
+  id: string;
+  description: string;
+  category: string;
+  categoryId: string;
+  type: 'income' | 'expense';
+  amount: number;
+  paymentMethod: string;
+  notes: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  startDate: string;
+  endDate: string | null;
+  nextDueDate: string;
+  isActive: boolean;
+}
+
 export interface UIState {
   selectedMonth: number;
   selectedYear: number;

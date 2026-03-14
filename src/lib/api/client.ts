@@ -1,4 +1,4 @@
-import type { Transaction, Category, PaymentMethod } from '@/lib/types';
+import type { Transaction, Category, PaymentMethod, RecurringTransaction } from '@/lib/types';
 import type {
   CreateTransactionRequest,
   BulkCreateTransactionRequest,
@@ -21,6 +21,9 @@ import type {
   SavingsGoalResponse,
   CreateSavingsGoalRequest,
   UpdateSavingsGoalRequest,
+  RecurringTransactionListResponse,
+  CreateRecurringTransactionRequest,
+  UpdateRecurringTransactionRequest,
   ApiResult,
 } from './contracts';
 
@@ -258,6 +261,38 @@ export const api = {
     delete(id: string) {
       return fetchApi<{ success: boolean }>(`/savings/${id}`, {
         method: 'DELETE',
+      });
+    },
+  },
+
+  recurringTransactions: {
+    list() {
+      return fetchApi<RecurringTransactionListResponse>('/recurring-transactions');
+    },
+
+    create(data: CreateRecurringTransactionRequest) {
+      return fetchApi<RecurringTransaction>('/recurring-transactions', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    update(id: string, data: UpdateRecurringTransactionRequest) {
+      return fetchApi<RecurringTransaction>(`/recurring-transactions/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+
+    delete(id: string) {
+      return fetchApi<{ success: boolean }>(`/recurring-transactions/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    generate() {
+      return fetchApi<{ generated: number }>('/recurring-transactions/generate', {
+        method: 'POST',
       });
     },
   },

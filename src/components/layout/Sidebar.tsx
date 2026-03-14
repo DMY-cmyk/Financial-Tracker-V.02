@@ -18,6 +18,7 @@ import {
   CalendarCheck,
   PiggyBank,
   Target,
+  Repeat,
   Languages,
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ type NavKey =
   | 'transactions'
   | 'budgetPage'
   | 'bills'
+  | 'recurringTransactions'
   | 'savingsPage'
   | 'upload'
   | 'export'
@@ -35,6 +37,7 @@ type NavKey =
 const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
+  { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
   { href: '/budget', key: 'budgetPage', icon: Target },
   { href: '/bills', key: 'bills', icon: CalendarCheck },
   { href: '/savings', key: 'savingsPage', icon: PiggyBank },

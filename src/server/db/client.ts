@@ -124,6 +124,23 @@ async function initializeSchema(client: DbClient): Promise<void> {
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       completed_at TEXT DEFAULT NULL
     )`,
+    `CREATE TABLE IF NOT EXISTS recurring_transactions (
+      id TEXT PRIMARY KEY,
+      description TEXT NOT NULL,
+      category TEXT NOT NULL,
+      category_id TEXT NOT NULL DEFAULT '',
+      type TEXT NOT NULL,
+      amount DOUBLE PRECISION NOT NULL,
+      payment_method TEXT NOT NULL,
+      notes TEXT DEFAULT '',
+      frequency TEXT NOT NULL,
+      start_date TEXT NOT NULL,
+      end_date TEXT DEFAULT NULL,
+      next_due_date TEXT NOT NULL,
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+      updated_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
   ];
 
   for (const ddl of tables) {
@@ -137,6 +154,8 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)',
     'CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)',
     'CREATE INDEX IF NOT EXISTS idx_bills_month_year ON bills(month, year)',
+    'CREATE INDEX IF NOT EXISTS idx_recurring_tx_next_due ON recurring_transactions(next_due_date)',
+    'CREATE INDEX IF NOT EXISTS idx_recurring_tx_active ON recurring_transactions(is_active)',
   ];
 
   for (const idx of indexes) {

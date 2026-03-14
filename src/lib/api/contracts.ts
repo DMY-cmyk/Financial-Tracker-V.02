@@ -1,4 +1,4 @@
-import type { Transaction, Category, PaymentMethod } from '@/lib/types';
+import type { Transaction, Category, PaymentMethod, RecurringTransaction } from '@/lib/types';
 
 // === Request types ===
 
@@ -201,4 +201,40 @@ export interface UpdateSavingsGoalRequest {
   targetAmount?: number;
   savedAmount?: number;
   color?: string;
+}
+
+// === Recurring transaction contracts ===
+
+export interface RecurringTransactionListResponse {
+  recurringTransactions: RecurringTransaction[];
+}
+
+export interface CreateRecurringTransactionRequest {
+  description: string;
+  category: string;
+  categoryId: string;
+  type: 'income' | 'expense';
+  amount: number;
+  paymentMethod: string;
+  notes: string;
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  startDate: string;
+  endDate: string | null;
+  nextDueDate: string;
+  isActive: boolean;
+}
+
+export interface UpdateRecurringTransactionRequest {
+  description?: string;
+  category?: string;
+  categoryId?: string;
+  type?: 'income' | 'expense';
+  amount?: number;
+  paymentMethod?: string;
+  notes?: string;
+  frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  startDate?: string;
+  endDate?: string | null;
+  nextDueDate?: string;
+  isActive?: boolean;
 }

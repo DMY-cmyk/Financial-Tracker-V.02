@@ -111,6 +111,35 @@ export const createExportJobSchema = z.object({
   recordCount: z.number().int().min(0).optional().default(0),
 });
 
+// === Recurring transaction schemas ===
+
+export const createRecurringTransactionSchema = z.object({
+  description: z.string().min(1, 'Description is required').max(200),
+  category: z.string().min(1, 'Category is required'),
+  categoryId: z.string().min(1, 'Category ID is required'),
+  type: z.enum(['income', 'expense']),
+  amount: z.number().positive('Amount must be positive'),
+  paymentMethod: z.string().min(1, 'Payment method is required'),
+  notes: z.string().max(500).optional().default(''),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional()
+    .default(null),
+  nextDueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
+  isActive: z.boolean().optional().default(true),
+});
+
+export const updateRecurringTransactionSchema = createRecurringTransactionSchema.partial();
+
+export const listRecurringTransactionsQuerySchema = z.object({
+  isActive: z.boolean().optional(),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
+});
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -129,3 +158,6 @@ export type CreateBillInput = z.infer<typeof createBillSchema>;
 export type UpdateBillInput = z.infer<typeof updateBillSchema>;
 export type CreateSavingsGoalInput = z.infer<typeof createSavingsGoalSchema>;
 export type UpdateSavingsGoalInput = z.infer<typeof updateSavingsGoalSchema>;
+export type CreateRecurringTransactionInput = z.infer<typeof createRecurringTransactionSchema>;
+export type UpdateRecurringTransactionInput = z.infer<typeof updateRecurringTransactionSchema>;
+export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransactionsQuerySchema>;
