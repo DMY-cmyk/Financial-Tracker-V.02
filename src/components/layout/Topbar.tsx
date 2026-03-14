@@ -3,9 +3,13 @@
 import { useStore } from '@/store';
 import { MONTH_NAMES } from '@/lib/constants';
 import { useLocale } from '@/lib/i18n';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Menu } from 'lucide-react';
 
-export function Topbar() {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Topbar({ onMenuClick }: TopbarProps) {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const setMonth = useStore((s) => s.setMonth);
@@ -32,8 +36,15 @@ export function Topbar() {
 
   return (
     <header className="border-border bg-card/80 flex h-14 shrink-0 items-center justify-between border-b px-4 backdrop-blur-sm sm:px-6">
-      {/* Mobile: Logo */}
-      <div className="flex items-center gap-3 lg:hidden">
+      {/* Mobile: Hamburger + Logo */}
+      <div className="flex items-center gap-2 lg:hidden">
+        <button
+          onClick={onMenuClick}
+          aria-label={locale === 'id' ? 'Buka menu' : 'Open menu'}
+          className="text-muted-foreground hover:bg-muted hover:text-foreground -ml-1 rounded-lg p-1.5 transition-colors"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg shadow-sm">
           <span className="text-primary-foreground text-xs font-bold">FT</span>
         </div>

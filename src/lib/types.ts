@@ -66,6 +66,7 @@ export interface UIState {
   selectedYear: number;
   theme: 'light' | 'dark' | 'system';
   locale: 'en' | 'id';
+  sidebarCollapsed: boolean;
 }
 
 export interface DashboardSummary {
@@ -165,6 +166,7 @@ export interface FinancialStore {
   setYear: (year: number) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setLocale: (locale: 'en' | 'id') => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 
   // Lifecycle
   initialize: () => void;
