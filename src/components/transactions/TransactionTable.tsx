@@ -5,7 +5,7 @@ import { formatCurrency, formatDate } from '@/lib/formatters';
 import { CategoryChip } from './CategoryChip';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +13,9 @@ interface TransactionTableProps {
   transactions: Transaction[];
   onEdit: (tx: Transaction) => void;
   onDelete: (id: string) => void;
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const rowVariants = {
@@ -21,7 +24,14 @@ const rowVariants = {
   exit: { opacity: 0, x: -16, transition: { duration: 0.2 } },
 };
 
-export function TransactionTable({ transactions, onEdit, onDelete }: TransactionTableProps) {
+export function TransactionTable({
+  transactions,
+  onEdit,
+  onDelete,
+  page = 1,
+  totalPages = 1,
+  onPageChange,
+}: TransactionTableProps) {
   const locale = useLocale();
 
   if (transactions.length === 0) {
@@ -105,6 +115,37 @@ export function TransactionTable({ transactions, onEdit, onDelete }: Transaction
           </div>
         </div>
       ))}
+
+      {/* Pagination */}
+      {totalPages > 1 && onPageChange && (
+        <div className="border-border flex items-center justify-between rounded-2xl border px-4 py-3">
+          <span className="text-muted-foreground text-xs">
+            {locale === 'id' ? `Halaman ${page} dari ${totalPages}` : `Page ${page} of ${totalPages}`}
+          </span>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+              className="h-8 w-8 p-0"
+              aria-label={locale === 'id' ? 'Sebelumnya' : 'Previous'}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
+              className="h-8 w-8 p-0"
+              aria-label={locale === 'id' ? 'Berikutnya' : 'Next'}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

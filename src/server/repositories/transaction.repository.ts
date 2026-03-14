@@ -163,5 +163,75 @@ export function createTransactionRepository() {
         categoryId,
       ]);
     },
+
+    async findFiltered(filters: {
+      month?: number;
+      year?: number;
+      type?: string;
+      categoryId?: string;
+      paymentMethod?: string;
+      search?: string;
+      page?: number;
+      pageSize?: number;
+    }): Promise<{ rows: Transaction[]; total: number; income: number; expense: number }> {
+      const db = await getDb();
+      const conditions: string[] = [];
+      const params: unknown[] = [];
+
+      if (filters.month !== undefined && filters.year !== undefined) {
+        const prefix = `${filters.year}-${String(filters.month + 1).padStart(2, '0')}`;
+        conditions.push("date LIKE ? || '%'");
+        params.push(prefix);
+      }
+      if (filters.type) {
+        conditions.push('type = ?');
+        params.push(filters.type);
+      }
+      if (filters.categoryId) {
+        conditions.push('category_id = ?');
+        params.push(filters.categoryId);
+      }
+      if (filters.paymentMethod) {
+        conditions.push('payment_method = ?');
+        params.push(filters.paymentMethod);
+      }
+      if (filters.search) {
+        conditions.push("(LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(notes) LIKE ?)");
+        const q = `%${filters.search.toLowerCase()}%`;
+        params.push(q, q, q);
+      }
+
+      const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+      // Get total count + aggregates in one query
+      const countResult = await db.query<{ cnt: number; total_income: number; total_expense: number }>(
+        `SELECT COUNT(*) as cnt,
+                COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
+                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expense
+         FROM transactions ${where}`,
+        params
+      );
+
+      const total = countResult.rows[0]?.cnt ?? 0;
+      const income = countResult.rows[0]?.total_income ?? 0;
+      const expense = countResult.rows[0]?.total_expense ?? 0;
+
+      // Get paginated rows
+      const page = filters.page ?? 1;
+      const pageSize = filters.pageSize ?? 25;
+      const offset = (page - 1) * pageSize;
+
+      const dataResult = await db.query<TxRow>(
+        `SELECT * FROM transactions ${where} ORDER BY date DESC LIMIT ? OFFSET ?`,
+        [...params, pageSize, offset]
+      );
+
+      return {
+        rows: dataResult.rows.map(rowToTransaction),
+        total,
+        income,
+        expense,
+      };
+    },
   };
 }

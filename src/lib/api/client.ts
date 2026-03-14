@@ -50,7 +50,10 @@ export const api = {
       year?: number;
       type?: string;
       categoryId?: string;
+      paymentMethod?: string;
       search?: string;
+      page?: number;
+      pageSize?: number;
     }) {
       const query = new URLSearchParams();
       if (params) {

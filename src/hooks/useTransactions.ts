@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import { type Transaction, type PaymentMethod } from '@/lib/types';
@@ -8,9 +8,15 @@ import { type Transaction, type PaymentMethod } from '@/lib/types';
 interface UseTransactionsReturn {
   // Data
   transactions: Transaction[];
-  filtered: Transaction[];
   income: number;
   expense: number;
+
+  // Pagination
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  total: number;
+  setPage: (v: number) => void;
 
   // Filters
   search: string;
@@ -55,9 +61,10 @@ export function useTransactions(): UseTransactionsReturn {
   const [fetchKey, setFetchKey] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
-  const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `${month}-${year}-${fetchKey}`;
-  const isApiLoading = loadedKey !== targetKey;
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [total, setTotal] = useState(0);
+  const pageSize = 25;
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
@@ -65,6 +72,16 @@ export function useTransactions(): UseTransactionsReturn {
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
+
+  const [loadedKey, setLoadedKey] = useState('');
+  const targetKey = `${month}-${year}-${fetchKey}-${page}-${typeFilter}-${categoryFilter}-${paymentMethodFilter}-${search}`;
+  const isApiLoading = loadedKey !== targetKey;
+
+  // Reset page when filters change
+  const setSearchWithReset = useCallback((v: string) => { setSearch(v); setPage(1); }, []);
+  const setTypeFilterWithReset = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilter(v); setPage(1); }, []);
+  const setCategoryFilterWithReset = useCallback((v: string) => { setCategoryFilter(v); setPage(1); }, []);
+  const setPaymentMethodFilterWithReset = useCallback((v: string) => { setPaymentMethodFilter(v); setPage(1); }, []);
 
   useEffect(() => {
     if (!initialized) return;
@@ -77,40 +94,30 @@ export function useTransactions(): UseTransactionsReturn {
     if (!initialized) return;
 
     let cancelled = false;
+    const params: Record<string, unknown> = { month, year, page, pageSize };
+    if (typeFilter !== 'all') params.type = typeFilter;
+    if (categoryFilter) params.categoryId = categoryFilter;
+    if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
+    if (search) params.search = search;
 
-    api.transactions.list({ month, year }).then((result) => {
+    api.transactions.list(params as Parameters<typeof api.transactions.list>[0]).then((result) => {
       if (cancelled) return;
       if (result.data) {
         setAllTransactions(result.data.transactions);
         setIncome(result.data.income);
         setExpense(result.data.expense);
+        setTotalPages(result.data.totalPages);
+        setTotal(result.data.total);
       }
-      setLoadedKey(`${month}-${year}-${fetchKey}`);
+      setLoadedKey(targetKey);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [month, year, fetchKey, initialized]);
+  }, [month, year, fetchKey, initialized, page, typeFilter, categoryFilter, paymentMethodFilter, search, targetKey]);
 
   const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
-
-  const filtered = useMemo(() => {
-    return allTransactions.filter((tx) => {
-      if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
-      if (categoryFilter && tx.categoryId !== categoryFilter) return false;
-      if (paymentMethodFilter && tx.paymentMethod !== paymentMethodFilter) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        return (
-          tx.description.toLowerCase().includes(q) ||
-          tx.category.toLowerCase().includes(q) ||
-          tx.notes.toLowerCase().includes(q)
-        );
-      }
-      return true;
-    });
-  }, [allTransactions, typeFilter, categoryFilter, paymentMethodFilter, search]);
 
   const hasActiveFilters =
     search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '';
@@ -120,6 +127,7 @@ export function useTransactions(): UseTransactionsReturn {
     setTypeFilter('all');
     setCategoryFilter('');
     setPaymentMethodFilter('');
+    setPage(1);
   }, []);
 
   const openAdd = useCallback(() => {
@@ -147,17 +155,21 @@ export function useTransactions(): UseTransactionsReturn {
 
   return {
     transactions: allTransactions,
-    filtered,
     income,
     expense,
+    page,
+    pageSize,
+    totalPages,
+    total,
+    setPage,
     search,
-    setSearch,
+    setSearch: setSearchWithReset,
     typeFilter,
-    setTypeFilter,
+    setTypeFilter: setTypeFilterWithReset,
     categoryFilter,
-    setCategoryFilter,
+    setCategoryFilter: setCategoryFilterWithReset,
     paymentMethodFilter,
-    setPaymentMethodFilter,
+    setPaymentMethodFilter: setPaymentMethodFilterWithReset,
     hasActiveFilters,
     clearFilters,
     paymentMethods,
@@ -169,7 +181,7 @@ export function useTransactions(): UseTransactionsReturn {
     closeForm,
     deleteTransaction,
     isLoading,
-    isEmpty: !isLoading && allTransactions.length === 0,
-    hasNoResults: !isLoading && allTransactions.length > 0 && filtered.length === 0,
+    isEmpty: !isLoading && total === 0 && !hasActiveFilters,
+    hasNoResults: !isLoading && allTransactions.length === 0 && hasActiveFilters,
   };
 }

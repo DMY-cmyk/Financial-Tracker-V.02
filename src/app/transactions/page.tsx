@@ -21,9 +21,13 @@ import { toast } from 'sonner';
 export default function TransactionsPage() {
   const locale = useLocale();
   const {
-    filtered,
+    transactions,
     income,
     expense,
+    page,
+    totalPages,
+    total,
+    setPage,
     search,
     setSearch,
     typeFilter,
@@ -75,7 +79,7 @@ export default function TransactionsPage() {
       <motion.div {...fadeInUp}>
         <PageHeader
           title={t(locale, 'transactions')}
-          description={`${filtered.length} ${t(locale, 'transactionCount')}`}
+          description={`${total} ${t(locale, 'transactionCount')}`}
         >
           <Button onClick={openAdd} className="gap-2 shadow-sm">
             <Plus className="h-4 w-4" />
@@ -127,7 +131,14 @@ export default function TransactionsPage() {
           </motion.div>
         ) : (
           <motion.div key="list" variants={staggerContainer} initial="hidden" animate="show">
-            <TransactionTable transactions={filtered} onEdit={openEdit} onDelete={handleDelete} />
+            <TransactionTable
+              transactions={transactions}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
           </motion.div>
         )}
       </AnimatePresence>

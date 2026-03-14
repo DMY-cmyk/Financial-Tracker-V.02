@@ -40,6 +40,8 @@ export interface ListTransactionsParams {
   type?: 'income' | 'expense';
   categoryId?: string;
   search?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface DashboardSummaryParams {
@@ -70,6 +72,9 @@ export interface TransactionListResponse {
   total: number;
   income: number;
   expense: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 export interface DashboardSummaryResponse {

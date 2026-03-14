@@ -16,8 +16,16 @@ export async function GET(request: NextRequest) {
   const categoryId = searchParams.get('categoryId');
   if (categoryId) query.categoryId = categoryId;
 
+  const paymentMethod = searchParams.get('paymentMethod');
+  if (paymentMethod) query.paymentMethod = paymentMethod;
+
   const search = searchParams.get('search');
   if (search) query.search = search;
+
+  const pageStr = searchParams.get('page');
+  if (pageStr) query.page = parseInt(pageStr, 10);
+  const pageSizeStr = searchParams.get('pageSize');
+  if (pageSizeStr) query.pageSize = parseInt(pageSizeStr, 10);
 
   const result = await listTransactions(query);
 

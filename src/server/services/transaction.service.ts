@@ -6,7 +6,6 @@ import {
   updateTransactionSchema,
   listTransactionsQuerySchema,
   bulkCreateTransactionSchema,
-  type ListTransactionsQuery,
 } from '@/lib/api/validation';
 import type { TransactionListResponse, BulkCreateTransactionResponse } from '@/lib/api/contracts';
 
@@ -22,28 +21,6 @@ function formatZodError(error: {
     fieldErrors[path].push(issue.message);
   }
   return fieldErrors;
-}
-
-function applyFilters(transactions: Transaction[], query: ListTransactionsQuery): Transaction[] {
-  let filtered = transactions;
-
-  if (query.type) {
-    filtered = filtered.filter((t) => t.type === query.type);
-  }
-  if (query.categoryId) {
-    filtered = filtered.filter((t) => t.categoryId === query.categoryId);
-  }
-  if (query.search) {
-    const q = query.search.toLowerCase();
-    filtered = filtered.filter(
-      (t) =>
-        t.description.toLowerCase().includes(q) ||
-        t.category.toLowerCase().includes(q) ||
-        t.notes.toLowerCase().includes(q)
-    );
-  }
-
-  return filtered.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 interface ServiceResult<T> {
@@ -68,19 +45,13 @@ export async function listTransactions(
   }
 
   const query = parsed.data;
-  const base =
-    query.month !== undefined && query.year !== undefined
-      ? await repo.findByMonth(query.month, query.year)
-      : await repo.findAll();
-
-  const transactions = applyFilters(base, query);
-  const income = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const expense = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((s, t) => s + t.amount, 0);
+  const { rows: transactions, total, income, expense } = await repo.findFiltered(query);
+  const page = query.page ?? 1;
+  const pageSize = query.pageSize ?? 25;
+  const totalPages = Math.ceil(total / pageSize);
 
   return {
-    data: { transactions, total: transactions.length, income, expense },
+    data: { transactions, total, income, expense, page, pageSize, totalPages },
   };
 }
 

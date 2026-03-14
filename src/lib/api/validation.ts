@@ -25,7 +25,10 @@ export const listTransactionsQuerySchema = z.object({
   year: z.number().int().min(2000).max(2100).optional(),
   type: z.enum(['income', 'expense']).optional(),
   categoryId: z.string().optional(),
+  paymentMethod: z.string().optional(),
   search: z.string().optional(),
+  page: z.number().int().min(1).optional().default(1),
+  pageSize: z.number().int().min(1).max(100).optional().default(25),
 });
 
 export const dashboardSummaryQuerySchema = z.object({
