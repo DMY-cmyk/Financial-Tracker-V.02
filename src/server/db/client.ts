@@ -158,6 +158,24 @@ async function initializeSchema(client: DbClient): Promise<void> {
     await client.exec(ddl);
   }
 
+  // Column migrations for existing tables that may lack newer columns.
+  // Uses IF NOT EXISTS (Postgres 9.6+); try/catch for SQLite compatibility.
+  const columnMigrations = [
+    `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS category_id TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE recurring_transactions ADD COLUMN IF NOT EXISTS category_id TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE categories ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'circle'`,
+    `ALTER TABLE categories ADD COLUMN IF NOT EXISTS budget DOUBLE PRECISION DEFAULT 0`,
+    `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'wallet'`,
+  ];
+
+  for (const migration of columnMigrations) {
+    try {
+      await client.exec(migration);
+    } catch {
+      // Column already exists or SQLite (doesn't support IF NOT EXISTS in ALTER TABLE)
+    }
+  }
+
   // Performance indexes
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)',
