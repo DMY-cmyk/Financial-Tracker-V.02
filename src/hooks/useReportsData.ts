@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { api } from '@/lib/api/client';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useStore } from '@/store';
 
 export interface MonthlyTrend {
@@ -21,24 +21,18 @@ interface UseReportsDataReturn {
 
 export function useReportsData(): UseReportsDataReturn {
   const initialized = useStore((s) => s.initialized);
-  const [trends, setTrends] = useState<MonthlyTrend[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [monthCount, setMonthCount] = useState(12);
 
-  useEffect(() => {
-    if (!initialized) return;
-    setIsLoading(true);
-
-    const params = new URLSearchParams({ months: String(monthCount) });
-    fetch(`/api/reports/trends?${params}`)
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.data?.months) {
-          setTrends(json.data.months);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, [initialized, monthCount]);
+  const { data: trends = [], isLoading } = useQuery<MonthlyTrend[]>({
+    queryKey: ['reports-trends', monthCount],
+    queryFn: async () => {
+      const params = new URLSearchParams({ months: String(monthCount) });
+      const res = await fetch(`/api/reports/trends?${params}`);
+      const json = await res.json();
+      return json.data?.months ?? [];
+    },
+    enabled: initialized,
+  });
 
   return { trends, isLoading, monthCount, setMonthCount };
 }

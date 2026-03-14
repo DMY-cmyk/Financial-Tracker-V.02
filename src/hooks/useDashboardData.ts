@@ -1,62 +1,67 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import type { DashboardSummaryResponse } from '@/lib/api/contracts';
 import type { Bill, Category, SavingsGoal } from '@/lib/types';
 
+interface DashboardData {
+  summary: DashboardSummaryResponse | null;
+  categories: Category[];
+  bills: Bill[];
+  savingsGoals: SavingsGoal[];
+}
+
 export function useDashboardData() {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
+  const queryClient = useQueryClient();
 
-  const [summary, setSummary] = useState<DashboardSummaryResponse | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [bills, setBills] = useState<Bill[]>([]);
-  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
+  const { data, isLoading: isQueryLoading } = useQuery<DashboardData>({
+    queryKey: ['dashboard', month, year],
+    queryFn: async () => {
+      const [summaryResult, catResult, billsResult, savingsResult] = await Promise.all([
+        api.dashboard.summary(month, year),
+        api.categories.list(),
+        api.bills.list({ month, year }),
+        api.savings.list(),
+      ]);
+      return {
+        summary: summaryResult.data ?? null,
+        categories: catResult.data?.categories ?? [],
+        bills: billsResult.data?.bills ?? [],
+        savingsGoals: savingsResult.data?.goals ?? [],
+      };
+    },
+    enabled: initialized,
+  });
 
-  const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `${month}-${year}`;
-  const isApiLoading = loadedKey !== targetKey;
-
-  useEffect(() => {
-    if (!initialized) return;
-
-    let cancelled = false;
-
-    Promise.all([
-      api.dashboard.summary(month, year),
-      api.categories.list(),
-      api.bills.list({ month, year }),
-      api.savings.list(),
-    ]).then(([summaryResult, catResult, billsResult, savingsResult]) => {
-      if (cancelled) return;
-      if (summaryResult.data) setSummary(summaryResult.data);
-      if (catResult.data) setCategories(catResult.data.categories);
-      if (billsResult.data) setBills(billsResult.data.bills);
-      if (savingsResult.data) setSavingsGoals(savingsResult.data.goals);
-      setLoadedKey(`${month}-${year}`);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [month, year, initialized]);
+  const summary = data?.summary ?? null;
+  const categories = data?.categories ?? [];
+  const bills = data?.bills ?? [];
+  const savingsGoals = data?.savingsGoals ?? [];
 
   const onToggleBill = useCallback(
     async (id: string) => {
       const bill = bills.find((b) => b.id === id);
       if (!bill) return;
       // Optimistic update
-      setBills((prev) => prev.map((b) => (b.id === id ? { ...b, isPaid: !b.isPaid } : b)));
+      queryClient.setQueryData<DashboardData>(['dashboard', month, year], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          bills: old.bills.map((b) => (b.id === id ? { ...b, isPaid: !b.isPaid } : b)),
+        };
+      });
       const result = await api.bills.update(id, { isPaid: !bill.isPaid });
       if (result.error) {
-        // Revert on failure
-        setBills((prev) => prev.map((b) => (b.id === id ? { ...b, isPaid: bill.isPaid } : b)));
+        queryClient.invalidateQueries({ queryKey: ['dashboard', month, year] });
       }
     },
-    [bills]
+    [bills, queryClient, month, year]
   );
 
   const budgetStatus = useMemo(() => {
@@ -71,23 +76,27 @@ export function useDashboardData() {
       });
   }, [summary, categories]);
 
-  const isLoading = !initialized || isApiLoading;
-
   const updateBudget = useCallback(
     async (categoryId: string, budget: number) => {
-      setCategories((prev) => prev.map((c) => (c.id === categoryId ? { ...c, budget } : c)));
+      // Optimistic update
+      queryClient.setQueryData<DashboardData>(['dashboard', month, year], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          categories: old.categories.map((c) => (c.id === categoryId ? { ...c, budget } : c)),
+        };
+      });
       const result = await api.categories.update(categoryId, { budget });
       if (result.error) {
-        // Revert — re-fetch categories
-        api.categories.list().then((r) => {
-          if (r.data) setCategories(r.data.categories);
-        });
+        queryClient.invalidateQueries({ queryKey: ['dashboard', month, year] });
         return false;
       }
       return true;
     },
-    []
+    [queryClient, month, year]
   );
+
+  const isLoading = !initialized || isQueryLoading;
 
   return {
     month,

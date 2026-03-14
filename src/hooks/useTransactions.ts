@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import { type Transaction, type PaymentMethod } from '@/lib/types';
@@ -57,85 +58,81 @@ export function useTransactions(): UseTransactionsReturn {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
-
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-  const [income, setIncome] = useState(0);
-  const [expense, setExpense] = useState(0);
-  const [fetchKey, setFetchKey] = useState(0);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [total, setTotal] = useState(0);
   const pageSize = 25;
 
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState('');
+  const [search, setSearchState] = useState('');
+  const [typeFilter, setTypeFilterState] = useState<'all' | 'income' | 'expense'>('all');
+  const [categoryFilter, setCategoryFilterState] = useState('');
+  const [paymentMethodFilter, setPaymentMethodFilterState] = useState('');
   const [allMonths, setAllMonthsState] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
-  const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `${allMonths ? 'all' : `${month}-${year}`}-${fetchKey}-${page}-${typeFilter}-${categoryFilter}-${paymentMethodFilter}-${search}`;
-  const isApiLoading = loadedKey !== targetKey;
-
   // Reset page when filters change
-  const setSearchWithReset = useCallback((v: string) => { setSearch(v); setPage(1); }, []);
-  const setTypeFilterWithReset = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilter(v); setPage(1); }, []);
-  const setCategoryFilterWithReset = useCallback((v: string) => { setCategoryFilter(v); setPage(1); }, []);
-  const setPaymentMethodFilterWithReset = useCallback((v: string) => { setPaymentMethodFilter(v); setPage(1); }, []);
-  const setAllMonthsWithReset = useCallback((v: boolean) => { setAllMonthsState(v); setPage(1); }, []);
+  const setSearch = useCallback((v: string) => { setSearchState(v); setPage(1); }, []);
+  const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilterState(v); setPage(1); }, []);
+  const setCategoryFilter = useCallback((v: string) => { setCategoryFilterState(v); setPage(1); }, []);
+  const setPaymentMethodFilter = useCallback((v: string) => { setPaymentMethodFilterState(v); setPage(1); }, []);
+  const setAllMonths = useCallback((v: boolean) => { setAllMonthsState(v); setPage(1); }, []);
 
-  useEffect(() => {
-    if (!initialized) return;
-    api.paymentMethods.list().then((result) => {
-      if (result.data) setPaymentMethods(result.data.paymentMethods);
-    });
-  }, [initialized]);
+  const { data: pmData } = useQuery({
+    queryKey: ['payment-methods'],
+    queryFn: async () => {
+      const result = await api.paymentMethods.list();
+      return result.data?.paymentMethods ?? [];
+    },
+    enabled: initialized,
+  });
+  const paymentMethods = pmData ?? [];
 
-  useEffect(() => {
-    if (!initialized) return;
+  const txQueryKey = [
+    'transactions',
+    allMonths ? 'all' : `${month}-${year}`,
+    page,
+    typeFilter,
+    categoryFilter,
+    paymentMethodFilter,
+    search,
+  ];
 
-    let cancelled = false;
-    const params: Record<string, unknown> = { page, pageSize };
-    if (!allMonths) {
-      params.month = month;
-      params.year = year;
-    }
-    if (typeFilter !== 'all') params.type = typeFilter;
-    if (categoryFilter) params.categoryId = categoryFilter;
-    if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
-    if (search) params.search = search;
-
-    api.transactions.list(params as Parameters<typeof api.transactions.list>[0]).then((result) => {
-      if (cancelled) return;
-      if (result.data) {
-        setAllTransactions(result.data.transactions);
-        setIncome(result.data.income);
-        setExpense(result.data.expense);
-        setTotalPages(result.data.totalPages);
-        setTotal(result.data.total);
+  const { data: txData, isLoading: isQueryLoading } = useQuery({
+    queryKey: txQueryKey,
+    queryFn: async () => {
+      const params: Record<string, unknown> = { page, pageSize };
+      if (!allMonths) {
+        params.month = month;
+        params.year = year;
       }
-      setLoadedKey(targetKey);
-    });
+      if (typeFilter !== 'all') params.type = typeFilter;
+      if (categoryFilter) params.categoryId = categoryFilter;
+      if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
+      if (search) params.search = search;
 
-    return () => {
-      cancelled = true;
-    };
-  }, [month, year, fetchKey, initialized, page, typeFilter, categoryFilter, paymentMethodFilter, search, allMonths, targetKey]);
+      const result = await api.transactions.list(
+        params as Parameters<typeof api.transactions.list>[0]
+      );
+      return result.data ?? null;
+    },
+    enabled: initialized,
+  });
 
-  const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
+  const transactions = txData?.transactions ?? [];
+  const income = txData?.income ?? 0;
+  const expense = txData?.expense ?? 0;
+  const totalPages = txData?.totalPages ?? 0;
+  const total = txData?.total ?? 0;
 
   const hasActiveFilters =
     search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '' || allMonths;
 
   const clearFilters = useCallback(() => {
-    setSearch('');
-    setTypeFilter('all');
-    setCategoryFilter('');
-    setPaymentMethodFilter('');
+    setSearchState('');
+    setTypeFilterState('all');
+    setCategoryFilterState('');
+    setPaymentMethodFilterState('');
     setAllMonthsState(false);
     setPage(1);
   }, []);
@@ -155,7 +152,7 @@ export function useTransactions(): UseTransactionsReturn {
       const today = `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
       setEditingTx({
         ...tx,
-        id: '', // empty ID triggers create mode in the form
+        id: '',
         date: today,
       });
       setFormOpen(true);
@@ -166,18 +163,24 @@ export function useTransactions(): UseTransactionsReturn {
   const closeForm = useCallback(() => {
     setFormOpen(false);
     setEditingTx(undefined);
-    refetch();
-  }, [refetch]);
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+  }, [queryClient]);
 
-  const deleteTransaction = useCallback((id: string) => {
-    setAllTransactions((prev) => prev.filter((t) => t.id !== id));
-    api.transactions.delete(id);
-  }, []);
+  const deleteTransaction = useCallback(
+    (id: string) => {
+      api.transactions.delete(id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      });
+    },
+    [queryClient]
+  );
 
-  const isLoading = !initialized || isApiLoading;
+  const isLoading = !initialized || isQueryLoading;
 
   return {
-    transactions: allTransactions,
+    transactions,
     income,
     expense,
     page,
@@ -186,15 +189,15 @@ export function useTransactions(): UseTransactionsReturn {
     total,
     setPage,
     search,
-    setSearch: setSearchWithReset,
+    setSearch,
     typeFilter,
-    setTypeFilter: setTypeFilterWithReset,
+    setTypeFilter,
     categoryFilter,
-    setCategoryFilter: setCategoryFilterWithReset,
+    setCategoryFilter,
     paymentMethodFilter,
-    setPaymentMethodFilter: setPaymentMethodFilterWithReset,
+    setPaymentMethodFilter,
     allMonths,
-    setAllMonths: setAllMonthsWithReset,
+    setAllMonths,
     hasActiveFilters,
     clearFilters,
     paymentMethods,
@@ -208,6 +211,6 @@ export function useTransactions(): UseTransactionsReturn {
     deleteTransaction,
     isLoading,
     isEmpty: !isLoading && total === 0 && !hasActiveFilters,
-    hasNoResults: !isLoading && allTransactions.length === 0 && hasActiveFilters,
+    hasNoResults: !isLoading && transactions.length === 0 && hasActiveFilters,
   };
 }

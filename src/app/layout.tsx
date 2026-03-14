@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/components/providers/StoreProvider';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -48,8 +49,10 @@ export default function RootLayout({
           Skip to main content
         </a>
         <StoreProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster position="top-right" duration={3000} />
+          <QueryProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster position="top-right" duration={3000} />
+          </QueryProvider>
         </StoreProvider>
       </body>
     </html>

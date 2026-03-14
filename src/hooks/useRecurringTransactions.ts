@@ -1,44 +1,41 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import type { RecurringTransaction, Category, PaymentMethod } from '@/lib/types';
 
+interface RecurringData {
+  recurringTransactions: RecurringTransaction[];
+  categories: Category[];
+  paymentMethods: PaymentMethod[];
+}
+
 export function useRecurringTransactions() {
   const initialized = useStore((s) => s.initialized);
+  const queryClient = useQueryClient();
 
-  const [recurringTransactions, setRecurringTransactions] = useState<RecurringTransaction[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [fetchKey, setFetchKey] = useState(0);
+  const { data, isLoading } = useQuery<RecurringData>({
+    queryKey: ['recurring-transactions'],
+    queryFn: async () => {
+      const [rtResult, catResult, pmResult] = await Promise.all([
+        api.recurringTransactions.list(),
+        api.categories.list(),
+        api.paymentMethods.list(),
+      ]);
+      return {
+        recurringTransactions: rtResult.data?.recurringTransactions ?? [],
+        categories: catResult.data?.categories ?? [],
+        paymentMethods: pmResult.data?.paymentMethods ?? [],
+      };
+    },
+    enabled: initialized,
+  });
 
-  const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `rt-${fetchKey}`;
-  const isLoading = loadedKey !== targetKey;
-
-  useEffect(() => {
-    if (!initialized) return;
-    let cancelled = false;
-
-    Promise.all([
-      api.recurringTransactions.list(),
-      api.categories.list(),
-      api.paymentMethods.list(),
-    ]).then(([rtResult, catResult, pmResult]) => {
-      if (cancelled) return;
-      if (rtResult.data) setRecurringTransactions(rtResult.data.recurringTransactions);
-      if (catResult.data) setCategories(catResult.data.categories);
-      if (pmResult.data) setPaymentMethods(pmResult.data.paymentMethods);
-      setLoadedKey(`rt-${fetchKey}`);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [initialized, fetchKey]);
-
-  const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
+  const recurringTransactions = data?.recurringTransactions ?? [];
+  const categories = data?.categories ?? [];
+  const paymentMethods = data?.paymentMethods ?? [];
 
   // Form state
   const [formOpen, setFormOpen] = useState(false);
@@ -57,15 +54,15 @@ export function useRecurringTransactions() {
   const closeForm = useCallback(() => {
     setFormOpen(false);
     setEditingRT(undefined);
-    refetch();
-  }, [refetch]);
+    queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
+  }, [queryClient]);
 
   const deleteRecurring = useCallback(
     async (id: string) => {
       await api.recurringTransactions.delete(id);
-      setRecurringTransactions((prev) => prev.filter((rt) => rt.id !== id));
+      queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
     },
-    []
+    [queryClient]
   );
 
   const toggleActive = useCallback(
@@ -74,23 +71,33 @@ export function useRecurringTransactions() {
       if (!rt) return;
       const newActive = !rt.isActive;
       // Optimistic update
-      setRecurringTransactions((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, isActive: newActive } : r))
-      );
+      queryClient.setQueryData<RecurringData>(['recurring-transactions'], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          recurringTransactions: old.recurringTransactions.map((r) =>
+            r.id === id ? { ...r, isActive: newActive } : r
+          ),
+        };
+      });
       const result = await api.recurringTransactions.update(id, { isActive: newActive });
-      if (result.error) refetch();
+      if (result.error) {
+        queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
+      }
     },
-    [recurringTransactions, refetch]
+    [recurringTransactions, queryClient]
   );
 
   const generate = useCallback(async () => {
     const result = await api.recurringTransactions.generate();
     if (result.data) {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       return result.data.generated;
     }
     return 0;
-  }, [refetch]);
+  }, [queryClient]);
 
   return {
     recurringTransactions,
@@ -106,6 +113,5 @@ export function useRecurringTransactions() {
     deleteRecurring,
     toggleActive,
     generate,
-    refetch,
   };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
@@ -24,18 +24,15 @@ interface AnnualSummaryProps {
 
 export function AnnualSummary({ year }: AnnualSummaryProps) {
   const locale = useLocale();
-  const [data, setData] = useState<AnnualData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetch(`/api/reports/annual?year=${year}`)
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.data) setData(json.data);
-      })
-      .finally(() => setIsLoading(false));
-  }, [year]);
+  const { data, isLoading } = useQuery<AnnualData | null>({
+    queryKey: ['reports-annual', year],
+    queryFn: async () => {
+      const res = await fetch(`/api/reports/annual?year=${year}`);
+      const json = await res.json();
+      return json.data ?? null;
+    },
+  });
 
   if (isLoading) {
     return (
