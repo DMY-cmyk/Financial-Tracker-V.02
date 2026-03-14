@@ -129,4 +129,17 @@ async function initializeSchema(client: DbClient): Promise<void> {
   for (const ddl of tables) {
     await client.exec(ddl);
   }
+
+  // Performance indexes
+  const indexes = [
+    'CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)',
+    'CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id)',
+    'CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)',
+    'CREATE INDEX IF NOT EXISTS idx_transactions_payment_method ON transactions(payment_method)',
+    'CREATE INDEX IF NOT EXISTS idx_bills_month_year ON bills(month, year)',
+  ];
+
+  for (const idx of indexes) {
+    await client.exec(idx);
+  }
 }
