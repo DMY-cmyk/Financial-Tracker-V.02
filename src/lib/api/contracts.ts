@@ -151,6 +151,7 @@ export interface BillResponse {
   amount: number;
   dueDate: number;
   isPaid: boolean;
+  isRecurring: boolean;
   month: number;
   year: number;
 }
@@ -164,6 +165,7 @@ export interface CreateBillRequest {
   amount: number;
   dueDate: number;
   isPaid?: boolean;
+  isRecurring?: boolean;
   month: number;
   year: number;
 }
@@ -173,6 +175,7 @@ export interface UpdateBillRequest {
   amount?: number;
   dueDate?: number;
   isPaid?: boolean;
+  isRecurring?: boolean;
 }
 
 // === Savings goal contracts ===

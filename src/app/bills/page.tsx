@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Pencil, Trash2, CalendarCheck, AlertCircle, Clock } from 'lucide-react';
+import { Plus, Pencil, Trash2, CalendarCheck, AlertCircle, Clock, Repeat } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Bill } from '@/lib/types';
 
@@ -40,6 +40,7 @@ export default function BillsPage() {
   const [formName, setFormName] = useState('');
   const [formAmount, setFormAmount] = useState('');
   const [formDueDate, setFormDueDate] = useState('');
+  const [formIsRecurring, setFormIsRecurring] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function BillsPage() {
     setFormName('');
     setFormAmount('');
     setFormDueDate('');
+    setFormIsRecurring(false);
     setFormErrors({});
     setEditingBill(null);
   };
@@ -80,6 +82,7 @@ export default function BillsPage() {
     setFormName(bill.name);
     setFormAmount(String(bill.amount));
     setFormDueDate(String(bill.dueDate));
+    setFormIsRecurring(bill.isRecurring);
     setFormOpen(true);
   };
 
@@ -107,6 +110,7 @@ export default function BillsPage() {
         name: formName.trim(),
         amount: Number(formAmount),
         dueDate: Number(formDueDate),
+        isRecurring: formIsRecurring,
       });
       if (result.data) {
         toast.success(t(locale, 'billSaved'));
@@ -120,6 +124,7 @@ export default function BillsPage() {
         name: formName.trim(),
         amount: Number(formAmount),
         dueDate: Number(formDueDate),
+        isRecurring: formIsRecurring,
         month,
         year,
       });
@@ -148,6 +153,16 @@ export default function BillsPage() {
       toast.success(t(locale, 'billDeleted'));
     }
     setDeleteId(null);
+  };
+
+  const handleGenerateRecurring = async () => {
+    const result = await api.bills.generateRecurring(month, year);
+    if (result.data && result.data.generated > 0) {
+      toast.success(t(locale, 'generatedBills').replace('{count}', String(result.data.generated)));
+      refetch();
+    } else {
+      toast.info(locale === 'id' ? 'Tidak ada tagihan berulang untuk dibuat' : 'No recurring bills to generate');
+    }
   };
 
   const paidCount = bills.filter((b) => b.isPaid).length;
@@ -209,10 +224,16 @@ export default function BillsPage() {
                 title={t(locale, 'noBills')}
                 icon={<CalendarCheck className="h-12 w-12" />}
               >
-                <Button onClick={openAdd} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t(locale, 'addBill')}
-                </Button>
+                <div className="flex flex-col items-center gap-2">
+                  <Button onClick={openAdd} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    {t(locale, 'addBill')}
+                  </Button>
+                  <Button variant="outline" onClick={handleGenerateRecurring} className="gap-2">
+                    <Repeat className="h-4 w-4" />
+                    {t(locale, 'generateBills')}
+                  </Button>
+                </div>
               </EmptyState>
             </motion.div>
           ) : (
@@ -260,6 +281,12 @@ export default function BillsPage() {
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
                           <Clock className="h-3 w-3" />
                           {t(locale, 'dueSoon')}
+                        </span>
+                      )}
+                      {bill.isRecurring && (
+                        <span className="text-muted-foreground inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
+                          <Repeat className="h-3 w-3" />
+                          {t(locale, 'recurringBill')}
                         </span>
                       )}
                     </div>
@@ -346,6 +373,16 @@ export default function BillsPage() {
               {formErrors.dueDate && (
                 <p className="text-destructive text-xs">{formErrors.dueDate}</p>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="bill-recurring"
+                checked={formIsRecurring}
+                onCheckedChange={(checked) => setFormIsRecurring(checked === true)}
+              />
+              <Label htmlFor="bill-recurring" className="cursor-pointer text-sm">
+                {t(locale, 'markAsRecurring')}
+              </Label>
             </div>
             <div className="flex gap-2 pt-2">
               <Button onClick={handleSubmit} className="flex-1">

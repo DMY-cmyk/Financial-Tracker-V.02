@@ -8,6 +8,7 @@ interface BillRow {
   amount: number;
   due_date: number;
   is_paid: number;
+  is_recurring: number;
   month: number;
   year: number;
 }
@@ -19,6 +20,7 @@ function rowToBill(row: BillRow): Bill {
     amount: row.amount,
     dueDate: row.due_date,
     isPaid: Boolean(row.is_paid),
+    isRecurring: Boolean(row.is_recurring),
     month: row.month,
     year: row.year,
   };
@@ -41,6 +43,15 @@ export function createBillRepository() {
       return result.rows.map(rowToBill);
     },
 
+    async findRecurringByMonth(month: number, year: number): Promise<Bill[]> {
+      const db = await getDb();
+      const result = await db.query<BillRow>(
+        'SELECT * FROM bills WHERE month = ? AND year = ? AND is_recurring = 1 ORDER BY due_date',
+        [month, year]
+      );
+      return result.rows.map(rowToBill);
+    },
+
     async findById(id: string): Promise<Bill | undefined> {
       const db = await getDb();
       const result = await db.query<BillRow>('SELECT * FROM bills WHERE id = ?', [id]);
@@ -51,8 +62,8 @@ export function createBillRepository() {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO bills (id, name, amount, due_date, is_paid, month, year) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [id, data.name, data.amount, data.dueDate, data.isPaid ? 1 : 0, data.month, data.year]
+        'INSERT INTO bills (id, name, amount, due_date, is_paid, is_recurring, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [id, data.name, data.amount, data.dueDate, data.isPaid ? 1 : 0, data.isRecurring ? 1 : 0, data.month, data.year]
       );
       return { ...data, id };
     },
@@ -64,12 +75,13 @@ export function createBillRepository() {
       const current = rowToBill(existing.rows[0]);
       const updated: Bill = { ...current, ...data };
       await db.query(
-        'UPDATE bills SET name=?, amount=?, due_date=?, is_paid=?, month=?, year=? WHERE id=?',
+        'UPDATE bills SET name=?, amount=?, due_date=?, is_paid=?, is_recurring=?, month=?, year=? WHERE id=?',
         [
           updated.name,
           updated.amount,
           updated.dueDate,
           updated.isPaid ? 1 : 0,
+          updated.isRecurring ? 1 : 0,
           updated.month,
           updated.year,
           id,

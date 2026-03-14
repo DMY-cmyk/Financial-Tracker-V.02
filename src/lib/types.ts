@@ -32,6 +32,7 @@ export interface Bill {
   amount: number;
   dueDate: number; // day of month
   isPaid: boolean;
+  isRecurring: boolean;
   month: number;
   year: number;
 }

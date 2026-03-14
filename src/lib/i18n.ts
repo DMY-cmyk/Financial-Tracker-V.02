@@ -235,6 +235,10 @@ type TranslationKeys = {
   billDeleted: string;
   noBills: string;
   deleteBill: string;
+  recurringBill: string;
+  generateBills: string;
+  generatedBills: string;
+  markAsRecurring: string;
 
   // Cascade guards
   cannotDeleteInUse: string;
@@ -509,6 +513,10 @@ const translations: Record<Locale, TranslationKeys> = {
     billDeleted: 'Bill deleted',
     noBills: 'No bills for this month',
     deleteBill: 'Delete Bill',
+    recurringBill: 'Recurring',
+    generateBills: 'Generate from recurring',
+    generatedBills: 'Generated {count} recurring bills',
+    markAsRecurring: 'Mark as recurring',
 
     // Cascade guards
     cannotDeleteInUse: 'Cannot delete — still in use by transactions',
@@ -771,6 +779,10 @@ const translations: Record<Locale, TranslationKeys> = {
     billDeleted: 'Tagihan dihapus',
     noBills: 'Tidak ada tagihan bulan ini',
     deleteBill: 'Hapus Tagihan',
+    recurringBill: 'Berulang',
+    generateBills: 'Buat dari tagihan berulang',
+    generatedBills: 'Berhasil membuat {count} tagihan berulang',
+    markAsRecurring: 'Tandai sebagai berulang',
 
     // Cascade guards
     cannotDeleteInUse: 'Tidak dapat dihapus — masih digunakan oleh transaksi',

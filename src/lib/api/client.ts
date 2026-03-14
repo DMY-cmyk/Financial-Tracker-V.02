@@ -237,6 +237,13 @@ export const api = {
         method: 'DELETE',
       });
     },
+
+    generateRecurring(month: number, year: number) {
+      return fetchApi<{ generated: number }>('/bills/generate', {
+        method: 'POST',
+        body: JSON.stringify({ month, year }),
+      });
+    },
   },
 
   savings: {

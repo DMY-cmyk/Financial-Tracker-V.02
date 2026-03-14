@@ -88,6 +88,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       amount DOUBLE PRECISION NOT NULL,
       due_date INTEGER NOT NULL,
       is_paid INTEGER DEFAULT 0,
+      is_recurring INTEGER DEFAULT 0,
       month INTEGER NOT NULL,
       year INTEGER NOT NULL
     )`,

@@ -102,6 +102,7 @@ function parseBills(sheet: WorkbookSheet, month: number, year: number): Bill[] {
       amount: parseInt(amount) || 0,
       dueDate: parseInt(dueDate) || 1,
       isPaid: paid === 'TRUE',
+      isRecurring: false,
       month,
       year,
     });

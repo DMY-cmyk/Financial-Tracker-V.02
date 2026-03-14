@@ -84,6 +84,7 @@ export const createBillSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
   dueDate: z.number().int().min(1).max(31),
   isPaid: z.boolean().optional().default(false),
+  isRecurring: z.boolean().optional().default(false),
   month: z.number().int().min(0).max(11),
   year: z.number().int().min(2000).max(2100),
 });

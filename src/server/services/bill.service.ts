@@ -59,6 +59,7 @@ export async function createBill(body: unknown): Promise<ServiceResult<Bill>> {
       amount: data.amount,
       dueDate: data.dueDate,
       isPaid: data.isPaid ?? false,
+      isRecurring: data.isRecurring ?? false,
       month: data.month,
       year: data.year,
     }),
@@ -86,4 +87,57 @@ export async function deleteBill(id: string): Promise<ServiceResult<{ success: b
   await ensureSeeded();
   if (!(await repo.delete(id))) return { error: { message: 'Bill not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
+}
+
+/** Copy recurring bills from a previous month into the target month (unpaid). */
+export async function generateRecurringBills(
+  month: number,
+  year: number
+): Promise<ServiceResult<{ generated: number }>> {
+  await ensureSeeded();
+
+  // Find if target month already has bills
+  const existing = await repo.findByMonth(month, year);
+  if (existing.length > 0) {
+    return { data: { generated: 0 } };
+  }
+
+  // Find the most recent month with recurring bills (look back up to 12 months)
+  let sourceMonth = month - 1;
+  let sourceYear = year;
+  if (sourceMonth < 0) {
+    sourceMonth = 11;
+    sourceYear--;
+  }
+
+  let recurringBills: Bill[] = [];
+  for (let i = 0; i < 12; i++) {
+    recurringBills = await repo.findRecurringByMonth(sourceMonth, sourceYear);
+    if (recurringBills.length > 0) break;
+    sourceMonth--;
+    if (sourceMonth < 0) {
+      sourceMonth = 11;
+      sourceYear--;
+    }
+  }
+
+  if (recurringBills.length === 0) {
+    return { data: { generated: 0 } };
+  }
+
+  let generated = 0;
+  for (const bill of recurringBills) {
+    await repo.create({
+      name: bill.name,
+      amount: bill.amount,
+      dueDate: bill.dueDate,
+      isPaid: false,
+      isRecurring: true,
+      month,
+      year,
+    });
+    generated++;
+  }
+
+  return { data: { generated } };
 }
