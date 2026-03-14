@@ -172,6 +172,7 @@ type TranslationKeys = {
   importComplete: string;
   transactionsCreated: string;
   transactionsFailed: string;
+  duplicatesSkipped: string;
   invalidHeaders: string;
   emptyFile: string;
   tooManyRows: string;
@@ -466,6 +467,7 @@ const translations: Record<Locale, TranslationKeys> = {
     importComplete: 'Import Complete',
     transactionsCreated: 'transactions created',
     transactionsFailed: 'transactions failed',
+    duplicatesSkipped: 'duplicates skipped',
     invalidHeaders: 'Invalid file headers. Please use the template.',
     emptyFile: 'No data found in file',
     tooManyRows: 'Too many rows. Maximum 500 per import.',
@@ -746,6 +748,7 @@ const translations: Record<Locale, TranslationKeys> = {
     importComplete: 'Impor Selesai',
     transactionsCreated: 'transaksi dibuat',
     transactionsFailed: 'transaksi gagal',
+    duplicatesSkipped: 'duplikat dilewati',
     invalidHeaders: 'Header file tidak valid. Gunakan template yang disediakan.',
     emptyFile: 'Tidak ada data dalam file',
     tooManyRows: 'Terlalu banyak baris. Maksimal 500 per impor.',

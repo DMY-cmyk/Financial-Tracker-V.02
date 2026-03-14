@@ -97,15 +97,26 @@ export function createTransactionRepository() {
 
     async createMany(
       data: Omit<Transaction, 'id'>[]
-    ): Promise<{ created: Transaction[]; errors: { index: number; message: string }[] }> {
+    ): Promise<{ created: Transaction[]; duplicates: number; errors: { index: number; message: string }[] }> {
       const db = await getDb();
       const created: Transaction[] = [];
       const errors: { index: number; message: string }[] = [];
+      let duplicates = 0;
 
       for (let i = 0; i < data.length; i++) {
         try {
-          const id = nanoid();
           const row = data[i];
+          // Check for existing transaction with same date, description, amount, and type
+          const existing = await db.query(
+            'SELECT id FROM transactions WHERE date = ? AND description = ? AND amount = ? AND type = ? LIMIT 1',
+            [row.date, row.description, row.amount, row.type]
+          );
+          if (existing.rows.length > 0) {
+            duplicates++;
+            continue;
+          }
+
+          const id = nanoid();
           await db.query(
             'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
@@ -129,7 +140,7 @@ export function createTransactionRepository() {
         }
       }
 
-      return { created, errors };
+      return { created, duplicates, errors };
     },
 
     async delete(id: string): Promise<boolean> {

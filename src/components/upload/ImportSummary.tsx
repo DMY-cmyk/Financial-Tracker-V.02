@@ -9,12 +9,13 @@ import { fadeInUp, scaleIn } from '@/lib/motion';
 
 interface ImportSummaryProps {
   created: number;
+  duplicates: number;
   failed: number;
   errors: { index: number; message: string }[];
   onReset: () => void;
 }
 
-export function ImportSummary({ created, failed, errors, onReset }: ImportSummaryProps) {
+export function ImportSummary({ created, duplicates, failed, errors, onReset }: ImportSummaryProps) {
   const locale = useLocale();
   const hasSuccess = created > 0;
 
@@ -43,6 +44,11 @@ export function ImportSummary({ created, failed, errors, onReset }: ImportSummar
           {failed > 0 && (
             <span className="font-medium text-red-600 dark:text-red-400">
               {failed} {t(locale, 'transactionsFailed')}
+            </span>
+          )}
+          {duplicates > 0 && (
+            <span className="font-medium text-amber-600 dark:text-amber-400">
+              {duplicates} {t(locale, 'duplicatesSkipped')}
             </span>
           )}
         </div>

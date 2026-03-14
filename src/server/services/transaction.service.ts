@@ -119,6 +119,7 @@ export async function bulkCreateTransactions(
   return {
     data: {
       created: result.created.length,
+      duplicates: result.duplicates,
       failed: result.errors.length,
       errors: result.errors,
     },

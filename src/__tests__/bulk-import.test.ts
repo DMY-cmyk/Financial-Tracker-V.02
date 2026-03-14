@@ -523,6 +523,23 @@ describe('bulkCreateTransactions', () => {
     expect(result.data!.failed).toBe(0);
   });
 
+  it('skips duplicate transactions on re-import', async () => {
+    // First import
+    const first = await bulkCreateTransactions({
+      transactions: [validTransaction],
+    });
+    expect(first.data!.created).toBe(1);
+    expect(first.data!.duplicates).toBe(0);
+
+    // Second import of same data
+    const second = await bulkCreateTransactions({
+      transactions: [validTransaction],
+    });
+    expect(second.data!.created).toBe(0);
+    expect(second.data!.duplicates).toBe(1);
+    expect(second.data!.failed).toBe(0);
+  });
+
   it('returns validation error when body is not an object', async () => {
     const result = await bulkCreateTransactions('not an object');
 

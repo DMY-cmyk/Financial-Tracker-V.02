@@ -173,6 +173,7 @@ export default function BulkImportPage() {
           {status === 'complete' && createResult && (
             <ImportSummary
               created={createResult.created}
+              duplicates={createResult.duplicates}
               failed={createResult.failed}
               errors={createResult.errors}
               onReset={reset}

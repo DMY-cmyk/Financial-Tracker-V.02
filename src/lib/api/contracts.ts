@@ -19,6 +19,7 @@ export interface BulkCreateTransactionRequest {
 
 export interface BulkCreateTransactionResponse {
   created: number;
+  duplicates: number;
   failed: number;
   errors: { index: number; message: string }[];
 }

@@ -21,6 +21,7 @@ interface ImportProgress {
 
 interface CreateResult {
   created: number;
+  duplicates: number;
   failed: number;
   errors: { index: number; message: string }[];
 }
@@ -212,6 +213,7 @@ export function useBulkImport(): UseBulkImportReturn {
         if (res.data) {
           setCreateResult({
             created: res.data.created,
+            duplicates: res.data.duplicates,
             failed: res.data.failed,
             errors: res.data.errors,
           });
