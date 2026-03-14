@@ -104,7 +104,7 @@ export function BudgetProgress({ budgets, onUpdateBudget }: BudgetProgressProps)
                       className={cn(
                         'text-muted-foreground font-mono',
                         onUpdateBudget &&
-                          'hover:text-foreground group/budget inline-flex cursor-pointer items-center gap-1 rounded px-1 transition-colors hover:bg-muted'
+                          'hover:text-foreground group/budget hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 transition-colors'
                       )}
                       disabled={!onUpdateBudget}
                       title={onUpdateBudget ? t(locale, 'editBudget') : undefined}

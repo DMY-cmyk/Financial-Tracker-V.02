@@ -141,7 +141,10 @@ export default function TransactionsPage() {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={() => {
-                    exportCSV(transactions, `transactions-${year}-${String(month + 1).padStart(2, '0')}`);
+                    exportCSV(
+                      transactions,
+                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`
+                    );
                     toast.success(t(locale, 'exportSuccess'));
                   }}
                 >
@@ -149,7 +152,12 @@ export default function TransactionsPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={async () => {
-                    await exportExcel(transactions, `transactions-${year}-${String(month + 1).padStart(2, '0')}`, t(locale, 'transactions'), false);
+                    await exportExcel(
+                      transactions,
+                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`,
+                      t(locale, 'transactions'),
+                      false
+                    );
                     toast.success(t(locale, 'exportSuccess'));
                   }}
                 >
@@ -171,20 +179,20 @@ export default function TransactionsPage() {
       </motion.div>
 
       <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
-         <TransactionFilters
-           search={search}
-           onSearchChange={setSearch}
-           typeFilter={typeFilter}
-           onTypeChange={setTypeFilter}
-           categoryFilter={categoryFilter}
-           onCategoryChange={setCategoryFilter}
-           paymentMethodFilter={paymentMethodFilter}
-           onPaymentMethodChange={setPaymentMethodFilter}
-           paymentMethods={paymentMethods}
-           allMonths={allMonths}
-           onAllMonthsChange={setAllMonths}
-           searchInputRef={searchInputRef}
-         />
+        <TransactionFilters
+          search={search}
+          onSearchChange={setSearch}
+          typeFilter={typeFilter}
+          onTypeChange={setTypeFilter}
+          categoryFilter={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+          paymentMethodFilter={paymentMethodFilter}
+          onPaymentMethodChange={setPaymentMethodFilter}
+          paymentMethods={paymentMethods}
+          allMonths={allMonths}
+          onAllMonthsChange={setAllMonths}
+          searchInputRef={searchInputRef}
+        />
       </motion.div>
 
       <AnimatePresence mode="wait">

@@ -9,7 +9,14 @@ import { useReportsData } from '@/hooks/useReportsData';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/components/reports/TrendChart';
 import { AnnualSummary } from '@/components/reports/AnnualSummary';
-import { TrendingUp, TrendingDown, Wallet, PiggyBank, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  PiggyBank,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ReportsPage() {
@@ -21,9 +28,10 @@ export default function ReportsPage() {
   const totalIncome = trends.reduce((s, m) => s + m.income, 0);
   const totalExpense = trends.reduce((s, m) => s + m.expense, 0);
   const totalBalance = totalIncome - totalExpense;
-  const avgSavingsRate = trends.length > 0
-    ? Math.round(trends.reduce((s, m) => s + m.savingsRate, 0) / trends.length)
-    : 0;
+  const avgSavingsRate =
+    trends.length > 0
+      ? Math.round(trends.reduce((s, m) => s + m.savingsRate, 0) / trends.length)
+      : 0;
 
   if (isLoading) {
     return (
@@ -33,7 +41,10 @@ export default function ReportsPage() {
           <div className="border-border bg-card h-80 animate-pulse rounded-2xl border" />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="border-border bg-card h-24 animate-pulse rounded-2xl border" />
+              <div
+                key={i}
+                className="border-border bg-card h-24 animate-pulse rounded-2xl border"
+              />
             ))}
           </div>
         </div>
@@ -60,25 +71,29 @@ export default function ReportsPage() {
       label: t(locale, 'netBalance'),
       value: formatCurrency(totalBalance),
       icon: Wallet,
-      color: totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400',
+      color:
+        totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400',
       bg: totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
     },
     {
       label: t(locale, 'avgSavingsRate'),
       value: `${avgSavingsRate}%`,
       icon: PiggyBank,
-      color: avgSavingsRate >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
-      bg: avgSavingsRate >= 20 ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30',
+      color:
+        avgSavingsRate >= 20
+          ? 'text-emerald-600 dark:text-emerald-400'
+          : 'text-amber-600 dark:text-amber-400',
+      bg:
+        avgSavingsRate >= 20
+          ? 'bg-emerald-50 dark:bg-emerald-950/30'
+          : 'bg-amber-50 dark:bg-amber-950/30',
     },
   ];
 
   return (
     <div className="space-y-4 sm:space-y-6">
       <motion.div {...fadeInUp}>
-        <PageHeader
-          title={t(locale, 'reports')}
-          description={t(locale, 'financialTrends')}
-        >
+        <PageHeader title={t(locale, 'reports')} description={t(locale, 'financialTrends')}>
           <div className="border-border flex rounded-lg border">
             {[6, 12].map((n) => (
               <button
@@ -163,12 +178,12 @@ export default function ReportsPage() {
                       <td className="py-2 text-right font-mono text-red-600 dark:text-red-400">
                         {formatCurrency(row.expense)}
                       </td>
-                      <td className={`py-2 text-right font-mono ${row.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                      <td
+                        className={`py-2 text-right font-mono ${row.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+                      >
                         {formatCurrency(row.balance)}
                       </td>
-                      <td className="py-2 text-right font-mono">
-                        {row.savingsRate}%
-                      </td>
+                      <td className="py-2 text-right font-mono">{row.savingsRate}%</td>
                     </tr>
                   ))}
                 </tbody>

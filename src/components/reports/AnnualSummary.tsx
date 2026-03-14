@@ -51,11 +51,51 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
   }
 
   const statCards = [
-    { label: t(locale, 'totalIncome'), value: formatCurrency(data.totalIncome), icon: TrendingUp, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
-    { label: t(locale, 'totalExpense'), value: formatCurrency(data.totalExpense), icon: TrendingDown, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/30' },
-    { label: t(locale, 'netBalance'), value: formatCurrency(data.totalBalance), icon: Wallet, color: data.totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400', bg: data.totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30' },
-    { label: t(locale, 'avgSavingsRate'), value: `${data.savingsRate}%`, icon: PiggyBank, color: data.savingsRate >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400', bg: data.savingsRate >= 20 ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30' },
-    { label: t(locale, 'totalTransactions'), value: String(data.transactionCount), icon: Hash, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+    {
+      label: t(locale, 'totalIncome'),
+      value: formatCurrency(data.totalIncome),
+      icon: TrendingUp,
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    },
+    {
+      label: t(locale, 'totalExpense'),
+      value: formatCurrency(data.totalExpense),
+      icon: TrendingDown,
+      color: 'text-red-600 dark:text-red-400',
+      bg: 'bg-red-50 dark:bg-red-950/30',
+    },
+    {
+      label: t(locale, 'netBalance'),
+      value: formatCurrency(data.totalBalance),
+      icon: Wallet,
+      color:
+        data.totalBalance >= 0
+          ? 'text-blue-600 dark:text-blue-400'
+          : 'text-red-600 dark:text-red-400',
+      bg:
+        data.totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
+    },
+    {
+      label: t(locale, 'avgSavingsRate'),
+      value: `${data.savingsRate}%`,
+      icon: PiggyBank,
+      color:
+        data.savingsRate >= 20
+          ? 'text-emerald-600 dark:text-emerald-400'
+          : 'text-amber-600 dark:text-amber-400',
+      bg:
+        data.savingsRate >= 20
+          ? 'bg-emerald-50 dark:bg-emerald-950/30'
+          : 'bg-amber-50 dark:bg-amber-950/30',
+    },
+    {
+      label: t(locale, 'totalTransactions'),
+      value: String(data.transactionCount),
+      icon: Hash,
+      color: 'text-blue-600 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-950/30',
+    },
   ];
 
   return (

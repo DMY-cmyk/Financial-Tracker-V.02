@@ -15,7 +15,13 @@ interface ImportSummaryProps {
   onReset: () => void;
 }
 
-export function ImportSummary({ created, duplicates, failed, errors, onReset }: ImportSummaryProps) {
+export function ImportSummary({
+  created,
+  duplicates,
+  failed,
+  errors,
+  onReset,
+}: ImportSummaryProps) {
   const locale = useLocale();
   const hasSuccess = created > 0;
 

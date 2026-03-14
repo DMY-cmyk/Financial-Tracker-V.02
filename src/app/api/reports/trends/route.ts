@@ -27,17 +27,16 @@ export async function GET(request: NextRequest) {
     [limit]
   );
 
-  const months = result.rows
-    .reverse()
-    .map((row) => ({
-      monthKey: row.month_key,
-      income: row.total_income,
-      expense: row.total_expense,
-      balance: row.total_income - row.total_expense,
-      savingsRate: row.total_income > 0
+  const months = result.rows.reverse().map((row) => ({
+    monthKey: row.month_key,
+    income: row.total_income,
+    expense: row.total_expense,
+    balance: row.total_income - row.total_expense,
+    savingsRate:
+      row.total_income > 0
         ? Math.round(((row.total_income - row.total_expense) / row.total_income) * 100)
         : 0,
-    }));
+  }));
 
   return NextResponse.json({ data: { months } });
 }

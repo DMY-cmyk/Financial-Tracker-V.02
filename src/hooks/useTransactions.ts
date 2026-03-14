@@ -72,11 +72,26 @@ export function useTransactions(): UseTransactionsReturn {
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
 
   // Reset page when filters change
-  const setSearch = useCallback((v: string) => { setSearchState(v); setPage(1); }, []);
-  const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilterState(v); setPage(1); }, []);
-  const setCategoryFilter = useCallback((v: string) => { setCategoryFilterState(v); setPage(1); }, []);
-  const setPaymentMethodFilter = useCallback((v: string) => { setPaymentMethodFilterState(v); setPage(1); }, []);
-  const setAllMonths = useCallback((v: boolean) => { setAllMonthsState(v); setPage(1); }, []);
+  const setSearch = useCallback((v: string) => {
+    setSearchState(v);
+    setPage(1);
+  }, []);
+  const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => {
+    setTypeFilterState(v);
+    setPage(1);
+  }, []);
+  const setCategoryFilter = useCallback((v: string) => {
+    setCategoryFilterState(v);
+    setPage(1);
+  }, []);
+  const setPaymentMethodFilter = useCallback((v: string) => {
+    setPaymentMethodFilterState(v);
+    setPage(1);
+  }, []);
+  const setAllMonths = useCallback((v: boolean) => {
+    setAllMonthsState(v);
+    setPage(1);
+  }, []);
 
   const { data: pmData } = useQuery({
     queryKey: ['payment-methods'],
@@ -126,7 +141,11 @@ export function useTransactions(): UseTransactionsReturn {
   const total = txData?.total ?? 0;
 
   const hasActiveFilters =
-    search !== '' || typeFilter !== 'all' || categoryFilter !== '' || paymentMethodFilter !== '' || allMonths;
+    search !== '' ||
+    typeFilter !== 'all' ||
+    categoryFilter !== '' ||
+    paymentMethodFilter !== '' ||
+    allMonths;
 
   const clearFilters = useCallback(() => {
     setSearchState('');

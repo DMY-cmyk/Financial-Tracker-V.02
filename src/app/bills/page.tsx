@@ -181,7 +181,11 @@ export default function BillsPage() {
       toast.success(t(locale, 'generatedBills').replace('{count}', String(result.data.generated)));
       refetch();
     } else {
-      toast.info(locale === 'id' ? 'Tidak ada tagihan berulang untuk dibuat' : 'No recurring bills to generate');
+      toast.info(
+        locale === 'id'
+          ? 'Tidak ada tagihan berulang untuk dibuat'
+          : 'No recurring bills to generate'
+      );
     }
   };
 
@@ -267,82 +271,82 @@ export default function BillsPage() {
               {bills.map((bill) => {
                 const status = getBillStatus(bill);
                 return (
-                <motion.div
-                  key={bill.id}
-                  variants={staggerItem}
-                  className={cn(
-                    'border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors',
-                    status === 'overdue' && 'border-red-400 dark:border-red-500/60',
-                    status === 'dueSoon' && 'border-amber-400 dark:border-amber-500/60'
-                  )}
-                >
-                  <Checkbox
-                    checked={bill.isPaid}
-                    onCheckedChange={() => handleTogglePaid(bill)}
-                    aria-label={bill.isPaid ? t(locale, 'paid') : t(locale, 'unpaid')}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p
-                        className={cn(
-                          'truncate text-sm font-medium',
-                          bill.isPaid && 'text-muted-foreground line-through'
-                        )}
-                      >
-                        {bill.name}
-                      </p>
-                      {status === 'overdue' && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
-                          <AlertCircle className="h-3 w-3" />
-                          {t(locale, 'overdue')}
-                        </span>
-                      )}
-                      {status === 'dueSoon' && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                          <Clock className="h-3 w-3" />
-                          {t(locale, 'dueSoon')}
-                        </span>
-                      )}
-                      {bill.isRecurring && (
-                        <span className="text-muted-foreground inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
-                          <Repeat className="h-3 w-3" />
-                          {t(locale, 'recurringBill')}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {t(locale, 'dueDate')}: {bill.dueDate}
-                    </p>
-                  </div>
-                  <span
+                  <motion.div
+                    key={bill.id}
+                    variants={staggerItem}
                     className={cn(
-                      'font-mono text-sm font-medium',
-                      bill.isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
+                      'border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors',
+                      status === 'overdue' && 'border-red-400 dark:border-red-500/60',
+                      status === 'dueSoon' && 'border-amber-400 dark:border-amber-500/60'
                     )}
                   >
-                    {formatCurrency(bill.amount)}
-                  </span>
-                  <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => openEdit(bill)}
-                      aria-label={t(locale, 'edit')}
+                    <Checkbox
+                      checked={bill.isPaid}
+                      onCheckedChange={() => handleTogglePaid(bill)}
+                      aria-label={bill.isPaid ? t(locale, 'paid') : t(locale, 'unpaid')}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={cn(
+                            'truncate text-sm font-medium',
+                            bill.isPaid && 'text-muted-foreground line-through'
+                          )}
+                        >
+                          {bill.name}
+                        </p>
+                        {status === 'overdue' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                            <AlertCircle className="h-3 w-3" />
+                            {t(locale, 'overdue')}
+                          </span>
+                        )}
+                        {status === 'dueSoon' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                            <Clock className="h-3 w-3" />
+                            {t(locale, 'dueSoon')}
+                          </span>
+                        )}
+                        {bill.isRecurring && (
+                          <span className="text-muted-foreground inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
+                            <Repeat className="h-3 w-3" />
+                            {t(locale, 'recurringBill')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {t(locale, 'dueDate')}: {bill.dueDate}
+                      </p>
+                    </div>
+                    <span
+                      className={cn(
+                        'font-mono text-sm font-medium',
+                        bill.isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
+                      )}
                     >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive h-8 w-8"
-                      onClick={() => setDeleteId(bill.id)}
-                      aria-label={t(locale, 'delete')}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </motion.div>
+                      {formatCurrency(bill.amount)}
+                    </span>
+                    <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openEdit(bill)}
+                        aria-label={t(locale, 'edit')}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive h-8 w-8"
+                        onClick={() => setDeleteId(bill.id)}
+                        aria-label={t(locale, 'delete')}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </motion.div>
                 );
               })}
             </motion.div>

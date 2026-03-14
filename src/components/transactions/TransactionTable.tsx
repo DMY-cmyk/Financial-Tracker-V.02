@@ -133,7 +133,9 @@ export function TransactionTable({
       {totalPages > 1 && onPageChange && (
         <div className="border-border flex items-center justify-between rounded-2xl border px-4 py-3">
           <span className="text-muted-foreground text-xs">
-            {locale === 'id' ? `Halaman ${page} dari ${totalPages}` : `Page ${page} of ${totalPages}`}
+            {locale === 'id'
+              ? `Halaman ${page} dari ${totalPages}`
+              : `Page ${page} of ${totalPages}`}
           </span>
           <div className="flex gap-1">
             <Button

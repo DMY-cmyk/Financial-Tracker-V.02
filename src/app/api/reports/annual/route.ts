@@ -22,7 +22,11 @@ export async function GET(request: NextRequest) {
   const prefix = `${year}-`;
 
   // Yearly totals
-  const totalsResult = await db.query<{ total_income: number; total_expense: number; tx_count: number }>(
+  const totalsResult = await db.query<{
+    total_income: number;
+    total_expense: number;
+    tx_count: number;
+  }>(
     `SELECT
        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expense,
@@ -65,9 +69,10 @@ export async function GET(request: NextRequest) {
       totalExpense: totals.total_expense,
       totalBalance: totals.total_income - totals.total_expense,
       transactionCount: totals.tx_count,
-      savingsRate: totals.total_income > 0
-        ? Math.round(((totals.total_income - totals.total_expense) / totals.total_income) * 100)
-        : 0,
+      savingsRate:
+        totals.total_income > 0
+          ? Math.round(((totals.total_income - totals.total_expense) / totals.total_income) * 100)
+          : 0,
       topExpenseCategories: categoriesResult.rows.map((r) => ({
         category: r.category,
         amount: r.total_amount,

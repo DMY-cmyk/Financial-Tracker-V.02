@@ -210,14 +210,8 @@ export function RecurringTransactionForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label>
-            {t(locale, 'endDate')}
-          </Label>
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+          <Label>{t(locale, 'endDate')}</Label>
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </div>
       </div>
 

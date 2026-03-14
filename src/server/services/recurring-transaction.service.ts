@@ -27,9 +27,7 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listRecurringTransactions(): Promise<
-  ServiceResult<RecurringTransaction[]>
-> {
+export async function listRecurringTransactions(): Promise<ServiceResult<RecurringTransaction[]>> {
   await ensureSeeded();
   return { data: await repo.findAll() };
 }

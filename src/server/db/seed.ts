@@ -41,7 +41,17 @@ export async function ensureSeeded() {
     const categoryId = catMap.get(t.category) || '';
     await db.query(
       'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [t.id, t.date, t.description, t.category, categoryId, t.type, t.amount, t.paymentMethod, t.notes]
+      [
+        t.id,
+        t.date,
+        t.description,
+        t.category,
+        categoryId,
+        t.type,
+        t.amount,
+        t.paymentMethod,
+        t.notes,
+      ]
     );
   }
 
@@ -78,7 +88,9 @@ export async function ensureSeeded() {
 }
 
 /** Backfill category_id for any transactions that have an empty category_id */
-async function migrateCategoryIds(db: { query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }> }) {
+async function migrateCategoryIds(db: {
+  query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }>;
+}) {
   const orphaned = await db.query<{ cnt: number }>(
     "SELECT COUNT(*) as cnt FROM transactions WHERE category_id = '' OR category_id IS NULL"
   );

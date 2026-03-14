@@ -63,7 +63,16 @@ export function createBillRepository() {
       const db = await getDb();
       await db.query(
         'INSERT INTO bills (id, name, amount, due_date, is_paid, is_recurring, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [id, data.name, data.amount, data.dueDate, data.isPaid ? 1 : 0, data.isRecurring ? 1 : 0, data.month, data.year]
+        [
+          id,
+          data.name,
+          data.amount,
+          data.dueDate,
+          data.isPaid ? 1 : 0,
+          data.isRecurring ? 1 : 0,
+          data.month,
+          data.year,
+        ]
       );
       return { ...data, id };
     },

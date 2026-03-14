@@ -95,9 +95,11 @@ export function createTransactionRepository() {
       return updated;
     },
 
-    async createMany(
-      data: Omit<Transaction, 'id'>[]
-    ): Promise<{ created: Transaction[]; duplicates: number; errors: { index: number; message: string }[] }> {
+    async createMany(data: Omit<Transaction, 'id'>[]): Promise<{
+      created: Transaction[];
+      duplicates: number;
+      errors: { index: number; message: string }[];
+    }> {
       const db = await getDb();
       const created: Transaction[] = [];
       const errors: { index: number; message: string }[] = [];
@@ -207,7 +209,9 @@ export function createTransactionRepository() {
         params.push(filters.paymentMethod);
       }
       if (filters.search) {
-        conditions.push("(LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(notes) LIKE ?)");
+        conditions.push(
+          '(LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(notes) LIKE ?)'
+        );
         const q = `%${filters.search.toLowerCase()}%`;
         params.push(q, q, q);
       }
@@ -215,7 +219,11 @@ export function createTransactionRepository() {
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
       // Get total count + aggregates in one query
-      const countResult = await db.query<{ cnt: number; total_income: number; total_expense: number }>(
+      const countResult = await db.query<{
+        cnt: number;
+        total_income: number;
+        total_expense: number;
+      }>(
         `SELECT COUNT(*) as cnt,
                 COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
                 COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expense

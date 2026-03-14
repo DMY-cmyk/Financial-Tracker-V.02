@@ -92,10 +92,7 @@ export default function RecurringTransactionsPage() {
         <PageHeader title={t(locale, 'recurringTransactions')} />
         <div className="mx-auto max-w-2xl space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-border bg-card h-20 animate-pulse rounded-2xl border"
-            />
+            <div key={i} className="border-border bg-card h-20 animate-pulse rounded-2xl border" />
           ))}
         </div>
       </div>
@@ -138,10 +135,7 @@ export default function RecurringTransactionsPage() {
         <AnimatePresence mode="wait">
           {recurringTransactions.length === 0 ? (
             <motion.div key="empty" {...fadeInUp}>
-              <EmptyState
-                title={t(locale, 'noRecurring')}
-                icon={<Repeat className="h-12 w-12" />}
-              >
+              <EmptyState title={t(locale, 'noRecurring')} icon={<Repeat className="h-12 w-12" />}>
                 <Button onClick={openAdd} className="gap-2">
                   <Plus className="h-4 w-4" />
                   {t(locale, 'addRecurring')}
