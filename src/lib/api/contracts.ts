@@ -90,6 +90,27 @@ export interface DashboardSummaryResponse {
   recentTransactions: Transaction[];
 }
 
+// === Folder summary contracts ===
+
+export interface YearSummary {
+  year: number;
+  count: number;
+  income: number;
+  expense: number;
+}
+
+export interface MonthSummary {
+  month: number;
+  count: number;
+  income: number;
+  expense: number;
+}
+
+export interface FolderSummaryResponse {
+  years?: YearSummary[];
+  months?: MonthSummary[];
+}
+
 // === Category contracts ===
 
 export interface CategoryListResponse {

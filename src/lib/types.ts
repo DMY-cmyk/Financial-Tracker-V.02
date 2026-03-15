@@ -61,12 +61,16 @@ export interface RecurringTransaction {
   isActive: boolean;
 }
 
+export type DashboardView = 'years' | 'months' | 'dashboard';
+
 export interface UIState {
   selectedMonth: number;
   selectedYear: number;
   theme: 'light' | 'dark' | 'system';
   locale: 'en' | 'id';
   sidebarCollapsed: boolean;
+  dashboardView: DashboardView;
+  dashboardViewDirection: 1 | -1;
 }
 
 export interface DashboardSummary {
@@ -167,6 +171,7 @@ export interface FinancialStore {
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setLocale: (locale: 'en' | 'id') => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  setDashboardView: (view: DashboardView) => void;
 
   // Lifecycle
   initialize: () => void;

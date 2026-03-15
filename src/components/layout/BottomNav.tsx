@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
+import { useStore } from '@/store';
 import {
   LayoutDashboard,
   Receipt,
@@ -54,6 +55,7 @@ const moreItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] =
 export function BottomNav() {
   const pathname = usePathname();
   const locale = useLocale();
+  const setDashboardView = useStore((s) => s.setDashboardView);
   const [moreOpen, setMoreOpen] = useState(false);
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
@@ -76,6 +78,13 @@ export function BottomNav() {
                 'flex flex-col items-center gap-1 px-3 py-1 text-xs transition-colors',
                 isActive(href) ? 'text-primary' : 'text-muted-foreground'
               )}
+              onClick={(e) => {
+                if (href === '/' && pathname === '/') {
+                  e.preventDefault();
+                  setDashboardView('years');
+                  window.history.pushState({ dashboardView: 'years' }, '');
+                }
+              }}
             >
               <Icon className="h-5 w-5" />
               <span>{t(locale, key)}</span>

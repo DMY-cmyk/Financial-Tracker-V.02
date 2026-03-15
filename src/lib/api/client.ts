@@ -6,6 +6,7 @@ import type {
   UpdateTransactionRequest,
   TransactionListResponse,
   DashboardSummaryResponse,
+  FolderSummaryResponse,
   CategoryListResponse,
   PaymentMethodListResponse,
   SettingsResponse,
@@ -101,6 +102,11 @@ export const api = {
   dashboard: {
     summary(month: number, year: number) {
       return fetchApi<DashboardSummaryResponse>(`/dashboard/summary?month=${month}&year=${year}`);
+    },
+
+    folderSummary(year?: number) {
+      const qs = year !== undefined ? `?year=${year}` : '';
+      return fetchApi<FolderSummaryResponse>(`/dashboard/folder-summary${qs}`);
     },
   },
 

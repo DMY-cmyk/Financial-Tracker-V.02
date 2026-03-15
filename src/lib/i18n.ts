@@ -329,6 +329,16 @@ type TranslationKeys = {
 
   // Reorder
   reorderCategories: string;
+
+  // Folder navigation
+  browseByYear: string;
+  selectMonth: string;
+  folderTransactions: string;
+  noTransactionsYet: string;
+  currentYear: string;
+  currentMonth: string;
+  allYears: string;
+  noDataYet: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -615,6 +625,14 @@ const translations: Record<Locale, TranslationKeys> = {
     extracted: 'Extracted',
     selectIcon: 'Select Icon',
     reorderCategories: 'Reorder Categories',
+    browseByYear: 'Browse by Year',
+    selectMonth: 'Select Month',
+    folderTransactions: 'transactions',
+    noTransactionsYet: 'No transactions yet',
+    currentYear: 'Current Year',
+    currentMonth: 'Current Month',
+    allYears: 'All Years',
+    noDataYet: 'No data',
   },
   id: {
     dashboard: 'Dasbor',
@@ -899,6 +917,14 @@ const translations: Record<Locale, TranslationKeys> = {
     extracted: 'Diekstrak',
     selectIcon: 'Pilih Ikon',
     reorderCategories: 'Urutkan Kategori',
+    browseByYear: 'Jelajahi per Tahun',
+    selectMonth: 'Pilih Bulan',
+    folderTransactions: 'transaksi',
+    noTransactionsYet: 'Belum ada transaksi',
+    currentYear: 'Tahun Ini',
+    currentMonth: 'Bulan Ini',
+    allYears: 'Semua Tahun',
+    noDataYet: 'Belum ada data',
   },
 };
 

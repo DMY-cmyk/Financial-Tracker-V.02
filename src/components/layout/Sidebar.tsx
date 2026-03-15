@@ -64,6 +64,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
   const pathname = usePathname();
   const locale = useLocale();
   const setLocale = useStore((s) => s.setLocale);
+  const setDashboardView = useStore((s) => s.setDashboardView);
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
@@ -150,6 +151,14 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
             className={navLinkClass(href)}
             title={collapsed ? t(locale, key) : undefined}
             aria-current={isActive(href) ? 'page' : undefined}
+            onClick={(e) => {
+              // If already on dashboard, reset to year folder view instead of navigating
+              if (href === '/' && pathname === '/') {
+                e.preventDefault();
+                setDashboardView('years');
+                window.history.pushState({ dashboardView: 'years' }, '');
+              }
+            }}
           >
             <Icon className="h-[18px] w-[18px] shrink-0" />
             <AnimatePresence>

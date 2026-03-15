@@ -128,6 +128,28 @@ export const EASE = {
   decelerate: [0, 0, 0.2, 1] as [number, number, number, number],
 } as const;
 
+// --- Folder navigation transitions ---
+
+export const folderTransition: Variants = {
+  enter: (direction: 1 | -1) => ({
+    opacity: 0,
+    scale: direction > 0 ? 1.04 : 0.96,
+    y: direction > 0 ? 8 : -8,
+  }),
+  center: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: EASE.smooth },
+  },
+  exit: (direction: 1 | -1) => ({
+    opacity: 0,
+    scale: direction > 0 ? 0.96 : 1.04,
+    y: direction > 0 ? -8 : 8,
+    transition: { duration: 0.2, ease: EASE.smooth },
+  }),
+};
+
 // --- Reduced motion helper ---
 
 export const reduceMotionProps = {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useStore } from '@/store';
 import { MONTH_NAMES } from '@/lib/constants';
 import { useLocale, t } from '@/lib/i18n';
@@ -19,11 +19,16 @@ interface TopbarProps {
 
 export function Topbar({ onMenuClick }: TopbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
+  const dashboardView = useStore((s) => s.ui.dashboardView);
   const setMonth = useStore((s) => s.setMonth);
   const setYear = useStore((s) => s.setYear);
   const locale = useLocale();
+
+  // Hide month navigation when on dashboard in folder views (years/months)
+  const hideMonthNav = pathname === '/' && dashboardView !== 'dashboard';
 
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -81,33 +86,35 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       <div className="hidden lg:block" />
 
       <div className="flex items-center gap-3">
-        {/* Month Navigation */}
-        <div
-          className="border-border bg-card flex items-center gap-1 rounded-xl border px-1 py-1"
-          role="group"
-          aria-label={locale === 'id' ? 'Navigasi bulan' : 'Month navigation'}
-        >
-          <button
-            onClick={handlePrev}
-            aria-label={locale === 'id' ? 'Bulan sebelumnya' : 'Previous month'}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1.5 transition-colors"
+        {/* Month Navigation — hidden when browsing year/month folders */}
+        {!hideMonthNav && (
+          <div
+            className="border-border bg-card flex items-center gap-1 rounded-xl border px-1 py-1"
+            role="group"
+            aria-label={locale === 'id' ? 'Navigasi bulan' : 'Month navigation'}
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </button>
-          <div className="flex items-center gap-1.5 px-2">
-            <Calendar className="text-muted-foreground h-3.5 w-3.5" />
-            <span className="min-w-[110px] text-center text-xs font-medium">
-              {MONTH_NAMES[month]} {year}
-            </span>
+            <button
+              onClick={handlePrev}
+              aria-label={locale === 'id' ? 'Bulan sebelumnya' : 'Previous month'}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1.5 transition-colors"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <div className="flex items-center gap-1.5 px-2">
+              <Calendar className="text-muted-foreground h-3.5 w-3.5" />
+              <span className="min-w-[110px] text-center text-xs font-medium">
+                {MONTH_NAMES[month]} {year}
+              </span>
+            </div>
+            <button
+              onClick={handleNext}
+              aria-label={locale === 'id' ? 'Bulan berikutnya' : 'Next month'}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1.5 transition-colors"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
-          <button
-            onClick={handleNext}
-            aria-label={locale === 'id' ? 'Bulan berikutnya' : 'Next month'}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg p-1.5 transition-colors"
-          >
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        )}
 
         {/* User Menu */}
         <DropdownMenu>

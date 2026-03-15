@@ -177,6 +177,61 @@ export function createTransactionRepository() {
       ]);
     },
 
+    async getYearSummaries(): Promise<
+      { year: number; count: number; income: number; expense: number }[]
+    > {
+      const db = await getDb();
+      const result = await db.query<{
+        year: string;
+        count: number;
+        income: number;
+        expense: number;
+      }>(
+        `SELECT SUBSTR(date, 1, 4) as year,
+                COUNT(*) as count,
+                COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
+                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
+         FROM transactions
+         GROUP BY SUBSTR(date, 1, 4)
+         ORDER BY year DESC`
+      );
+      return result.rows.map((r) => ({
+        year: parseInt(r.year, 10),
+        count: Number(r.count),
+        income: Number(r.income),
+        expense: Number(r.expense),
+      }));
+    },
+
+    async getMonthSummaries(
+      year: number
+    ): Promise<{ month: number; count: number; income: number; expense: number }[]> {
+      const db = await getDb();
+      const prefix = `${year}`;
+      const result = await db.query<{
+        month: number;
+        count: number;
+        income: number;
+        expense: number;
+      }>(
+        `SELECT CAST(SUBSTR(date, 6, 2) AS INTEGER) - 1 as month,
+                COUNT(*) as count,
+                COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
+                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
+         FROM transactions
+         WHERE date LIKE ? || '%'
+         GROUP BY SUBSTR(date, 6, 2)
+         ORDER BY month`,
+        [prefix]
+      );
+      return result.rows.map((r) => ({
+        month: Number(r.month),
+        count: Number(r.count),
+        income: Number(r.income),
+        expense: Number(r.expense),
+      }));
+    },
+
     async findFiltered(filters: {
       month?: number;
       year?: number;

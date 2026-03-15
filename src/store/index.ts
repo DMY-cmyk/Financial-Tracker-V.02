@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { FinancialStore } from '@/lib/types';
+import type { FinancialStore, DashboardView } from '@/lib/types';
 
 const currentDate = new Date();
 
@@ -13,6 +13,8 @@ export const useStore = create<FinancialStore>()(
         theme: 'system',
         locale: 'en',
         sidebarCollapsed: false,
+        dashboardView: 'years',
+        dashboardViewDirection: 1,
       },
       initialized: false,
 
@@ -28,6 +30,17 @@ export const useStore = create<FinancialStore>()(
 
       setSidebarCollapsed: (collapsed: boolean) =>
         set((state) => ({ ui: { ...state.ui, sidebarCollapsed: collapsed } })),
+
+      setDashboardView: (view: DashboardView) =>
+        set((state) => {
+          const depthMap: Record<DashboardView, number> = { years: 0, months: 1, dashboard: 2 };
+          const prev = depthMap[state.ui.dashboardView];
+          const next = depthMap[view];
+          const dir = next >= prev ? 1 : -1;
+          return {
+            ui: { ...state.ui, dashboardView: view, dashboardViewDirection: dir as 1 | -1 },
+          };
+        }),
 
       // Lifecycle
       initialize: () => set({ initialized: true }),
