@@ -146,7 +146,7 @@ export function migrateWorkbook(workbook: Workbook): {
   const allTransactions: Transaction[] = [];
   const allBills: Bill[] = [];
   let savingsGoals: SavingsGoal[] = [];
-  const year = 2025;
+  const year = 2026;
 
   for (const sheet of workbook.sheets) {
     const monthIndex = SHEET_MONTH_MAP[sheet.name];

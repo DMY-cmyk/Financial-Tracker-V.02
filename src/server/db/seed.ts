@@ -18,8 +18,9 @@ export async function ensureSeeded() {
   const result = await db.query<{ c: number }>('SELECT COUNT(*) as c FROM transactions');
 
   if (result.rows[0]?.c > 0) {
-    // Run migration for existing data that may lack category_id
+    // Run migrations for existing data
     await migrateCategoryIds(db);
+    await cleanup2025Data(db);
     seeded = true;
     return;
   }
@@ -85,6 +86,20 @@ export async function ensureSeeded() {
   ]);
 
   seeded = true;
+}
+
+/** One-time cleanup: delete all 2025 seed data from production */
+async function cleanup2025Data(db: {
+  query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }>;
+}) {
+  const flag = await db.query<{ value: string }>(
+    "SELECT value FROM settings WHERE key = 'migration_cleanup_2025'"
+  );
+  if (flag.rows.length > 0) return;
+
+  await db.query("DELETE FROM transactions WHERE date LIKE '2025-%'", []);
+  await db.query('DELETE FROM bills WHERE year = 2025', []);
+  await db.query("INSERT INTO settings (key, value) VALUES ('migration_cleanup_2025', 'done')", []);
 }
 
 /** Backfill category_id for any transactions that have an empty category_id */

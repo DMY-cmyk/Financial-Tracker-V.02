@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 describe('createTransaction', () => {
   const validInput = {
-    date: '2025-01-15',
+    date: '2026-01-15',
     description: 'Monthly Salary',
     category: 'Salary',
     categoryId: 'cat-salary-001',
@@ -55,7 +55,7 @@ describe('createTransaction', () => {
 describe('listTransactions', () => {
   beforeEach(async () => {
     await createTransaction({
-      date: '2025-01-15',
+      date: '2026-01-15',
       description: 'Salary',
       category: 'Salary',
       categoryId: 'cat-salary',
@@ -65,7 +65,7 @@ describe('listTransactions', () => {
       notes: '',
     });
     await createTransaction({
-      date: '2025-01-20',
+      date: '2026-01-20',
       description: 'Groceries',
       category: 'Food',
       categoryId: 'cat-food',
@@ -75,7 +75,7 @@ describe('listTransactions', () => {
       notes: '',
     });
     await createTransaction({
-      date: '2025-02-10',
+      date: '2026-02-10',
       description: 'Rent',
       category: 'Utilities',
       categoryId: 'cat-utilities',
@@ -93,7 +93,7 @@ describe('listTransactions', () => {
   });
 
   it('filters by month and year', async () => {
-    const result = await listTransactions({ month: 0, year: 2025 });
+    const result = await listTransactions({ month: 0, year: 2026 });
     expect(result.data!.total).toBe(2);
   });
 
@@ -110,22 +110,22 @@ describe('listTransactions', () => {
   });
 
   it('calculates income and expense totals', async () => {
-    const result = await listTransactions({ month: 0, year: 2025 });
+    const result = await listTransactions({ month: 0, year: 2026 });
     expect(result.data!.income).toBe(8500000);
     expect(result.data!.expense).toBe(500000);
   });
 
   it('returns sorted by date descending', async () => {
-    const result = await listTransactions({ month: 0, year: 2025 });
-    expect(result.data!.transactions[0].date).toBe('2025-01-20');
-    expect(result.data!.transactions[1].date).toBe('2025-01-15');
+    const result = await listTransactions({ month: 0, year: 2026 });
+    expect(result.data!.transactions[0].date).toBe('2026-01-20');
+    expect(result.data!.transactions[1].date).toBe('2026-01-15');
   });
 });
 
 describe('updateTransaction', () => {
   it('updates an existing transaction', async () => {
     const created = await createTransaction({
-      date: '2025-01-15',
+      date: '2026-01-15',
       description: 'Original',
       category: 'Food',
       categoryId: 'cat-food',
@@ -157,7 +157,7 @@ describe('updateTransaction', () => {
 describe('deleteTransaction', () => {
   it('deletes an existing transaction', async () => {
     const created = await createTransaction({
-      date: '2025-01-15',
+      date: '2026-01-15',
       description: 'To Delete',
       category: 'Food',
       categoryId: 'cat-food',

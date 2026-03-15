@@ -16,7 +16,7 @@
         "2:4": { "raw": "", "formula": "" },
         "2:5": { "raw": "", "formula": "" },
         "2:6": { "raw": "", "formula": "" },
-        "2:7": { "raw": "JANUARY 2025", "formula": "" },
+        "2:7": { "raw": "JANUARY 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -226,7 +226,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "FEBRUARY 2025", "formula": "" },
+        "2:7": { "raw": "FEBRUARY 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -279,7 +279,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "MARCH 2025", "formula": "" },
+        "2:7": { "raw": "MARCH 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -307,7 +307,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "APRIL 2025", "formula": "" },
+        "2:7": { "raw": "APRIL 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -328,7 +328,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "MAY 2025", "formula": "" },
+        "2:7": { "raw": "MAY 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -349,7 +349,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "JUNE 2025", "formula": "" },
+        "2:7": { "raw": "JUNE 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -370,7 +370,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "JULY 2025", "formula": "" },
+        "2:7": { "raw": "JULY 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -391,7 +391,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "AUGUST 2025", "formula": "" },
+        "2:7": { "raw": "AUGUST 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -412,7 +412,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "SEPTEMBER 2025", "formula": "" },
+        "2:7": { "raw": "SEPTEMBER 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -433,7 +433,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "OCTOBER 2025", "formula": "" },
+        "2:7": { "raw": "OCTOBER 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -454,7 +454,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "NOVEMBER 2025", "formula": "" },
+        "2:7": { "raw": "NOVEMBER 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },
@@ -475,7 +475,7 @@
       "colCount": 20,
       "cells": {
         "2:0": { "raw": "MONTHLY BUDGET TRACKER", "formula": "" },
-        "2:7": { "raw": "DECEMBER 2025", "formula": "" },
+        "2:7": { "raw": "DECEMBER 2026", "formula": "" },
         "3:0": { "raw": "Date", "formula": "" },
         "3:1": { "raw": "Description", "formula": "" },
         "3:2": { "raw": "Category", "formula": "" },

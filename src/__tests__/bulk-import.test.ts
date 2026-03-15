@@ -153,21 +153,21 @@ describe('parseExcelWorkbook', () => {
   // --- Date format variations ---
 
   it('handles DD/MM/YYYY date strings', () => {
-    const wb = createTestWorkbook([['15/06/2025', 1000000, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['15/06/2026', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
-    expect(result.rows[0].date).toBe('2025-06-15');
+    expect(result.rows[0].date).toBe('2026-06-15');
   });
 
   it('handles ISO YYYY-MM-DD date strings', () => {
-    const wb = createTestWorkbook([['2025-06-15', 1000000, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['2026-06-15', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
-    expect(result.rows[0].date).toBe('2025-06-15');
+    expect(result.rows[0].date).toBe('2026-06-15');
   });
 
   it('handles DD-MM-YYYY date strings (dash separator)', () => {
-    const wb = createTestWorkbook([['15-06-2025', 1000000, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['15-06-2026', 1000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
-    expect(result.rows[0].date).toBe('2025-06-15');
+    expect(result.rows[0].date).toBe('2026-06-15');
   });
 
   it('handles text dates like "1 Mar 2026"', () => {
@@ -179,25 +179,25 @@ describe('parseExcelWorkbook', () => {
   // --- Amount format variations ---
 
   it('handles plain number amounts', () => {
-    const wb = createTestWorkbook([['01/01/2025', 5000000, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', 5000000, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Indonesian dot separators (5.000.000)', () => {
-    const wb = createTestWorkbook([['01/01/2025', '5.000.000', 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', '5.000.000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Rp prefix', () => {
-    const wb = createTestWorkbook([['01/01/2025', 'Rp 2.500.000', 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', 'Rp 2.500.000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(2500000);
   });
 
   it('handles amounts with western comma separators (5,000,000)', () => {
-    const wb = createTestWorkbook([['01/01/2025', '5,000,000', 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', '5,000,000', 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
@@ -205,7 +205,7 @@ describe('parseExcelWorkbook', () => {
   // --- Validation ---
 
   it('marks row with missing category as invalid', () => {
-    const wb = createTestWorkbook([['01/01/2025', 1000000, '', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', 1000000, '', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     expect(result.rows[0].isValid).toBe(false);
     expect(result.rows[0].errors).toContain('Category is required');
@@ -213,7 +213,7 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('marks row with zero amount as invalid', () => {
-    const wb = createTestWorkbook([['01/01/2025', 0, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', 0, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     // Zero amount rows have both tanggal and jumlah, but jumlah is 0
     // The parser checks `jumlah != null && String(jumlah).trim() !== ''`
@@ -225,7 +225,7 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('marks row with negative amount as invalid', () => {
-    const wb = createTestWorkbook([['01/01/2025', -500, 'Salary', 'Cash']], []);
+    const wb = createTestWorkbook([['01/01/2026', -500, 'Salary', 'Cash']], []);
     const result = parseExcelWorkbook(wb);
     // parseAmount uses Math.abs, so -500 becomes 500 — row should be valid
     // Verify the parser's behavior with negative numbers
@@ -240,7 +240,7 @@ describe('parseExcelWorkbook', () => {
   it('respects the 500 row limit', () => {
     const incomeRows: unknown[][] = [];
     for (let i = 0; i < 501; i++) {
-      incomeRows.push([`01/01/2025`, 1000, 'Salary', 'Cash']);
+      incomeRows.push([`01/01/2026`, 1000, 'Salary', 'Cash']);
     }
     const wb = createTestWorkbook(incomeRows, []);
     const result = parseExcelWorkbook(wb);
@@ -253,7 +253,7 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('defaults paymentMethod to Cash when empty', () => {
-    const wb = createTestWorkbook([['01/01/2025', 1000000, 'Salary', '']], []);
+    const wb = createTestWorkbook([['01/01/2026', 1000000, 'Salary', '']], []);
     const result = parseExcelWorkbook(wb);
     if (result.rows.length > 0) {
       expect(result.rows[0].paymentMethod).toBe('Cash');
@@ -262,8 +262,8 @@ describe('parseExcelWorkbook', () => {
 
   it('generates description from category and type', () => {
     const wb = createTestWorkbook(
-      [['01/01/2025', 1000000, 'Salary', 'Cash']],
-      [['01/01/2025', 50000, 'Food', 'Cash', '']]
+      [['01/01/2026', 1000000, 'Salary', 'Cash']],
+      [['01/01/2026', 50000, 'Food', 'Cash', '']]
     );
     const result = parseExcelWorkbook(wb);
     const incomeRow = result.rows.find((r) => r.type === 'income');
@@ -275,13 +275,13 @@ describe('parseExcelWorkbook', () => {
   it('handles multiple income and expense rows correctly', () => {
     const wb = createTestWorkbook(
       [
-        ['01/01/2025', 5000000, 'Salary', 'Bank BCA'],
-        ['15/01/2025', 1000000, 'Freelance', 'GoPay'],
+        ['01/01/2026', 5000000, 'Salary', 'Bank BCA'],
+        ['15/01/2026', 1000000, 'Freelance', 'GoPay'],
       ],
       [
-        ['02/01/2025', 100000, 'Food', 'Cash', 'Lunch'],
-        ['03/01/2025', 200000, 'Transport', 'GoPay', 'Grab'],
-        ['04/01/2025', 50000, 'Entertainment', 'Cash', 'Movie'],
+        ['02/01/2026', 100000, 'Food', 'Cash', 'Lunch'],
+        ['03/01/2026', 200000, 'Transport', 'GoPay', 'Grab'],
+        ['04/01/2026', 50000, 'Entertainment', 'Cash', 'Movie'],
       ]
     );
     const result = parseExcelWorkbook(wb);
@@ -305,9 +305,9 @@ describe('parseOcrTextToTransactions', () => {
 
   it('parses text with multiple transaction lines', () => {
     const text = [
-      '01/03/2025 Makan siang Rp 50.000',
-      '02/03/2025 Gojek Rp 25.000',
-      '03/03/2025 Coffee Rp 35.000',
+      '01/03/2026 Makan siang Rp 50.000',
+      '02/03/2026 Gojek Rp 25.000',
+      '03/03/2026 Coffee Rp 35.000',
     ].join('\n');
 
     const result = parseOcrTextToTransactions(text, testCategories);
@@ -315,16 +315,16 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('parses dates and amounts correctly', () => {
-    const text = '15/06/2025 Grocery Rp 150.000';
+    const text = '15/06/2026 Grocery Rp 150.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
-    expect(result.rows[0].date).toBe('2025-06-15');
+    expect(result.rows[0].date).toBe('2026-06-15');
     expect(result.rows[0].amount).toBe(150000);
   });
 
   it('handles Rp prefix amounts', () => {
-    const text = '01/01/2025 Item Rp 2.500.000';
+    const text = '01/01/2026 Item Rp 2.500.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
@@ -332,7 +332,7 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('detects income keywords and sets type to income', () => {
-    const text = '01/01/2025 Gaji salary Rp 8.000.000';
+    const text = '01/01/2026 Gaji salary Rp 8.000.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
@@ -340,7 +340,7 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('defaults to expense when no income keywords found', () => {
-    const text = '01/01/2025 Beli makan Rp 50.000';
+    const text = '01/01/2026 Beli makan Rp 50.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
@@ -356,9 +356,9 @@ describe('parseOcrTextToTransactions', () => {
 
   it('handles mixed valid and invalid lines', () => {
     const text = [
-      '01/01/2025 Makan Rp 50.000',
+      '01/01/2026 Makan Rp 50.000',
       'Random text without date or amount',
-      '02/01/2025 Transport Rp 25.000',
+      '02/01/2026 Transport Rp 25.000',
       'Another line without data',
     ].join('\n');
 
@@ -368,32 +368,32 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('handles YYYY-MM-DD date format', () => {
-    const text = '2025-03-15 Coffee Rp 45.000';
+    const text = '2026-03-15 Coffee Rp 45.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
-    expect(result.rows[0].date).toBe('2025-03-15');
+    expect(result.rows[0].date).toBe('2026-03-15');
   });
 
   it('handles DD-MM-YYYY date format (dash separator)', () => {
-    const text = '15-03-2025 Coffee Rp 45.000';
+    const text = '15-03-2026 Coffee Rp 45.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
-    expect(result.rows[0].date).toBe('2025-03-15');
+    expect(result.rows[0].date).toBe('2026-03-15');
   });
 
   it('sets default paymentMethod to Cash', () => {
-    const text = '01/01/2025 Makan Rp 50.000';
+    const text = '01/01/2026 Makan Rp 50.000';
     const result = parseOcrTextToTransactions(text, testCategories);
     expect(result.rows[0].paymentMethod).toBe('Cash');
   });
 
   it('calculates totals correctly', () => {
     const text = [
-      '01/01/2025 Gaji salary Rp 5.000.000',
-      '02/01/2025 Makan Rp 50.000',
-      '03/01/2025 Transport grab Rp 25.000',
+      '01/01/2026 Gaji salary Rp 5.000.000',
+      '02/01/2026 Makan Rp 50.000',
+      '03/01/2026 Transport grab Rp 25.000',
     ].join('\n');
 
     const result = parseOcrTextToTransactions(text, testCategories);
@@ -403,7 +403,7 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('suggests categories from keyword matching', () => {
-    const text = '01/01/2025 Makan siang di warung Rp 50.000';
+    const text = '01/01/2026 Makan siang di warung Rp 50.000';
     const result = parseOcrTextToTransactions(text, testCategories);
 
     expect(result.rows).toHaveLength(1);
@@ -418,7 +418,7 @@ describe('parseOcrTextToTransactions', () => {
   });
 
   it('handles text with empty categories list', () => {
-    const text = '01/01/2025 Something Rp 50.000';
+    const text = '01/01/2026 Something Rp 50.000';
     const result = parseOcrTextToTransactions(text, []);
 
     expect(result.rows).toHaveLength(1);
@@ -438,7 +438,7 @@ describe('bulkCreateTransactions', () => {
   });
 
   const validTransaction = {
-    date: '2025-01-15',
+    date: '2026-01-15',
     description: 'Monthly Salary',
     category: 'Salary',
     categoryId: 'cat-salary',
@@ -454,7 +454,7 @@ describe('bulkCreateTransactions', () => {
         validTransaction,
         {
           ...validTransaction,
-          date: '2025-01-20',
+          date: '2026-01-20',
           description: 'Groceries',
           category: 'Food',
           categoryId: 'cat-food',
@@ -560,7 +560,7 @@ describe('bulkCreateTransactions', () => {
 // ---------------------------------------------------------------------------
 describe('bulkCreateTransactionSchema', () => {
   const validTransaction = {
-    date: '2025-01-15',
+    date: '2026-01-15',
     description: 'Test Transaction',
     category: 'Food',
     categoryId: 'cat-food',
@@ -602,14 +602,14 @@ describe('bulkCreateTransactionSchema', () => {
 
   it('rejects transaction with missing required fields', () => {
     const result = bulkCreateTransactionSchema.safeParse({
-      transactions: [{ date: '2025-01-01' }],
+      transactions: [{ date: '2026-01-01' }],
     });
     expect(result.success).toBe(false);
   });
 
   it('rejects transaction with invalid date format', () => {
     const result = bulkCreateTransactionSchema.safeParse({
-      transactions: [{ ...validTransaction, date: '01-15-2025' }],
+      transactions: [{ ...validTransaction, date: '01-15-2026' }],
     });
     expect(result.success).toBe(false);
   });

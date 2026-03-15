@@ -13,7 +13,7 @@ import {
 
 describe('createTransactionSchema', () => {
   const validInput = {
-    date: '2025-01-15',
+    date: '2026-01-15',
     description: 'Monthly Salary',
     category: 'Salary',
     categoryId: 'cat-salary-001',
@@ -43,7 +43,7 @@ describe('createTransactionSchema', () => {
   it('rejects invalid date format', () => {
     const result = createTransactionSchema.safeParse({
       ...validInput,
-      date: '15-01-2025',
+      date: '15-01-2026',
     });
     expect(result.success).toBe(false);
   });
@@ -109,7 +109,7 @@ describe('listTransactionsQuerySchema', () => {
   it('accepts valid month and year', () => {
     const result = listTransactionsQuerySchema.safeParse({
       month: 0,
-      year: 2025,
+      year: 2026,
     });
     expect(result.success).toBe(true);
   });
@@ -122,7 +122,7 @@ describe('listTransactionsQuerySchema', () => {
   it('rejects month out of range', () => {
     const result = listTransactionsQuerySchema.safeParse({
       month: 12,
-      year: 2025,
+      year: 2026,
     });
     expect(result.success).toBe(false);
   });
@@ -139,14 +139,14 @@ describe('dashboardSummaryQuerySchema', () => {
   it('accepts valid month and year', () => {
     const result = dashboardSummaryQuerySchema.safeParse({
       month: 5,
-      year: 2025,
+      year: 2026,
     });
     expect(result.success).toBe(true);
   });
 
   it('rejects missing month', () => {
     const result = dashboardSummaryQuerySchema.safeParse({
-      year: 2025,
+      year: 2026,
     });
     expect(result.success).toBe(false);
   });
