@@ -150,6 +150,15 @@ export const folderTransition: Variants = {
   }),
 };
 
+// --- Floating bar (bulk action bar, snackbar) ---
+
+export const slideUpBar = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 60 },
+  transition: { type: 'spring', stiffness: 300, damping: 30 },
+} as const;
+
 // --- Reduced motion helper ---
 
 export const reduceMotionProps = {

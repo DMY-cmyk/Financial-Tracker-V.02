@@ -6,8 +6,13 @@ import {
   updateTransactionSchema,
   listTransactionsQuerySchema,
   bulkCreateTransactionSchema,
+  bulkDeleteTransactionSchema,
 } from '@/lib/api/validation';
-import type { TransactionListResponse, BulkCreateTransactionResponse } from '@/lib/api/contracts';
+import type {
+  TransactionListResponse,
+  BulkCreateTransactionResponse,
+  BulkDeleteTransactionResponse,
+} from '@/lib/api/contracts';
 
 const repo = createTransactionRepository();
 
@@ -124,6 +129,26 @@ export async function bulkCreateTransactions(
       errors: result.errors,
     },
   };
+}
+
+export async function bulkDeleteTransactions(
+  body: unknown
+): Promise<ServiceResult<BulkDeleteTransactionResponse>> {
+  await ensureSeeded();
+
+  const parsed = bulkDeleteTransactionSchema.safeParse(body);
+  if (!parsed.success) {
+    return {
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: formatZodError(parsed.error),
+      },
+    };
+  }
+
+  const deleted = await repo.deleteMany(parsed.data.ids);
+  return { data: { deleted } };
 }
 
 export async function deleteTransaction(id: string): Promise<ServiceResult<{ success: boolean }>> {

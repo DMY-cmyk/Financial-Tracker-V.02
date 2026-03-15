@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -8,6 +8,7 @@ import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
+import { BulkActionBar } from '@/components/transactions/BulkActionBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
@@ -66,6 +67,12 @@ export default function TransactionsPage() {
     openDuplicate,
     closeForm,
     deleteTransaction,
+    selectedIds,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+    isAllSelected,
+    bulkDeleteTransactions,
     isLoading,
     isEmpty,
     hasNoResults,
@@ -78,6 +85,7 @@ export default function TransactionsPage() {
 
   // Delete confirmation
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const handleDelete = (id: string) => {
     setDeleteId(id);
@@ -111,6 +119,12 @@ export default function TransactionsPage() {
       });
       setDeleteId(null);
     }
+  };
+
+  const confirmBulkDelete = async () => {
+    const deleted = await bulkDeleteTransactions();
+    toast.success(`${deleted} ${t(locale, 'bulkDeleteSuccess')}`);
+    setBulkDeleteOpen(false);
   };
 
   if (isLoading) {
@@ -232,6 +246,10 @@ export default function TransactionsPage() {
               page={page}
               totalPages={totalPages}
               onPageChange={setPage}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
+              onSelectAll={selectAll}
+              isAllSelected={isAllSelected}
             />
           </motion.div>
         )}
@@ -256,24 +274,44 @@ export default function TransactionsPage() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t(locale, 'deleteTransaction')}
-        description={
-          locale === 'id'
-            ? 'Transaksi ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
-            : 'This transaction will be permanently deleted. This action cannot be undone.'
-        }
+        description={t(locale, 'deleteConfirmDescription')}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
       />
 
-      {/* Mobile FAB */}
-      <button
-        onClick={openAdd}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-        aria-label={t(locale, 'addTransaction')}
-      >
-        <Plus className="h-6 w-6" />
-      </button>
+      {/* Bulk delete confirmation */}
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        onOpenChange={setBulkDeleteOpen}
+        title={t(locale, 'bulkDeleteTitle')}
+        description={t(locale, 'bulkDeleteDescription').replace('{count}', String(selectedIds.size))}
+        confirmLabel={t(locale, 'delete')}
+        cancelLabel={t(locale, 'cancel')}
+        onConfirm={confirmBulkDelete}
+      />
+
+      {/* Bulk action bar */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <BulkActionBar
+            count={selectedIds.size}
+            onClear={clearSelection}
+            onDelete={() => setBulkDeleteOpen(true)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile FAB — hidden when bulk selection active */}
+      {selectedIds.size === 0 && (
+        <button
+          onClick={openAdd}
+          className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
+          aria-label={t(locale, 'addTransaction')}
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { Pencil, Trash2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TransactionTableProps {
@@ -17,6 +18,10 @@ interface TransactionTableProps {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  onSelectAll?: () => void;
+  isAllSelected?: boolean;
 }
 
 const rowVariants = {
@@ -33,6 +38,10 @@ export function TransactionTable({
   page = 1,
   totalPages = 1,
   onPageChange,
+  selectedIds,
+  onToggleSelect,
+  onSelectAll,
+  isAllSelected,
 }: TransactionTableProps) {
   const locale = useLocale();
 
@@ -54,8 +63,21 @@ export function TransactionTable({
 
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
+  const hasSelection = selectedIds !== undefined && onToggleSelect !== undefined;
+
   return (
     <div className="space-y-4">
+      {hasSelection && onSelectAll && (
+        <div className="flex items-center gap-3 px-3">
+          <Checkbox
+            checked={isAllSelected ?? false}
+            onCheckedChange={() => onSelectAll()}
+          />
+          <span className="text-muted-foreground text-xs font-medium">
+            {isAllSelected ? t(locale, 'deselectAll') : t(locale, 'selectAll')}
+          </span>
+        </div>
+      )}
       {sortedDates.map((date) => (
         <div key={date}>
           <div className="text-muted-foreground mb-2 text-xs font-medium">
@@ -71,8 +93,17 @@ export function TransactionTable({
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  className="group bg-card hover:border-border hover:bg-muted/30 flex items-center gap-3 rounded-xl border border-transparent p-3 transition-colors"
+                  className={cn(
+                    'group bg-card hover:border-border hover:bg-muted/30 flex items-center gap-3 rounded-xl border border-transparent p-3 transition-colors',
+                    hasSelection && selectedIds.has(tx.id) && 'border-primary/30 bg-primary/5'
+                  )}
                 >
+                  {hasSelection && (
+                    <Checkbox
+                      checked={selectedIds.has(tx.id)}
+                      onCheckedChange={() => onToggleSelect(tx.id)}
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{tx.description}</p>
                     <div className="mt-1 flex items-center gap-2">

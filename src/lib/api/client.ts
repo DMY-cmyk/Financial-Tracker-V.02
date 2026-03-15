@@ -3,6 +3,7 @@ import type {
   CreateTransactionRequest,
   BulkCreateTransactionRequest,
   BulkCreateTransactionResponse,
+  BulkDeleteTransactionResponse,
   UpdateTransactionRequest,
   TransactionListResponse,
   DashboardSummaryResponse,
@@ -95,6 +96,13 @@ export const api = {
       return fetchApi<BulkCreateTransactionResponse>('/transactions/bulk', {
         method: 'POST',
         body: JSON.stringify(data),
+      });
+    },
+
+    bulkDelete(ids: string[]) {
+      return fetchApi<BulkDeleteTransactionResponse>('/transactions/bulk', {
+        method: 'DELETE',
+        body: JSON.stringify({ ids }),
       });
     },
   },

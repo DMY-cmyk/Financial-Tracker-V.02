@@ -339,6 +339,34 @@ type TranslationKeys = {
   currentMonth: string;
   allYears: string;
   noDataYet: string;
+
+  // Home screen
+  home: string;
+  welcomeBack: string;
+  welcomeMorning: string;
+  welcomeAfternoon: string;
+  welcomeEvening: string;
+  homeSubtitle: string;
+  viewDashboard: string;
+  manageTransactions: string;
+  manageBudget: string;
+  manageBills: string;
+  manageRecurring: string;
+  manageSavings: string;
+  viewReports: string;
+  uploadReceipts: string;
+  appSettings: string;
+
+  // Bulk delete
+  bulkDeleteTitle: string;
+  bulkDeleteDescription: string;
+  bulkDeleteSuccess: string;
+  selected: string;
+  selectAll: string;
+  deselectAll: string;
+
+  // Confirmation
+  deleteConfirmDescription: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -633,6 +661,34 @@ const translations: Record<Locale, TranslationKeys> = {
     currentMonth: 'Current Month',
     allYears: 'All Years',
     noDataYet: 'No data',
+
+    // Home screen
+    home: 'Home',
+    welcomeBack: 'Welcome back',
+    welcomeMorning: 'Good morning',
+    welcomeAfternoon: 'Good afternoon',
+    welcomeEvening: 'Good evening',
+    homeSubtitle: 'What would you like to do today?',
+    viewDashboard: 'View your financial overview',
+    manageTransactions: 'Record and manage transactions',
+    manageBudget: 'Set and track spending limits',
+    manageBills: 'Track upcoming bills',
+    manageRecurring: 'Manage recurring transactions',
+    manageSavings: 'Track savings progress',
+    viewReports: 'Analyze financial trends',
+    uploadReceipts: 'Scan and import receipts',
+    appSettings: 'Customize your experience',
+
+    // Bulk delete
+    bulkDeleteTitle: 'Delete Selected Transactions',
+    bulkDeleteDescription: '{count} transactions will be permanently deleted. This action cannot be undone.',
+    bulkDeleteSuccess: 'Transactions deleted',
+    selected: 'selected',
+    selectAll: 'Select All',
+    deselectAll: 'Deselect All',
+
+    // Confirmation
+    deleteConfirmDescription: 'This will be permanently deleted. This action cannot be undone.',
   },
   id: {
     dashboard: 'Dasbor',
@@ -925,6 +981,34 @@ const translations: Record<Locale, TranslationKeys> = {
     currentMonth: 'Bulan Ini',
     allYears: 'Semua Tahun',
     noDataYet: 'Belum ada data',
+
+    // Home screen
+    home: 'Beranda',
+    welcomeBack: 'Selamat datang kembali',
+    welcomeMorning: 'Selamat pagi',
+    welcomeAfternoon: 'Selamat siang',
+    welcomeEvening: 'Selamat malam',
+    homeSubtitle: 'Apa yang ingin Anda lakukan hari ini?',
+    viewDashboard: 'Lihat ringkasan keuangan',
+    manageTransactions: 'Catat dan kelola transaksi',
+    manageBudget: 'Atur dan pantau batas pengeluaran',
+    manageBills: 'Pantau tagihan mendatang',
+    manageRecurring: 'Kelola transaksi berulang',
+    manageSavings: 'Pantau progres tabungan',
+    viewReports: 'Analisis tren keuangan',
+    uploadReceipts: 'Pindai dan impor struk',
+    appSettings: 'Sesuaikan pengalaman Anda',
+
+    // Bulk delete
+    bulkDeleteTitle: 'Hapus Transaksi Terpilih',
+    bulkDeleteDescription: '{count} transaksi akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
+    bulkDeleteSuccess: 'Transaksi dihapus',
+    selected: 'dipilih',
+    selectAll: 'Pilih Semua',
+    deselectAll: 'Batal Pilih Semua',
+
+    // Confirmation
+    deleteConfirmDescription: 'Ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
   },
 };
 

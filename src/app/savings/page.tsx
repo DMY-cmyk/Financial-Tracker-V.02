@@ -413,11 +413,7 @@ export default function SavingsPage() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t(locale, 'deleteSavingsGoal')}
-        description={
-          locale === 'id'
-            ? 'Target tabungan ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
-            : 'This savings goal will be permanently deleted. This action cannot be undone.'
-        }
+        description={t(locale, 'deleteConfirmDescription')}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}

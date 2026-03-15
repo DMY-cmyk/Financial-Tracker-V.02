@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
 import {
+  Home,
   LayoutDashboard,
   Receipt,
   Target,
@@ -23,6 +24,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 type NavKey =
+  | 'home'
   | 'dashboard'
   | 'transactions'
   | 'budgetPage'
@@ -36,6 +38,7 @@ type NavKey =
   | 'categories';
 
 const mainItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
+  { href: '/home', key: 'home', icon: Home },
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
   { href: '/budget', key: 'budgetPage', icon: Target },
@@ -58,7 +61,11 @@ export function BottomNav() {
   const setDashboardView = useStore((s) => s.setDashboardView);
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '/home') return pathname === '/home';
+    return pathname.startsWith(href);
+  };
 
   const isMoreActive = moreItems.some((item) => isActive(item.href));
 

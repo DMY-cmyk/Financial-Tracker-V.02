@@ -24,6 +24,10 @@ export interface BulkCreateTransactionResponse {
   errors: { index: number; message: string }[];
 }
 
+export interface BulkDeleteTransactionResponse {
+  deleted: number;
+}
+
 export interface UpdateTransactionRequest {
   date?: string;
   description?: string;

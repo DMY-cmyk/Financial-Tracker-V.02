@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
 import {
+  Home,
   LayoutDashboard,
   Receipt,
   Upload,
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 
 type NavKey =
+  | 'home'
   | 'dashboard'
   | 'transactions'
   | 'budgetPage'
@@ -38,6 +40,7 @@ type NavKey =
   | 'categories';
 
 const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
+  { href: '/home', key: 'home', icon: Home },
   { href: '/', key: 'dashboard', icon: LayoutDashboard },
   { href: '/transactions', key: 'transactions', icon: Receipt },
   { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
@@ -66,7 +69,11 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
   const setLocale = useStore((s) => s.setLocale);
   const setDashboardView = useStore((s) => s.setDashboardView);
 
-  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '/home') return pathname === '/home';
+    return pathname.startsWith(href);
+  };
 
   const navLinkClass = (href: string) =>
     cn(

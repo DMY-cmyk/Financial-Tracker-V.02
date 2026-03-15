@@ -50,6 +50,14 @@ interface UseTransactionsReturn {
   // Actions
   deleteTransaction: (id: string) => void;
 
+  // Selection (bulk)
+  selectedIds: Set<string>;
+  toggleSelect: (id: string) => void;
+  selectAll: () => void;
+  clearSelection: () => void;
+  isAllSelected: boolean;
+  bulkDeleteTransactions: () => Promise<number>;
+
   // States
   isLoading: boolean;
   isEmpty: boolean;
@@ -73,33 +81,40 @@ export function useTransactions(): UseTransactionsReturn {
   const [yearOnly, setYearOnlyState] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // Reset page when filters change
+  // Reset page + clear selection when filters change
   const setSearch = useCallback((v: string) => {
     setSearchState(v);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
   const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => {
     setTypeFilterState(v);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
   const setCategoryFilter = useCallback((v: string) => {
     setCategoryFilterState(v);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
   const setPaymentMethodFilter = useCallback((v: string) => {
     setPaymentMethodFilterState(v);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
   const setAllMonths = useCallback((v: boolean) => {
     setAllMonthsState(v);
     if (v) setYearOnlyState(false);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
   const setYearOnly = useCallback((v: boolean) => {
     setYearOnlyState(v);
     if (v) setAllMonthsState(false);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
 
   const { data: pmData } = useQuery({
@@ -210,6 +225,35 @@ export function useTransactions(): UseTransactionsReturn {
     [queryClient]
   );
 
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectAll = useCallback(() => {
+    setSelectedIds(new Set(transactions.map((tx) => tx.id)));
+  }, [transactions]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const isAllSelected = transactions.length > 0 && selectedIds.size === transactions.length;
+
+  const bulkDeleteTransactions = useCallback(async () => {
+    const ids = Array.from(selectedIds);
+    const result = await api.transactions.bulkDelete(ids);
+    const deleted = result.data?.deleted ?? 0;
+    setSelectedIds(new Set());
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    return deleted;
+  }, [selectedIds, queryClient]);
+
   const isLoading = !initialized || isQueryLoading;
 
   return {
@@ -244,6 +288,12 @@ export function useTransactions(): UseTransactionsReturn {
     openDuplicate,
     closeForm,
     deleteTransaction,
+    selectedIds,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+    isAllSelected,
+    bulkDeleteTransactions,
     isLoading,
     isEmpty: !isLoading && total === 0 && !hasActiveFilters,
     hasNoResults: !isLoading && transactions.length === 0 && hasActiveFilters,

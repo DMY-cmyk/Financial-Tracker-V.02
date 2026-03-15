@@ -151,6 +151,16 @@ export function createTransactionRepository() {
       return result.rowCount > 0;
     },
 
+    async deleteMany(ids: string[]): Promise<number> {
+      const db = await getDb();
+      let deleted = 0;
+      for (const id of ids) {
+        const result = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
+        deleted += result.rowCount;
+      }
+      return deleted;
+    },
+
     async countByCategory(categoryId: string): Promise<number> {
       const db = await getDb();
       const result = await db.query<{ cnt: number }>(

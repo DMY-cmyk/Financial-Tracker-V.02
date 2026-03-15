@@ -425,11 +425,7 @@ export default function BillsPage() {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t(locale, 'deleteBill')}
-        description={
-          locale === 'id'
-            ? 'Tagihan ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.'
-            : 'This bill will be permanently deleted. This action cannot be undone.'
-        }
+        description={t(locale, 'deleteConfirmDescription')}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}

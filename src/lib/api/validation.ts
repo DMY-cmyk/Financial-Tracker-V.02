@@ -20,6 +20,10 @@ export const bulkCreateTransactionSchema = z.object({
     .max(500, 'Maximum 500 transactions per import'),
 });
 
+export const bulkDeleteTransactionSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(500),
+});
+
 export const listTransactionsQuerySchema = z.object({
   month: z.number().int().min(0).max(11).optional(),
   year: z.number().int().min(2000).max(2100).optional(),
@@ -147,6 +151,7 @@ export const listRecurringTransactionsQuerySchema = z.object({
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
 export type BulkCreateTransactionInput = z.infer<typeof bulkCreateTransactionSchema>;
+export type BulkDeleteTransactionInput = z.infer<typeof bulkDeleteTransactionSchema>;
 export type ListTransactionsQuery = z.infer<typeof listTransactionsQuerySchema>;
 export type DashboardSummaryQuery = z.infer<typeof dashboardSummaryQuerySchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
