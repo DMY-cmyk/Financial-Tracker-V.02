@@ -6,6 +6,8 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { useReportsData } from '@/hooks/useReportsData';
+import { BalanceGrid } from '@/features/balances/BalanceGrid';
+import { useBalances } from '@/features/balances/useBalances';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/components/reports/TrendChart';
 import { AnnualSummary } from '@/components/reports/AnnualSummary';
@@ -23,6 +25,7 @@ export default function ReportsPage() {
   const locale = useLocale();
   const { trends, isLoading, monthCount, setMonthCount } = useReportsData();
   const [annualYear, setAnnualYear] = useState(new Date().getFullYear());
+  const { balances, isLoading: balancesLoading } = useBalances();
 
   const latest = trends[trends.length - 1];
   const totalIncome = trends.reduce((s, m) => s + m.income, 0);
@@ -224,6 +227,12 @@ export default function ReportsPage() {
             </div>
           </div>
           <AnnualSummary year={annualYear} />
+        </motion.div>
+
+        {/* Account Balances Snapshot */}
+        <motion.div {...fadeInUp} transition={{ duration: 0.3, delay: 0.2 }}>
+          <h2 className="mb-4 text-lg font-semibold">{t(locale, 'accountBalances')}</h2>
+          <BalanceGrid balances={balances} locale={locale} isLoading={balancesLoading} />
         </motion.div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/l
 import { BillsChecklist } from '@/components/dashboard/BillsChecklist';
 import { SavingsGoals } from '@/components/dashboard/SavingsGoals';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
+import { AccountBalancesWidget } from '@/features/balances/AccountBalancesWidget';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -207,6 +208,15 @@ export function DashboardContent() {
             <motion.div variants={staggerItem}>
               <PaymentMethodsSummary totals={paymentMethodTotals} />
             </motion.div>
+          </motion.div>
+
+          {/* Account Balances */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <AccountBalancesWidget />
           </motion.div>
         </>
       )}
