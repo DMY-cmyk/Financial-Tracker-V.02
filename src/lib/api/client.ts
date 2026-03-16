@@ -26,6 +26,9 @@ import type {
   RecurringTransactionListResponse,
   CreateRecurringTransactionRequest,
   UpdateRecurringTransactionRequest,
+  BalanceListResponse,
+  MonthlyReportResponse,
+  AnnualReportResponse,
   ApiResult,
 } from './contracts';
 
@@ -315,6 +318,22 @@ export const api = {
       return fetchApi<{ generated: number }>('/recurring-transactions/generate', {
         method: 'POST',
       });
+    },
+  },
+
+  balances: {
+    list() {
+      return fetchApi<BalanceListResponse>('/payment-methods/balances');
+    },
+  },
+
+  reports: {
+    monthly(month: number, year: number) {
+      return fetchApi<MonthlyReportResponse>(`/reports/monthly?month=${month}&year=${year}`);
+    },
+
+    annual(year: number) {
+      return fetchApi<AnnualReportResponse>(`/reports/annual?year=${year}`);
     },
   },
 };

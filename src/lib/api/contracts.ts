@@ -1,4 +1,4 @@
-import type { Transaction, Category, PaymentMethod, RecurringTransaction } from '@/lib/types';
+import type { Transaction, Category, PaymentMethod, RecurringTransaction, Bill } from '@/lib/types';
 
 // === Request types ===
 
@@ -266,4 +266,54 @@ export interface UpdateRecurringTransactionRequest {
   endDate?: string | null;
   nextDueDate?: string;
   isActive?: boolean;
+}
+
+// === Balance contracts ===
+
+export interface PaymentMethodBalance {
+  id: string;
+  name: string;
+  type: 'bank' | 'cash' | 'ewallet';
+  icon: string;
+  income: number;
+  expense: number;
+  balance: number;
+}
+
+export interface BalanceListResponse {
+  balances: PaymentMethodBalance[];
+}
+
+// === Report contracts ===
+
+export interface MonthlyReportData {
+  month: number;
+  year: number;
+  totalIncome: number;
+  totalExpense: number;
+  totalAssets: number;
+  incomeTransactions: Transaction[];
+  expenseTransactions: Transaction[];
+  expenseSummaryByCategory: { category: string; total: number }[];
+  paymentMethodBalances: PaymentMethodBalance[];
+  bills: Bill[];
+}
+
+export interface AnnualReportData {
+  year: number;
+  totalIncome: number;
+  totalExpense: number;
+  totalAssets: number;
+  monthlyBreakdown: { month: number; income: number; expense: number; net: number }[];
+  topCategories: { category: string; type: 'income' | 'expense'; total: number }[];
+  paymentMethodBalances: PaymentMethodBalance[];
+  transactions: Transaction[];
+}
+
+export interface MonthlyReportResponse {
+  report: MonthlyReportData;
+}
+
+export interface AnnualReportResponse {
+  report: AnnualReportData;
 }

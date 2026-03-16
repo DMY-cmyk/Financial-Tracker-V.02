@@ -367,6 +367,26 @@ type TranslationKeys = {
 
   // Confirmation
   deleteConfirmDescription: string;
+
+  // Report download keys
+  downloadReport: string;
+  reportTypeMonthly: string;
+  reportTypeYearly: string;
+  generatingReport: string;
+  reportDownloaded: string;
+  reportError: string;
+  annualSummary: string;
+  transactionDetail: string;
+  accountBalances: string;
+
+  // Load-more transaction keys
+  loadMore: string;
+  allLoaded: string;
+  showing: string;
+
+  // Sidebar group keys
+  groupFinance: string;
+  groupTools: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -689,6 +709,26 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Confirmation
     deleteConfirmDescription: 'This will be permanently deleted. This action cannot be undone.',
+
+    // Report download keys
+    downloadReport: 'Download Report',
+    reportTypeMonthly: 'Monthly',
+    reportTypeYearly: 'Yearly',
+    generatingReport: 'Generating...',
+    reportDownloaded: 'Report downloaded',
+    reportError: 'Failed to generate report',
+    annualSummary: 'Annual Summary',
+    transactionDetail: 'Transaction Detail',
+    accountBalances: 'Account Balances',
+
+    // Load-more transaction keys
+    loadMore: 'Load more',
+    allLoaded: 'All loaded',
+    showing: 'Showing',
+
+    // Sidebar group keys
+    groupFinance: 'Finance',
+    groupTools: 'Tools',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1009,6 +1049,26 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Confirmation
     deleteConfirmDescription: 'Ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
+
+    // Report download keys
+    downloadReport: 'Unduh Laporan',
+    reportTypeMonthly: 'Bulanan',
+    reportTypeYearly: 'Tahunan',
+    generatingReport: 'Membuat...',
+    reportDownloaded: 'Laporan diunduh',
+    reportError: 'Gagal membuat laporan',
+    annualSummary: 'Ringkasan Tahunan',
+    transactionDetail: 'Detail Transaksi',
+    accountBalances: 'Saldo Akun',
+
+    // Load-more transaction keys
+    loadMore: 'Muat lagi',
+    allLoaded: 'Semua dimuat',
+    showing: 'Menampilkan',
+
+    // Sidebar group keys
+    groupFinance: 'Keuangan',
+    groupTools: 'Alat',
   },
 };
 
