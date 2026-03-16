@@ -8,6 +8,7 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { useReportsData } from '@/hooks/useReportsData';
 import { BalanceGrid } from '@/features/balances/BalanceGrid';
 import { useBalances } from '@/features/balances/useBalances';
+import { ReportDownloader } from '@/features/reports/ReportDownloader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/components/reports/TrendChart';
 import { AnnualSummary } from '@/components/reports/AnnualSummary';
@@ -233,6 +234,15 @@ export default function ReportsPage() {
         <motion.div {...fadeInUp} transition={{ duration: 0.3, delay: 0.2 }}>
           <h2 className="mb-4 text-lg font-semibold">{t(locale, 'accountBalances')}</h2>
           <BalanceGrid balances={balances} locale={locale} isLoading={balancesLoading} />
+        </motion.div>
+
+        {/* Report Downloader */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+        >
+          <ReportDownloader />
         </motion.div>
       </div>
     </div>
