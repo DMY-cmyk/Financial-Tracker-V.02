@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTransactions } from '@/hooks/useTransactions';
+import { useAllTransactions } from '@/features/transactions/useAllTransactions';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
@@ -11,8 +11,8 @@ import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/components/transactions/BulkActionBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
-import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionForm } from '@/components/transactions/TransactionForm';
+import { AllTransactionsView } from '@/features/transactions/AllTransactionsView';
 import { TransactionSummary } from '@/components/transactions/TransactionSummary';
 import { EmptyState, NoResults } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -41,10 +41,11 @@ export default function TransactionsPage() {
     transactions,
     income,
     expense,
-    page,
-    totalPages,
     total,
-    setPage,
+    hasMore,
+    loadMore,
+    isLoading,
+    isLoadingMore,
     search,
     setSearch,
     typeFilter,
@@ -73,10 +74,9 @@ export default function TransactionsPage() {
     clearSelection,
     isAllSelected,
     bulkDeleteTransactions,
-    isLoading,
     isEmpty,
     hasNoResults,
-  } = useTransactions();
+  } = useAllTransactions();
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
@@ -110,7 +110,7 @@ export default function TransactionsPage() {
                   date: deletedTx.date,
                   notes: deletedTx.notes,
                 });
-                queryClient.invalidateQueries({ queryKey: ['transactions'] });
+                queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
                 queryClient.invalidateQueries({ queryKey: ['dashboard'] });
                 toast.success(t(locale, 'itemRestored'));
               },
@@ -238,18 +238,19 @@ export default function TransactionsPage() {
           </motion.div>
         ) : (
           <motion.div key="list" variants={staggerContainer} initial="hidden" animate="show">
-            <TransactionTable
+            <AllTransactionsView
               transactions={transactions}
-              onEdit={openEdit}
-              onDelete={handleDelete}
-              onDuplicate={openDuplicate}
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
+              total={total}
+              hasMore={hasMore}
+              isLoadingMore={isLoadingMore}
+              onLoadMore={loadMore}
               selectedIds={selectedIds}
               onToggleSelect={toggleSelect}
               onSelectAll={selectAll}
               isAllSelected={isAllSelected}
+              onEdit={openEdit}
+              onDuplicate={openDuplicate}
+              onDelete={handleDelete}
             />
           </motion.div>
         )}
