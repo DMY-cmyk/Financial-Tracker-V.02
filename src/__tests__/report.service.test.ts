@@ -43,6 +43,7 @@ describe('getMonthlyReportData', () => {
     });
     // month=0 (January), year=2026
     const result = await getMonthlyReportData(0, 2026);
+    expect(result.error).toBeUndefined();
     expect(result.data!.incomeTransactions).toHaveLength(1);
     expect(result.data!.expenseTransactions).toHaveLength(1);
     expect(result.data!.totalIncome).toBe(5000000);
@@ -81,6 +82,7 @@ describe('getMonthlyReportData', () => {
       notes: '',
     });
     const result = await getMonthlyReportData(0, 2026);
+    expect(result.error).toBeUndefined();
     const food = result.data!.expenseSummaryByCategory.find((s) => s.category === 'Food');
     expect(food!.total).toBe(130000);
     expect(result.data!.expenseSummaryByCategory).toHaveLength(2);
@@ -98,6 +100,7 @@ describe('getMonthlyReportData', () => {
       notes: '',
     });
     const result = await getMonthlyReportData(0, 2026); // January
+    expect(result.error).toBeUndefined();
     expect(result.data!.incomeTransactions).toHaveLength(0);
   });
 });
@@ -131,6 +134,7 @@ describe('getAnnualReportData', () => {
       notes: '',
     });
     const result = await getAnnualReportData(2026);
+    expect(result.error).toBeUndefined();
     expect(result.data!.totalIncome).toBe(10000000);
   });
 });

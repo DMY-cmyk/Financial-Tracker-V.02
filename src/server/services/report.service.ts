@@ -25,6 +25,8 @@ export async function getMonthlyReportData(
     listBills({ month, year }),
   ]);
 
+  if (balancesResult.error) return { error: balancesResult.error };
+  if (billsResult.error) return { error: billsResult.error };
   const incomeTransactions = incomeResult.rows;
   const expenseTransactions = expenseResult.rows;
   const paymentMethodBalances = balancesResult.data ?? [];
@@ -70,6 +72,7 @@ export async function getAnnualReportData(
     txRepo.findFiltered({ year, yearOnly: true, page: 1, pageSize: 10000 }),
   ]);
 
+  if (balancesResult.error) return { error: balancesResult.error };
   const paymentMethodBalances = balancesResult.data ?? [];
 
   // Build 12-month breakdown (fill missing months with zeros)
