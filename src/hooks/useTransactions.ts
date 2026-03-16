@@ -235,8 +235,8 @@ export function useTransactions(): UseTransactionsReturn {
   }, []);
 
   const selectAll = useCallback(() => {
-    setSelectedIds(new Set(transactions.map((tx) => tx.id)));
-  }, [transactions]);
+    setSelectedIds(new Set((txData?.transactions ?? []).map((tx) => tx.id)));
+  }, [txData]);
 
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());

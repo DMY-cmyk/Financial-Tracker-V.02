@@ -228,7 +228,7 @@ export function useBulkImport(): UseBulkImportReturn {
         setStatus('error');
       }
     },
-    [importResult]
+    [importResult, categories]
   );
 
   const downloadTemplate = useCallback(() => {

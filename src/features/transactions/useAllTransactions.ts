@@ -236,8 +236,11 @@ export function useAllTransactions(): UseAllTransactionsReturn {
     });
   }, []);
   const selectAll = useCallback(
-    () => setSelectedIds(new Set(transactions.map((tx) => tx.id))),
-    [transactions]
+    () =>
+      setSelectedIds(
+        new Set((data?.pages.flatMap((p) => p?.transactions ?? []) ?? []).map((tx) => tx.id))
+      ),
+    [data]
   );
   const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
   const isAllSelected = transactions.length > 0 && selectedIds.size === transactions.length;

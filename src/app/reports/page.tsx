@@ -28,7 +28,6 @@ export default function ReportsPage() {
   const [annualYear, setAnnualYear] = useState(new Date().getFullYear());
   const { balances, isLoading: balancesLoading } = useBalances();
 
-  const latest = trends[trends.length - 1];
   const totalIncome = trends.reduce((s, m) => s + m.income, 0);
   const totalExpense = trends.reduce((s, m) => s + m.expense, 0);
   const totalBalance = totalIncome - totalExpense;

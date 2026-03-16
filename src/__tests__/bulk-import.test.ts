@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as XLSX from 'xlsx';
 import { parseExcelWorkbook } from '@/lib/excel-import';
 import { parseOcrTextToTransactions } from '@/lib/ocr-import';
-import { bulkCreateTransactionSchema, createTransactionSchema } from '@/lib/api/validation';
+import { bulkCreateTransactionSchema } from '@/lib/api/validation';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { bulkCreateTransactions } from '@/server/services/transaction.service';
@@ -663,6 +663,7 @@ describe('bulkCreateTransactionSchema', () => {
   });
 
   it('defaults notes to empty string when not provided', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { notes, ...withoutNotes } = validTransaction;
     const result = bulkCreateTransactionSchema.safeParse({
       transactions: [withoutNotes],

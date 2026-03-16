@@ -67,7 +67,7 @@ export function useRecurringTransactions() {
 
   const toggleActive = useCallback(
     async (id: string) => {
-      const rt = recurringTransactions.find((r) => r.id === id);
+      const rt = (data?.recurringTransactions ?? []).find((r) => r.id === id);
       if (!rt) return;
       const newActive = !rt.isActive;
       // Optimistic update
@@ -85,7 +85,7 @@ export function useRecurringTransactions() {
         queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
       }
     },
-    [recurringTransactions, queryClient]
+    [data, queryClient]
   );
 
   const generate = useCallback(async () => {

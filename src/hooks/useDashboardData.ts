@@ -46,7 +46,7 @@ export function useDashboardData() {
 
   const onToggleBill = useCallback(
     async (id: string) => {
-      const bill = bills.find((b) => b.id === id);
+      const bill = (data?.bills ?? []).find((b) => b.id === id);
       if (!bill) return;
       // Optimistic update
       queryClient.setQueryData<DashboardData>(['dashboard', month, year], (old) => {
@@ -61,12 +61,12 @@ export function useDashboardData() {
         queryClient.invalidateQueries({ queryKey: ['dashboard', month, year] });
       }
     },
-    [bills, queryClient, month, year]
+    [data, queryClient, month, year]
   );
 
   const budgetStatus = useMemo(() => {
     if (!summary) return [];
-    return categories
+    return (data?.categories ?? [])
       .filter((c) => c.type === 'expense' && c.budget > 0)
       .map((c) => {
         const spent = summary.categoryTotals[c.id] || 0;
@@ -82,7 +82,7 @@ export function useDashboardData() {
           percentage,
         };
       });
-  }, [summary, categories]);
+  }, [summary, data]);
 
   const updateBudget = useCallback(
     async (categoryId: string, budget: number) => {
