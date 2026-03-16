@@ -71,6 +71,7 @@ export interface UIState {
   sidebarCollapsed: boolean;
   dashboardView: DashboardView;
   dashboardViewDirection: 1 | -1;
+  collapsedGroups: Record<string, boolean>;
 }
 
 export interface DashboardSummary {
@@ -172,6 +173,7 @@ export interface FinancialStore {
   setLocale: (locale: 'en' | 'id') => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setDashboardView: (view: DashboardView) => void;
+  toggleNavGroup: (groupId: string) => void;
 
   // Lifecycle
   initialize: () => void;

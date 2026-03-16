@@ -15,6 +15,7 @@ export const useStore = create<FinancialStore>()(
         sidebarCollapsed: false,
         dashboardView: 'years',
         dashboardViewDirection: 1,
+        collapsedGroups: {},
       },
       initialized: false,
 
@@ -41,6 +42,17 @@ export const useStore = create<FinancialStore>()(
             ui: { ...state.ui, dashboardView: view, dashboardViewDirection: dir as 1 | -1 },
           };
         }),
+
+      toggleNavGroup: (groupId: string) =>
+        set((state) => ({
+          ui: {
+            ...state.ui,
+            collapsedGroups: {
+              ...state.ui.collapsedGroups,
+              [groupId]: !(state.ui.collapsedGroups[groupId] ?? false),
+            },
+          },
+        })),
 
       // Lifecycle
       initialize: () => set({ initialized: true }),
