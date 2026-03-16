@@ -7,9 +7,6 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
 import {
-  Home,
-  LayoutDashboard,
-  Receipt,
   Upload,
   Download,
   Settings,
@@ -17,42 +14,12 @@ import {
   PanelLeftClose,
   PanelLeft,
   Tag,
-  CalendarCheck,
-  PiggyBank,
-  Target,
-  Repeat,
-  BarChart3,
   Languages,
 } from 'lucide-react';
+import { SidebarGroup } from '@/features/navigation/SidebarGroup';
+import { useNavGroups } from '@/features/navigation/useNavGroups';
 
-type NavKey =
-  | 'home'
-  | 'dashboard'
-  | 'transactions'
-  | 'budgetPage'
-  | 'bills'
-  | 'recurringTransactions'
-  | 'savingsPage'
-  | 'reports'
-  | 'upload'
-  | 'export'
-  | 'settings'
-  | 'categories';
-
-const NAV_MAIN: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
-  { href: '/home', key: 'home', icon: Home },
-  { href: '/', key: 'dashboard', icon: LayoutDashboard },
-  { href: '/transactions', key: 'transactions', icon: Receipt },
-  { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
-  { href: '/budget', key: 'budgetPage', icon: Target },
-  { href: '/bills', key: 'bills', icon: CalendarCheck },
-  { href: '/savings', key: 'savingsPage', icon: PiggyBank },
-  { href: '/reports', key: 'reports', icon: BarChart3 },
-  { href: '/upload', key: 'upload', icon: Upload },
-  { href: '/export', key: 'export', icon: Download },
-];
-
-const NAV_BOTTOM: { href: string; key: NavKey; icon: typeof Settings }[] = [
+const NAV_BOTTOM: { href: string; key: Parameters<typeof t>[1]; icon: typeof Settings }[] = [
   { href: '/settings', key: 'settings', icon: Settings },
   { href: '/settings/categories', key: 'categories', icon: Tag },
 ];
@@ -67,7 +34,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
   const pathname = usePathname();
   const locale = useLocale();
   const setLocale = useStore((s) => s.setLocale);
-  const setDashboardView = useStore((s) => s.setDashboardView);
+  const { groups, isGroupCollapsed, toggleGroup } = useNavGroups();
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -145,43 +112,16 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 space-y-1 px-3" aria-label={t(locale, 'menu')}>
-        {!collapsed && (
-          <p className="text-muted-foreground/60 mb-2 px-3 text-[10px] font-semibold tracking-wider uppercase">
-            {t(locale, 'menu')}
-          </p>
-        )}
-        {NAV_MAIN.map(({ href, key, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={navLinkClass(href)}
-            title={collapsed ? t(locale, key) : undefined}
-            aria-current={isActive(href) ? 'page' : undefined}
-            onClick={(e) => {
-              // If already on dashboard, reset to year folder view instead of navigating
-              if (href === '/' && pathname === '/') {
-                e.preventDefault();
-                setDashboardView('years');
-                window.history.pushState({ dashboardView: 'years' }, '');
-              }
-            }}
-          >
-            <Icon className="h-[18px] w-[18px] shrink-0" />
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="whitespace-nowrap"
-                >
-                  {t(locale, key)}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
+      <nav className="flex-1 space-y-3 overflow-y-auto px-3 py-2" aria-label={t(locale, 'menu')}>
+        {groups.map((group) => (
+          <SidebarGroup
+            key={group.id}
+            group={group}
+            railMode={collapsed}
+            isCollapsed={isGroupCollapsed(group.id)}
+            onToggle={() => toggleGroup(group.id)}
+            locale={locale}
+          />
         ))}
       </nav>
 
