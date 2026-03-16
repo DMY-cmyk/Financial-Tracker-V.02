@@ -89,20 +89,33 @@ export function useAllTransactions(): UseAllTransactionsReturn {
   ].join('|');
 
   // Filter setters — each resets selection
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setSearch = useCallback((v: string) => { setSearchState(v); setSelectedIds(new Set()); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => { setTypeFilterState(v); setSelectedIds(new Set()); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setCategoryFilter = useCallback((v: string) => { setCategoryFilterState(v); setSelectedIds(new Set()); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setPaymentMethodFilter = useCallback((v: string) => { setPaymentMethodFilterState(v); setSelectedIds(new Set()); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setAllMonths = useCallback((v: boolean) => { setAllMonthsState(v); if (v) setYearOnlyState(false); setSelectedIds(new Set()); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setYearOnly = useCallback((v: boolean) => { setYearOnlyState(v); if (v) setAllMonthsState(false); setSelectedIds(new Set()); }, []);
+  const setSearch = useCallback((v: string) => {
+    setSearchState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => {
+    setTypeFilterState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setCategoryFilter = useCallback((v: string) => {
+    setCategoryFilterState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setPaymentMethodFilter = useCallback((v: string) => {
+    setPaymentMethodFilterState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setAllMonths = useCallback((v: boolean) => {
+    setAllMonthsState(v);
+    if (v) setYearOnlyState(false);
+    setSelectedIds(new Set());
+  }, []);
+  const setYearOnly = useCallback((v: boolean) => {
+    setYearOnlyState(v);
+    if (v) setAllMonthsState(false);
+    setSelectedIds(new Set());
+  }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const clearFilters = useCallback(() => {
     setSearchState('');
     setTypeFilterState('all');
@@ -114,8 +127,12 @@ export function useAllTransactions(): UseAllTransactionsReturn {
   }, []);
 
   const hasActiveFilters =
-    search !== '' || typeFilter !== 'all' || categoryFilter !== '' ||
-    paymentMethodFilter !== '' || allMonths || yearOnly;
+    search !== '' ||
+    typeFilter !== 'all' ||
+    categoryFilter !== '' ||
+    paymentMethodFilter !== '' ||
+    allMonths ||
+    yearOnly;
 
   // Payment methods reference data
   const { data: pmData } = useQuery({
@@ -173,16 +190,22 @@ export function useAllTransactions(): UseAllTransactionsReturn {
   const isLoading = !initialized || isQueryLoading;
 
   // Form actions
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openAdd = useCallback(() => { setEditingTx(undefined); setFormOpen(true); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openEdit = useCallback((tx: Transaction) => { setEditingTx(tx); setFormOpen(true); }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openDuplicate = useCallback((tx: Transaction) => {
-    const today = `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
-    setEditingTx({ ...tx, id: '', date: today });
+  const openAdd = useCallback(() => {
+    setEditingTx(undefined);
     setFormOpen(true);
-  }, [month, year]);
+  }, []);
+  const openEdit = useCallback((tx: Transaction) => {
+    setEditingTx(tx);
+    setFormOpen(true);
+  }, []);
+  const openDuplicate = useCallback(
+    (tx: Transaction) => {
+      const today = `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+      setEditingTx({ ...tx, id: '', date: today });
+      setFormOpen(true);
+    },
+    [month, year]
+  );
 
   const closeForm = useCallback(() => {
     setFormOpen(false);
@@ -192,26 +215,30 @@ export function useAllTransactions(): UseAllTransactionsReturn {
     queryClient.invalidateQueries({ queryKey: ['payment-method-balances'] });
   }, [queryClient]);
 
-  const deleteTransaction = useCallback((id: string) => {
-    api.transactions.delete(id).then(() => {
-      queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['payment-method-balances'] });
-    });
-  }, [queryClient]);
+  const deleteTransaction = useCallback(
+    (id: string) => {
+      api.transactions.delete(id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['payment-method-balances'] });
+      });
+    },
+    [queryClient]
+  );
 
   // Selection
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }, []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const selectAll = useCallback(() => setSelectedIds(new Set(transactions.map((tx) => tx.id))), [transactions]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const selectAll = useCallback(
+    () => setSelectedIds(new Set(transactions.map((tx) => tx.id))),
+    [transactions]
+  );
   const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
   const isAllSelected = transactions.length > 0 && selectedIds.size === transactions.length;
 
@@ -227,22 +254,42 @@ export function useAllTransactions(): UseAllTransactionsReturn {
   }, [selectedIds, queryClient]);
 
   return {
-    transactions, income, expense, total,
+    transactions,
+    income,
+    expense,
+    total,
     hasMore: Boolean(hasNextPage),
     loadMore: fetchNextPage,
     isLoading,
     isLoadingMore: isFetchingNextPage,
-    search, setSearch,
-    typeFilter, setTypeFilter,
-    categoryFilter, setCategoryFilter,
-    paymentMethodFilter, setPaymentMethodFilter,
-    allMonths, setAllMonths,
-    yearOnly, setYearOnly,
-    hasActiveFilters, clearFilters,
+    search,
+    setSearch,
+    typeFilter,
+    setTypeFilter,
+    categoryFilter,
+    setCategoryFilter,
+    paymentMethodFilter,
+    setPaymentMethodFilter,
+    allMonths,
+    setAllMonths,
+    yearOnly,
+    setYearOnly,
+    hasActiveFilters,
+    clearFilters,
     paymentMethods,
-    formOpen, setFormOpen,
-    editingTx, openAdd, openEdit, openDuplicate, closeForm, deleteTransaction,
-    selectedIds, toggleSelect, selectAll, clearSelection, isAllSelected,
+    formOpen,
+    setFormOpen,
+    editingTx,
+    openAdd,
+    openEdit,
+    openDuplicate,
+    closeForm,
+    deleteTransaction,
+    selectedIds,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+    isAllSelected,
     bulkDeleteTransactions,
     isEmpty: !isLoading && total === 0 && !hasActiveFilters,
     hasNoResults: !isLoading && transactions.length === 0 && hasActiveFilters,

@@ -48,7 +48,6 @@ export function useReportData(): UseReportDataReturn {
         setIsGenerating(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -69,7 +68,6 @@ export function useReportData(): UseReportDataReturn {
         setIsGenerating(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

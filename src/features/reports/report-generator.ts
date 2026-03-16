@@ -2,19 +2,19 @@ import * as XLSX from 'xlsx';
 import type { MonthlyReportData, AnnualReportData } from './types';
 
 const MONTH_NAMES_ID = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
 ];
-
-// Column letter helpers (A=0, B=1, ...)
-function colToLetter(col: number): string {
-  return String.fromCharCode(65 + col);
-}
-
-function cellAddress(row: number, col: number): string {
-  // row and col are 0-based
-  return `${colToLetter(col)}${row + 1}`;
-}
 
 function dateToExcelSerial(dateStr: string): number {
   // Excel serial: days since 1899-12-30
@@ -155,26 +155,26 @@ export function generateMonthlyReport(data: MonthlyReportData): void {
 
   // Column widths
   ws['!cols'] = [
-    { wch: 3 },   // A
-    { wch: 20 },  // B
-    { wch: 20 },  // C
-    { wch: 12 },  // D
-    { wch: 3 },   // E
-    { wch: 5 },   // F (No)
-    { wch: 12 },  // G (Tanggal)
-    { wch: 14 },  // H (Jumlah)
-    { wch: 18 },  // I (Kategori)
-    { wch: 14 },  // J (Method)
-    { wch: 3 },   // K
-    { wch: 5 },   // L (No)
-    { wch: 12 },  // M (Tanggal)
-    { wch: 14 },  // N (Jumlah)
-    { wch: 18 },  // O (Kategori)
-    { wch: 14 },  // P (Account)
-    { wch: 22 },  // Q (Notes)
-    { wch: 3 },   // R
-    { wch: 18 },  // S (Rekap Kategori)
-    { wch: 14 },  // T (Total)
+    { wch: 3 }, // A
+    { wch: 20 }, // B
+    { wch: 20 }, // C
+    { wch: 12 }, // D
+    { wch: 3 }, // E
+    { wch: 5 }, // F (No)
+    { wch: 12 }, // G (Tanggal)
+    { wch: 14 }, // H (Jumlah)
+    { wch: 18 }, // I (Kategori)
+    { wch: 14 }, // J (Method)
+    { wch: 3 }, // K
+    { wch: 5 }, // L (No)
+    { wch: 12 }, // M (Tanggal)
+    { wch: 14 }, // N (Jumlah)
+    { wch: 18 }, // O (Kategori)
+    { wch: 14 }, // P (Account)
+    { wch: 22 }, // Q (Notes)
+    { wch: 3 }, // R
+    { wch: 18 }, // S (Rekap Kategori)
+    { wch: 14 }, // T (Total)
   ];
 
   XLSX.utils.book_append_sheet(wb, ws, 'Monthly Report');
@@ -192,12 +192,7 @@ export function generateAnnualReport(data: AnnualReportData): void {
     ['Ringkasan Tahunan', data.year],
     [],
     ['Bulan', 'Pemasukan', 'Pengeluaran', 'Net'],
-    ...data.monthlyBreakdown.map((m) => [
-      MONTH_NAMES_ID[m.month],
-      m.income,
-      m.expense,
-      m.net,
-    ]),
+    ...data.monthlyBreakdown.map((m) => [MONTH_NAMES_ID[m.month], m.income, m.expense, m.net]),
     [],
     ['Total', data.totalIncome, data.totalExpense, data.totalIncome - data.totalExpense],
     [],
@@ -226,11 +221,27 @@ export function generateAnnualReport(data: AnnualReportData): void {
   for (const tx of sorted) {
     const txDate = new Date(tx.date);
     const monthLabel = MONTH_NAMES_ID[txDate.getMonth()];
-    detailRows.push([monthLabel, tx.date, tx.description, tx.category, tx.type, tx.amount, tx.paymentMethod]);
+    detailRows.push([
+      monthLabel,
+      tx.date,
+      tx.description,
+      tx.category,
+      tx.type,
+      tx.amount,
+      tx.paymentMethod,
+    ]);
   }
 
   const wsDetail = XLSX.utils.aoa_to_sheet(detailRows);
-  wsDetail['!cols'] = [{ wch: 14 }, { wch: 12 }, { wch: 28 }, { wch: 18 }, { wch: 10 }, { wch: 16 }, { wch: 16 }];
+  wsDetail['!cols'] = [
+    { wch: 14 },
+    { wch: 12 },
+    { wch: 28 },
+    { wch: 18 },
+    { wch: 10 },
+    { wch: 16 },
+    { wch: 16 },
+  ];
   XLSX.utils.book_append_sheet(wb, wsDetail, 'Detail Transaksi');
 
   XLSX.writeFile(wb, `Laporan_Tahunan_${data.year}.xlsx`);
