@@ -7,8 +7,6 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
 import {
-  Upload,
-  Download,
   Settings,
   Plus,
   PanelLeftClose,
