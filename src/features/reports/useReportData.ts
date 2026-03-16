@@ -31,45 +31,39 @@ export function useReportData(): UseReportDataReturn {
 
   const availableYears = (folderData ?? []).map((y) => y.year).sort((a, b) => b - a);
 
-  const downloadMonthly = useCallback(
-    async (month: number, year: number, locale: 'en' | 'id') => {
-      setIsGenerating(true);
-      try {
-        const result = await api.reports.monthly(month, year);
-        if (result.error || !result.data?.report) {
-          toast.error(t(locale, 'reportError'));
-          return;
-        }
-        generateMonthlyReport(result.data.report);
-        toast.success(t(locale, 'reportDownloaded'));
-      } catch {
+  const downloadMonthly = useCallback(async (month: number, year: number, locale: 'en' | 'id') => {
+    setIsGenerating(true);
+    try {
+      const result = await api.reports.monthly(month, year);
+      if (result.error || !result.data?.report) {
         toast.error(t(locale, 'reportError'));
-      } finally {
-        setIsGenerating(false);
+        return;
       }
-    },
-    []
-  );
+      generateMonthlyReport(result.data.report);
+      toast.success(t(locale, 'reportDownloaded'));
+    } catch {
+      toast.error(t(locale, 'reportError'));
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
 
-  const downloadAnnual = useCallback(
-    async (year: number, locale: 'en' | 'id') => {
-      setIsGenerating(true);
-      try {
-        const result = await api.reports.annual(year);
-        if (result.error || !result.data?.report) {
-          toast.error(t(locale, 'reportError'));
-          return;
-        }
-        generateAnnualReport(result.data.report);
-        toast.success(t(locale, 'reportDownloaded'));
-      } catch {
+  const downloadAnnual = useCallback(async (year: number, locale: 'en' | 'id') => {
+    setIsGenerating(true);
+    try {
+      const result = await api.reports.annual(year);
+      if (result.error || !result.data?.report) {
         toast.error(t(locale, 'reportError'));
-      } finally {
-        setIsGenerating(false);
+        return;
       }
-    },
-    []
-  );
+      generateAnnualReport(result.data.report);
+      toast.success(t(locale, 'reportDownloaded'));
+    } catch {
+      toast.error(t(locale, 'reportError'));
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
 
   return { availableYears, isLoadingYears, isGenerating, downloadMonthly, downloadAnnual };
 }
