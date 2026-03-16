@@ -17,7 +17,18 @@
       "Bash(npx vitest:*)",
       "Bash(mkdir:*)",
       "Bash(gh pr:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(cd \"D:\\\\VsCode\\\\Financial Tracker\\\\Financial-Tracker-V.02\" && gh run list --limit 3)",
+      "Bash(cd \"D:\\\\VsCode\\\\Financial Tracker\\\\Financial-Tracker-V.02\" && gh run watch 23103578423 --exit-status)",
+      "Bash(cd \"D:\\\\VsCode\\\\Financial Tracker\\\\Financial-Tracker-V.02\" && gh api repos/DMY-cmyk/Financial-Tracker-V.02/deployments --jq '.[0] | {environment, state: .statuses_url, created_at, sha: .sha[0:7], description}')",
+      "Bash(cd \"D:\\\\VsCode\\\\Financial Tracker\\\\Financial-Tracker-V.02\" && gh api repos/DMY-cmyk/Financial-Tracker-V.02/deployments/4072640049/statuses --jq '.[0] | {state, environment, target_url, created_at}')",
+      "WebFetch(domain:financial-tracker-v-02.vercel.app)",
+      "Bash(cd \"D:\\\\VsCode\\\\Financial Tracker\\\\Financial-Tracker-V.02\" && gh api repos/DMY-cmyk/Financial-Tracker-V.02/deployments --jq '.[0] | {sha: .sha[0:7], environment, created_at}' && gh api repos/DMY-cmyk/Financial-Tracker-V.02/deployments/4072640049/statuses --jq '.[0] | {state, created_at}')",
+      "Bash(claude mcp:*)",
+      "Bash(cd:*)",
+      "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--VsCode-Financial-Tracker-Financial-Tracker-V-02\\\\52f06f1a-731f-4387-8d4b-7e994cace4ca\\\\tasks\\\\aa9b5caf1de37a4cd.output' | Select-Object -Last 40\")",
+      "Bash(powershell -Command \"Get-Content 'C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--VsCode-Financial-Tracker-Financial-Tracker-V-02\\\\52f06f1a-731f-4387-8d4b-7e994cace4ca\\\\tasks\\\\ac0e01b3eecc969cb.output' | Select-Object -Last 40\")",
+      "Bash(powershell -Command \"\n\\\\$file = 'C:\\\\Users\\\\HP\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--VsCode-Financial-Tracker-Financial-Tracker-V-02\\\\52f06f1a-731f-4387-8d4b-7e994cace4ca\\\\tasks\\\\ac0e01b3eecc969cb.output'\n\\\\$lines = Get-Content \\\\$file -Encoding UTF8\n\\\\$found = \\\\$false\nforeach \\(\\\\$line in \\\\$lines\\) {\n  try {\n    \\\\$json = \\\\$line | ConvertFrom-Json -ErrorAction SilentlyContinue\n    if \\(\\\\$json.message.role -eq 'assistant'\\) {\n      foreach \\(\\\\$content in \\\\$json.message.content\\) {\n        if \\(\\\\$content.type -eq 'text' -and \\\\$content.text -match 'Plan Review'\\) {\n          Write-Output \\\\$content.text\n          \\\\$found = \\\\$true\n        }\n      }\n    }\n  } catch {}\n}\nif \\(-not \\\\$found\\) { Write-Output 'Not found - checking last messages...' }\n\")"
     ]
   }
 }

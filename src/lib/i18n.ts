@@ -701,7 +701,8 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Bulk delete
     bulkDeleteTitle: 'Delete Selected Transactions',
-    bulkDeleteDescription: '{count} transactions will be permanently deleted. This action cannot be undone.',
+    bulkDeleteDescription:
+      '{count} transactions will be permanently deleted. This action cannot be undone.',
     bulkDeleteSuccess: 'Transactions deleted',
     selected: 'selected',
     selectAll: 'Select All',
@@ -1041,14 +1042,16 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Bulk delete
     bulkDeleteTitle: 'Hapus Transaksi Terpilih',
-    bulkDeleteDescription: '{count} transaksi akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
+    bulkDeleteDescription:
+      '{count} transaksi akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
     bulkDeleteSuccess: 'Transaksi dihapus',
     selected: 'dipilih',
     selectAll: 'Pilih Semua',
     deselectAll: 'Batal Pilih Semua',
 
     // Confirmation
-    deleteConfirmDescription: 'Ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
+    deleteConfirmDescription:
+      'Ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.',
 
     // Report download keys
     downloadReport: 'Unduh Laporan',

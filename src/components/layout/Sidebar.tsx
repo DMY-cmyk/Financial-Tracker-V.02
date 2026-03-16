@@ -6,14 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
-import {
-  Settings,
-  Plus,
-  PanelLeftClose,
-  PanelLeft,
-  Tag,
-  Languages,
-} from 'lucide-react';
+import { Settings, Plus, PanelLeftClose, PanelLeft, Tag, Languages } from 'lucide-react';
 import { SidebarGroup } from '@/features/navigation/SidebarGroup';
 import { useNavGroups } from '@/features/navigation/useNavGroups';
 

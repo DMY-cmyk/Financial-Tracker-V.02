@@ -69,10 +69,7 @@ export function TransactionTable({
     <div className="space-y-4">
       {hasSelection && onSelectAll && (
         <div className="flex items-center gap-3 px-3">
-          <Checkbox
-            checked={isAllSelected ?? false}
-            onCheckedChange={() => onSelectAll()}
-          />
+          <Checkbox checked={isAllSelected ?? false} onCheckedChange={() => onSelectAll()} />
           <span className="text-muted-foreground text-xs font-medium">
             {isAllSelected ? t(locale, 'deselectAll') : t(locale, 'selectAll')}
           </span>

@@ -31,12 +31,7 @@ export function LoadMoreButton({
     <div className="flex flex-col items-center gap-2 py-4">
       {hasMore ? (
         <motion.div whileTap={tapScale}>
-          <Button
-            variant="outline"
-            onClick={onLoadMore}
-            disabled={isLoadingMore}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={onLoadMore} disabled={isLoadingMore} className="gap-2">
             {isLoadingMore ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />

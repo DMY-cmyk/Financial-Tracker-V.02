@@ -286,7 +286,10 @@ export default function TransactionsPage() {
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
         title={t(locale, 'bulkDeleteTitle')}
-        description={t(locale, 'bulkDeleteDescription').replace('{count}', String(selectedIds.size))}
+        description={t(locale, 'bulkDeleteDescription').replace(
+          '{count}',
+          String(selectedIds.size)
+        )}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmBulkDelete}

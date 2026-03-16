@@ -20,8 +20,8 @@ export interface NavItem {
 
 export interface NavGroup {
   id: string;
-  labelKey?: string;           // omit for unlabeled groups
-  defaultCollapsed?: boolean;  // defaults to false
+  labelKey?: string; // omit for unlabeled groups
+  defaultCollapsed?: boolean; // defaults to false
   items: NavItem[];
 }
 
@@ -30,8 +30,8 @@ export const NAV_GROUPS: NavGroup[] = [
     id: 'overview',
     // no labelKey — no header, not collapsible
     items: [
-      { href: '/home', labelKey: 'home',      icon: Home },
-      { href: '/',     labelKey: 'dashboard', icon: LayoutDashboard },
+      { href: '/home', labelKey: 'home', icon: Home },
+      { href: '/', labelKey: 'dashboard', icon: LayoutDashboard },
     ],
   },
   {
@@ -39,11 +39,11 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: 'groupFinance',
     defaultCollapsed: false,
     items: [
-      { href: '/transactions', labelKey: 'transactions',         icon: Receipt },
-      { href: '/recurring',    labelKey: 'recurringTransactions', icon: Repeat },
-      { href: '/budget',       labelKey: 'budgetPage',           icon: Target },
-      { href: '/bills',        labelKey: 'bills',                icon: CalendarCheck },
-      { href: '/savings',      labelKey: 'savingsPage',          icon: PiggyBank },
+      { href: '/transactions', labelKey: 'transactions', icon: Receipt },
+      { href: '/recurring', labelKey: 'recurringTransactions', icon: Repeat },
+      { href: '/budget', labelKey: 'budgetPage', icon: Target },
+      { href: '/bills', labelKey: 'bills', icon: CalendarCheck },
+      { href: '/savings', labelKey: 'savingsPage', icon: PiggyBank },
     ],
   },
   {
@@ -52,8 +52,8 @@ export const NAV_GROUPS: NavGroup[] = [
     defaultCollapsed: false,
     items: [
       { href: '/reports', labelKey: 'reports', icon: BarChart3 },
-      { href: '/upload',  labelKey: 'upload',  icon: Upload },
-      { href: '/export',  labelKey: 'export',  icon: Download },
+      { href: '/upload', labelKey: 'upload', icon: Upload },
+      { href: '/export', labelKey: 'export', icon: Download },
     ],
   },
 ];

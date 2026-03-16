@@ -61,9 +61,7 @@ export async function getMonthlyReportData(
   };
 }
 
-export async function getAnnualReportData(
-  year: number
-): Promise<ServiceResult<AnnualReportData>> {
+export async function getAnnualReportData(year: number): Promise<ServiceResult<AnnualReportData>> {
   await ensureSeeded();
 
   const [monthSummaries, balancesResult, allYearResult] = await Promise.all([
