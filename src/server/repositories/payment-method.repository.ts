@@ -7,6 +7,7 @@ interface PmRow {
   name: string;
   icon: string;
   type: string;
+  beginning_balance: number;
 }
 
 function rowToPm(row: PmRow): PaymentMethod {
@@ -15,6 +16,7 @@ function rowToPm(row: PmRow): PaymentMethod {
     name: row.name,
     icon: row.icon,
     type: row.type as 'bank' | 'cash' | 'ewallet',
+    beginningBalance: Number(row.beginning_balance),
   };
 }
 
@@ -35,13 +37,11 @@ export function createPaymentMethodRepository() {
     async create(data: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
       const id = nanoid();
       const db = await getDb();
-      await db.query('INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?)', [
-        id,
-        data.name,
-        data.icon,
-        data.type,
-      ]);
-      return { ...data, id };
+      await db.query(
+        'INSERT INTO payment_methods (id, name, icon, type, beginning_balance) VALUES (?, ?, ?, ?, ?)',
+        [id, data.name, data.icon, data.type, data.beginningBalance ?? 0],
+      );
+      return { ...data, id, beginningBalance: data.beginningBalance ?? 0 };
     },
 
     async update(id: string, data: Partial<PaymentMethod>): Promise<PaymentMethod | undefined> {
@@ -49,10 +49,11 @@ export function createPaymentMethodRepository() {
       const existing = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
       if (!existing.rows[0]) return undefined;
       const updated = { ...rowToPm(existing.rows[0]), ...data };
-      await db.query('UPDATE payment_methods SET name=?, icon=?, type=? WHERE id=?', [
+      await db.query('UPDATE payment_methods SET name=?, icon=?, type=?, beginning_balance=? WHERE id=?', [
         updated.name,
         updated.icon,
         updated.type,
+        updated.beginningBalance ?? 0,
         id,
       ]);
       return updated;
