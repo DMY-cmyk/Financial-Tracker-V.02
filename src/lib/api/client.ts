@@ -322,8 +322,12 @@ export const api = {
   },
 
   balances: {
-    list() {
-      return fetchApi<BalanceListResponse>('/payment-methods/balances');
+    list(params?: { month?: number; year?: number }) {
+      const query = new URLSearchParams();
+      if (params?.month !== undefined) query.set('month', String(params.month));
+      if (params?.year !== undefined) query.set('year', String(params.year));
+      const qs = query.toString();
+      return fetchApi<BalanceListResponse>(`/payment-methods/balances${qs ? `?${qs}` : ''}`);
     },
   },
 

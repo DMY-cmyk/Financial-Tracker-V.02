@@ -9,9 +9,10 @@ interface BalanceGridProps {
   balances: PaymentMethodBalance[];
   locale: 'en' | 'id';
   isLoading?: boolean;
+  onCardClick?: (paymentMethodName: string) => void;
 }
 
-export function BalanceGrid({ balances, locale, isLoading }: BalanceGridProps) {
+export function BalanceGrid({ balances, locale, isLoading, onCardClick }: BalanceGridProps) {
   if (isLoading) {
     return (
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -38,7 +39,12 @@ export function BalanceGrid({ balances, locale, isLoading }: BalanceGridProps) {
       animate="show"
     >
       {balances.map((b) => (
-        <BalanceCard key={b.id} balance={b} locale={locale} />
+        <BalanceCard
+          key={b.id}
+          balance={b}
+          locale={locale}
+          onClick={onCardClick ? () => onCardClick(b.name) : undefined}
+        />
       ))}
     </motion.div>
   );

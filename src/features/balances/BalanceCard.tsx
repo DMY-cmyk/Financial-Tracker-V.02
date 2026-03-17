@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Building2, Wallet, Smartphone } from 'lucide-
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { staggerGridItem, tapScale } from '@/lib/motion';
+import { t } from '@/lib/i18n';
 import type { PaymentMethodBalance } from './types';
 
 const TYPE_LABELS: Record<PaymentMethodBalance['type'], { en: string; id: string }> = {
@@ -22,18 +23,36 @@ const TYPE_ICONS: Record<PaymentMethodBalance['type'], typeof Building2> = {
 interface BalanceCardProps {
   balance: PaymentMethodBalance;
   locale: 'en' | 'id';
+  onClick?: () => void;
 }
 
-export function BalanceCard({ balance, locale }: BalanceCardProps) {
+export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
   const Icon = TYPE_ICONS[balance.type];
   const typeLabel = TYPE_LABELS[balance.type][locale];
   const isPositive = balance.balance > 0;
+  const flowPositive = balance.monthlyFlow > 0;
 
   return (
     <motion.div
       variants={staggerGridItem}
-      whileTap={tapScale}
-      className="bg-card border-border rounded-2xl border p-4 shadow-sm"
+      whileTap={onClick ? tapScale : undefined}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      className={cn(
+        'bg-card border-border rounded-2xl border p-4 shadow-sm',
+        onClick && 'cursor-pointer transition-colors hover:border-primary/50'
+      )}
     >
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
@@ -48,7 +67,7 @@ export function BalanceCard({ balance, locale }: BalanceCardProps) {
         </div>
       </div>
 
-      {/* Balance */}
+      {/* All-time balance */}
       <p
         className={cn(
           'font-mono text-xl font-bold tracking-tight',
@@ -57,6 +76,19 @@ export function BalanceCard({ balance, locale }: BalanceCardProps) {
       >
         {formatCurrency(balance.balance)}
       </p>
+
+      {/* Monthly flow secondary line */}
+      {balance.monthlyFlow !== 0 && (
+        <p
+          className={cn(
+            'font-mono mt-0.5 text-xs',
+            flowPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
+          )}
+        >
+          {flowPositive ? '↑' : '↓'} {formatCurrency(Math.abs(balance.monthlyFlow))}{' '}
+          {t(locale, 'thisMonth')}
+        </p>
+      )}
 
       {/* Income / Expense breakdown */}
       <div className="mt-2 flex gap-3">

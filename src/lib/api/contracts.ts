@@ -278,6 +278,7 @@ export interface PaymentMethodBalance {
   income: number;
   expense: number;
   balance: number;
+  monthlyFlow: number; // income − expense for the queried month/year; 0 when no params given
 }
 
 export interface BalanceListResponse {
