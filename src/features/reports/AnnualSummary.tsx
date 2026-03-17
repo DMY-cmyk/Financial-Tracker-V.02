@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
-import { staggerContainer, staggerItem } from '@/lib/motion';
+import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, Hash, BarChart3 } from 'lucide-react';
 import type { AnnualReportData } from '@/lib/api/contracts';
 
@@ -141,12 +141,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
 
       {/* Top Expense Categories */}
       {data.topExpenseCategories.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="border-border bg-card rounded-2xl border p-6"
-        >
+        <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-6">
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="text-muted-foreground h-4 w-4" />
             <h3 className="text-sm font-semibold">{t(locale, 'topCategories')}</h3>
