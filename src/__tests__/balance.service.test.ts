@@ -114,6 +114,88 @@ describe('listPaymentMethodBalances', () => {
     expect(result.data![1].name).toBe('Bank BCA');
   });
 
+  it('balance equals beginning_balance when no transactions exist', async () => {
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 500000,
+    });
+    const result = await listPaymentMethodBalances();
+    expect(result.error).toBeUndefined();
+    expect(result.data![0].balance).toBe(500000);
+  });
+
+  it('balance = beginning_balance + income − expense', async () => {
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 1000000,
+    });
+    await createTransaction({
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 3000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-01-20',
+      description: 'Food',
+      category: 'Food',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 500000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances();
+    // 1,000,000 + 3,000,000 - 500,000 = 3,500,000
+    expect(result.data![0].balance).toBe(3500000);
+  });
+
+  it('negative beginning_balance is reflected in balance', async () => {
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: -200000,
+    });
+    const result = await listPaymentMethodBalances();
+    expect(result.data![0].balance).toBe(-200000);
+  });
+
+  it('beginning_balance of 0 preserves income minus expense behavior', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' }); // no beginningBalance → defaults to 0
+    await createTransaction({
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 2000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-01-20',
+      description: 'Food',
+      category: 'Food',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 500000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances();
+    // 0 + 2,000,000 - 500,000 = 1,500,000
+    expect(result.data![0].balance).toBe(1500000);
+  });
+
   it('returns monthlyFlow of 0 for all accounts when no month/year params given', async () => {
     await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
     await createTransaction({

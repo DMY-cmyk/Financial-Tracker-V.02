@@ -12,6 +12,7 @@ interface BalanceRow {
   name: string;
   type: string;
   icon: string;
+  beginning_balance: number;
   income: number;
   expense: number;
   balance: number;
@@ -36,13 +37,15 @@ export async function listPaymentMethodBalances(
       pm.name,
       pm.type,
       pm.icon,
+      pm.beginning_balance,
       COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) AS income,
       COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) AS expense,
-      COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount
-                        WHEN t.type = 'expense' THEN -t.amount ELSE 0 END), 0) AS balance
+      pm.beginning_balance +
+        COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount
+                          WHEN t.type = 'expense' THEN -t.amount ELSE 0 END), 0) AS balance
     FROM payment_methods pm
     LEFT JOIN transactions t ON t.payment_method = pm.name
-    GROUP BY pm.id, pm.name, pm.type, pm.icon
+    GROUP BY pm.id, pm.name, pm.type, pm.icon, pm.beginning_balance
     ORDER BY balance DESC
   `);
 

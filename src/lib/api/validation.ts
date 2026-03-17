@@ -59,9 +59,15 @@ export const createPaymentMethodSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   icon: z.string().max(50).optional().default('wallet'),
   type: z.enum(['bank', 'cash', 'ewallet']),
+  beginningBalance: z.number().default(0),
 });
 
-export const updatePaymentMethodSchema = createPaymentMethodSchema.partial();
+export const updatePaymentMethodSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100).optional(),
+  icon: z.string().max(50).optional(),
+  type: z.enum(['bank', 'cash', 'ewallet']).optional(),
+  beginningBalance: z.number().optional(),
+});
 
 // === Settings schema ===
 
