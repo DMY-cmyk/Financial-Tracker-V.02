@@ -35,7 +35,7 @@ export function useNavGroups(): UseNavGroupsReturn {
       if (!group.labelKey) return false;
       // Groups containing the active route are always expanded
       if (hasActiveItem(group)) return false;
-      return collapsedGroups[groupId] ?? group.defaultCollapsed ?? false;
+      return (collapsedGroups ?? {})[groupId] ?? group.defaultCollapsed ?? false;
     },
     [collapsedGroups, hasActiveItem]
   );

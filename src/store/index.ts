@@ -64,6 +64,14 @@ export const useStore = create<FinancialStore>()(
     }),
     {
       name: 'financial-tracker-v2',
+      version: 1,
+      migrate: (persistedState: unknown, version: number) => {
+        const s = persistedState as { ui?: Record<string, unknown> };
+        if (version < 1 && s.ui && s.ui.collapsedGroups === undefined) {
+          s.ui.collapsedGroups = {};
+        }
+        return s;
+      },
     }
   )
 );
