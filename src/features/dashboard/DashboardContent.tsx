@@ -2,14 +2,14 @@
 
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { useDashboardData } from '@/hooks/useDashboardData';
+import { useDashboardData } from '@/features/dashboard/useDashboardData';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { MONTH_NAMES } from '@/lib/constants';
 import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/lib/motion';
-import { BillsChecklist } from '@/components/dashboard/BillsChecklist';
-import { SavingsGoals } from '@/components/dashboard/SavingsGoals';
-import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
+import { BillsChecklist } from '@/features/dashboard/BillsChecklist';
+import { SavingsGoals } from '@/features/dashboard/SavingsGoals';
+import { RecentTransactions } from '@/features/dashboard/RecentTransactions';
 import { AccountBalancesWidget } from '@/features/balances/AccountBalancesWidget';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
@@ -27,24 +27,24 @@ import {
 } from 'lucide-react';
 
 const CashFlowChart = dynamic(
-  () => import('@/components/dashboard/CashFlowChart').then((m) => ({ default: m.CashFlowChart })),
+  () => import('@/features/dashboard/CashFlowChart').then((m) => ({ default: m.CashFlowChart })),
   { loading: () => <ChartCardSkeleton />, ssr: false }
 );
 const CategoryBreakdown = dynamic(
   () =>
-    import('@/components/dashboard/CategoryBreakdown').then((m) => ({
+    import('@/features/dashboard/CategoryBreakdown').then((m) => ({
       default: m.CategoryBreakdown,
     })),
   { loading: () => <ChartCardSkeleton />, ssr: false }
 );
 const BudgetProgress = dynamic(
   () =>
-    import('@/components/dashboard/BudgetProgress').then((m) => ({ default: m.BudgetProgress })),
+    import('@/features/dashboard/BudgetProgress').then((m) => ({ default: m.BudgetProgress })),
   { loading: () => <ChartCardSkeleton />, ssr: false }
 );
 const PaymentMethodsSummary = dynamic(
   () =>
-    import('@/components/dashboard/PaymentMethods').then((m) => ({
+    import('@/features/dashboard/PaymentMethods').then((m) => ({
       default: m.PaymentMethodsSummary,
     })),
   { loading: () => <ChartCardSkeleton />, ssr: false }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useImport } from '@/hooks/useImport';
+import { useImport } from '@/features/upload/useImport';
 import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import {

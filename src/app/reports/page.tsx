@@ -5,13 +5,13 @@ import { motion } from 'framer-motion';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
-import { useReportsData } from '@/hooks/useReportsData';
+import { useReportsData } from '@/features/reports/useReportsData';
 import { BalanceGrid } from '@/features/balances/BalanceGrid';
 import { useBalances } from '@/features/balances/useBalances';
 import { ReportDownloader } from '@/features/reports/ReportDownloader';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { TrendChart } from '@/components/reports/TrendChart';
-import { AnnualSummary } from '@/components/reports/AnnualSummary';
+import { TrendChart } from '@/features/reports/TrendChart';
+import { AnnualSummary } from '@/features/reports/AnnualSummary';
 import {
   TrendingUp,
   TrendingDown,

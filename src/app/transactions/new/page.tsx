@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { TransactionForm } from '@/components/transactions/TransactionForm';
+import { TransactionForm } from '@/features/transactions/TransactionForm';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp } from '@/lib/motion';
 import { ArrowLeft } from 'lucide-react';

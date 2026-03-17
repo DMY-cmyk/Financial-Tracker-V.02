@@ -8,7 +8,7 @@ import { useFolderData } from '@/hooks/useFolderData';
 import { FolderBreadcrumb } from './FolderBreadcrumb';
 import { YearGrid } from './YearGrid';
 import { MonthGrid } from './MonthGrid';
-import { DashboardContent } from '@/components/dashboard/DashboardContent';
+import { DashboardContent } from '@/features/dashboard/DashboardContent';
 import { PageSkeleton } from '@/components/shared/Skeletons';
 import type { DashboardView } from '@/lib/types';
 
