@@ -135,3 +135,43 @@ describe('deletePaymentMethod', () => {
     expect(list.data!.length).toBe(0);
   });
 });
+
+describe('createPaymentMethod with beginningBalance', () => {
+  it('stores beginningBalance correctly', async () => {
+    const result = await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 250000,
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.beginningBalance).toBe(250000);
+  });
+
+  it('defaults beginningBalance to 0 when not provided', async () => {
+    const result = await createPaymentMethod({ name: 'Cash', type: 'cash' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.beginningBalance).toBe(0);
+  });
+});
+
+describe('updatePaymentMethod with beginningBalance', () => {
+  it('updates beginningBalance', async () => {
+    const created = await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    const result = await updatePaymentMethod(created.data!.id, { beginningBalance: 500000 });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.beginningBalance).toBe(500000);
+  });
+
+  it('leaves beginningBalance unchanged when not provided in update', async () => {
+    const created = await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 100000,
+    });
+    const result = await updatePaymentMethod(created.data!.id, { name: 'Bank Mandiri' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.beginningBalance).toBe(100000);
+  });
+});
