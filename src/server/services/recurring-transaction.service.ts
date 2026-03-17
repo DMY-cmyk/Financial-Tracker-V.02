@@ -106,24 +106,28 @@ export async function deleteRecurringTransaction(
   return { data: { success: true } };
 }
 
-// Advance nextDueDate based on frequency
+// Advance nextDueDate based on frequency (UTC-safe to avoid timezone shifts)
 function advanceDate(dateStr: string, frequency: RecurringTransaction['frequency']): string {
-  const d = new Date(dateStr + 'T00:00:00');
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day));
   switch (frequency) {
     case 'daily':
-      d.setDate(d.getDate() + 1);
+      d.setUTCDate(d.getUTCDate() + 1);
       break;
     case 'weekly':
-      d.setDate(d.getDate() + 7);
+      d.setUTCDate(d.getUTCDate() + 7);
       break;
     case 'monthly':
-      d.setMonth(d.getMonth() + 1);
+      d.setUTCMonth(d.getUTCMonth() + 1);
       break;
     case 'yearly':
-      d.setFullYear(d.getFullYear() + 1);
+      d.setUTCFullYear(d.getUTCFullYear() + 1);
       break;
   }
-  return d.toISOString().slice(0, 10);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
 }
 
 // Generate pending transactions from all active recurring rules up to today

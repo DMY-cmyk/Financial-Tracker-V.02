@@ -94,7 +94,15 @@ export const createBillSchema = z.object({
   year: z.number().int().min(2000).max(2100),
 });
 
-export const updateBillSchema = createBillSchema.partial();
+export const updateBillSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100).optional(),
+  amount: z.number().positive('Amount must be positive').optional(),
+  dueDate: z.number().int().min(1).max(31).optional(),
+  isPaid: z.boolean().optional(),
+  isRecurring: z.boolean().optional(),
+  month: z.number().int().min(0).max(11).optional(),
+  year: z.number().int().min(2000).max(2100).optional(),
+});
 
 // === Savings goal schemas ===
 
@@ -105,7 +113,12 @@ export const createSavingsGoalSchema = z.object({
   color: z.string().min(1, 'Color is required').max(20),
 });
 
-export const updateSavingsGoalSchema = createSavingsGoalSchema.partial();
+export const updateSavingsGoalSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100).optional(),
+  targetAmount: z.number().positive('Target amount must be positive').optional(),
+  savedAmount: z.number().min(0, 'Saved amount must be non-negative').optional(),
+  color: z.string().min(1, 'Color is required').max(20).optional(),
+});
 
 // === Export job schema ===
 
@@ -139,7 +152,30 @@ export const createRecurringTransactionSchema = z.object({
   isActive: z.boolean().optional().default(true),
 });
 
-export const updateRecurringTransactionSchema = createRecurringTransactionSchema.partial();
+export const updateRecurringTransactionSchema = z.object({
+  description: z.string().min(1, 'Description is required').max(200).optional(),
+  category: z.string().min(1, 'Category is required').optional(),
+  categoryId: z.string().min(1, 'Category ID is required').optional(),
+  type: z.enum(['income', 'expense']).optional(),
+  amount: z.number().positive('Amount must be positive').optional(),
+  paymentMethod: z.string().min(1, 'Payment method is required').optional(),
+  notes: z.string().max(500).optional(),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
+  startDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+    .optional(),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
+  nextDueDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+    .optional(),
+  isActive: z.boolean().optional(),
+});
 
 export const listRecurringTransactionsQuerySchema = z.object({
   isActive: z.boolean().optional(),
