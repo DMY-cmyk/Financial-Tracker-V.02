@@ -28,7 +28,7 @@ import type {
   UpdateRecurringTransactionRequest,
   BalanceListResponse,
   MonthlyReportResponse,
-  AnnualReportResponse,
+  AnnualReportData,
   ApiResult,
 } from './contracts';
 
@@ -322,8 +322,12 @@ export const api = {
   },
 
   balances: {
-    list() {
-      return fetchApi<BalanceListResponse>('/payment-methods/balances');
+    list(params?: { month?: number; year?: number }) {
+      const query = new URLSearchParams();
+      if (params?.month !== undefined) query.set('month', String(params.month));
+      if (params?.year !== undefined) query.set('year', String(params.year));
+      const qs = query.toString();
+      return fetchApi<BalanceListResponse>(`/payment-methods/balances${qs ? `?${qs}` : ''}`);
     },
   },
 
@@ -333,7 +337,7 @@ export const api = {
     },
 
     annual(year: number) {
-      return fetchApi<AnnualReportResponse>(`/reports/annual?year=${year}`);
+      return fetchApi<AnnualReportData>(`/reports/annual?year=${year}`);
     },
   },
 };

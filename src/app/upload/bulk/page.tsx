@@ -1,15 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useBulkImport } from '@/hooks/useBulkImport';
+import { useBulkImport } from '@/features/upload/useBulkImport';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { BulkImportTabs } from '@/components/upload/BulkImportTabs';
-import { DropZone } from '@/components/upload/DropZone';
-import { ImportPreview } from '@/components/upload/ImportPreview';
-import { ImportProgress } from '@/components/upload/ImportProgress';
-import { ImportSummary } from '@/components/upload/ImportSummary';
+import { BulkImportTabs } from '@/features/upload/BulkImportTabs';
+import { DropZone } from '@/features/upload/DropZone';
+import { ImportPreview } from '@/features/upload/ImportPreview';
+import { ImportProgress } from '@/features/upload/ImportProgress';
+import { ImportSummary } from '@/features/upload/ImportSummary';
 import { Button } from '@/components/ui/button';
 import { Download, RotateCcw, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';

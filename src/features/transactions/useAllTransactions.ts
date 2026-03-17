@@ -8,6 +8,10 @@ import { type Transaction, type PaymentMethod } from '@/lib/types';
 
 const PAGE_SIZE = 50;
 
+interface InitialFilters {
+  paymentMethod?: string;
+}
+
 interface UseAllTransactionsReturn {
   // Data
   transactions: Transaction[];
@@ -63,7 +67,7 @@ interface UseAllTransactionsReturn {
   hasNoResults: boolean;
 }
 
-export function useAllTransactions(): UseAllTransactionsReturn {
+export function useAllTransactions(initialFilters?: InitialFilters): UseAllTransactionsReturn {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
@@ -72,7 +76,9 @@ export function useAllTransactions(): UseAllTransactionsReturn {
   const [search, setSearchState] = useState('');
   const [typeFilter, setTypeFilterState] = useState<'all' | 'income' | 'expense'>('all');
   const [categoryFilter, setCategoryFilterState] = useState('');
-  const [paymentMethodFilter, setPaymentMethodFilterState] = useState('');
+  const [paymentMethodFilter, setPaymentMethodFilterState] = useState(
+    initialFilters?.paymentMethod ?? ''
+  );
   const [allMonths, setAllMonthsState] = useState(false);
   const [yearOnly, setYearOnlyState] = useState(false);
   const [formOpen, setFormOpen] = useState(false);

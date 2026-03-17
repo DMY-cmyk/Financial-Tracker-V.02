@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { formatCurrencyShort } from '@/lib/formatters';
 import { t, useLocale } from '@/lib/i18n';
-import type { MonthlyTrend } from '@/hooks/useReportsData';
+import type { MonthlyTrend } from '@/features/reports/useReportsData';
 
 interface TrendChartProps {
   data: MonthlyTrend[];

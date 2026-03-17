@@ -1,15 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useExport } from '@/hooks/useExport';
+import { useExport } from '@/features/export/useExport';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { FormatCard } from '@/components/export/FormatCard';
-import { ScopeSelector } from '@/components/export/ScopeSelector';
-import { ExportOptions } from '@/components/export/ExportOptions';
-import { ExportPreview } from '@/components/export/ExportPreview';
-import { ExportActionBar } from '@/components/export/ExportActionBar';
+import { FormatCard } from '@/features/export/FormatCard';
+import { ScopeSelector } from '@/features/export/ScopeSelector';
+import { ExportOptions } from '@/features/export/ExportOptions';
+import { ExportPreview } from '@/features/export/ExportPreview';
+import { ExportActionBar } from '@/features/export/ExportActionBar';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { MONTH_NAMES } from '@/lib/constants';
 import { useStore } from '@/store';

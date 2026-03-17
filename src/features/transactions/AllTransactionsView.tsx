@@ -1,7 +1,7 @@
 'use client';
 
 import { t, useLocale } from '@/lib/i18n';
-import { TransactionTable } from '@/components/transactions/TransactionTable';
+import { TransactionTable } from '@/features/transactions/TransactionTable';
 import { LoadMoreButton } from './LoadMoreButton';
 import type { Transaction } from '@/lib/types';
 

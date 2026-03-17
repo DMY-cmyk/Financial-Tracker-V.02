@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
 import { type ExtractionStatus, type Category, type PaymentMethod } from '@/lib/types';
-import { type OcrData } from '@/components/upload/OcrPreview';
+import { type OcrData } from '@/features/upload/OcrPreview';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { validateOcrFields, type FieldError } from '@/lib/validation';
 import { suggestCategory } from '@/lib/category-suggest';
