@@ -26,7 +26,7 @@ data/workbook.json  -->  seed script  -->  Database (Neon Postgres / SQLite)
 | Database | Neon Postgres (production) / SQLite (dev/tests) |
 | State | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | Validation | Zod (API request/response validation) |
-| Testing | Vitest (84 tests: validation, all services) |
+| Testing | Vitest (243 tests: validation, all services, balance, reports) |
 | Charts | Recharts (area, pie, bars) |
 | Animations | Framer Motion (spring counters, stagger, transitions) |
 | Fonts | Plus Jakarta Sans + JetBrains Mono |
@@ -415,7 +415,7 @@ The app is live on Vercel with Neon Postgres. All implementation phases complete
 - [x] Settings service tests (6 tests — get, update, preserve, validation)
 - [x] Export job service tests (7 tests — create, list, validation)
 - [x] Validation tests expanded (12 new tests for new schemas)
-- [x] All 84 tests passing
+- [x] All 84 tests passing (expanded to 243 in V.02 improvements)
 
 #### What's Still In Zustand
 - Bills and savings goals remain in Zustand (localStorage)
@@ -538,6 +538,37 @@ npm run test         # Run vitest tests
 
 Deployment: Vercel, Railway, or any Node.js host (API routes require server runtime).
 Static-only GitHub Pages deployment no longer supported due to API routes.
+
+---
+
+## V.02 Improvements (post-launch features)
+
+### Balance Service & Clickable Cards
+- [x] `beginning_balance` column on `payment_methods` (DDL + ALTER TABLE migration, DEFAULT 0)
+- [x] Balance formula: `beginning_balance + income − expense`
+- [x] Saldo Awal field on payment method create form in Settings
+- [x] Edit Dialog (pencil button per row) — update name, type, beginning balance
+- [x] `monthlyFlow` added to balance service — net income/expense for a given month
+- [x] Clickable balance cards on dashboard — click to reveal monthly flow overlay
+- [x] `GET /api/payment-methods/balances?month=N&year=YYYY` — monthly flow param
+
+### Reports
+- [x] `/reports` page with monthly and annual XLSX download
+- [x] `GET /api/reports/monthly?month=N&year=YYYY` — monthly report data
+- [x] `GET /api/reports/annual?year=YYYY` — annual report data with YoY comparison
+- [x] XLSX generator (SheetJS) — monthly: Indonesian template format; annual: 2-sheet workbook
+
+### Load-More Transactions
+- [x] `useAllTransactions` with `useInfiniteQuery` (50/page, load-more button)
+- [x] `GET /api/transactions?allMonths=true&yearOnly=true` query params
+
+### Collapsible Sidebar Navigation
+- [x] Grouped nav (Overview, Finance, Tools) with animated height collapse
+- [x] `useNavGroups` hook — guards against collapsing group with active route
+- [x] `SidebarGroup` component — ChevronRight rotation, rail mode (icons only)
+
+### Testing
+- [x] 243 tests total (up from 84) — balance service (15), PM service (16), report service (20), bulk-import (57)
 
 ## Reference Documents
 

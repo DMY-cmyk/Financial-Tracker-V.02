@@ -19,6 +19,7 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 ### Dashboard
 - [x] 4 summary metric cards (balance, income, expense, savings rate)
 - [x] 9 bento widgets: cash flow chart, category donut, budget bars, payment methods, bills checklist, savings rings, recent transactions
+- [x] Clickable balance cards — show monthly flow overlay on click
 - [x] Quick Actions section (add transaction, upload receipt, export data)
 - [x] Animated counter with Framer Motion spring
 - [x] Responsive sectioned layout with visual hierarchy
@@ -56,12 +57,15 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] PDF export via jsPDF (styled report with summary and table)
 - [x] Toast feedback for export success/failure
 - [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
-- [ ] Custom date range
+- [x] Custom date range
+- [x] Downloadable monthly and annual XLSX reports (`/reports`)
 
 ### Settings
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
 - [x] Category & payment method management (CRUD, color picker, budget)
+- [x] Beginning Balance (Saldo Awal) per payment method — real-world account starting balance
+- [x] Edit dialog for payment methods (name, type, beginning balance)
 - [x] Data management section (export, import, clear/reset)
 - [x] Import data from JSON/CSV with validation and preview
 - [x] SaaS-style sectioned layout with SettingsSection component
@@ -100,7 +104,7 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 | **State** | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
-| **Testing** | Vitest (84 tests: validation, all services) |
+| **Testing** | Vitest (243 tests: validation, all services, balance, reports) |
 | **Charts** | Recharts (area, pie) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -129,7 +133,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 84 tests)
+npm run test         # Run tests (Vitest, 243 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
