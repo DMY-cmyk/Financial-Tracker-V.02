@@ -6,31 +6,7 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { staggerContainer, staggerItem } from '@/lib/motion';
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, Hash, BarChart3 } from 'lucide-react';
-
-interface AnnualData {
-  year: number;
-  totalIncome: number;
-  totalExpense: number;
-  totalBalance: number;
-  transactionCount: number;
-  savingsRate: number;
-  topExpenseCategories: { category: string; amount: number }[];
-  monthlyBreakdown: { monthKey: string; income: number; expense: number; balance: number }[];
-  previousYear?: {
-    year: number;
-    totalIncome: number;
-    totalExpense: number;
-    totalBalance: number;
-    transactionCount: number;
-    savingsRate: number;
-  };
-  comparison?: {
-    incomeChange: number | null;
-    expenseChange: number | null;
-    balanceChange: number | null;
-    savingsRateChange: number | null;
-  };
-}
+import type { AnnualReportData } from '@/lib/api/contracts';
 
 interface AnnualSummaryProps {
   year: number;
@@ -39,7 +15,7 @@ interface AnnualSummaryProps {
 export function AnnualSummary({ year }: AnnualSummaryProps) {
   const locale = useLocale();
 
-  const { data, isLoading } = useQuery<AnnualData | null>({
+  const { data, isLoading } = useQuery<AnnualReportData | null>({
     queryKey: ['reports-annual', year],
     queryFn: async () => {
       const res = await fetch(`/api/reports/annual?year=${year}`);

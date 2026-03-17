@@ -52,11 +52,11 @@ export function useReportData(): UseReportDataReturn {
     setIsGenerating(true);
     try {
       const result = await api.reports.annual(year);
-      if (result.error || !result.data?.report) {
+      if (result.error || !result.data) {
         toast.error(t(locale, 'reportError'));
         return;
       }
-      generateAnnualReport(result.data.report);
+      generateAnnualReport(result.data);
       toast.success(t(locale, 'reportDownloaded'));
     } catch {
       toast.error(t(locale, 'reportError'));

@@ -28,7 +28,7 @@ import type {
   UpdateRecurringTransactionRequest,
   BalanceListResponse,
   MonthlyReportResponse,
-  AnnualReportResponse,
+  AnnualReportData,
   ApiResult,
 } from './contracts';
 
@@ -337,7 +337,7 @@ export const api = {
     },
 
     annual(year: number) {
-      return fetchApi<AnnualReportResponse>(`/reports/annual?year=${year}`);
+      return fetchApi<AnnualReportData>(`/reports/annual?year=${year}`);
     },
   },
 };

@@ -301,20 +301,46 @@ export interface MonthlyReportData {
 }
 
 export interface AnnualReportData {
+  // Existing fields — kept for report-generator.ts (XLSX download)
   year: number;
   totalIncome: number;
   totalExpense: number;
-  totalAssets: number;
-  monthlyBreakdown: { month: number; income: number; expense: number; net: number }[];
+  totalAssets: number;           // sum of all payment method all-time balances
+  monthlyBreakdown: {
+    month: number;               // 0-based (0 = January)
+    income: number;
+    expense: number;
+    net: number;                 // kept for report-generator.ts
+    balance: number;             // alias for net; used by AnnualSummary.tsx
+    monthKey: string;            // 'YYYY-MM', e.g. '2026-03'
+  }[];
   topCategories: { category: string; type: 'income' | 'expense'; total: number }[];
   paymentMethodBalances: PaymentMethodBalance[];
   transactions: Transaction[];
+
+  // New fields — consumed by AnnualSummary.tsx
+  totalBalance: number;          // totalIncome − totalExpense for the year
+  transactionCount: number;
+  savingsRate: number;           // 0–100, rounded; 0 if totalIncome = 0 or net is negative
+  topExpenseCategories: { category: string; amount: number }[];
+  previousYear: {
+    year: number;
+    totalIncome: number;
+    totalExpense: number;
+    totalBalance: number;
+    transactionCount: number;
+    savingsRate: number;
+  } | null;
+  comparison: {
+    incomeChange: number | null;
+    expenseChange: number | null;
+    balanceChange: number | null;
+    savingsRateChange: number | null;
+  } | null;
 }
 
 export interface MonthlyReportResponse {
   report: MonthlyReportData;
 }
 
-export interface AnnualReportResponse {
-  report: AnnualReportData;
-}
+export type AnnualReportResponse = AnnualReportData;
