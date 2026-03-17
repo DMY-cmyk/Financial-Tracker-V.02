@@ -83,6 +83,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       name TEXT NOT NULL,
       icon TEXT NOT NULL DEFAULT 'wallet',
       type TEXT NOT NULL,
+      beginning_balance DOUBLE PRECISION NOT NULL DEFAULT 0,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
     `CREATE TABLE IF NOT EXISTS bills (
@@ -166,6 +167,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'circle'`,
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS budget DOUBLE PRECISION DEFAULT 0`,
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'wallet'`,
+    `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS beginning_balance DOUBLE PRECISION NOT NULL DEFAULT 0`,
   ];
 
   for (const migration of columnMigrations) {

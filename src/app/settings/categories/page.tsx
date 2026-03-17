@@ -195,6 +195,7 @@ export default function CategoriesPage() {
       name: newMethodName,
       icon: 'wallet',
       type: newMethodType,
+      beginningBalance: 0,
     });
     if (result.data) {
       setPaymentMethods((prev) => [...prev, result.data!]);

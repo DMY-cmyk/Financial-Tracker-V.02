@@ -24,6 +24,7 @@ export interface PaymentMethod {
   name: string;
   icon: string;
   type: 'bank' | 'cash' | 'ewallet';
+  beginningBalance: number;
 }
 
 export interface Bill {
