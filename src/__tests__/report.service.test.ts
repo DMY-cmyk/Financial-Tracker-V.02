@@ -140,12 +140,24 @@ describe('getAnnualReportData', () => {
 
   it('transactionCount equals the number of transactions created for that year', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'A', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 1000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'A',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 1000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-02-10', description: 'B', category: 'Expense', categoryId: 'c2',
-      type: 'expense', amount: 500000, paymentMethod: 'Bank', notes: '',
+      date: '2026-02-10',
+      description: 'B',
+      category: 'Expense',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 500000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.transactionCount).toBe(2);
@@ -158,12 +170,24 @@ describe('getAnnualReportData', () => {
 
   it('totalBalance equals totalIncome minus totalExpense', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-01-20', description: 'Food', category: 'Food', categoryId: 'c2',
-      type: 'expense', amount: 1000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-20',
+      description: 'Food',
+      category: 'Food',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 1000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.totalBalance).toBe(4000000);
@@ -171,12 +195,24 @@ describe('getAnnualReportData', () => {
 
   it('savingsRate is calculated as Math.round((totalBalance / totalIncome) * 100)', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 10000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 10000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-01-20', description: 'Rent', category: 'Housing', categoryId: 'c2',
-      type: 'expense', amount: 3000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-20',
+      description: 'Rent',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 3000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     // totalBalance = 7M, totalIncome = 10M → savingsRate = 70
@@ -190,8 +226,14 @@ describe('getAnnualReportData', () => {
 
   it('savingsRate is 0 when totalBalance is negative', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'Expense', category: 'Food', categoryId: 'c2',
-      type: 'expense', amount: 3000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Expense',
+      category: 'Food',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 3000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.savingsRate).toBe(0);
@@ -199,16 +241,34 @@ describe('getAnnualReportData', () => {
 
   it('topExpenseCategories contains only expense transactions sorted by amount descending', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-01-15', description: 'Rent', category: 'Housing', categoryId: 'c2',
-      type: 'expense', amount: 2000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-15',
+      description: 'Rent',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 2000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-01-20', description: 'Food', category: 'Food', categoryId: 'c3',
-      type: 'expense', amount: 500000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-20',
+      description: 'Food',
+      category: 'Food',
+      categoryId: 'c3',
+      type: 'expense',
+      amount: 500000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.topExpenseCategories).toHaveLength(2);
@@ -221,8 +281,14 @@ describe('getAnnualReportData', () => {
 
   it('topExpenseCategories is empty when no expense transactions exist', async () => {
     await createTransaction({
-      date: '2026-01-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.topExpenseCategories).toEqual([]);
@@ -236,13 +302,25 @@ describe('getAnnualReportData', () => {
   it('previousYear returns correct totals when prior year data exists', async () => {
     // 2025 transaction
     await createTransaction({
-      date: '2025-06-15', description: 'Old Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 4000000, paymentMethod: 'Bank', notes: '',
+      date: '2025-06-15',
+      description: 'Old Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 4000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     // 2026 transaction
     await createTransaction({
-      date: '2026-01-10', description: 'New Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'New Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     expect(result.data!.previousYear).not.toBeNull();
@@ -258,13 +336,25 @@ describe('getAnnualReportData', () => {
   it('comparison.incomeChange is null when previous year income is 0', async () => {
     // 2025: only expense transactions (income = 0)
     await createTransaction({
-      date: '2025-06-15', description: 'Old Expense', category: 'Housing', categoryId: 'c2',
-      type: 'expense', amount: 1000000, paymentMethod: 'Bank', notes: '',
+      date: '2025-06-15',
+      description: 'Old Expense',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 1000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     // 2026: has income
     await createTransaction({
-      date: '2026-01-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     // previousYear exists (2025 has a transaction), but prevTotalIncome = 0 → pctChange returns null
@@ -280,12 +370,24 @@ describe('getAnnualReportData', () => {
 
   it('monthlyBreakdown balance equals net (income minus expense) for that month', async () => {
     await createTransaction({
-      date: '2026-03-10', description: 'Salary', category: 'Income', categoryId: 'c1',
-      type: 'income', amount: 5000000, paymentMethod: 'Bank', notes: '',
+      date: '2026-03-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     await createTransaction({
-      date: '2026-03-15', description: 'Rent', category: 'Housing', categoryId: 'c2',
-      type: 'expense', amount: 1500000, paymentMethod: 'Bank', notes: '',
+      date: '2026-03-15',
+      description: 'Rent',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 1500000,
+      paymentMethod: 'Bank',
+      notes: '',
     });
     const result = await getAnnualReportData(2026);
     const march = result.data!.monthlyBreakdown[2]; // index 2 = March

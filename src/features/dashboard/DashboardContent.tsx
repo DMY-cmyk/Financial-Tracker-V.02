@@ -38,8 +38,7 @@ const CategoryBreakdown = dynamic(
   { loading: () => <ChartCardSkeleton />, ssr: false }
 );
 const BudgetProgress = dynamic(
-  () =>
-    import('@/features/dashboard/BudgetProgress').then((m) => ({ default: m.BudgetProgress })),
+  () => import('@/features/dashboard/BudgetProgress').then((m) => ({ default: m.BudgetProgress })),
   { loading: () => <ChartCardSkeleton />, ssr: false }
 );
 const PaymentMethodsSummary = dynamic(

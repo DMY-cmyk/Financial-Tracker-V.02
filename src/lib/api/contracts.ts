@@ -305,23 +305,23 @@ export interface AnnualReportData {
   year: number;
   totalIncome: number;
   totalExpense: number;
-  totalAssets: number;           // sum of all payment method all-time balances
+  totalAssets: number; // sum of all payment method all-time balances
   monthlyBreakdown: {
-    month: number;               // 0-based (0 = January)
+    month: number; // 0-based (0 = January)
     income: number;
     expense: number;
-    net: number;                 // kept for report-generator.ts
-    balance: number;             // alias for net; used by AnnualSummary.tsx
-    monthKey: string;            // 'YYYY-MM', e.g. '2026-03'
+    net: number; // kept for report-generator.ts
+    balance: number; // alias for net; used by AnnualSummary.tsx
+    monthKey: string; // 'YYYY-MM', e.g. '2026-03'
   }[];
   topCategories: { category: string; type: 'income' | 'expense'; total: number }[];
   paymentMethodBalances: PaymentMethodBalance[];
   transactions: Transaction[];
 
   // New fields — consumed by AnnualSummary.tsx
-  totalBalance: number;          // totalIncome − totalExpense for the year
+  totalBalance: number; // totalIncome − totalExpense for the year
   transactionCount: number;
-  savingsRate: number;           // 0–100, rounded; 0 if totalIncome = 0 or net is negative
+  savingsRate: number; // 0–100, rounded; 0 if totalIncome = 0 or net is negative
   topExpenseCategories: { category: string; amount: number }[];
   previousYear: {
     year: number;

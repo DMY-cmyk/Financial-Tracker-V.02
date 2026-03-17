@@ -51,7 +51,7 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
       }
       className={cn(
         'bg-card border-border rounded-2xl border p-4 shadow-sm',
-        onClick && 'cursor-pointer transition-colors hover:border-primary/50'
+        onClick && 'hover:border-primary/50 cursor-pointer transition-colors'
       )}
     >
       {/* Header */}
@@ -81,7 +81,7 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
       {balance.monthlyFlow !== 0 && (
         <p
           className={cn(
-            'font-mono mt-0.5 text-xs',
+            'mt-0.5 font-mono text-xs',
             flowPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
           )}
         >

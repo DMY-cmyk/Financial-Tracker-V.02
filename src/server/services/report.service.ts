@@ -141,9 +141,7 @@ export async function getAnnualReportData(year: number): Promise<ServiceResult<A
     const prevTotalBalance = prevIncomeTotal - prevExpenseTotal;
     const prevTransactionCount = prevRows.length;
     const prevSavingsRate =
-      prevIncomeTotal > 0
-        ? Math.round(Math.max(0, (prevTotalBalance / prevIncomeTotal) * 100))
-        : 0;
+      prevIncomeTotal > 0 ? Math.round(Math.max(0, (prevTotalBalance / prevIncomeTotal) * 100)) : 0;
 
     previousYear = {
       year: year - 1,
