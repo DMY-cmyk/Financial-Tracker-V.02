@@ -35,12 +35,11 @@ export default function TransactionsPage() {
   const locale = useLocale();
   const queryClient = useQueryClient();
 
-  // One-time URL seed: read paymentMethod from URL on mount
-  const urlPaymentMethod = useRef<string | null>(null);
-  if (urlPaymentMethod.current === null && typeof window !== 'undefined') {
-    const params = new URLSearchParams(window.location.search);
-    urlPaymentMethod.current = params.get('paymentMethod') ?? '';
-  }
+  // One-time URL seed: read paymentMethod from URL on mount (lazy useState avoids ref-in-render)
+  const [urlPaymentMethod] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('paymentMethod') ?? '';
+  });
 
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
@@ -84,9 +83,7 @@ export default function TransactionsPage() {
     bulkDeleteTransactions,
     isEmpty,
     hasNoResults,
-  } = useAllTransactions(
-    urlPaymentMethod.current ? { paymentMethod: urlPaymentMethod.current } : undefined
-  );
+  } = useAllTransactions(urlPaymentMethod ? { paymentMethod: urlPaymentMethod } : undefined);
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
