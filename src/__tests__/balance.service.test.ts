@@ -115,14 +115,24 @@ describe('listPaymentMethodBalances', () => {
   });
 
   it('balance equals beginning_balance when no transactions exist', async () => {
-    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank', beginningBalance: 500000 });
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 500000,
+    });
     const result = await listPaymentMethodBalances();
     expect(result.error).toBeUndefined();
     expect(result.data![0].balance).toBe(500000);
   });
 
   it('balance = beginning_balance + income − expense', async () => {
-    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank', beginningBalance: 1000000 });
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: 1000000,
+    });
     await createTransaction({
       date: '2026-01-10',
       description: 'Salary',
@@ -149,7 +159,12 @@ describe('listPaymentMethodBalances', () => {
   });
 
   it('negative beginning_balance is reflected in balance', async () => {
-    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank', beginningBalance: -200000 });
+    await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'building',
+      type: 'bank',
+      beginningBalance: -200000,
+    });
     const result = await listPaymentMethodBalances();
     expect(result.data![0].balance).toBe(-200000);
   });
