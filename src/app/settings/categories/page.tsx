@@ -35,8 +35,16 @@ import {
   Palette,
   Wrench,
   Circle,
+  Pencil,
 } from 'lucide-react';
 import { Reorder } from 'framer-motion';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { toast } from 'sonner';
 import type { Category, PaymentMethod } from '@/lib/types';
@@ -89,6 +97,13 @@ export default function CategoriesPage() {
   const [newMethodName, setNewMethodName] = useState('');
   const [newMethodType, setNewMethodType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
   const [addingMethod, setAddingMethod] = useState(false);
+  const [newMethodBeginningBalance, setNewMethodBeginningBalance] = useState('');
+
+  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
+  const [editBeginningBalance, setEditBeginningBalance] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const refetch = useCallback(() => setFetchCount((c) => c + 1), []);
 
@@ -195,11 +210,12 @@ export default function CategoriesPage() {
       name: newMethodName,
       icon: 'wallet',
       type: newMethodType,
-      beginningBalance: 0,
+      beginningBalance: parseCurrencyInput(newMethodBeginningBalance),
     });
     if (result.data) {
       setPaymentMethods((prev) => [...prev, result.data!]);
       setNewMethodName('');
+      setNewMethodBeginningBalance('');
       toast.success(t(locale, 'saved'));
     } else {
       toast.error(result.error?.message || t(locale, 'failedSave'));
@@ -214,6 +230,33 @@ export default function CategoriesPage() {
       toast.error(result.error.message);
       refetch();
     }
+  };
+
+  const handleOpenEdit = (method: PaymentMethod) => {
+    setEditingMethod(method);
+    setEditName(method.name);
+    setEditType(method.type);
+    setEditBeginningBalance(
+      method.beginningBalance > 0 ? formatCurrencyInput(method.beginningBalance) : ''
+    );
+  };
+
+  const handleEditSave = async () => {
+    if (!editingMethod) return;
+    setSavingEdit(true);
+    const result = await api.paymentMethods.update(editingMethod.id, {
+      name: editName,
+      type: editType,
+      beginningBalance: parseCurrencyInput(editBeginningBalance),
+    });
+    if (result.data) {
+      setPaymentMethods((prev) => prev.map((m) => (m.id === editingMethod.id ? result.data! : m)));
+      setEditingMethod(null);
+      toast.success(t(locale, 'saved'));
+    } else {
+      toast.error(result.error?.message || t(locale, 'failedSave'));
+    }
+    setSavingEdit(false);
   };
 
   if (loading) {
@@ -410,6 +453,15 @@ export default function CategoriesPage() {
               <Button
                 variant="ghost"
                 size="icon"
+                className="h-7 w-7"
+                onClick={() => handleOpenEdit(m)}
+                aria-label={t(locale, 'edit')}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 className="text-destructive h-7 w-7"
                 onClick={() => handleDeleteMethod(m.id)}
                 aria-label={t(locale, 'delete')}
@@ -419,7 +471,7 @@ export default function CategoriesPage() {
             </div>
           ))}
         </div>
-        <div className="flex items-end gap-3">
+        <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1">
             <Input
               value={newMethodName}
@@ -436,6 +488,17 @@ export default function CategoriesPage() {
             <option value="cash">Cash</option>
             <option value="ewallet">E-Wallet</option>
           </select>
+          <div className="w-36">
+            <label className="text-muted-foreground mb-1 block text-xs">
+              {t(locale, 'beginningBalance')}
+            </label>
+            <Input
+              value={newMethodBeginningBalance}
+              onChange={(e) => setNewMethodBeginningBalance(e.target.value)}
+              placeholder="0"
+              className="font-mono"
+            />
+          </div>
           <Button onClick={handleAddMethod} className="gap-1" disabled={addingMethod}>
             {addingMethod ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -446,6 +509,67 @@ export default function CategoriesPage() {
           </Button>
         </div>
       </div>
+      {/* Edit Payment Method Dialog */}
+      <Dialog
+        open={!!editingMethod}
+        onOpenChange={(open) => {
+          if (!open) setEditingMethod(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {t(locale, 'edit')} {editingMethod?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-muted-foreground mb-1 block text-xs">
+                {t(locale, 'name')}
+              </label>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder={t(locale, 'methodName')}
+              />
+            </div>
+            <div>
+              <label className="text-muted-foreground mb-1 block text-xs">
+                {t(locale, 'type')}
+              </label>
+              <select
+                value={editType}
+                onChange={(e) => setEditType(e.target.value as 'bank' | 'cash' | 'ewallet')}
+                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+              >
+                <option value="bank">Bank</option>
+                <option value="cash">Cash</option>
+                <option value="ewallet">E-Wallet</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-muted-foreground mb-1 block text-xs">
+                {t(locale, 'beginningBalance')}
+              </label>
+              <Input
+                value={editBeginningBalance}
+                onChange={(e) => setEditBeginningBalance(e.target.value)}
+                placeholder="0"
+                className="font-mono"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingMethod(null)}>
+              {t(locale, 'cancel')}
+            </Button>
+            <Button onClick={handleEditSave} disabled={savingEdit || !editName}>
+              {savingEdit ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {t(locale, 'save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }
