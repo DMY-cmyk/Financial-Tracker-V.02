@@ -64,34 +64,42 @@ export async function getMonthlyReportData(
 export async function getAnnualReportData(year: number): Promise<ServiceResult<AnnualReportData>> {
   await ensureSeeded();
 
-  const [monthSummaries, balancesResult, allYearResult] = await Promise.all([
+  const [monthSummaries, balancesResult, allYearResult, prevYearResult] = await Promise.all([
     txRepo.getMonthSummaries(year),
     listPaymentMethodBalances(),
     txRepo.findFiltered({ year, yearOnly: true, page: 1, pageSize: 10000 }),
+    txRepo.findFiltered({ year: year - 1, yearOnly: true, page: 1, pageSize: 10000 }),
   ]);
 
   if (balancesResult.error) return { error: balancesResult.error };
   const paymentMethodBalances = balancesResult.data ?? [];
 
-  // Build 12-month breakdown (fill missing months with zeros)
-  // Note: getMonthSummaries uses `CAST(SUBSTR(date,6,2) AS INTEGER) - 1 as month`
-  // which already returns 0-based months (January=0 ... December=11).
+  // 12-month breakdown
   const summaryMap = new Map(monthSummaries.map((s) => [s.month, s]));
   const monthlyBreakdown = Array.from({ length: 12 }, (_, i) => {
-    const s = summaryMap.get(i); // 0-based: i=0 → January
+    const s = summaryMap.get(i);
+    const income = s?.income ?? 0;
+    const expense = s?.expense ?? 0;
+    const net = income - expense;
     return {
       month: i,
-      income: s?.income ?? 0,
-      expense: s?.expense ?? 0,
-      net: (s?.income ?? 0) - (s?.expense ?? 0),
+      income,
+      expense,
+      net,
+      balance: net,
+      monthKey: `${year}-${String(i + 1).padStart(2, '0')}`,
     };
   });
 
   const totalIncome = monthlyBreakdown.reduce((s, m) => s + m.income, 0);
   const totalExpense = monthlyBreakdown.reduce((s, m) => s + m.expense, 0);
   const totalAssets = paymentMethodBalances.reduce((s, b) => s + b.balance, 0);
+  const totalBalance = totalIncome - totalExpense;
+  const transactionCount = allYearResult.rows.length;
+  const savingsRate =
+    totalIncome > 0 ? Math.round(Math.max(0, (totalBalance / totalIncome) * 100)) : 0;
 
-  // Top categories by total
+  // Top categories (all types, top 10) — kept for XLSX generator
   const catMap = new Map<string, { total: number; type: 'income' | 'expense' }>();
   for (const tx of allYearResult.rows) {
     const existing = catMap.get(tx.category);
@@ -106,14 +114,70 @@ export async function getAnnualReportData(year: number): Promise<ServiceResult<A
     .sort((a, b) => b.total - a.total)
     .slice(0, 10);
 
+  // Top expense categories (expense-only, top 5) — for web UI
+  const expenseCatMap = new Map<string, number>();
+  for (const tx of allYearResult.rows) {
+    if (tx.type === 'expense') {
+      expenseCatMap.set(tx.category, (expenseCatMap.get(tx.category) ?? 0) + tx.amount);
+    }
+  }
+  const topExpenseCategories = Array.from(expenseCatMap.entries())
+    .map(([category, amount]) => ({ category, amount }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+
+  // Previous year data
+  const prevRows = prevYearResult.rows;
+  let previousYear: AnnualReportData['previousYear'] = null;
+  let comparison: AnnualReportData['comparison'] = null;
+
+  if (prevRows.length > 0) {
+    const prevIncomeTotal = prevRows
+      .filter((t) => t.type === 'income')
+      .reduce((s, t) => s + t.amount, 0);
+    const prevExpenseTotal = prevRows
+      .filter((t) => t.type === 'expense')
+      .reduce((s, t) => s + t.amount, 0);
+    const prevTotalBalance = prevIncomeTotal - prevExpenseTotal;
+    const prevTransactionCount = prevRows.length;
+    const prevSavingsRate =
+      prevIncomeTotal > 0 ? Math.round(Math.max(0, (prevTotalBalance / prevIncomeTotal) * 100)) : 0;
+
+    previousYear = {
+      year: year - 1,
+      totalIncome: prevIncomeTotal,
+      totalExpense: prevExpenseTotal,
+      totalBalance: prevTotalBalance,
+      transactionCount: prevTransactionCount,
+      savingsRate: prevSavingsRate,
+    };
+
+    const pctChange = (curr: number, prev: number): number | null => {
+      if (prev === 0) return null;
+      return Math.round(((curr - prev) / prev) * 100);
+    };
+    comparison = {
+      incomeChange: pctChange(totalIncome, prevIncomeTotal),
+      expenseChange: pctChange(totalExpense, prevExpenseTotal),
+      balanceChange: pctChange(totalBalance, prevTotalBalance),
+      savingsRateChange: pctChange(savingsRate, prevSavingsRate),
+    };
+  }
+
   return {
     data: {
       year,
       totalIncome,
       totalExpense,
       totalAssets,
-      monthlyBreakdown,
+      totalBalance,
+      transactionCount,
+      savingsRate,
       topCategories,
+      topExpenseCategories,
+      previousYear,
+      comparison,
+      monthlyBreakdown,
       paymentMethodBalances,
       transactions: allYearResult.rows,
     },

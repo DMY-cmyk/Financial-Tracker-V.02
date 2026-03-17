@@ -4,7 +4,7 @@ import { filterByMonth } from '@/lib/calculations';
 import { MONTH_NAMES } from '@/lib/constants';
 import { exportCSV, exportJSON, exportExcel, exportPDF } from '@/lib/export-utils';
 import { type ExportFormat, type ExportScope, type Transaction } from '@/lib/types';
-import { type ExportOptionsState } from '@/components/export/ExportOptions';
+import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
 import type { ExportJobResponse } from '@/lib/api/contracts';
 

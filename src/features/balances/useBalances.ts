@@ -13,11 +13,13 @@ interface UseBalancesReturn {
 
 export function useBalances(): UseBalancesReturn {
   const initialized = useStore((s) => s.initialized);
+  const month = useStore((s) => s.ui.selectedMonth);
+  const year = useStore((s) => s.ui.selectedYear);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['payment-method-balances'],
+    queryKey: ['payment-method-balances', month, year],
     queryFn: async () => {
-      const result = await api.balances.list();
+      const result = await api.balances.list({ month, year });
       return result.data?.balances ?? [];
     },
     enabled: initialized,

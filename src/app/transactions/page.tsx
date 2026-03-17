@@ -8,12 +8,12 @@ import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
-import { BulkActionBar } from '@/components/transactions/BulkActionBar';
+import { BulkActionBar } from '@/features/transactions/BulkActionBar';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { TransactionFilters } from '@/components/transactions/TransactionFilters';
-import { TransactionForm } from '@/components/transactions/TransactionForm';
+import { TransactionFilters } from '@/features/transactions/TransactionFilters';
+import { TransactionForm } from '@/features/transactions/TransactionForm';
 import { AllTransactionsView } from '@/features/transactions/AllTransactionsView';
-import { TransactionSummary } from '@/components/transactions/TransactionSummary';
+import { TransactionSummary } from '@/features/transactions/TransactionSummary';
 import { EmptyState, NoResults } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ListSkeleton } from '@/components/shared/Skeletons';
@@ -34,6 +34,13 @@ import { exportCSV, exportExcel } from '@/lib/export-utils';
 export default function TransactionsPage() {
   const locale = useLocale();
   const queryClient = useQueryClient();
+
+  // One-time URL seed: read paymentMethod from URL on mount (lazy useState avoids ref-in-render)
+  const [urlPaymentMethod] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('paymentMethod') ?? '';
+  });
+
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +83,7 @@ export default function TransactionsPage() {
     bulkDeleteTransactions,
     isEmpty,
     hasNoResults,
-  } = useAllTransactions();
+  } = useAllTransactions(urlPaymentMethod ? { paymentMethod: urlPaymentMethod } : undefined);
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,

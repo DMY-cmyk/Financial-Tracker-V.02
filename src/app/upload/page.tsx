@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useUpload } from '@/hooks/useUpload';
+import { useUpload } from '@/features/upload/useUpload';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { formatDate } from '@/lib/formatters';
@@ -10,12 +10,12 @@ import { api } from '@/lib/api/client';
 import type { UploadResponse } from '@/lib/api/contracts';
 import type { ExtractionStatus } from '@/lib/types';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { BulkImportTabs } from '@/components/upload/BulkImportTabs';
-import { DropZone } from '@/components/upload/DropZone';
-import { UploadedFileCard } from '@/components/upload/UploadedFileCard';
-import { ExtractionStatusBadge } from '@/components/upload/ExtractionStatusBadge';
-import { ConfidenceBar } from '@/components/upload/ConfidenceBar';
-import { OcrPreview } from '@/components/upload/OcrPreview';
+import { BulkImportTabs } from '@/features/upload/BulkImportTabs';
+import { DropZone } from '@/features/upload/DropZone';
+import { UploadedFileCard } from '@/features/upload/UploadedFileCard';
+import { ExtractionStatusBadge } from '@/features/upload/ExtractionStatusBadge';
+import { ConfidenceBar } from '@/features/upload/ConfidenceBar';
+import { OcrPreview } from '@/features/upload/OcrPreview';
 import { InlineError } from '@/components/shared/EmptyState';
 import { Button } from '@/components/ui/button';
 import { ScanLine, CheckCircle2, RotateCcw, History } from 'lucide-react';

@@ -113,4 +113,129 @@ describe('listPaymentMethodBalances', () => {
     expect(result.data![0].name).toBe('GoPay');
     expect(result.data![1].name).toBe('Bank BCA');
   });
+
+  it('returns monthlyFlow of 0 for all accounts when no month/year params given', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    await createTransaction({
+      date: '2026-01-15',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances();
+    expect(result.data![0].monthlyFlow).toBe(0);
+  });
+
+  it('returns monthlyFlow of 0 when account has no transactions in the queried month', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    await createTransaction({
+      date: '2026-01-15',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    // Query February — no transactions in Feb
+    const result = await listPaymentMethodBalances(1, 2026);
+    expect(result.data![0].monthlyFlow).toBe(0);
+    // All-time balance is unchanged
+    expect(result.data![0].balance).toBe(5000000);
+  });
+
+  it('returns positive monthlyFlow for an income-only month', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    await createTransaction({
+      date: '2026-03-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances(2, 2026); // month=2 = March
+    expect(result.data![0].monthlyFlow).toBe(5000000);
+  });
+
+  it('returns negative monthlyFlow for an expense-only month', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    await createTransaction({
+      date: '2026-03-15',
+      description: 'Rent',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 2000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances(2, 2026);
+    expect(result.data![0].monthlyFlow).toBe(-2000000);
+  });
+
+  it('monthlyFlow is independent of all-time balance', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    // January: income 5M
+    await createTransaction({
+      date: '2026-01-10',
+      description: 'Salary Jan',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    // March: expense 200K
+    await createTransaction({
+      date: '2026-03-15',
+      description: 'Food',
+      category: 'Food',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 200000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const result = await listPaymentMethodBalances(2, 2026); // query March only
+    expect(result.data![0].balance).toBe(4800000); // all-time: 5M - 200K
+    expect(result.data![0].monthlyFlow).toBe(-200000); // March only: -200K
+  });
+
+  it('all-time income/expense/balance are identical regardless of month/year params', async () => {
+    await createPaymentMethod({ name: 'Bank BCA', icon: 'building', type: 'bank' });
+    await createTransaction({
+      date: '2026-01-10',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 5000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-01-20',
+      description: 'Rent',
+      category: 'Housing',
+      categoryId: 'c2',
+      type: 'expense',
+      amount: 1000000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    const withParams = await listPaymentMethodBalances(1, 2026); // Feb — no transactions
+    const withoutParams = await listPaymentMethodBalances();
+    expect(withParams.data![0].balance).toBe(withoutParams.data![0].balance);
+    expect(withParams.data![0].income).toBe(withoutParams.data![0].income);
+    expect(withParams.data![0].expense).toBe(withoutParams.data![0].expense);
+  });
 });
