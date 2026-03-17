@@ -387,6 +387,9 @@ type TranslationKeys = {
   // Sidebar group keys
   groupFinance: string;
   groupTools: string;
+
+  // Beginning Balance
+  beginningBalance: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -730,6 +733,9 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Finance',
     groupTools: 'Tools',
+
+    // Beginning Balance
+    beginningBalance: 'Beginning Balance',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1072,6 +1078,9 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Keuangan',
     groupTools: 'Alat',
+
+    // Beginning Balance
+    beginningBalance: 'Saldo Awal',
   },
 };
 
