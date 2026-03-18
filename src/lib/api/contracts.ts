@@ -296,6 +296,8 @@ export interface MonthlyReportData {
   incomeTransactions: Transaction[];
   expenseTransactions: Transaction[];
   expenseSummaryByCategory: { category: string; total: number }[];
+  incomeCategories: { category: string; total: number }[];
+  expenseCategories: { category: string; total: number }[];
   paymentMethodBalances: PaymentMethodBalance[];
   bills: Bill[];
 }

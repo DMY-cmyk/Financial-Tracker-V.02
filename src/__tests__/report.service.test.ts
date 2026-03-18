@@ -3,6 +3,7 @@ import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { getMonthlyReportData, getAnnualReportData } from '@/server/services/report.service';
 import { createTransaction } from '@/server/services/transaction.service';
+import { createPaymentMethod } from '@/server/services/payment-method.service';
 
 beforeEach(async () => {
   await resetDb();
@@ -102,6 +103,24 @@ describe('getMonthlyReportData', () => {
     const result = await getMonthlyReportData(0, 2026); // January
     expect(result.error).toBeUndefined();
     expect(result.data!.incomeTransactions).toHaveLength(0);
+  });
+
+  it('includes incomeCategories and expenseCategories in monthly report', async () => {
+    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createTransaction({ date: '2026-03-05', description: 'Salary', category: 'Gaji',
+      categoryId: 'c1', type: 'income', amount: 5000000, paymentMethod: 'BCA', notes: '' });
+    await createTransaction({ date: '2026-03-10', description: 'Bonus', category: 'Bonus',
+      categoryId: 'c2', type: 'income', amount: 1000000, paymentMethod: 'BCA', notes: '' });
+    await createTransaction({ date: '2026-03-15', description: 'Food', category: 'Makanan',
+      categoryId: 'c3', type: 'expense', amount: 500000, paymentMethod: 'BCA', notes: '' });
+
+    const r = await getMonthlyReportData(2, 2026); // month=2 → March
+    expect(r.error).toBeUndefined();
+    expect(r.data!.incomeCategories).toContainEqual({ category: 'Gaji', total: 5000000 });
+    expect(r.data!.incomeCategories).toContainEqual({ category: 'Bonus', total: 1000000 });
+    expect(r.data!.expenseCategories).toContainEqual({ category: 'Makanan', total: 500000 });
+    // sorted descending by total
+    expect(r.data!.incomeCategories[0].total).toBeGreaterThanOrEqual(r.data!.incomeCategories[1]?.total ?? 0);
   });
 });
 

@@ -21,7 +21,7 @@ export async function getMonthlyReportData(
   const [incomeResult, expenseResult, balancesResult, billsResult] = await Promise.all([
     txRepo.findFiltered({ month, year, type: 'income', page: 1, pageSize: 1000 }),
     txRepo.findFiltered({ month, year, type: 'expense', page: 1, pageSize: 1000 }),
-    listPaymentMethodBalances(),
+    listPaymentMethodBalances(month, year),
     listBills({ month, year }),
   ]);
 
@@ -45,6 +45,16 @@ export async function getMonthlyReportData(
     .map(([category, total]) => ({ category, total }))
     .sort((a, b) => b.total - a.total);
 
+  const incomeCategoryMap = new Map<string, number>();
+  for (const tx of incomeTransactions) {
+    incomeCategoryMap.set(tx.category, (incomeCategoryMap.get(tx.category) ?? 0) + tx.amount);
+  }
+  const incomeCategories = Array.from(incomeCategoryMap.entries())
+    .map(([category, total]) => ({ category, total }))
+    .sort((a, b) => b.total - a.total);
+
+  const expenseCategories = expenseSummaryByCategory;
+
   return {
     data: {
       month,
@@ -55,6 +65,8 @@ export async function getMonthlyReportData(
       incomeTransactions,
       expenseTransactions,
       expenseSummaryByCategory,
+      incomeCategories,
+      expenseCategories,
       paymentMethodBalances,
       bills,
     },
