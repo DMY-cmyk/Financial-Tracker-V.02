@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Receipt, Download } from 'lucide-react';
+import { Plus, Receipt, Download, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
@@ -65,6 +65,8 @@ export default function TransactionsPage() {
     setAllMonths,
     yearOnly,
     setYearOnly,
+    sortOrder,
+    toggleSortOrder,
     paymentMethods,
     clearFilters,
     formOpen,
@@ -202,23 +204,36 @@ export default function TransactionsPage() {
       </motion.div>
 
       <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
-        <TransactionFilters
-          search={search}
-          onSearchChange={setSearch}
-          typeFilter={typeFilter}
-          onTypeChange={setTypeFilter}
-          categoryFilter={categoryFilter}
-          onCategoryChange={setCategoryFilter}
-          paymentMethodFilter={paymentMethodFilter}
-          onPaymentMethodChange={setPaymentMethodFilter}
-          paymentMethods={paymentMethods}
-          allMonths={allMonths}
-          onAllMonthsChange={setAllMonths}
-          yearOnly={yearOnly}
-          onYearOnlyChange={setYearOnly}
-          selectedYear={year}
-          searchInputRef={searchInputRef}
-        />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+          <div className="flex-1">
+            <TransactionFilters
+              search={search}
+              onSearchChange={setSearch}
+              typeFilter={typeFilter}
+              onTypeChange={setTypeFilter}
+              categoryFilter={categoryFilter}
+              onCategoryChange={setCategoryFilter}
+              paymentMethodFilter={paymentMethodFilter}
+              onPaymentMethodChange={setPaymentMethodFilter}
+              paymentMethods={paymentMethods}
+              allMonths={allMonths}
+              onAllMonthsChange={setAllMonths}
+              yearOnly={yearOnly}
+              onYearOnlyChange={setYearOnly}
+              selectedYear={year}
+              searchInputRef={searchInputRef}
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleSortOrder}
+            className="gap-1.5 self-start"
+          >
+            <ArrowUpDown className="h-3.5 w-3.5" />
+            {sortOrder === 'desc' ? t(locale, 'newest') : t(locale, 'oldest')}
+          </Button>
+        </div>
       </motion.div>
 
       <AnimatePresence mode="wait">

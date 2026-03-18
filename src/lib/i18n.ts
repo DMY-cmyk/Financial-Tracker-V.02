@@ -390,6 +390,10 @@ type TranslationKeys = {
 
   // Beginning Balance
   beginningBalance: string;
+
+  // Sort order
+  newest: string;
+  oldest: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -736,6 +740,10 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Beginning Balance',
+
+    // Sort order
+    newest: 'Newest',
+    oldest: 'Oldest',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1081,6 +1089,10 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Saldo Awal',
+
+    // Sort order
+    newest: 'Terbaru',
+    oldest: 'Terlama',
   },
 };
 

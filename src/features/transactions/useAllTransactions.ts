@@ -38,6 +38,8 @@ interface UseAllTransactionsReturn {
   setAllMonths: (v: boolean) => void;
   yearOnly: boolean;
   setYearOnly: (v: boolean) => void;
+  sortOrder: 'asc' | 'desc';
+  toggleSortOrder: () => void;
   hasActiveFilters: boolean;
   clearFilters: () => void;
 
@@ -81,6 +83,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   );
   const [allMonths, setAllMonthsState] = useState(false);
   const [yearOnly, setYearOnlyState] = useState(false);
+  const [sortOrder, setSortOrderState] = useState<'asc' | 'desc'>('desc');
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -92,6 +95,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     categoryFilter,
     paymentMethodFilter,
     search,
+    sortOrder,
   ].join('|');
 
   // Filter setters — each resets selection
@@ -119,6 +123,10 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   const setYearOnly = useCallback((v: boolean) => {
     setYearOnlyState(v);
     if (v) setAllMonthsState(false);
+    setSelectedIds(new Set());
+  }, []);
+  const toggleSortOrder = useCallback(() => {
+    setSortOrderState((prev) => (prev === 'desc' ? 'asc' : 'desc'));
     setSelectedIds(new Set());
   }, []);
 
@@ -173,6 +181,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
       if (categoryFilter) params.categoryId = categoryFilter;
       if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
       if (search) params.search = search;
+      params.sortOrder = sortOrder;
 
       const result = await api.transactions.list(
         params as Parameters<typeof api.transactions.list>[0]
@@ -283,6 +292,8 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     setAllMonths,
     yearOnly,
     setYearOnly,
+    sortOrder,
+    toggleSortOrder,
     hasActiveFilters,
     clearFilters,
     paymentMethods,
