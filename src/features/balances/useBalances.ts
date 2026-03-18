@@ -23,7 +23,7 @@ export function useBalances(): UseBalancesReturn {
       return result.data?.balances ?? [];
     },
     enabled: initialized,
-    staleTime: 30_000,
+    staleTime: 0,
   });
 
   const balances = data ?? [];

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Building2, Wallet, Smartphone } from 'lucide-react';
+import { Building2, Wallet, Smartphone, TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { staggerGridItem, tapScale } from '@/lib/motion';
@@ -29,8 +29,7 @@ interface BalanceCardProps {
 export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
   const Icon = TYPE_ICONS[balance.type];
   const typeLabel = TYPE_LABELS[balance.type][locale];
-  const isPositive = balance.balance > 0;
-  const hasBeginningBalance = balance.beginningBalance !== 0;
+  const closingPositive = balance.balance >= 0;
 
   return (
     <motion.div
@@ -55,45 +54,41 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
       )}
     >
       {/* Header */}
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-            <Icon className="text-primary h-4 w-4" />
-          </div>
-          <div>
-            <p className="text-sm font-medium">{balance.name}</p>
-            <p className="text-muted-foreground text-xs">{typeLabel}</p>
-          </div>
+      <div className="mb-3 flex items-center gap-2">
+        <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+          <Icon className="text-primary h-4 w-4" />
+        </div>
+        <div>
+          <p className="text-sm font-medium">{balance.name}</p>
+          <p className="text-muted-foreground text-xs">{typeLabel}</p>
         </div>
       </div>
 
-      {/* All-time balance */}
-      <p
-        className={cn(
-          'font-mono text-xl font-bold tracking-tight',
-          isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
-        )}
-      >
-        {formatCurrency(balance.balance)}
-      </p>
-
-      {/* Beginning balance secondary line */}
-      {hasBeginningBalance && (
-        <p className="text-muted-foreground mt-0.5 font-mono text-xs">
-          {t(locale, 'beginningBalance')}: {formatCurrency(balance.beginningBalance)}
-        </p>
-      )}
-
-      {/* Income / Expense breakdown */}
-      <div className="mt-2 flex gap-3">
-        <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          <TrendingUp className="h-3 w-3 text-emerald-500" />
-          {formatCurrency(balance.income)}
-        </span>
-        <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          <TrendingDown className="h-3 w-3 text-red-500" />
-          {formatCurrency(balance.expense)}
-        </span>
+      {/* Ledger rows */}
+      <div className="space-y-1 text-xs">
+        <div className="text-muted-foreground flex justify-between">
+          <span>{t(locale, 'beginningBalance')}</span>
+          <span className="font-mono">{formatCurrency(balance.beginningBalance)}</span>
+        </div>
+        <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+          <span className="flex items-center gap-1">
+            <TrendingUp className="h-3 w-3" />
+            {t(locale, 'income')}
+          </span>
+          <span className="font-mono">+{formatCurrency(balance.income)}</span>
+        </div>
+        <div className="flex justify-between text-red-500">
+          <span className="flex items-center gap-1">
+            <TrendingDown className="h-3 w-3" />
+            {t(locale, 'expense')}
+          </span>
+          <span className="font-mono">-{formatCurrency(balance.expense)}</span>
+        </div>
+        <div className={cn('border-border mt-2 flex justify-between border-t pt-2 font-medium',
+          closingPositive ? 'text-foreground' : 'text-destructive')}>
+          <span>{t(locale, 'closing')}</span>
+          <span className="font-mono">{formatCurrency(balance.balance)}</span>
+        </div>
       </div>
     </motion.div>
   );

@@ -390,6 +390,7 @@ type TranslationKeys = {
 
   // Beginning Balance
   beginningBalance: string;
+  closing: string;
 
   // Sort order
   newest: string;
@@ -740,6 +741,7 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Beginning Balance',
+    closing: 'Closing',
 
     // Sort order
     newest: 'Newest',
@@ -1089,6 +1091,7 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Saldo Awal',
+    closing: 'Penutupan',
 
     // Sort order
     newest: 'Terbaru',
