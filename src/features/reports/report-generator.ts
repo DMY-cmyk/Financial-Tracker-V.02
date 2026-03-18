@@ -22,22 +22,15 @@ function formatDatetimeID(date: Date): string {
 }
 
 function setCurrency(ws: XLSX.WorkSheet, ref: string, value: number): void {
-  if (!ws[ref]) ws[ref] = {};
-  ws[ref].v = value;
-  ws[ref].t = 'n';
-  ws[ref].z = CURRENCY_FMT;
+  ws[ref] = { v: value, t: 'n', z: CURRENCY_FMT };
 }
 
 function setString(ws: XLSX.WorkSheet, ref: string, value: string): void {
-  if (!ws[ref]) ws[ref] = {};
-  ws[ref].v = value;
-  ws[ref].t = 's';
+  ws[ref] = { v: value, t: 's' };
 }
 
 function setNumber(ws: XLSX.WorkSheet, ref: string, value: number): void {
-  if (!ws[ref]) ws[ref] = {};
-  ws[ref].v = value;
-  ws[ref].t = 'n';
+  ws[ref] = { v: value, t: 'n' };
 }
 
 function buildRange(maxRow: number, maxCol: number): string {
@@ -45,7 +38,9 @@ function buildRange(maxRow: number, maxCol: number): string {
 }
 
 export function generateMonthlyReport(data: MonthlyReportData): void {
-  const ws: XLSX.WorkSheet = { '!ref': buildRange(50, 8) };
+  const maxCategoryRows = Math.max(data.incomeCategories.length, data.expenseCategories.length);
+  const maxRow = Math.max(50, 18 + maxCategoryRows + 2); // at least 50, expand for large datasets
+  const ws: XLSX.WorkSheet = { '!ref': buildRange(maxRow, 7) };
 
   // Header section
   setString(ws, 'B5', 'LAPORAN KEUANGAN BULANAN');
@@ -86,7 +81,7 @@ export function generateMonthlyReport(data: MonthlyReportData): void {
 
 export function generateAnnualReport(data: AnnualReportData): void {
   // Sheet 1: Monthly breakdown
-  const ws1: XLSX.WorkSheet = { '!ref': buildRange(25, 7) };
+  const ws1: XLSX.WorkSheet = { '!ref': buildRange(30, 7) };
   setString(ws1, 'B5', 'LAPORAN KEUANGAN TAHUNAN');
   setString(ws1, 'B7', formatDatetimeID(new Date()));
   setString(ws1, 'B9', 'Tahun:');
