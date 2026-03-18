@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAllTransactions } from '@/features/transactions/useAllTransactions';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -31,15 +32,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { exportCSV, exportExcel } from '@/lib/export-utils';
 
-export default function TransactionsPage() {
+function TransactionsPageInner() {
   const locale = useLocale();
   const queryClient = useQueryClient();
 
-  // One-time URL seed: read paymentMethod from URL on mount (lazy useState avoids ref-in-render)
-  const [urlPaymentMethod] = useState<string>(() => {
-    if (typeof window === 'undefined') return '';
-    return new URLSearchParams(window.location.search).get('paymentMethod') ?? '';
-  });
+  const searchParams = useSearchParams();
+  const urlPaymentMethod = searchParams.get('paymentMethod') ?? '';
+  const urlAllMonths = searchParams.get('allMonths') === 'true';
 
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
@@ -85,7 +84,10 @@ export default function TransactionsPage() {
     bulkDeleteTransactions,
     isEmpty,
     hasNoResults,
-  } = useAllTransactions(urlPaymentMethod ? { paymentMethod: urlPaymentMethod } : undefined);
+  } = useAllTransactions({
+    paymentMethod: urlPaymentMethod,
+    allMonths: urlAllMonths,
+  });
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
@@ -339,5 +341,13 @@ export default function TransactionsPage() {
         </button>
       )}
     </div>
+  );
+}
+
+export default function TransactionsPage() {
+  return (
+    <Suspense fallback={<ListSkeleton />}>
+      <TransactionsPageInner />
+    </Suspense>
   );
 }

@@ -10,6 +10,7 @@ const PAGE_SIZE = 50;
 
 interface InitialFilters {
   paymentMethod?: string;
+  allMonths?: boolean;
 }
 
 interface UseAllTransactionsReturn {
@@ -81,7 +82,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   const [paymentMethodFilter, setPaymentMethodFilterState] = useState(
     initialFilters?.paymentMethod ?? ''
   );
-  const [allMonths, setAllMonthsState] = useState(false);
+  const [allMonths, setAllMonthsState] = useState(initialFilters?.allMonths ?? false);
   const [yearOnly, setYearOnlyState] = useState(false);
   const [sortOrder, setSortOrderState] = useState<'asc' | 'desc'>('desc');
   const [formOpen, setFormOpen] = useState(false);

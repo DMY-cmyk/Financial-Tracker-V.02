@@ -3,22 +3,18 @@
 import { useRouter } from 'next/navigation';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
-import { useStore } from '@/store';
 import { useBalances } from './useBalances';
 import { BalanceGrid } from './BalanceGrid';
 
 export function AccountBalancesWidget() {
   const locale = useLocale();
   const router = useRouter();
-  const month = useStore((s) => s.ui.selectedMonth);
-  const year = useStore((s) => s.ui.selectedYear);
   const { balances, totalBalance, isLoading } = useBalances();
 
   const handleCardClick = (paymentMethodName: string) => {
     const params = new URLSearchParams({
       paymentMethod: paymentMethodName,
-      month: String(month),
-      year: String(year),
+      allMonths: 'true',
     });
     router.push(`/transactions?${params.toString()}`);
   };
