@@ -395,6 +395,12 @@ type TranslationKeys = {
   // Sort order
   newest: string;
   oldest: string;
+
+  // End-of-month reminder
+  endOfMonthTitle: string;
+  endOfMonthBody: string;
+  goToTransactions: string;
+  dismiss: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -746,6 +752,13 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sort order
     newest: 'Newest',
     oldest: 'Oldest',
+
+    // End-of-month reminder
+    endOfMonthTitle: 'End of Month Reminder',
+    endOfMonthBody:
+      "Today is the last day of the month. Make sure you've recorded all transactions before midnight so next month's opening balance is accurate.",
+    goToTransactions: 'Go to Transactions',
+    dismiss: 'Dismiss',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1096,6 +1109,13 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sort order
     newest: 'Terbaru',
     oldest: 'Terlama',
+
+    // End-of-month reminder
+    endOfMonthTitle: 'Pengingat Akhir Bulan',
+    endOfMonthBody:
+      'Hari ini adalah hari terakhir bulan ini. Pastikan semua transaksi sudah dicatat sebelum tengah malam agar saldo awal bulan berikutnya akurat.',
+    goToTransactions: 'Ke Transaksi',
+    dismiss: 'Tutup',
   },
 };
 

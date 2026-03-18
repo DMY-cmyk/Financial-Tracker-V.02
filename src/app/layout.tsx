@@ -5,6 +5,7 @@ import { StoreProvider } from '@/components/providers/StoreProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { Toaster } from '@/components/ui/sonner';
+import { EndOfMonthReminder } from '@/components/shared/EndOfMonthReminder';
 
 const jakarta = Plus_Jakarta_Sans({
   variable: '--font-sans',
@@ -51,6 +52,7 @@ export default function RootLayout({
         <StoreProvider>
           <QueryProvider>
             <AppShell>{children}</AppShell>
+            <EndOfMonthReminder />
             <Toaster position="top-right" duration={3000} />
           </QueryProvider>
         </StoreProvider>
