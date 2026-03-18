@@ -1,0 +1,81 @@
+<h2>What Should the Balance Card Show?</h2>
+<p class="subtitle">The current formula is <strong>all-time income − expense</strong>. Is that correct, or should it be filtered?</p>
+
+<div class="options" style="margin-top:1.5rem;flex-direction:column;gap:1rem;">
+
+  <!-- Option A: All-time cumulative -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)" style="align-items:flex-start;padding:1rem 1.25rem;gap:1.25rem;">
+    <div class="letter">A</div>
+    <div class="content" style="flex:1;">
+      <h3>All-Time Balance (current behavior)</h3>
+      <p>Lifetime income − lifetime expense for that payment method. Like a bank balance — accumulates forever.</p>
+      <div style="display:flex;gap:0.75rem;margin-top:0.75rem;flex-wrap:wrap;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">GoPay</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#059669;">Rp 2.450.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">All time</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">BCA</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#059669;">Rp 12.750.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">All time</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">Cash</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#dc2626;">−Rp 500.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">All time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Selected month/year only -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)" style="align-items:flex-start;padding:1rem 1.25rem;gap:1.25rem;">
+    <div class="letter">B</div>
+    <div class="content" style="flex:1;">
+      <h3>Selected Month Net Flow</h3>
+      <p>Income − expense for the currently selected month/year only. Changes as you navigate months. Shows cash flow, not bank balance.</p>
+      <div style="display:flex;gap:0.75rem;margin-top:0.75rem;flex-wrap:wrap;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">GoPay</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#dc2626;">−Rp 315.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">March 2026</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">BCA</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#059669;">Rp 4.200.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">March 2026</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:130px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">Cash</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#dc2626;">−Rp 150.000</div>
+          <div style="font-size:0.6rem;color:#94a3b8;margin-top:0.25rem;">March 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: Both -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)" style="align-items:flex-start;padding:1rem 1.25rem;gap:1.25rem;">
+    <div class="letter">C</div>
+    <div class="content" style="flex:1;">
+      <h3>Both — Balance + Monthly Flow</h3>
+      <p>Show all-time balance as the headline figure, with monthly net flow shown as a secondary line below it.</p>
+      <div style="display:flex;gap:0.75rem;margin-top:0.75rem;flex-wrap:wrap;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:145px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">GoPay</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#059669;">Rp 2.450.000</div>
+          <div style="font-size:0.65rem;color:#dc2626;font-family:monospace;margin-top:0.15rem;">↓ −Rp 315.000 this month</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 1rem;min-width:145px;">
+          <div style="font-size:0.65rem;color:#64748b;font-weight:600;text-transform:uppercase;">BCA</div>
+          <div style="font-family:monospace;font-size:1rem;font-weight:700;color:#059669;">Rp 12.750.000</div>
+          <div style="font-size:0.65rem;color:#059669;font-family:monospace;margin-top:0.15rem;">↑ +Rp 4.200.000 this month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:1.5rem;text-align:center;">Click to select, or reply in the terminal.</p>

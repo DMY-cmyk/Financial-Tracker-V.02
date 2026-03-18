@@ -13,13 +13,6 @@ export function exportCSV(transactions: Transaction[], filename: string): void {
   downloadBlob(content, filename, 'text/csv;charset=utf-8');
 }
 
-// --- JSON ---
-
-export function exportJSON(transactions: Transaction[], filename: string): void {
-  const content = JSON.stringify(transactions, null, 2);
-  downloadBlob(content, filename, 'application/json');
-}
-
 // --- Excel (xlsx via SheetJS) ---
 
 export async function exportExcel(
