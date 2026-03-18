@@ -30,7 +30,7 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
   const Icon = TYPE_ICONS[balance.type];
   const typeLabel = TYPE_LABELS[balance.type][locale];
   const isPositive = balance.balance > 0;
-  const flowPositive = balance.monthlyFlow > 0;
+  const hasBeginningBalance = balance.beginningBalance !== 0;
 
   return (
     <motion.div
@@ -77,16 +77,10 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
         {formatCurrency(balance.balance)}
       </p>
 
-      {/* Monthly flow secondary line */}
-      {balance.monthlyFlow !== 0 && (
-        <p
-          className={cn(
-            'mt-0.5 font-mono text-xs',
-            flowPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
-          )}
-        >
-          {flowPositive ? '↑' : '↓'} {formatCurrency(Math.abs(balance.monthlyFlow))}{' '}
-          {t(locale, 'thisMonth')}
+      {/* Beginning balance secondary line */}
+      {hasBeginningBalance && (
+        <p className="text-muted-foreground mt-0.5 font-mono text-xs">
+          {t(locale, 'beginningBalance')}: {formatCurrency(balance.beginningBalance)}
         </p>
       )}
 

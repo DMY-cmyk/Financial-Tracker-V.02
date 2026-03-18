@@ -275,10 +275,10 @@ export interface PaymentMethodBalance {
   name: string;
   type: 'bank' | 'cash' | 'ewallet';
   icon: string;
+  beginningBalance: number; // sum of all transactions before the queried month; 0 for all-time path
   income: number;
   expense: number;
-  balance: number;
-  monthlyFlow: number; // income − expense for the queried month/year; 0 when no params given
+  balance: number; // beginningBalance + income − expense (monthly) or income − expense (all-time)
 }
 
 export interface BalanceListResponse {
