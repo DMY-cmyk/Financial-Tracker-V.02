@@ -36,7 +36,8 @@ export function EndOfMonthReminder() {
     if (!isLastDayOfMonth(today)) return;
     const key = getStorageKey(today);
     if (localStorage.getItem(key)) return;
-    setOpen(true);
+    const id = window.setTimeout(() => setOpen(true));
+    return () => window.clearTimeout(id);
   }, []);
 
   const handleDismiss = () => {

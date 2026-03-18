@@ -15,6 +15,10 @@ const eslintConfig = defineConfig([
     // Legacy files from original project (not part of redesign)
     "script.js",
     "scripts/**",
+    // Git worktrees and tool-generated directories
+    ".worktrees/**",
+    ".claude/**",
+    ".superpowers/**",
   ]),
 ]);
 
