@@ -47,6 +47,9 @@ export interface ListTransactionsParams {
   search?: string;
   page?: number;
   pageSize?: number;
+  sortOrder?: 'asc' | 'desc';
+  allMonths?: boolean;
+  yearOnly?: boolean;
 }
 
 export interface DashboardSummaryParams {

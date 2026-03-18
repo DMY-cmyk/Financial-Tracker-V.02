@@ -21,6 +21,11 @@ export async function ensureSeeded() {
     // Run migrations for existing data
     await migrateCategoryIds(db);
     await cleanup2025Data(db);
+    // Ensure "Saldo Awal" income category always exists (even on pre-existing databases)
+    await db.query(
+      'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      ['cat-saldo-awal', 'Saldo Awal', 'income', '#10B981', 'wallet', 0]
+    );
     seeded = true;
     return;
   }

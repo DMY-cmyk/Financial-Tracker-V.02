@@ -52,9 +52,8 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 
 export const EXPORT_FORMATS = [
   { value: 'csv' as const, label: 'CSV', description: 'Spreadsheet compatible', available: true },
-  { value: 'json' as const, label: 'JSON', description: 'Raw data format', available: true },
-  { value: 'xlsx' as const, label: 'Excel', description: 'Formatted workbook', available: false },
-  { value: 'pdf' as const, label: 'PDF', description: 'Print-ready report', available: false },
+  { value: 'xlsx' as const, label: 'Excel', description: 'Formatted workbook', available: true },
+  { value: 'pdf' as const, label: 'PDF', description: 'Print-ready report', available: true },
 ] as const;
 
 export const UPLOAD_ACCEPTED_TYPES = 'image/png,image/jpeg,image/webp,image/heic';
