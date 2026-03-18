@@ -8,7 +8,6 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { useReportsData } from '@/features/reports/useReportsData';
 import { BalanceGrid } from '@/features/balances/BalanceGrid';
 import { useBalances } from '@/features/balances/useBalances';
-import { ReportDownloader } from '@/features/reports/ReportDownloader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/features/reports/TrendChart';
 import { AnnualSummary } from '@/features/reports/AnnualSummary';
@@ -235,14 +234,6 @@ export default function ReportsPage() {
           <BalanceGrid balances={balances} locale={locale} isLoading={balancesLoading} />
         </motion.div>
 
-        {/* Report Downloader */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-        >
-          <ReportDownloader />
-        </motion.div>
       </div>
     </div>
   );

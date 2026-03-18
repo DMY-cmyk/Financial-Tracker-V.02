@@ -23,14 +23,14 @@ describe('createExportJob', () => {
 
   it('creates an export job with all options', async () => {
     const result = await createExportJob({
-      format: 'json',
+      format: 'xlsx',
       scope: 'all',
       filters: '{"month":0}',
       options: '{"includeSummary":true}',
       recordCount: 42,
     });
     expect(result.data).toBeDefined();
-    expect(result.data!.format).toBe('json');
+    expect(result.data!.format).toBe('xlsx');
     expect(result.data!.scope).toBe('all');
     expect(result.data!.recordCount).toBe(42);
   });
@@ -57,7 +57,7 @@ describe('createExportJob', () => {
 describe('listExportJobs', () => {
   it('returns all export jobs', async () => {
     await createExportJob({ format: 'csv', scope: 'current' });
-    await createExportJob({ format: 'json', scope: 'all' });
+    await createExportJob({ format: 'xlsx', scope: 'all' });
 
     const result = await listExportJobs();
     expect(result.data).toBeDefined();

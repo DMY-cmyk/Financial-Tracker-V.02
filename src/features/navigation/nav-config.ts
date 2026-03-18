@@ -53,7 +53,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/reports', labelKey: 'reports', icon: BarChart3 },
       { href: '/upload', labelKey: 'upload', icon: Upload },
-      { href: '/export', labelKey: 'export', icon: Download },
+      { href: '/export', labelKey: 'downloadReport', icon: Download },
     ],
   },
 ];

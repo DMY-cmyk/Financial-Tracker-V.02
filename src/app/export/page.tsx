@@ -15,7 +15,6 @@ import { MONTH_NAMES } from '@/lib/constants';
 import { useStore } from '@/store';
 import {
   FileSpreadsheet,
-  FileText,
   FileDown,
   FileBarChart,
   type LucideIcon,
@@ -26,14 +25,12 @@ import { toast } from 'sonner';
 
 const FORMAT_ICONS: Record<string, LucideIcon> = {
   csv: FileSpreadsheet,
-  json: FileText,
   xlsx: FileDown,
   pdf: FileBarChart,
 };
 
 const FORMAT_OPTIONS: { value: ExportFormat; label: string; description: string }[] = [
   { value: 'csv', label: 'CSV', description: 'Spreadsheet compatible' },
-  { value: 'json', label: 'JSON', description: 'Raw data format' },
   { value: 'xlsx', label: 'Excel', description: 'Formatted workbook' },
   { value: 'pdf', label: 'PDF', description: 'Print-ready report' },
 ];
@@ -91,7 +88,7 @@ export default function ExportPage() {
             {FORMAT_OPTIONS.map(({ value, label, description }) => (
               <FormatCard
                 key={value}
-                icon={FORMAT_ICONS[value] || FileText}
+                icon={FORMAT_ICONS[value] || FileDown}
                 label={label}
                 description={description}
                 selected={format === value}

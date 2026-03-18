@@ -144,7 +144,7 @@ export type BulkImportSource = 'excel' | 'image';
 
 export type BulkImportStatus = 'idle' | 'parsing' | 'preview' | 'importing' | 'complete' | 'error';
 
-export type ExportFormat = 'csv' | 'json' | 'xlsx' | 'pdf';
+export type ExportFormat = 'csv' | 'xlsx' | 'pdf';
 export type ExportScope = 'current' | 'all' | 'range';
 
 export interface ExportState {

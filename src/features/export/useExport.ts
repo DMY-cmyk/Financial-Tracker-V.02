@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useStore } from '@/store';
 import { filterByMonth } from '@/lib/calculations';
 import { MONTH_NAMES } from '@/lib/constants';
-import { exportCSV, exportJSON, exportExcel, exportPDF } from '@/lib/export-utils';
+import { exportCSV, exportExcel, exportPDF } from '@/lib/export-utils';
 import { type ExportFormat, type ExportScope, type Transaction } from '@/lib/types';
 import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
@@ -108,9 +108,6 @@ export function useExport(): UseExportReturn {
       switch (format) {
         case 'csv':
           exportCSV(scopedTransactions, buildFilename('csv'));
-          break;
-        case 'json':
-          exportJSON(scopedTransactions, buildFilename('json'));
           break;
         case 'xlsx':
           await exportExcel(

@@ -128,7 +128,7 @@ export const updateSavingsGoalSchema = z.object({
 // === Export job schema ===
 
 export const createExportJobSchema = z.object({
-  format: z.enum(['csv', 'json', 'xlsx', 'pdf']),
+  format: z.enum(['csv', 'xlsx', 'pdf']),
   scope: z.enum(['current', 'all', 'range']),
   filters: z.string().optional(),
   options: z.string().optional(),
