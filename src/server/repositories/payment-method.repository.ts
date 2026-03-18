@@ -35,10 +35,12 @@ export function createPaymentMethodRepository() {
     async create(data: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
       const id = nanoid();
       const db = await getDb();
-      await db.query(
-        'INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?)',
-        [id, data.name, data.icon, data.type]
-      );
+      await db.query('INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?)', [
+        id,
+        data.name,
+        data.icon,
+        data.type,
+      ]);
       return { ...data, id };
     },
 
@@ -47,10 +49,12 @@ export function createPaymentMethodRepository() {
       const existing = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
       if (!existing.rows[0]) return undefined;
       const updated = { ...rowToPm(existing.rows[0]), ...data };
-      await db.query(
-        'UPDATE payment_methods SET name=?, icon=?, type=? WHERE id=?',
-        [updated.name, updated.icon, updated.type, id]
-      );
+      await db.query('UPDATE payment_methods SET name=?, icon=?, type=? WHERE id=?', [
+        updated.name,
+        updated.icon,
+        updated.type,
+        id,
+      ]);
       return updated;
     },
 

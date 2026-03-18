@@ -48,8 +48,16 @@ export async function listPaymentMethodBalances(
       LEFT JOIN transactions t ON t.payment_method = pm.name
       GROUP BY pm.id, pm.name, pm.type, pm.icon
       ORDER BY balance DESC`,
-      [monthStart, monthStart, monthPattern, monthPattern,
-       monthStart, monthStart, monthPattern, monthPattern]
+      [
+        monthStart,
+        monthStart,
+        monthPattern,
+        monthPattern,
+        monthStart,
+        monthStart,
+        monthPattern,
+        monthPattern,
+      ]
     );
 
     return {

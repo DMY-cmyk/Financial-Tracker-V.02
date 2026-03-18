@@ -135,4 +135,3 @@ describe('deletePaymentMethod', () => {
     expect(list.data!.length).toBe(0);
   });
 });
-

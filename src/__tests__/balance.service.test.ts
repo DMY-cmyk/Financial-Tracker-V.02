@@ -12,8 +12,16 @@ beforeEach(async () => {
 });
 
 const mkTx = (date: string, type: 'income' | 'expense', amount: number, pm = 'BCA') =>
-  createTransaction({ date, description: 'd', category: 'c', categoryId: 'c1',
-    type, amount, paymentMethod: pm, notes: '' });
+  createTransaction({
+    date,
+    description: 'd',
+    category: 'c',
+    categoryId: 'c1',
+    type,
+    amount,
+    paymentMethod: pm,
+    notes: '',
+  });
 
 describe('listPaymentMethodBalances (monthly chain)', () => {
   it('returns empty array when no payment methods exist', async () => {

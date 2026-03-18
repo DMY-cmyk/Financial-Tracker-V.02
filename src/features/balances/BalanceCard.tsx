@@ -84,8 +84,12 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
           </span>
           <span className="font-mono">-{formatCurrency(balance.expense)}</span>
         </div>
-        <div className={cn('border-border mt-2 flex justify-between border-t pt-2 font-medium',
-          closingPositive ? 'text-foreground' : 'text-destructive')}>
+        <div
+          className={cn(
+            'border-border mt-2 flex justify-between border-t pt-2 font-medium',
+            closingPositive ? 'text-foreground' : 'text-destructive'
+          )}
+        >
           <span>{t(locale, 'closing')}</span>
           <span className="font-mono">{formatCurrency(balance.balance)}</span>
         </div>

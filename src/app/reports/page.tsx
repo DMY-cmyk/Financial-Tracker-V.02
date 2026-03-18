@@ -233,7 +233,6 @@ export default function ReportsPage() {
           <h2 className="mb-4 text-lg font-semibold">{t(locale, 'accountBalances')}</h2>
           <BalanceGrid balances={balances} locale={locale} isLoading={balancesLoading} />
         </motion.div>
-
       </div>
     </div>
   );
