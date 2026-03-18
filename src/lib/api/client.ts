@@ -62,6 +62,7 @@ export const api = {
       search?: string;
       page?: number;
       pageSize?: number;
+      sortOrder?: 'asc' | 'desc';
     }) {
       const query = new URLSearchParams();
       if (params) {

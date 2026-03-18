@@ -29,6 +29,9 @@ export async function GET(request: NextRequest) {
   const pageSizeStr = searchParams.get('pageSize');
   if (pageSizeStr) query.pageSize = parseInt(pageSizeStr, 10);
 
+  const sortOrder = searchParams.get('sortOrder');
+  if (sortOrder === 'asc' || sortOrder === 'desc') query.sortOrder = sortOrder;
+
   const result = await listTransactions(query);
 
   if (result.error) {
