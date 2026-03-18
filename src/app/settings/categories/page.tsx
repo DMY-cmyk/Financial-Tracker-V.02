@@ -97,12 +97,10 @@ export default function CategoriesPage() {
   const [newMethodName, setNewMethodName] = useState('');
   const [newMethodType, setNewMethodType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
   const [addingMethod, setAddingMethod] = useState(false);
-  const [newMethodBeginningBalance, setNewMethodBeginningBalance] = useState('');
 
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
   const [editName, setEditName] = useState('');
   const [editType, setEditType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
-  const [editBeginningBalance, setEditBeginningBalance] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const refetch = useCallback(() => setFetchCount((c) => c + 1), []);
@@ -210,12 +208,10 @@ export default function CategoriesPage() {
       name: newMethodName,
       icon: 'wallet',
       type: newMethodType,
-      beginningBalance: parseCurrencyInput(newMethodBeginningBalance),
     });
     if (result.data) {
       setPaymentMethods((prev) => [...prev, result.data!]);
       setNewMethodName('');
-      setNewMethodBeginningBalance('');
       toast.success(t(locale, 'saved'));
     } else {
       toast.error(result.error?.message || t(locale, 'failedSave'));
@@ -236,9 +232,6 @@ export default function CategoriesPage() {
     setEditingMethod(method);
     setEditName(method.name);
     setEditType(method.type);
-    setEditBeginningBalance(
-      method.beginningBalance > 0 ? formatCurrencyInput(method.beginningBalance) : ''
-    );
   };
 
   const handleEditSave = async () => {
@@ -247,7 +240,6 @@ export default function CategoriesPage() {
     const result = await api.paymentMethods.update(editingMethod.id, {
       name: editName,
       type: editType,
-      beginningBalance: parseCurrencyInput(editBeginningBalance),
     });
     if (result.data) {
       setPaymentMethods((prev) => prev.map((m) => (m.id === editingMethod.id ? result.data! : m)));
@@ -488,17 +480,6 @@ export default function CategoriesPage() {
             <option value="cash">Cash</option>
             <option value="ewallet">E-Wallet</option>
           </select>
-          <div className="w-36">
-            <label className="text-muted-foreground mb-1 block text-xs">
-              {t(locale, 'beginningBalance')}
-            </label>
-            <Input
-              value={newMethodBeginningBalance}
-              onChange={(e) => setNewMethodBeginningBalance(e.target.value)}
-              placeholder="0"
-              className="font-mono"
-            />
-          </div>
           <Button onClick={handleAddMethod} className="gap-1" disabled={addingMethod}>
             {addingMethod ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -546,17 +527,6 @@ export default function CategoriesPage() {
                 <option value="cash">Cash</option>
                 <option value="ewallet">E-Wallet</option>
               </select>
-            </div>
-            <div>
-              <label className="text-muted-foreground mb-1 block text-xs">
-                {t(locale, 'beginningBalance')}
-              </label>
-              <Input
-                value={editBeginningBalance}
-                onChange={(e) => setEditBeginningBalance(e.target.value)}
-                placeholder="0"
-                className="font-mono"
-              />
             </div>
           </div>
           <DialogFooter>

@@ -24,7 +24,7 @@ export interface PaymentMethod {
   name: string;
   icon: string;
   type: 'bank' | 'cash' | 'ewallet';
-  beginningBalance: number;
+  // beginningBalance removed — balance is now computed from transaction chain
 }
 
 export interface Bill {
