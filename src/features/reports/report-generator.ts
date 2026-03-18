@@ -86,7 +86,7 @@ export function generateMonthlyReport(data: MonthlyReportData): void {
 
 export function generateAnnualReport(data: AnnualReportData): void {
   // Sheet 1: Monthly breakdown
-  const ws1: XLSX.WorkSheet = { '!ref': buildRange(25, 6) };
+  const ws1: XLSX.WorkSheet = { '!ref': buildRange(25, 7) };
   setString(ws1, 'B5', 'LAPORAN KEUANGAN TAHUNAN');
   setString(ws1, 'B7', formatDatetimeID(new Date()));
   setString(ws1, 'B9', 'Tahun:');
