@@ -252,6 +252,7 @@ export function createTransactionRepository() {
       search?: string;
       page?: number;
       pageSize?: number;
+      sortOrder?: 'asc' | 'desc';
     }): Promise<{ rows: Transaction[]; total: number; income: number; expense: number }> {
       const db = await getDb();
       const conditions: string[] = [];
@@ -287,6 +288,7 @@ export function createTransactionRepository() {
       }
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+      const dir = filters.sortOrder === 'asc' ? 'ASC' : 'DESC';
 
       // Get total count + aggregates in one query
       const countResult = await db.query<{
@@ -311,7 +313,7 @@ export function createTransactionRepository() {
       const offset = (page - 1) * pageSize;
 
       const dataResult = await db.query<TxRow>(
-        `SELECT * FROM transactions ${where} ORDER BY date DESC LIMIT ? OFFSET ?`,
+        `SELECT * FROM transactions ${where} ORDER BY date ${dir} LIMIT ? OFFSET ?`,
         [...params, pageSize, offset]
       );
 

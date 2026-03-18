@@ -181,3 +181,55 @@ describe('deleteTransaction', () => {
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 });
+
+describe('listTransactions — sortOrder', () => {
+  beforeEach(async () => {
+    await createTransaction({
+      date: '2026-01-10',
+      description: 'Oldest',
+      category: 'A',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 100000,
+      paymentMethod: 'BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-01-20',
+      description: 'Middle',
+      category: 'A',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 200000,
+      paymentMethod: 'BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-01-30',
+      description: 'Newest',
+      category: 'A',
+      categoryId: 'c1',
+      type: 'income',
+      amount: 300000,
+      paymentMethod: 'BCA',
+      notes: '',
+    });
+  });
+
+  it('defaults to newest first (desc)', async () => {
+    const r = await listTransactions({});
+    expect(r.data!.transactions[0].description).toBe('Newest');
+    expect(r.data!.transactions[2].description).toBe('Oldest');
+  });
+
+  it('sortOrder asc returns oldest first', async () => {
+    const r = await listTransactions({ sortOrder: 'asc' });
+    expect(r.data!.transactions[0].description).toBe('Oldest');
+    expect(r.data!.transactions[2].description).toBe('Newest');
+  });
+
+  it('sortOrder desc explicitly returns newest first', async () => {
+    const r = await listTransactions({ sortOrder: 'desc' });
+    expect(r.data!.transactions[0].description).toBe('Newest');
+  });
+});
