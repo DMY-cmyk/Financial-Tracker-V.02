@@ -135,6 +135,30 @@ describe('listTransactionsQuerySchema', () => {
   });
 });
 
+describe('listTransactionsQuerySchema — sortOrder', () => {
+  it('accepts asc', () => {
+    const r = listTransactionsQuerySchema.safeParse({ sortOrder: 'asc' });
+    expect(r.success).toBe(true);
+    expect(r.data?.sortOrder).toBe('asc');
+  });
+
+  it('accepts desc', () => {
+    const r = listTransactionsQuerySchema.safeParse({ sortOrder: 'desc' });
+    expect(r.success).toBe(true);
+  });
+
+  it('rejects invalid value', () => {
+    const r = listTransactionsQuerySchema.safeParse({ sortOrder: 'random' });
+    expect(r.success).toBe(false);
+  });
+
+  it('is optional — defaults to undefined when omitted', () => {
+    const r = listTransactionsQuerySchema.safeParse({});
+    expect(r.success).toBe(true);
+    expect(r.data?.sortOrder).toBeUndefined();
+  });
+});
+
 describe('dashboardSummaryQuerySchema', () => {
   it('accepts valid month and year', () => {
     const result = dashboardSummaryQuerySchema.safeParse({

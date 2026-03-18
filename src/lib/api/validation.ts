@@ -34,6 +34,7 @@ export const listTransactionsQuerySchema = z.object({
   search: z.string().optional(),
   page: z.number().int().min(1).optional().default(1),
   pageSize: z.number().int().min(1).max(100).optional().default(25),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
 export const dashboardSummaryQuerySchema = z.object({
