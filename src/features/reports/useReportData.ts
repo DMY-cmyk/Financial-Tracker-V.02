@@ -39,7 +39,7 @@ export function useReportData(): UseReportDataReturn {
         toast.error(t(locale, 'reportError'));
         return;
       }
-      generateMonthlyReport(result.data.report);
+      await generateMonthlyReport(result.data.report);
       toast.success(t(locale, 'reportDownloaded'));
     } catch {
       toast.error(t(locale, 'reportError'));
@@ -56,7 +56,7 @@ export function useReportData(): UseReportDataReturn {
         toast.error(t(locale, 'reportError'));
         return;
       }
-      generateAnnualReport(result.data);
+      await generateAnnualReport(result.data);
       toast.success(t(locale, 'reportDownloaded'));
     } catch {
       toast.error(t(locale, 'reportError'));
