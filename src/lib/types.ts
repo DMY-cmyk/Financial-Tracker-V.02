@@ -150,7 +150,6 @@ export type ExportScope = 'current' | 'all' | 'range';
 export interface ExportState {
   format: ExportFormat;
   scope: ExportScope;
-  includeSummary: boolean;
   groupByDate: boolean;
   startDate?: string;
   endDate?: string;
