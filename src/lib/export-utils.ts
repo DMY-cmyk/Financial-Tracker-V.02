@@ -1,10 +1,6 @@
 import type { ExportReportInput } from './types';
 import { type Transaction } from './types';
-import {
-  renderDonutChart,
-  renderCashflowChart,
-  renderExpensePieChart,
-} from './chart-renderer';
+import { renderDonutChart, renderCashflowChart, renderExpensePieChart } from './chart-renderer';
 import { formatDateID, formatDatetimeID } from './formatters';
 
 // --- CSV ---
@@ -264,7 +260,6 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
     totalIncome,
     totalExpense,
     totalAssets,
-    incomeCategories,
     expenseCategories,
     paymentMethodBalances,
     bills,
@@ -438,8 +433,8 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
   // ── Expense transactions ──
   const expenseTxs = transactions.filter((tx) => tx.type === 'expense');
   if (expenseTxs.length > 0) {
-    const afterIncome = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
-      ?.finalY ?? MARGIN;
+    const afterIncome =
+      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable?.finalY ?? MARGIN;
     let expenseStartY: number;
     if (afterIncome + 8 < 260) {
       expenseStartY = afterIncome + 8;
@@ -479,8 +474,8 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
 
   // ── Bills (monthly scope only — caller passes empty array for other scopes) ──
   if (bills.length > 0) {
-    const afterExpense = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable
-      ?.finalY ?? MARGIN;
+    const afterExpense =
+      (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable?.finalY ?? MARGIN;
     let billsStartY: number;
     if (afterExpense + 8 < 260) {
       billsStartY = afterExpense + 8;

@@ -1,11 +1,7 @@
 // src/features/reports/report-generator.ts
 // CLIENT-ONLY — called from useReportData.ts hooks only.
 import type { MonthlyReportData, AnnualReportData } from '@/lib/api/contracts';
-import {
-  renderDonutChart,
-  renderCashflowChart,
-  renderExpensePieChart,
-} from '@/lib/chart-renderer';
+import { renderDonutChart, renderCashflowChart, renderExpensePieChart } from '@/lib/chart-renderer';
 import { formatDateID, formatDatetimeID, MONTH_NAMES_ID } from '@/lib/formatters';
 
 const CURRENCY_FMT = '"Rp"#,##0';
