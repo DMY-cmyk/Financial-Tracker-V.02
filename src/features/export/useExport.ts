@@ -3,7 +3,12 @@ import { useStore } from '@/store';
 import { filterByMonth } from '@/lib/calculations';
 import { MONTH_NAMES } from '@/lib/constants';
 import { exportCSV, exportExcel, exportPDF } from '@/lib/export-utils';
-import { type ExportFormat, type ExportScope, type Transaction } from '@/lib/types';
+import {
+  type ExportFormat,
+  type ExportScope,
+  type Transaction,
+  type ExportReportInput,
+} from '@/lib/types';
 import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
 import type { ExportJobResponse } from '@/lib/api/contracts';
@@ -48,7 +53,6 @@ export function useExport(): UseExportReturn {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [options, setOptions] = useState<ExportOptionsState>({
-    includeSummary: false,
     groupByDate: false,
   });
   const [isExporting, setIsExporting] = useState(false);
@@ -105,26 +109,72 @@ export function useExport(): UseExportReturn {
     setExportError(null);
 
     try {
-      switch (format) {
-        case 'csv':
-          exportCSV(scopedTransactions, buildFilename('csv'));
-          break;
-        case 'xlsx':
-          await exportExcel(
-            scopedTransactions,
-            buildFilename('xlsx'),
-            scopeLabel,
-            options.includeSummary
-          );
-          break;
-        case 'pdf':
-          await exportPDF(
-            scopedTransactions,
-            buildFilename('pdf'),
-            scopeLabel,
-            options.includeSummary
-          );
-          break;
+      if (format === 'csv') {
+        exportCSV(scopedTransactions, buildFilename('csv'));
+      } else {
+        // Compute summaries from scoped transactions
+        const totalIncome = scopedTransactions
+          .filter((t) => t.type === 'income')
+          .reduce((s, t) => s + t.amount, 0);
+        const totalExpense = scopedTransactions
+          .filter((t) => t.type === 'expense')
+          .reduce((s, t) => s + t.amount, 0);
+
+        const incomeCategories = Object.entries(
+          scopedTransactions
+            .filter((t) => t.type === 'income')
+            .reduce<Record<string, number>>((acc, t) => {
+              acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+              return acc;
+            }, {})
+        )
+          .map(([category, total]) => ({ category, total }))
+          .sort((a, b) => b.total - a.total);
+
+        const expenseCategories = Object.entries(
+          scopedTransactions
+            .filter((t) => t.type === 'expense')
+            .reduce<Record<string, number>>((acc, t) => {
+              acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+              return acc;
+            }, {})
+        )
+          .map(([category, total]) => ({ category, total }))
+          .sort((a, b) => b.total - a.total);
+
+        const paymentMethodBalances = Object.entries(
+          scopedTransactions.reduce<Record<string, number>>((acc, t) => {
+            const delta = t.type === 'income' ? t.amount : -t.amount;
+            acc[t.paymentMethod] = (acc[t.paymentMethod] ?? 0) + delta;
+            return acc;
+          }, {})
+        ).map(([name, balance]) => ({ name, balance }));
+
+        // Fetch bills only for single-month scope
+        let bills: import('@/lib/types').Bill[] = [];
+        if (scope === 'current') {
+          const billsResult = await api.bills.list({ month, year });
+          bills = billsResult.data?.bills ?? [];
+        }
+
+        const input: ExportReportInput = {
+          scopeLabel,
+          transactions: scopedTransactions,
+          totalIncome,
+          totalExpense,
+          totalAssets: totalIncome - totalExpense,
+          incomeCategories,
+          expenseCategories,
+          paymentMethodBalances,
+          bills,
+          filename: buildFilename(format === 'xlsx' ? 'xlsx' : 'pdf'),
+        };
+
+        if (format === 'xlsx') {
+          await exportExcel(input);
+        } else {
+          await exportPDF(input);
+        }
       }
 
       // Persist export job record
@@ -150,8 +200,9 @@ export function useExport(): UseExportReturn {
     scopedTransactions,
     buildFilename,
     scopeLabel,
-    options.includeSummary,
     scope,
+    month,
+    year,
     startDate,
     endDate,
   ]);

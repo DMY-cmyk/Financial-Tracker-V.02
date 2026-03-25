@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { exportCSV, exportExcel } from '@/lib/export-utils';
+import type { ExportReportInput } from '@/lib/types';
 
 function TransactionsPageInner() {
   const locale = useLocale();
@@ -179,12 +180,52 @@ function TransactionsPageInner() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={async () => {
-                    await exportExcel(
+                    const txTotalIncome = transactions
+                      .filter((t) => t.type === 'income')
+                      .reduce((s, t) => s + t.amount, 0);
+                    const txTotalExpense = transactions
+                      .filter((t) => t.type === 'expense')
+                      .reduce((s, t) => s + t.amount, 0);
+                    const txIncomeCategories = Object.entries(
+                      transactions
+                        .filter((t) => t.type === 'income')
+                        .reduce<Record<string, number>>((acc, t) => {
+                          acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+                          return acc;
+                        }, {})
+                    )
+                      .map(([category, total]) => ({ category, total }))
+                      .sort((a, b) => b.total - a.total);
+                    const txExpenseCategories = Object.entries(
+                      transactions
+                        .filter((t) => t.type === 'expense')
+                        .reduce<Record<string, number>>((acc, t) => {
+                          acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+                          return acc;
+                        }, {})
+                    )
+                      .map(([category, total]) => ({ category, total }))
+                      .sort((a, b) => b.total - a.total);
+                    const txPaymentMethodBalances = Object.entries(
+                      transactions.reduce<Record<string, number>>((acc, t) => {
+                        const delta = t.type === 'income' ? t.amount : -t.amount;
+                        acc[t.paymentMethod] = (acc[t.paymentMethod] ?? 0) + delta;
+                        return acc;
+                      }, {})
+                    ).map(([name, balance]) => ({ name, balance }));
+                    const txInput: ExportReportInput = {
+                      scopeLabel: t(locale, 'transactions'),
                       transactions,
-                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`,
-                      t(locale, 'transactions'),
-                      false
-                    );
+                      totalIncome: txTotalIncome,
+                      totalExpense: txTotalExpense,
+                      totalAssets: txTotalIncome - txTotalExpense,
+                      incomeCategories: txIncomeCategories,
+                      expenseCategories: txExpenseCategories,
+                      paymentMethodBalances: txPaymentMethodBalances,
+                      bills: [],
+                      filename: `transactions-${year}-${String(month + 1).padStart(2, '0')}.xlsx`,
+                    };
+                    await exportExcel(txInput);
                     toast.success(t(locale, 'exportSuccess'));
                   }}
                 >

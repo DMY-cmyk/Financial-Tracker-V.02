@@ -42,3 +42,40 @@ export function formatCurrencyInput(value: number): string {
   if (value === 0) return '';
   return new Intl.NumberFormat('id-ID').format(value);
 }
+
+const MONTH_NAMES_ID_FMT = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
+];
+const DAY_NAMES_ID_FMT = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+/** Format an ISO date string as "1 Januari 2026" */
+export function formatDateID(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return `${day} ${MONTH_NAMES_ID_FMT[month - 1]} ${year}`;
+}
+
+/** Format a Date as "Senin, 1 Januari 2026, 14.30.00" */
+export function formatDatetimeID(date: Date): string {
+  const day = DAY_NAMES_ID_FMT[date.getDay()];
+  const d = date.getDate();
+  const m = MONTH_NAMES_ID_FMT[date.getMonth()];
+  const y = date.getFullYear();
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  return `${day}, ${d} ${m} ${y}, ${hh}.${mm}.${ss}`;
+}
+
+/** Month names in Indonesian (0-based: 0 = Januari) */
+export const MONTH_NAMES_ID = MONTH_NAMES_ID_FMT;
