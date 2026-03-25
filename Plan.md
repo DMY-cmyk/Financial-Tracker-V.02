@@ -26,12 +26,12 @@ data/workbook.json  -->  seed script  -->  Database (Neon Postgres / SQLite)
 | Database | Neon Postgres (production) / SQLite (dev/tests) |
 | State | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | Validation | Zod (API request/response validation) |
-| Testing | Vitest (243 tests: validation, all services, balance, reports) |
+| Testing | Vitest (241 tests: validation, all services, balance, reports) |
 | Charts | Recharts (area, pie, bars) |
 | Animations | Framer Motion (spring counters, stagger, transitions) |
 | Fonts | Plus Jakarta Sans + JetBrains Mono |
 | OCR | Tesseract.js (client-side, lazy-loaded) |
-| Export | CSV (native) + xlsx (SheetJS) + PDF (jspdf) |
+| Export | CSV (native) + ExcelJS (XLSX write, Chart.js charts) + xlsx (read-only, bulk-import) + PDF (jspdf) |
 | Hosting | Vercel (auto-deploys from GitHub, Neon Postgres via DATABASE_URL) |
 
 ## Status: ✅ DEPLOYED
@@ -556,7 +556,20 @@ Static-only GitHub Pages deployment no longer supported due to API routes.
 - [x] `/reports` page with monthly and annual XLSX download
 - [x] `GET /api/reports/monthly?month=N&year=YYYY` — monthly report data
 - [x] `GET /api/reports/annual?year=YYYY` — annual report data with YoY comparison
-- [x] XLSX generator (SheetJS) — monthly: Indonesian template format; annual: 2-sheet workbook
+- [x] XLSX generator (ExcelJS) — monthly: Indonesian template format; annual: 2-sheet workbook
+
+### Export Template Redesign
+
+- [x] Replaced SheetJS with **ExcelJS** for all XLSX writing (reports + export pages)
+- [x] Added **Chart.js** (`chart.js/auto`) for off-screen canvas chart rendering
+- [x] `src/lib/chart-renderer.ts` — `renderDonutChart`, `renderCashflowChart`, `renderExpensePieChart` (all return PNG base64)
+- [x] `ExportReportInput` interface in `src/lib/types.ts` — single typed input replacing old 4-argument export signatures
+- [x] XLSX template: Indonesian-style layout with positioned header, summary block, 3 embedded Chart.js charts
+- [x] Annual XLSX: two sheets — "Ringkasan Tahunan" (monthly breakdown) + "Detail Transaksi"
+- [x] PDF template: A4 portrait, 3 embedded chart images, bills checklist (current month only)
+- [x] `xlsx` package retained as explicit dependency for bulk-import XLSX reading
+- [x] `ExportOptions` simplified — removed `includeSummary` toggle (groupByDate only)
+- [x] `src/lib/formatters.ts` extended — `formatDateID`, `formatDatetimeID`, `MONTH_NAMES_ID`
 
 ### Load-More Transactions
 - [x] `useAllTransactions` with `useInfiniteQuery` (50/page, load-more button)
@@ -568,7 +581,7 @@ Static-only GitHub Pages deployment no longer supported due to API routes.
 - [x] `SidebarGroup` component — ChevronRight rotation, rail mode (icons only)
 
 ### Testing
-- [x] 243 tests total (up from 84) — balance service (15), PM service (16), report service (20), bulk-import (57)
+- [x] 241 tests total (up from 84) — balance service (15), PM service (16), report service (20), bulk-import (57)
 
 ## Reference Documents
 

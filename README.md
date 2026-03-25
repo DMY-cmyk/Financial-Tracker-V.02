@@ -51,14 +51,38 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] CSV and JSON export
 - [x] Scope: current month or all data
 - [x] Format selection (CSV, JSON, Excel, PDF)
-- [x] Export options (include summary, group by date)
+- [x] Export options (group by date)
 - [x] Transaction preview table
-- [x] Excel export via SheetJS (formatted workbook with summary sheet)
-- [x] PDF export via jsPDF (styled report with summary and table)
+- [x] Excel export via ExcelJS — Indonesian-style template with 3 embedded Chart.js charts (income/expense donut, cash flow bar, expense category pie)
+- [x] PDF export via jsPDF — A4 portrait report with same 3 embedded charts + bills checklist
 - [x] Toast feedback for export success/failure
 - [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
 - [x] Custom date range
 - [x] Downloadable monthly and annual XLSX reports (`/reports`)
+
+### Export Template Redesign
+
+The `/export` and `/reports` pages generate publication-quality XLSX and PDF documents with embedded charts, replacing the original flat SheetJS workbook.
+
+**XLSX output** (ExcelJS):
+- Indonesian-style template — positioned header, summary block, transaction table
+- 3 embedded charts: income/expense donut, monthly cash flow bar, expense category pie
+- Charts rendered off-screen via Chart.js canvas → PNG base64 → workbook cells
+- Annual report: two sheets — "Ringkasan Tahunan" + "Detail Transaksi"
+
+**PDF output** (jsPDF):
+- A4 portrait with the same 3 charts embedded as images
+- jsPDF-autotable for transaction rows with alternating row colors
+- Bills checklist section (current month scope only)
+
+**Architecture highlights:**
+- `src/lib/chart-renderer.ts` — three async functions returning PNG base64 (`renderDonutChart`, `renderCashflowChart`, `renderExpensePieChart`)
+- `ExportReportInput` typed interface — single input for both Excel and PDF generators
+- `xlsx` package kept for bulk-import reading; ExcelJS used exclusively for writing
+
+<!-- Screenshots: capture from /export and /reports after deployment -->
+![XLSX export template](docs/screenshots/export-xlsx-template.png)
+![PDF export template](docs/screenshots/export-pdf-template.png)
 
 ### Settings
 - [x] Theme: Light / Dark / System
@@ -104,11 +128,11 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 | **State** | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
-| **Testing** | Vitest (243 tests: validation, all services, balance, reports) |
-| **Charts** | Recharts (area, pie) |
+| **Testing** | Vitest (241 tests: validation, all services, balance, reports) |
+| **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
-| **Export** | SheetJS (xlsx), jsPDF (pdf), native CSV/JSON |
+| **Export** | ExcelJS (XLSX write) · Chart.js (embedded charts) · xlsx (bulk-import read) · jsPDF (PDF) · native CSV/JSON |
 | **Deploy** | Vercel (auto-deploys from GitHub) |
 | **Toasts** | Sonner |
 | **Fonts** | Plus Jakarta Sans + JetBrains Mono |
@@ -133,7 +157,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 243 tests)
+npm run test         # Run tests (Vitest, 241 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -224,4 +248,3 @@ Deploy via **Vercel** — connects to the GitHub repo and auto-deploys on push. 
 | Branch | Purpose |
 |--------|---------|
 | `main` | Production (deployed to Vercel) |
-| `redesign` | Active development |
