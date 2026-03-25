@@ -31,6 +31,11 @@ function formatDatetimeID(date: Date): string {
   return `${day}, ${d} ${m} ${y}, ${hh}.${mm}.${ss}`;
 }
 
+function formatDateID(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return `${day} ${MONTH_NAMES_ID[month - 1]} ${year}`;
+}
+
 function setCurrency(ws: XLSX.WorkSheet, ref: string, value: number): void {
   ws[ref] = { v: value, t: 'n', z: CURRENCY_FMT };
 }
@@ -51,6 +56,18 @@ export function generateMonthlyReport(data: MonthlyReportData): void {
   const maxCategoryRows = Math.max(data.incomeCategories.length, data.expenseCategories.length);
   const maxRow = Math.max(50, 18 + maxCategoryRows + 2); // at least 50, expand for large datasets
   const ws: XLSX.WorkSheet = { '!ref': buildRange(maxRow, 7) };
+
+  ws['!cols'] = [
+    { wch: 3 }, // A – spacer
+    { wch: 28 }, // B – labels / income category names
+    { wch: 18 }, // C – income amounts
+    { wch: 28 }, // D – expense category names
+    { wch: 18 }, // E – expense amounts
+    { wch: 3 }, // F – spacer
+    { wch: 22 }, // G – total labels
+    { wch: 18 }, // H – total amounts
+  ];
+  ws['!merges'] = [{ s: { r: 4, c: 1 }, e: { r: 4, c: 7 } }]; // B5:H5 – title row
 
   // Header section
   setString(ws, 'B5', 'LAPORAN KEUANGAN BULANAN');
@@ -92,6 +109,18 @@ export function generateMonthlyReport(data: MonthlyReportData): void {
 export function generateAnnualReport(data: AnnualReportData): void {
   // Sheet 1: Monthly breakdown
   const ws1: XLSX.WorkSheet = { '!ref': buildRange(30, 7) };
+
+  ws1['!cols'] = [
+    { wch: 3 }, // A – spacer
+    { wch: 15 }, // B – month names
+    { wch: 18 }, // C – Pemasukan
+    { wch: 18 }, // D – Pengeluaran
+    { wch: 18 }, // E – Saldo
+    { wch: 3 }, // F – spacer
+    { wch: 22 }, // G – total labels
+    { wch: 18 }, // H – total amounts
+  ];
+  ws1['!merges'] = [{ s: { r: 4, c: 1 }, e: { r: 4, c: 7 } }]; // B5:H5 – title row
   setString(ws1, 'B5', 'LAPORAN KEUANGAN TAHUNAN');
   setString(ws1, 'B7', formatDatetimeID(new Date()));
   setString(ws1, 'B9', 'Tahun:');
@@ -119,7 +148,7 @@ export function generateAnnualReport(data: AnnualReportData): void {
   // Sheet 2: Transaction detail
   const ws2 = XLSX.utils.json_to_sheet(
     data.transactions.map((tx) => ({
-      Tanggal: tx.date,
+      Tanggal: formatDateID(tx.date),
       Deskripsi: tx.description,
       Kategori: tx.category,
       Tipe: tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
@@ -127,6 +156,22 @@ export function generateAnnualReport(data: AnnualReportData): void {
       'Metode Pembayaran': tx.paymentMethod,
     }))
   );
+
+  // Apply currency format to Jumlah column (index 4)
+  const ws2Range = XLSX.utils.decode_range(ws2['!ref']!);
+  for (let r = ws2Range.s.r + 1; r <= ws2Range.e.r; r++) {
+    const ref = XLSX.utils.encode_cell({ r, c: 4 });
+    if (ws2[ref] && ws2[ref].t === 'n') ws2[ref].z = CURRENCY_FMT;
+  }
+
+  ws2['!cols'] = [
+    { wch: 18 }, // Tanggal
+    { wch: 35 }, // Deskripsi
+    { wch: 20 }, // Kategori
+    { wch: 14 }, // Tipe
+    { wch: 18 }, // Jumlah
+    { wch: 22 }, // Metode Pembayaran
+  ];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws1, 'Ringkasan Tahunan');

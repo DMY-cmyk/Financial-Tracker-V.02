@@ -26,7 +26,7 @@ export async function exportExcel(
 
   // Transaction data
   const txRows = transactions.map((tx) => ({
-    Date: tx.date,
+    Date: tx.date.split('-').reverse().join('/'), // DD/MM/YYYY
     Description: tx.description,
     Category: tx.category,
     Type: tx.type,
@@ -36,6 +36,13 @@ export async function exportExcel(
   }));
 
   const ws = XLSX.utils.json_to_sheet(txRows);
+
+  // Apply currency format to Amount column (index 4)
+  const wsRange = XLSX.utils.decode_range(ws['!ref']!);
+  for (let r = wsRange.s.r + 1; r <= wsRange.e.r; r++) {
+    const ref = XLSX.utils.encode_cell({ r, c: 4 });
+    if (ws[ref] && ws[ref].t === 'n') ws[ref].z = '"Rp"#,##0';
+  }
 
   // Set column widths
   ws['!cols'] = [
