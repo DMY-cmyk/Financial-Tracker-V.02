@@ -155,6 +155,36 @@ export interface ExportState {
   endDate?: string;
 }
 
+export interface ExportReportInput {
+  /** Human-readable scope label, e.g. "Januari 2026" or "Jan 2025 – Mar 2026" */
+  scopeLabel: string;
+  /** All transactions in scope */
+  transactions: Transaction[];
+  /** Sum of all income transactions */
+  totalIncome: number;
+  /** Sum of all expense transactions */
+  totalExpense: number;
+  /** totalIncome − totalExpense */
+  totalAssets: number;
+  /** Grouped income totals by category string */
+  incomeCategories: { category: string; total: number }[];
+  /** Grouped expense totals by category string (used for Rekap Pengeluaran + pie chart) */
+  expenseCategories: { category: string; total: number }[];
+  /**
+   * Net balance per payment method over the selected scope.
+   * Computed as: Σ income txs − Σ expense txs, grouped by tx.paymentMethod.
+   * Section header reads "Saldo (periode ini)" to indicate this is not an all-time balance.
+   */
+  paymentMethodBalances: { name: string; balance: number }[];
+  /**
+   * Bills from REST API. Only populated for single-month (current) scope.
+   * Empty array for annual or multi-month range exports.
+   */
+  bills: Bill[];
+  /** Download filename including extension, e.g. "transactions-Januari-2026.xlsx" */
+  filename: string;
+}
+
 export interface LanguageOption {
   code: 'en' | 'id';
   label: string;
