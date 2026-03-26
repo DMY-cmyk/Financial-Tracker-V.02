@@ -1,7 +1,7 @@
 import type { ExportReportInput } from './types';
 import { type Transaction } from './types';
 import { renderDonutChart, renderCashflowChart, renderExpensePieChart } from './chart-renderer';
-import { formatDateID, formatDatetimeID } from './formatters';
+import { formatDateID } from './formatters';
 import { buildXlsxWorkbook } from './xlsx-template-builder';
 import { injectCharts } from './chart-xml-injector';
 
