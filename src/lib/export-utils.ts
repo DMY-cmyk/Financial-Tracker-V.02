@@ -361,8 +361,7 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
       bodyStyles: {},
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 0) {
-          data.cell.styles.textColor =
-            data.cell.raw === 'Lunas' ? [16, 185, 129] : [239, 68, 68];
+          data.cell.styles.textColor = data.cell.raw === 'Lunas' ? [16, 185, 129] : [239, 68, 68];
         }
       },
       columnStyles: { 0: { cellWidth: 18, halign: 'center' }, 2: { halign: 'right' } },

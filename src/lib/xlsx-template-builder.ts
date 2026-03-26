@@ -60,18 +60,18 @@ export async function buildXlsxWorkbook(input: XlsxTemplateInput): Promise<Array
   // Old layout had spacers at K and R; new layout uses K for Metode (income)
   // and R for Catatan (expense), eliminating both spacers to fit Deskripsi columns.
   ws.columns = [
-    { width: 3 },  // A  spacer
+    { width: 3 }, // A  spacer
     { width: 28 }, // B  left panel: category names (income)
     { width: 14 }, // C  left panel: category totals (income)
     { width: 28 }, // D  left panel: category names (expense) — CHART CONTRACT D18:D{n}
     { width: 14 }, // E  left panel: category totals (expense) — CHART CONTRACT E18:E{n}
-    { width: 6 },  // F  No (income tx)
+    { width: 6 }, // F  No (income tx)
     { width: 14 }, // G  Tanggal (income tx)
     { width: 18 }, // H  Jumlah (income tx) — CHART CONTRACT H10=income, H12=expense
     { width: 22 }, // I  Kategori (income tx)
     { width: 22 }, // J  Deskripsi (income tx) — NEW
     { width: 18 }, // K  Metode (income tx) — was spacer col, now content
-    { width: 6 },  // L  No (expense tx)
+    { width: 6 }, // L  No (expense tx)
     { width: 14 }, // M  Tanggal (expense tx)
     { width: 18 }, // N  Jumlah (expense tx)
     { width: 22 }, // O  Kategori (expense tx)
@@ -153,7 +153,7 @@ export async function buildXlsxWorkbook(input: XlsxTemplateInput): Promise<Array
     ['H17', 'Jumlah'],
     ['I17', 'Kategori'],
     ['J17', 'Deskripsi'], // NEW — was "Method" / missing
-    ['K17', 'Metode'],    // was spacer column
+    ['K17', 'Metode'], // was spacer column
   ] as [string, string][]) {
     ws.getCell(cell).value = label;
     ws.getCell(cell).font = colHdrFont;
@@ -165,8 +165,8 @@ export async function buildXlsxWorkbook(input: XlsxTemplateInput): Promise<Array
     ['N17', 'Jumlah'],
     ['O17', 'Kategori'],
     ['P17', 'Deskripsi'], // NEW — was "Akun"
-    ['Q17', 'Akun'],      // shifted right
-    ['R17', 'Catatan'],   // was spacer column
+    ['Q17', 'Akun'], // shifted right
+    ['R17', 'Catatan'], // was spacer column
   ] as [string, string][]) {
     ws.getCell(cell).value = label;
     ws.getCell(cell).font = colHdrFont;
@@ -189,7 +189,7 @@ export async function buildXlsxWorkbook(input: XlsxTemplateInput): Promise<Array
   input.expenseCategories.forEach((cat, i) => {
     const r = 18 + i;
     ws.getCell(`D${r}`).value = cat.category; // CHART CONTRACT
-    ws.getCell(`E${r}`).value = cat.total;    // CHART CONTRACT
+    ws.getCell(`E${r}`).value = cat.total; // CHART CONTRACT
     ws.getCell(`E${r}`).numFmt = CURRENCY_FMT;
   });
 
@@ -213,9 +213,9 @@ export async function buildXlsxWorkbook(input: XlsxTemplateInput): Promise<Array
     ws.getCell(`N${r}`).numFmt = CURRENCY_FMT;
     ws.getCell(`N${r}`).font = { color: { argb: 'FFEF4444' } };
     ws.getCell(`O${r}`).value = tx.category;
-    ws.getCell(`P${r}`).value = tx.description;   // NEW Deskripsi
+    ws.getCell(`P${r}`).value = tx.description; // NEW Deskripsi
     ws.getCell(`Q${r}`).value = tx.paymentMethod; // Akun (shifted from P)
-    ws.getCell(`R${r}`).value = tx.notes || '';   // Catatan (shifted from Q)
+    ws.getCell(`R${r}`).value = tx.notes || ''; // Catatan (shifted from Q)
   });
 
   // Rekap Pengeluaran (right side panel)

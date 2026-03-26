@@ -12,8 +12,15 @@ export interface ChartInjectorInput {
 
 // OOXML color palette for pie/donut slices (fully opaque ARGB)
 const PIE_COLORS = [
-  'FF2563EB', 'FF10B981', 'FFF59E0B', 'FFEF4444',
-  'FF8B5CF6', 'FF06B6D4', 'FFF97316', 'FF84CC16', 'FFEC4899',
+  'FF2563EB',
+  'FF10B981',
+  'FFF59E0B',
+  'FFEF4444',
+  'FF8B5CF6',
+  'FF06B6D4',
+  'FFF97316',
+  'FF84CC16',
+  'FFEC4899',
 ];
 
 function formatDateShort(d: Date): string {
@@ -87,8 +94,9 @@ function cashflowBarChartXml(): string {
 }
 
 function expensePieChartXml(lastRow: number): string {
-  const dPts = PIE_COLORS.map((clr, i) =>
-    `<c:dPt><c:idx val="${i}"/><c:spPr><a:solidFill><a:srgbClr val="${clr.slice(2)}"/></a:solidFill></c:spPr></c:dPt>`
+  const dPts = PIE_COLORS.map(
+    (clr, i) =>
+      `<c:dPt><c:idx val="${i}"/><c:spPr><a:solidFill><a:srgbClr val="${clr.slice(2)}"/></a:solidFill></c:spPr></c:dPt>`
   ).join('\n        ');
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
@@ -153,7 +161,9 @@ function drawingXml(includePie: boolean): string {
       <c:chart r:id="rId2"/>
     </a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/>
   </xdr:twoCellAnchor>
-  ${includePie ? `<xdr:twoCellAnchor>
+  ${
+    includePie
+      ? `<xdr:twoCellAnchor>
     <xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>22</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
     <xdr:to><xdr:col>19</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>39</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
     <xdr:graphicFrame macro=""><xdr:nvGraphicFramePr>
@@ -163,7 +173,9 @@ function drawingXml(includePie: boolean): string {
     <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
       <c:chart r:id="rId3"/>
     </a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/>
-  </xdr:twoCellAnchor>` : ''}
+  </xdr:twoCellAnchor>`
+      : ''
+  }
 </xdr:wsDr>`;
 }
 
@@ -271,10 +283,7 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   );
 
   // ── Step 5: Add Grafik worksheet and its rels ─────────────────────────────
-  zip.file(
-    `xl/worksheets/sheet${N}.xml`,
-    grafikSheetXml(input.scopeLabel, input.generatedAt)
-  );
+  zip.file(`xl/worksheets/sheet${N}.xml`, grafikSheetXml(input.scopeLabel, input.generatedAt));
   zip.file(
     `xl/worksheets/_rels/sheet${N}.xml.rels`,
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -303,10 +312,7 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   // ── Step 7: Prepend Grafik as first sheet in workbook.xml ─────────────────
   const grafikSheetEl = `<sheet name="Grafik" sheetId="${newSheetId}" r:id="${newRid}"/>`;
   // Insert Grafik before the first existing <sheet element inside <sheets>
-  zip.file(
-    'xl/workbook.xml',
-    wbXml.replace(/<sheets>/, `<sheets>${grafikSheetEl}`)
-  );
+  zip.file('xl/workbook.xml', wbXml.replace(/<sheets>/, `<sheets>${grafikSheetEl}`));
 
   // ── Step 8: Add Grafik relationship in workbook.xml.rels ──────────────────
   const wbRelsFile = zip.file('xl/_rels/workbook.xml.rels');
@@ -314,7 +320,10 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
     throw new Error('injectCharts: xl/_rels/workbook.xml.rels not found in XLSX buffer');
   const wbRelsXml = await wbRelsFile.async('string');
   const grafikRel = `<Relationship Id="${newRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${N}.xml"/>`;
-  zip.file('xl/_rels/workbook.xml.rels', wbRelsXml.replace('</Relationships>', `${grafikRel}\n</Relationships>`));
+  zip.file(
+    'xl/_rels/workbook.xml.rels',
+    wbRelsXml.replace('</Relationships>', `${grafikRel}\n</Relationships>`)
+  );
 
   // ── Step 9: Generate and return new buffer ────────────────────────────────
   return zip.generateAsync({ type: 'arraybuffer' });
