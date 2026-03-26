@@ -172,7 +172,7 @@ function TransactionsPageInner() {
                   onClick={() => {
                     exportCSV(
                       transactions,
-                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`,
+                      `transactions-${year}-${String(month + 1).padStart(2, '0')}.csv`,
                       `${MONTH_NAMES[month]} ${year}`,
                       income,
                       expense,
