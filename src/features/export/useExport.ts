@@ -109,17 +109,25 @@ export function useExport(): UseExportReturn {
     setExportError(null);
 
     try {
-      if (format === 'csv') {
-        exportCSV(scopedTransactions, buildFilename('csv'));
-      } else {
-        // Compute summaries from scoped transactions
-        const totalIncome = scopedTransactions
-          .filter((t) => t.type === 'income')
-          .reduce((s, t) => s + t.amount, 0);
-        const totalExpense = scopedTransactions
-          .filter((t) => t.type === 'expense')
-          .reduce((s, t) => s + t.amount, 0);
+      // Compute summaries from scoped transactions (used by CSV and rich formats)
+      const totalIncome = scopedTransactions
+        .filter((t) => t.type === 'income')
+        .reduce((s, t) => s + t.amount, 0);
+      const totalExpense = scopedTransactions
+        .filter((t) => t.type === 'expense')
+        .reduce((s, t) => s + t.amount, 0);
+      const totalAssets = totalIncome - totalExpense;
 
+      if (format === 'csv') {
+        exportCSV(
+          scopedTransactions,
+          buildFilename('csv'),
+          scopeLabel,
+          totalIncome,
+          totalExpense,
+          totalAssets
+        );
+      } else {
         const incomeCategories = Object.entries(
           scopedTransactions
             .filter((t) => t.type === 'income')
@@ -162,7 +170,7 @@ export function useExport(): UseExportReturn {
           transactions: scopedTransactions,
           totalIncome,
           totalExpense,
-          totalAssets: totalIncome - totalExpense,
+          totalAssets,
           incomeCategories,
           expenseCategories,
           paymentMethodBalances,
