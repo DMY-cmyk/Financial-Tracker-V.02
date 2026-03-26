@@ -2,6 +2,8 @@ import type { ExportReportInput } from './types';
 import { type Transaction } from './types';
 import { renderDonutChart, renderCashflowChart, renderExpensePieChart } from './chart-renderer';
 import { formatDateID, formatDatetimeID } from './formatters';
+import { buildXlsxWorkbook } from './xlsx-template-builder';
+import { injectCharts } from './chart-xml-injector';
 
 // --- CSV ---
 
@@ -15,7 +17,7 @@ export function exportCSV(transactions: Transaction[], filename: string): void {
   downloadBlob(content, filename, 'text/csv;charset=utf-8');
 }
 
-// --- Excel (ExcelJS template) ---
+// --- Excel (xlsx-template-builder + chart-xml-injector) ---
 
 export async function exportExcel(input: ExportReportInput): Promise<void> {
   const {
@@ -31,225 +33,38 @@ export async function exportExcel(input: ExportReportInput): Promise<void> {
     filename,
   } = input;
 
-  const [donutPng, cashflowPng, piePng] = await Promise.all([
-    renderDonutChart(totalIncome, totalExpense).catch(() => null),
-    renderCashflowChart(totalIncome, totalExpense, totalAssets).catch(() => null),
-    renderExpensePieChart(expenseCategories).catch(() => null),
-  ]);
-
-  const ExcelJS = await import('exceljs');
-  const workbook = new ExcelJS.Workbook();
-  const ws = workbook.addWorksheet('Report');
-
-  ws.columns = [
-    { width: 3 }, // A
-    { width: 28 }, // B
-    { width: 14 }, // C
-    { width: 28 }, // D
-    { width: 14 }, // E
-    { width: 6 }, // F
-    { width: 14 }, // G
-    { width: 18 }, // H
-    { width: 22 }, // I
-    { width: 18 }, // J
-    { width: 3 }, // K
-    { width: 6 }, // L
-    { width: 14 }, // M
-    { width: 18 }, // N
-    { width: 22 }, // O
-    { width: 18 }, // P
-    { width: 25 }, // Q
-    { width: 3 }, // R
-    { width: 25 }, // S
-    { width: 18 }, // T
-  ];
-
-  const headerFill = {
-    type: 'pattern' as const,
-    pattern: 'solid' as const,
-    fgColor: { argb: 'FF2563EB' },
-  };
-  const headerFont = { bold: true, color: { argb: 'FFFFFFFF' } };
-  const CURRENCY_FMT = '"Rp"#,##0';
-
-  // Header
-  ws.mergeCells('B4:E4');
-  ws.getCell('B4').value = 'Laporan Keuangan';
-  ws.getCell('B4').font = { bold: true, size: 16 };
-
-  ws.getCell('B7').value = formatDatetimeID(new Date());
-  ws.getCell('B7').font = { italic: true, size: 9, color: { argb: 'FF666666' } };
-
-  ws.mergeCells('B9:E9');
-  ws.getCell('B9').value = scopeLabel;
-  ws.getCell('B9').font = { bold: true, size: 12 };
-
-  ws.getCell('G10').value = 'Total Pemasukan';
-  ws.getCell('G10').font = { bold: true };
-  ws.getCell('H10').value = totalIncome;
-  ws.getCell('H10').numFmt = CURRENCY_FMT;
-  ws.getCell('H10').font = { color: { argb: 'FF10B981' }, bold: true };
-
-  ws.mergeCells('B12:E12');
-  ws.getCell('B12').value = 'T O T A L   A S S E T S';
-  ws.getCell('B12').font = { bold: true };
-  ws.getCell('G12').value = 'Total Pengeluaran';
-  ws.getCell('G12').font = { bold: true };
-  ws.getCell('H12').value = totalExpense;
-  ws.getCell('H12').numFmt = CURRENCY_FMT;
-  ws.getCell('H12').font = { color: { argb: 'FFEF4444' }, bold: true };
-
-  ws.getCell('B13').value = totalAssets;
-  ws.getCell('B13').numFmt = CURRENCY_FMT;
-  ws.getCell('B13').font = { bold: true, size: 13 };
-
-  // Section headers
-  ws.mergeCells('B16:E16');
-  ws.getCell('B16').value = 'KATEGORI';
-  ws.getCell('B16').fill = headerFill;
-  ws.getCell('B16').font = headerFont;
-
-  ws.mergeCells('F16:J16');
-  ws.getCell('F16').value = 'P E M A S U K A N';
-  ws.getCell('F16').fill = headerFill;
-  ws.getCell('F16').font = headerFont;
-
-  ws.mergeCells('L16:Q16');
-  ws.getCell('L16').value = 'P E N G E L U A R A N';
-  ws.getCell('L16').fill = headerFill;
-  ws.getCell('L16').font = headerFont;
-
-  ws.mergeCells('S16:T16');
-  ws.getCell('S16').value = 'Rekap Pengeluaran';
-  ws.getCell('S16').fill = headerFill;
-  ws.getCell('S16').font = headerFont;
-
-  // Column headers row 17
-  const colHdrFont = { bold: true };
-  ws.getCell('B17').value = 'Pemasukan';
-  ws.getCell('B17').font = colHdrFont;
-  ws.getCell('D17').value = 'Pengeluaran';
-  ws.getCell('D17').font = colHdrFont;
-  for (const [cell, label] of [
-    ['F17', 'No'],
-    ['G17', 'Tanggal'],
-    ['H17', 'Jumlah'],
-    ['I17', 'Kategori'],
-    ['J17', 'Method'],
-  ] as [string, string][]) {
-    ws.getCell(cell).value = label;
-    ws.getCell(cell).font = colHdrFont;
-  }
-  for (const [cell, label] of [
-    ['L17', 'No'],
-    ['M17', 'Tanggal'],
-    ['N17', 'Jumlah'],
-    ['O17', 'Kategori'],
-    ['P17', 'Akun'],
-    ['Q17', 'Catatan'],
-  ] as [string, string][]) {
-    ws.getCell(cell).value = label;
-    ws.getCell(cell).font = colHdrFont;
-  }
-  ws.getCell('S17').value = 'Kategori';
-  ws.getCell('S17').font = colHdrFont;
-  ws.getCell('T17').value = 'Total';
-  ws.getCell('T17').font = colHdrFont;
-
-  // Data
-  incomeCategories.forEach((cat, i) => {
-    ws.getCell(`B${18 + i}`).value = cat.category;
-    ws.getCell(`C${18 + i}`).value = cat.total;
-    ws.getCell(`C${18 + i}`).numFmt = CURRENCY_FMT;
-  });
-  expenseCategories.forEach((cat, i) => {
-    ws.getCell(`D${18 + i}`).value = cat.category;
-    ws.getCell(`E${18 + i}`).value = cat.total;
-    ws.getCell(`E${18 + i}`).numFmt = CURRENCY_FMT;
-  });
-
   const incomeTxs = transactions.filter((tx) => tx.type === 'income');
   const expenseTxs = transactions.filter((tx) => tx.type === 'expense');
 
-  incomeTxs.forEach((tx, i) => {
-    const r = 18 + i;
-    ws.getCell(`F${r}`).value = i + 1;
-    ws.getCell(`G${r}`).value = formatDateID(tx.date);
-    ws.getCell(`H${r}`).value = tx.amount;
-    ws.getCell(`H${r}`).numFmt = CURRENCY_FMT;
-    ws.getCell(`I${r}`).value = tx.category;
-    ws.getCell(`J${r}`).value = tx.paymentMethod;
-  });
-  expenseTxs.forEach((tx, i) => {
-    const r = 18 + i;
-    ws.getCell(`L${r}`).value = i + 1;
-    ws.getCell(`M${r}`).value = formatDateID(tx.date);
-    ws.getCell(`N${r}`).value = tx.amount;
-    ws.getCell(`N${r}`).numFmt = CURRENCY_FMT;
-    ws.getCell(`O${r}`).value = tx.category;
-    ws.getCell(`P${r}`).value = tx.paymentMethod;
-    ws.getCell(`Q${r}`).value = tx.notes || '';
-  });
-  expenseCategories.forEach((cat, i) => {
-    ws.getCell(`S${18 + i}`).value = cat.category;
-    ws.getCell(`T${18 + i}`).value = cat.total;
-    ws.getCell(`T${18 + i}`).numFmt = CURRENCY_FMT;
+  const buffer = await buildXlsxWorkbook({
+    title: scopeLabel,
+    scopeLabel,
+    generatedAt: new Date(),
+    totalIncome,
+    totalExpense,
+    totalAssets,
+    incomeCategories,
+    expenseCategories,
+    incomeTxs,
+    expenseTxs,
+    paymentMethodBalances,
+    bills,
+    filename,
   });
 
-  // Payment Methods
-  const catRows = Math.max(incomeCategories.length, expenseCategories.length);
-  const pmRow = Math.max(32, 20 + catRows);
-  ws.getCell(`B${pmRow}`).value = 'Saldo (periode ini)';
-  ws.getCell(`B${pmRow}`).font = { bold: true };
-  ws.getCell(`D${pmRow}`).value = 'Jumlah';
-  ws.getCell(`D${pmRow}`).font = { bold: true };
-  paymentMethodBalances.forEach((pm, i) => {
-    const r = pmRow + 2 + i;
-    ws.getCell(`B${r}`).value = pm.name;
-    ws.getCell(`D${r}`).value = pm.balance;
-    ws.getCell(`D${r}`).numFmt = CURRENCY_FMT;
+  const finalBuffer = await injectCharts({
+    buffer,
+    scopeLabel,
+    generatedAt: new Date(),
+    expCatCount: expenseCategories.length,
   });
 
-  // Bills (only for single-month scope — caller passes empty array otherwise)
-  if (bills.length > 0) {
-    const billsRow = pmRow + 4 + paymentMethodBalances.length;
-    ws.mergeCells(`B${billsRow}:E${billsRow}`);
-    ws.getCell(`B${billsRow}`).value = 'C A T A T A N   T A G I H A N';
-    ws.getCell(`B${billsRow}`).fill = headerFill;
-    ws.getCell(`B${billsRow}`).font = headerFont;
-    const billsHdrRow = billsRow + 2;
-    ws.getCell(`C${billsHdrRow}`).value = 'Tagihan';
-    ws.getCell(`C${billsHdrRow}`).font = { bold: true };
-    ws.getCell(`D${billsHdrRow}`).value = 'Jumlah';
-    ws.getCell(`D${billsHdrRow}`).font = { bold: true };
-    bills.forEach((bill, i) => {
-      const r = billsHdrRow + 1 + i;
-      ws.getCell(`B${r}`).value = bill.isPaid;
-      ws.getCell(`C${r}`).value = bill.name;
-      ws.getCell(`D${r}`).value = bill.amount;
-      ws.getCell(`D${r}`).numFmt = CURRENCY_FMT;
-    });
-  }
-
-  // Chart images
-  if (donutPng) {
-    const id = workbook.addImage({ base64: donutPng.split(',')[1], extension: 'png' });
-    ws.addImage(id, { tl: { col: 20, row: 1 }, ext: { width: 220, height: 220 } });
-  }
-  if (cashflowPng) {
-    const id = workbook.addImage({ base64: cashflowPng.split(',')[1], extension: 'png' });
-    ws.addImage(id, { tl: { col: 20, row: 9 }, ext: { width: 350, height: 140 } });
-  }
-  if (piePng) {
-    const id = workbook.addImage({ base64: piePng.split(',')[1], extension: 'png' });
-    ws.addImage(id, { tl: { col: 20, row: 16 }, ext: { width: 300, height: 215 } });
-  }
-
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer as ArrayBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-  downloadBlob(blob, filename);
+  downloadBlob(
+    new Blob([finalBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+    filename
+  );
 }
 
 // --- PDF (jsPDF + autotable — template layout) ---
