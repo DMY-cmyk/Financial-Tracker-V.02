@@ -571,6 +571,16 @@ Static-only GitHub Pages deployment no longer supported due to API routes.
 - [x] `ExportOptions` simplified — removed `includeSummary` toggle (groupByDate only)
 - [x] `src/lib/formatters.ts` extended — `formatDateID`, `formatDatetimeID`, `MONTH_NAMES_ID`
 
+### Export Template Redesign v2
+
+- [x] Added `jszip@^3.10.1` as explicit dependency (already transitive via ExcelJS)
+- [x] Created `src/lib/xlsx-template-builder.ts` — shared Laporan sheet builder: 20-col A–T layout, Indonesian label fixes, Deskripsi column, "✓ Lunas"/"○ Belum" bill status, optional `ringkasanSheet` field for annual reports
+- [x] Created `src/lib/chart-xml-injector.ts` — JSZip OpenXML injection: donut chart (income/expense), cashflow bar chart, expense pie chart; Grafik first-tab worksheet with KPI header + helper data rows (44–46); null guards on required ZIP entries; `hasPieData` guard for zero expense categories
+- [x] Rewired `exportExcel` in `export-utils.ts` to delegate to `buildXlsxWorkbook` + `injectCharts`
+- [x] Rewrote `exportCSV` in `export-utils.ts`: UTF-8 BOM, scope+totals comment rows, Indonesian headers/type values, `formatDateID` dates, formatted amounts; updated call sites in `useExport.ts` and `transactions/page.tsx`
+- [x] Rewrote `exportPDF` in `export-utils.ts`: dark gradient header (20-strip `#1E3A8A→#3B82F6`), full 45mm header with 3 KPI boxes (page 1), 12mm condensed header (page 2+), two-pass page numbers, income category breakdown side-by-side, Deskripsi column, bill status "Lunas"/"Belum" plain text
+- [x] Rewrote `generateMonthlyReport` and `generateAnnualReport` in `report-generator.ts` to delegate to shared builder+injector — removes ~400 lines of duplicated layout code
+
 ### Load-More Transactions
 - [x] `useAllTransactions` with `useInfiniteQuery` (50/page, load-more button)
 - [x] `GET /api/transactions?allMonths=true&yearOnly=true` query params

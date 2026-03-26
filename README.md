@@ -53,8 +53,8 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Format selection (CSV, JSON, Excel, PDF)
 - [x] Export options (group by date)
 - [x] Transaction preview table
-- [x] Excel export via ExcelJS — Indonesian-style template with 3 embedded Chart.js charts (income/expense donut, cash flow bar, expense category pie)
-- [x] PDF export via jsPDF — A4 portrait report with same 3 embedded charts + bills checklist
+- [x] Excel export via ExcelJS + JSZip — Indonesian-style template with 3 **native live** Excel charts (income/expense donut, cash flow bar, expense category pie); "Grafik" tab opens first
+- [x] PDF export via jsPDF — A4 portrait with dark gradient header, KPI boxes, page numbers, income/expense breakdown, Deskripsi column
 - [x] Toast feedback for export success/failure
 - [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
 - [x] Custom date range
@@ -83,6 +83,33 @@ The `/export` and `/reports` pages generate publication-quality XLSX and PDF doc
 <!-- Screenshots: capture from /export and /reports after deployment -->
 ![XLSX export template](docs/screenshots/export-xlsx-template.png)
 ![PDF export template](docs/screenshots/export-pdf-template.png)
+
+### Export Template Redesign v2
+
+Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing all static PNG embeds.
+
+**XLSX output** (ExcelJS + JSZip OpenXML):
+- Native live Excel charts: donut (income vs expense), cashflow bar, expense category pie — injected via JSZip + DrawingML; charts update when data changes, no static images
+- "Grafik" tab opens first when the file loads — 2×1 chart grid + KPI header rows with formulas referencing the Laporan data sheet
+- Shared layout builder (`xlsx-template-builder.ts`) — single source of truth for both `/export` and `/reports`; eliminates ~400 lines of duplicated layout code
+- Fixes: "Laporan Bulanan"/"Laporan Tahunan" titles, "Metode" column header, "Saldo (periode ini)" section label, "✓ Lunas"/"○ Belum" bill status text, new Deskripsi column in transaction tables
+
+**PDF output** (jsPDF):
+- Dark blue gradient header (20-strip simulation `#1E3A8A → #3B82F6`): 45mm full header with 3 KPI boxes on page 1; 12mm condensed header on page 2+
+- Two-pass page numbering: "Halaman X / N" footer on every page
+- "Rekap Pemasukan" income category table rendered side-by-side with "Rekap Pengeluaran"
+- Deskripsi column added to both income and expense transaction tables
+- Bill status as "Lunas" (green) / "Belum" (red) plain text (replaces broken Unicode checkboxes)
+
+**CSV output:**
+- UTF-8 BOM prepended — Indonesian characters render correctly in Excel on Windows
+- Two quoted comment header rows: scope+date and totals summary
+- Indonesian column names: Tanggal, Deskripsi, Kategori, Tipe, Jumlah, Metode Pembayaran, Catatan
+- Formatted dates ("1 Maret 2026") and amounts ("Rp 5.200.000")
+
+**Architecture highlights:**
+- `src/lib/xlsx-template-builder.ts` — shared Laporan sheet builder; chart contract cells H10/H12/B13/D18:D{n}/E18:E{n} locked for chart XML references
+- `src/lib/chart-xml-injector.ts` — JSZip post-processor: injects 3 DrawingML charts + Grafik worksheet into the XLSX buffer
 
 ### Settings
 - [x] Theme: Light / Dark / System
@@ -132,7 +159,7 @@ The `/export` and `/reports` pages generate publication-quality XLSX and PDF doc
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
-| **Export** | ExcelJS (XLSX write) · Chart.js (embedded charts) · xlsx (bulk-import read) · jsPDF (PDF) · native CSV/JSON |
+| **Export** | ExcelJS (XLSX write) · JSZip (OpenXML chart injection) · Chart.js (PDF chart rendering) · xlsx (bulk-import read) · jsPDF (PDF) · native CSV/JSON |
 | **Deploy** | Vercel (auto-deploys from GitHub) |
 | **Toasts** | Sonner |
 | **Fonts** | Plus Jakarta Sans + JetBrains Mono |
