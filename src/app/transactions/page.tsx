@@ -7,6 +7,7 @@ import { useAllTransactions } from '@/features/transactions/useAllTransactions';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
+import { MONTH_NAMES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
@@ -171,7 +172,11 @@ function TransactionsPageInner() {
                   onClick={() => {
                     exportCSV(
                       transactions,
-                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`
+                      `transactions-${year}-${String(month + 1).padStart(2, '0')}`,
+                      `${MONTH_NAMES[month]} ${year}`,
+                      income,
+                      expense,
+                      income - expense
                     );
                     toast.success(t(locale, 'exportSuccess'));
                   }}

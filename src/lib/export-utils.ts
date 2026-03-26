@@ -7,13 +7,26 @@ import { injectCharts } from './chart-xml-injector';
 
 // --- CSV ---
 
-export function exportCSV(transactions: Transaction[], filename: string): void {
-  const headers = 'Date,Description,Category,Type,Amount,Payment Method,Notes';
+export function exportCSV(
+  transactions: Transaction[],
+  filename: string,
+  scopeLabel: string,
+  totalIncome: number,
+  totalExpense: number,
+  totalAssets: number
+): void {
+  const fmtAmount = (n: number) => 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
+
+  const commentScope = `"// Laporan Keuangan - ${scopeLabel} | Diekspor: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}"`;
+  const commentTotals = `"// Total Pemasukan: ${fmtAmount(totalIncome)} | Total Pengeluaran: ${fmtAmount(totalExpense)} | Saldo: ${fmtAmount(totalAssets)}"`;
+
+  const headers = 'Tanggal,Deskripsi,Kategori,Tipe,Jumlah,Metode Pembayaran,Catatan';
   const rows = transactions.map(
     (tx) =>
-      `${tx.date},"${tx.description.replace(/"/g, '""')}","${tx.category}",${tx.type},${tx.amount},"${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
+      `${formatDateID(tx.date)},"${tx.description.replace(/"/g, '""')}","${tx.category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(tx.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
   );
-  const content = [headers, ...rows].join('\n');
+  // \uFEFF = UTF-8 BOM — required for correct Indonesian character rendering in Excel on Windows
+  const content = '\uFEFF' + [commentScope, commentTotals, headers, ...rows].join('\n');
   downloadBlob(content, filename, 'text/csv;charset=utf-8');
 }
 
