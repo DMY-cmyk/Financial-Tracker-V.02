@@ -121,7 +121,7 @@ function expensePieChartXml(lastRow: number): string {
 
 // ── Drawing XML (anchors 3 charts on Grafik sheet) ────────────────────────────
 
-function drawingXml(): string {
+function drawingXml(includePie: boolean): string {
   // Rows are 0-indexed in OOXML twoCellAnchor.
   // Spec layout (1-indexed): rows 6–22 = donut+bar; rows 23–40 = pie
   // 0-indexed: donut+bar rows 5–21; pie rows 22–39
@@ -153,7 +153,7 @@ function drawingXml(): string {
       <c:chart r:id="rId2"/>
     </a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/>
   </xdr:twoCellAnchor>
-  <xdr:twoCellAnchor>
+  ${includePie ? `<xdr:twoCellAnchor>
     <xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>22</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
     <xdr:to><xdr:col>19</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>39</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
     <xdr:graphicFrame macro=""><xdr:nvGraphicFramePr>
@@ -163,7 +163,7 @@ function drawingXml(): string {
     <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
       <c:chart r:id="rId3"/>
     </a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/>
-  </xdr:twoCellAnchor>
+  </xdr:twoCellAnchor>` : ''}
 </xdr:wsDr>`;
 }
 
@@ -231,6 +231,8 @@ function grafikSheetXml(scopeLabel: string, generatedAt: Date): string {
 export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuffer> {
   const zip = await JSZip.loadAsync(input.buffer);
   const lastExpCatRow = 17 + input.expCatCount; // e.g., 5 cats → row 22
+  // Skip pie chart if no expense categories (degenerate range would break Excel)
+  const hasPieData = input.expCatCount > 0;
 
   // ── Step 1: Count existing worksheets to determine N ─────────────────────
   const existingSheets = Object.keys(zip.files).filter((f) =>
@@ -239,7 +241,9 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   const N = existingSheets.length + 1; // Grafik sheet file index
 
   // ── Step 2: Parse existing sheetId and rId maxima ────────────────────────
-  const wbXml = await zip.file('xl/workbook.xml')!.async('string');
+  const wbFile = zip.file('xl/workbook.xml');
+  if (!wbFile) throw new Error('injectCharts: xl/workbook.xml not found in XLSX buffer');
+  const wbXml = await wbFile.async('string');
   const sheetIdMatches = [...wbXml.matchAll(/sheetId="(\d+)"/g)];
   const maxSheetId = sheetIdMatches.reduce((max, m) => Math.max(max, parseInt(m[1])), 0);
   const rIdMatches = [...wbXml.matchAll(/r:id="rId(\d+)"/g)];
@@ -250,10 +254,12 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   // ── Step 3: Add chart XML files ───────────────────────────────────────────
   zip.file('xl/charts/chart1.xml', donutChartXml());
   zip.file('xl/charts/chart2.xml', cashflowBarChartXml());
-  zip.file('xl/charts/chart3.xml', expensePieChartXml(lastExpCatRow));
+  if (hasPieData) {
+    zip.file('xl/charts/chart3.xml', expensePieChartXml(lastExpCatRow));
+  }
 
   // ── Step 4: Add drawing XML and its rels ─────────────────────────────────
-  zip.file('xl/drawings/drawing1.xml', drawingXml());
+  zip.file('xl/drawings/drawing1.xml', drawingXml(hasPieData));
   zip.file(
     'xl/drawings/_rels/drawing1.xml.rels',
     `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -278,11 +284,17 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   );
 
   // ── Step 6: Update [Content_Types].xml ───────────────────────────────────
-  const ctXml = await zip.file('[Content_Types].xml')!.async('string');
+  const ctFile = zip.file('[Content_Types].xml');
+  if (!ctFile) throw new Error('injectCharts: [Content_Types].xml not found in XLSX buffer');
+  const ctXml = await ctFile.async('string');
   const chartOverrides = [
     `<Override PartName="/xl/charts/chart1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`,
     `<Override PartName="/xl/charts/chart2.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`,
-    `<Override PartName="/xl/charts/chart3.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`,
+    ...(hasPieData
+      ? [
+          `<Override PartName="/xl/charts/chart3.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>`,
+        ]
+      : []),
     `<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`,
     `<Override PartName="/xl/worksheets/sheet${N}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
   ].join('\n');
@@ -297,7 +309,10 @@ export async function injectCharts(input: ChartInjectorInput): Promise<ArrayBuff
   );
 
   // ── Step 8: Add Grafik relationship in workbook.xml.rels ──────────────────
-  const wbRelsXml = await zip.file('xl/_rels/workbook.xml.rels')!.async('string');
+  const wbRelsFile = zip.file('xl/_rels/workbook.xml.rels');
+  if (!wbRelsFile)
+    throw new Error('injectCharts: xl/_rels/workbook.xml.rels not found in XLSX buffer');
+  const wbRelsXml = await wbRelsFile.async('string');
   const grafikRel = `<Relationship Id="${newRid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${N}.xml"/>`;
   zip.file('xl/_rels/workbook.xml.rels', wbRelsXml.replace('</Relationships>', `${grafikRel}\n</Relationships>`));
 
