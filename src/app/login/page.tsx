@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fadeInUp } from '@/lib/motion';
+import { t, useLocale } from '@/lib/i18n';
 import { Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
 
 function LoginPageInner() {
   const router = useRouter();
+  const locale = useLocale();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,8 +22,7 @@ function LoginPageInner() {
   // Show session-expired banner when redirected by middleware
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
-  const sessionExpiredMessage =
-    reason === 'expired' ? 'Your session has expired. Please sign in again.' : '';
+  const sessionExpiredMessage = reason === 'expired' ? t(locale, 'sessionExpired') : '';
 
   // SKIP_AUTH: auto-redirect to /register if no users exist (dev only)
   useEffect(() => {
@@ -162,7 +163,7 @@ function LoginPageInner() {
 
 export default function LoginPage() {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <LoginPageInner />
     </Suspense>
   );
