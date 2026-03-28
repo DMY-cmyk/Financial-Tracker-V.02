@@ -401,6 +401,16 @@ type TranslationKeys = {
   endOfMonthBody: string;
   goToTransactions: string;
   dismiss: string;
+  // Auth
+  signIn: string;
+  createAccount: string;
+  signOut: string;
+  emailLabel: string;
+  passwordLabel: string;
+  fullName: string;
+  invalidCredentials: string;
+  sessionExpired: string;
+  loginRequired: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -759,6 +769,15 @@ const translations: Record<Locale, TranslationKeys> = {
       "Today is the last day of the month. Make sure you've recorded all transactions before midnight so next month's opening balance is accurate.",
     goToTransactions: 'Go to Transactions',
     dismiss: 'Dismiss',
+    signIn: 'Sign In',
+    createAccount: 'Create Account',
+    signOut: 'Sign Out',
+    emailLabel: 'Email',
+    passwordLabel: 'Password',
+    fullName: 'Full Name',
+    invalidCredentials: 'Invalid email or password',
+    sessionExpired: 'Your session has expired. Please sign in again.',
+    loginRequired: 'Please sign in to continue',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1116,6 +1135,15 @@ const translations: Record<Locale, TranslationKeys> = {
       'Hari ini adalah hari terakhir bulan ini. Pastikan semua transaksi sudah dicatat sebelum tengah malam agar saldo awal bulan berikutnya akurat.',
     goToTransactions: 'Ke Transaksi',
     dismiss: 'Tutup',
+    signIn: 'Masuk',
+    createAccount: 'Buat Akun',
+    signOut: 'Keluar',
+    emailLabel: 'Email',
+    passwordLabel: 'Kata Sandi',
+    fullName: 'Nama Lengkap',
+    invalidCredentials: 'Email atau kata sandi salah',
+    sessionExpired: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+    loginRequired: 'Silakan masuk untuk melanjutkan',
   },
 };
 
