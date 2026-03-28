@@ -285,7 +285,7 @@ export function createTransactionRepository() {
 
       // Multi-category takes priority over single categoryId
       if (filters.categories && filters.categories.trim().length > 0) {
-        const ids = filters.categories.split(',').filter(Boolean);
+        const ids = filters.categories.split(',').map((id) => id.trim()).filter(Boolean);
         if (ids.length > 0) {
           const placeholders = ids.map(() => '?').join(',');
           conditions.push(`category_id IN (${placeholders})`);
@@ -315,7 +315,7 @@ export function createTransactionRepository() {
         }
       }
 
-      // Amount range (0 = no filter)
+      // Amount range: 0 is treated as "no bound" (omit clause) per spec
       if (filters.amountMin !== undefined && filters.amountMin > 0) {
         conditions.push('amount >= ?');
         params.push(filters.amountMin);

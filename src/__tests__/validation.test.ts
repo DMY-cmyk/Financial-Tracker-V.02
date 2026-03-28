@@ -320,4 +320,12 @@ describe('listTransactionsQuerySchema — advanced filters', () => {
     const result = listTransactionsQuerySchema.safeParse({ dateTo: '2026-01-31' });
     expect(result.success).toBe(false);
   });
+
+  it('rejects when dateFrom is after dateTo', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      dateFrom: '2026-03-01',
+      dateTo: '2026-01-01',
+    });
+    expect(result.success).toBe(false);
+  });
 });

@@ -71,6 +71,13 @@ export const listTransactionsQuerySchema = z
         path: ['dateFrom'],
       });
     }
+    if (data.dateFrom && data.dateTo && data.dateFrom > data.dateTo) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'dateFrom must be on or before dateTo',
+        path: ['dateFrom'],
+      });
+    }
   });
 
 export const dashboardSummaryQuerySchema = z.object({
