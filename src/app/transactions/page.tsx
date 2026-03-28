@@ -58,8 +58,6 @@ function TransactionsPageInner() {
     setSearch,
     typeFilter,
     setTypeFilter,
-    categoryFilter,
-    setCategoryFilter,
     paymentMethodFilter,
     setPaymentMethodFilter,
     allMonths,
@@ -259,8 +257,8 @@ function TransactionsPageInner() {
               onSearchChange={setSearch}
               typeFilter={typeFilter}
               onTypeChange={setTypeFilter}
-              categoryFilter={categoryFilter}
-              onCategoryChange={setCategoryFilter}
+              categoryFilter={''}
+              onCategoryChange={() => {}}
               paymentMethodFilter={paymentMethodFilter}
               onPaymentMethodChange={setPaymentMethodFilter}
               paymentMethods={paymentMethods}
