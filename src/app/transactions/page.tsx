@@ -367,15 +367,17 @@ function TransactionsPageInner() {
         onSavePreset={savePreset}
         onDeletePreset={deletePreset}
         onApplyPreset={(filters) => {
+          clearAdvancedFilters();
           if (filters.amountMin !== undefined) setAmountMin(String(filters.amountMin));
           if (filters.amountMax !== undefined) setAmountMax(String(filters.amountMax));
-          if (filters.selectedCategories) {
-            clearCategories();
+          if (filters.selectedCategories !== undefined) {
             filters.selectedCategories.forEach((id) => toggleCategory(id));
           }
-          if (filters.dateFrom) setDateFrom(filters.dateFrom);
-          if (filters.dateTo) setDateTo(filters.dateTo);
+          if (filters.dateFrom !== undefined) setDateFrom(filters.dateFrom);
+          if (filters.dateTo !== undefined) setDateTo(filters.dateTo);
           if (filters.includeNotes !== undefined) setIncludeNotes(filters.includeNotes);
+          if (filters.type) setTypeFilter(filters.type as 'all' | 'income' | 'expense');
+          if (filters.search !== undefined) setSearch(filters.search);
         }}
         currentFilters={{
           amountMin: Number(amountMin) || undefined,

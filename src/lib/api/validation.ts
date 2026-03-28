@@ -48,7 +48,10 @@ export const listTransactionsQuerySchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
       .optional(),
-    includeNotes: z.coerce.boolean().optional(),
+    includeNotes: z
+      .enum(['true', 'false'])
+      .transform((v) => v === 'true')
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (

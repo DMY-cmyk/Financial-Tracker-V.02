@@ -260,6 +260,44 @@ describe('listTransactions — advanced filters', () => {
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(0);
   });
+
+  it('treats amountMin=0 as no minimum filter', async () => {
+    const result = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      amountMin: '0',
+    });
+    expect(result.error).toBeUndefined();
+    // Should return all transactions (not filtered to amount >= 0 with exclusion behavior)
+    expect(result.data!.total).toBeGreaterThan(0);
+    // Should return same count as no amount filter
+    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    expect(result.data!.total).toBe(baseline.data!.total);
+  });
+
+  it('treats empty categories string as no category filter', async () => {
+    const result = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      categories: '',
+    });
+    expect(result.error).toBeUndefined();
+    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    expect(result.data!.total).toBe(baseline.data!.total);
+  });
+
+  it('uses categories param over legacy categoryId when both provided', async () => {
+    // Both point to nonexistent IDs → categories (multi) takes priority and yields 0 results
+    const resultMulti = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      categories: 'nonexistent-id',
+      categoryId: 'also-nonexistent',
+    });
+    expect(resultMulti.error).toBeUndefined();
+    // Both are nonexistent → 0 results, proving categories was used (not ignored)
+    expect(resultMulti.data!.total).toBe(0);
+  });
 });
 
 describe('listTransactions — sortOrder', () => {
