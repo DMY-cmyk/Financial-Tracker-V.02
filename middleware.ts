@@ -5,7 +5,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'financial-tracker-secret-key-change-in-production'
 );
 
-const PUBLIC_PATHS = ['/login', '/register', '/api/auth'];
+const PUBLIC_PATHS = ['/login', '/register', '/api/auth', '/api/health'];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
@@ -34,13 +34,18 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, JWT_SECRET, { issuer: 'financial-tracker' });
-    return NextResponse.next();
+    const { payload } = await jwtVerify(token, JWT_SECRET, { issuer: 'financial-tracker' });
+    // Forward user identity to API routes via header
+    const response = NextResponse.next();
+    response.headers.set('x-user-id', payload.sub as string);
+    return response;
   } catch {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: { message: 'Invalid token' } }, { status: 401 });
     }
-    const response = NextResponse.redirect(new URL('/login', request.url));
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('reason', 'expired');
+    const response = NextResponse.redirect(loginUrl);
     response.cookies.delete('auth-token');
     return response;
   }
