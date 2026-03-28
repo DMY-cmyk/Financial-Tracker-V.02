@@ -37,6 +37,16 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Toast feedback (save/delete)
 - [x] Mobile FAB for quick add
 - [x] Framer Motion entrance animations
+- [x] Load-more pagination (50/page, `useAllTransactions` with `useInfiniteQuery`)
+
+### Advanced Transaction Search
+- [x] `TransactionFilterSheet` slide-over panel — amount range, multi-category, date range, notes toggle
+- [x] Filter presets — save/apply/delete up to 5 named presets (localStorage persistence)
+- [x] Filters badge button on the transaction toolbar with active-filter count indicator
+- [x] Extended API: `amountMin`, `amountMax`, `categories` (multi), `dateFrom`, `dateTo`, `includeNotes` query params
+- [x] Cross-field validation: `amountMin ≤ amountMax`, `dateFrom`/`dateTo` must be paired
+- [x] Date range scope overrides month/year selector when active
+- [x] Bilingual filter labels and error messages (EN/ID)
 
 ### Upload & OCR
 - [x] Drag-and-drop receipt image upload (enhanced DropZone with drag state feedback)
@@ -150,7 +160,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] ConfirmDialog for destructive actions
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
-- [x] Custom hooks (useDashboardData, useTransactions, useUpload, useExport, useImport)
+- [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets)
 - [x] API boundary placeholders (services.ts)
 - [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
 - [x] App-level error boundary and custom 404 page
@@ -170,7 +180,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (253 tests: validation, all services, balance, reports, auth) |
+| **Testing** | Vitest (269 tests: validation, all services, balance, reports, auth, advanced filters) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -201,7 +211,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 253 tests)
+npm run test         # Run tests (Vitest, 269 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -254,7 +264,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (84 tests: validation, transaction, dashboard, category, payment-method, settings, export-job)
+  __tests__/                  # Vitest tests (269 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters)
 ```
 
 ## Documentation
