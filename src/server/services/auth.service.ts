@@ -39,7 +39,8 @@ export async function registerUser(
   }
 
   const id = crypto.randomUUID();
-  const passwordHash = await bcrypt.hash(password, 12);
+  const bcryptRounds = process.env.NODE_ENV === 'test' ? 4 : 12;
+  const passwordHash = await bcrypt.hash(password, bcryptRounds);
 
   try {
     await db.query('INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)', [
