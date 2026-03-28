@@ -9,7 +9,9 @@ export async function GET() {
 
   try {
     const db = await getDb();
-    const result = await db.query<{ count: number | string }>('SELECT COUNT(*) as count FROM users');
+    const result = await db.query<{ count: number | string }>(
+      'SELECT COUNT(*) as count FROM users'
+    );
     const hasUsers = Number(result.rows[0]?.count ?? 0) > 0;
     return NextResponse.json({ data: { hasUsers } });
   } catch {
