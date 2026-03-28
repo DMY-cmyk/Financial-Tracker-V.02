@@ -305,4 +305,19 @@ describe('listTransactionsQuerySchema — advanced filters', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it('accepts amountMin alone without amountMax', () => {
+    const result = listTransactionsQuerySchema.safeParse({ amountMin: '100000' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts amountMax alone without amountMin', () => {
+    const result = listTransactionsQuerySchema.safeParse({ amountMax: '500000' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects when only dateTo is provided without dateFrom', () => {
+    const result = listTransactionsQuerySchema.safeParse({ dateTo: '2026-01-31' });
+    expect(result.success).toBe(false);
+  });
 });

@@ -39,14 +39,14 @@ export const listTransactionsQuerySchema = z
     // Advanced filters
     amountMin: z.coerce.number().min(0).optional(),
     amountMax: z.coerce.number().min(0).optional(),
-    categories: z.string().optional(),
+    categories: z.string().optional(), // comma-separated category IDs e.g. "cat-1,cat-2"
     dateFrom: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
       .optional(),
     dateTo: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
       .optional(),
     includeNotes: z.coerce.boolean().optional(),
   })
