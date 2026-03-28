@@ -9,8 +9,8 @@ export async function GET() {
 
   try {
     const db = await getDb();
-    const result = await db.query<{ count: number }>('SELECT COUNT(*) as count FROM users', []);
-    const hasUsers = result.rows.length > 0 && result.rows[0].count > 0;
+    const result = await db.query<{ count: number | string }>('SELECT COUNT(*) as count FROM users');
+    const hasUsers = Number(result.rows[0]?.count ?? 0) > 0;
     return NextResponse.json({ data: { hasUsers } });
   } catch {
     return NextResponse.json({ error: { message: 'Internal server error' } }, { status: 500 });
