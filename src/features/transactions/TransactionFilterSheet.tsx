@@ -18,7 +18,7 @@ import { X, Trash2 } from 'lucide-react';
 import type { Category } from '@/lib/types';
 import type { FilterPreset, FilterPresetFilters } from './useFilterPresets';
 
-interface TransactionFilterSheetProps {
+export interface TransactionFilterSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   // Amount range
@@ -208,7 +208,7 @@ export function TransactionFilterSheet({
             </div>
             {((dateFrom && !dateTo) || (!dateFrom && dateTo)) && (
               <p className="text-destructive mt-1.5 text-xs">
-                {t(locale, 'dateFrom')} &amp; {t(locale, 'dateTo')} must both be set
+                {t(locale, 'dateRangeBothRequired')}
               </p>
             )}
           </section>

@@ -418,6 +418,7 @@ type TranslationKeys = {
   clearAllFilters: string;
   activeFilters: string;
   dateRangeOverridesMonth: string;
+  dateRangeBothRequired: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -793,6 +794,7 @@ const translations: Record<Locale, TranslationKeys> = {
     clearAllFilters: 'Clear All',
     activeFilters: 'Filters ({n})',
     dateRangeOverridesMonth: 'Overrides month selector',
+    dateRangeBothRequired: 'Both date fields are required',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1167,6 +1169,7 @@ const translations: Record<Locale, TranslationKeys> = {
     clearAllFilters: 'Hapus Semua',
     activeFilters: 'Filter ({n})',
     dateRangeOverridesMonth: 'Menimpa pemilih bulan',
+    dateRangeBothRequired: 'Kedua field tanggal diperlukan',
   },
 };
 
