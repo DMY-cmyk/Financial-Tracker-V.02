@@ -111,6 +111,20 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - `src/lib/xlsx-template-builder.ts` — shared Laporan sheet builder; chart contract cells H10/H12/B13/D18:D{n}/E18:E{n} locked for chart XML references
 - `src/lib/chart-xml-injector.ts` — JSZip post-processor: injects 3 DrawingML charts + Grafik worksheet into the XLSX buffer
 
+### Authentication
+
+- [x] JWT-based auth enforced by Next.js Edge Middleware on every request
+- [x] Login page (`/login`) with session-expired banner (`?reason=expired`) and SKIP_AUTH first-run redirect
+- [x] Register page (`/register`) — creates the single-user account
+- [x] `POST /api/auth/logout` — clears `auth-token` httpOnly cookie
+- [x] `GET /api/auth/me` — returns current user from validated JWT
+- [x] `GET /api/auth/setup-check` (dev-only) — detects empty DB for first-run auto-redirect
+- [x] `GET /api/health` — public health check endpoint (bypasses auth)
+- [x] `x-user-id` header forwarded to all API route handlers by middleware
+- [x] 7-day JWT expiry; cookie cleared automatically on expiry redirect
+- [x] `bcryptjs` password hashing (cost 12 in production, 4 in tests)
+- [x] Bilingual auth strings (EN/ID) via i18n system
+
 ### Settings
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
@@ -155,7 +169,8 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **State** | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
-| **Testing** | Vitest (241 tests: validation, all services, balance, reports) |
+| **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
+| **Testing** | Vitest (253 tests: validation, all services, balance, reports, auth) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -178,13 +193,15 @@ npm run build                # Production build
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Production | Neon Postgres connection string. Leave empty to use SQLite (dev/tests). |
+| `JWT_SECRET` | Production | Random 32+ character string for signing JWT tokens. Required for auth to work. |
+| `NEXT_PUBLIC_SKIP_AUTH` | Dev only | Set to `true` to auto-redirect to `/register` when no users exist in DB. |
 | `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
 | `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
 
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 241 tests)
+npm run test         # Run tests (Vitest, 253 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
