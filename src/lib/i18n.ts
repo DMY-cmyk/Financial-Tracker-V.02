@@ -421,6 +421,17 @@ type TranslationKeys = {
   dateRangeBothRequired: string;
   amountRangeError: string;
   deletePreset: string;
+
+  // Auth
+  signIn: string;
+  createAccount: string;
+  signOut: string;
+  emailLabel: string;
+  passwordLabel: string;
+  fullName: string;
+  invalidCredentials: string;
+  sessionExpired: string;
+  loginRequired: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -799,6 +810,17 @@ const translations: Record<Locale, TranslationKeys> = {
     dateRangeBothRequired: 'Both date fields are required',
     amountRangeError: 'Minimum must be ≤ maximum',
     deletePreset: 'Delete preset {name}',
+
+    // Auth
+    signIn: 'Sign In',
+    createAccount: 'Create Account',
+    signOut: 'Sign Out',
+    emailLabel: 'Email',
+    passwordLabel: 'Password',
+    fullName: 'Full Name',
+    invalidCredentials: 'Invalid email or password',
+    sessionExpired: 'Your session has expired. Please sign in again.',
+    loginRequired: 'Please sign in to continue',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1176,6 +1198,17 @@ const translations: Record<Locale, TranslationKeys> = {
     dateRangeBothRequired: 'Kedua field tanggal diperlukan',
     amountRangeError: 'Minimum harus ≤ maksimum',
     deletePreset: 'Hapus preset {name}',
+
+    // Auth
+    signIn: 'Masuk',
+    createAccount: 'Buat Akun',
+    signOut: 'Keluar',
+    emailLabel: 'Email',
+    passwordLabel: 'Kata Sandi',
+    fullName: 'Nama Lengkap',
+    invalidCredentials: 'Email atau kata sandi salah',
+    sessionExpired: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+    loginRequired: 'Silakan masuk untuk melanjutkan',
   },
 };
 
