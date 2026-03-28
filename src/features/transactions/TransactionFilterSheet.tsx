@@ -7,13 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { X, Trash2 } from 'lucide-react';
 import type { Category } from '@/lib/types';
 import type { FilterPreset, FilterPresetFilters } from './useFilterPresets';
@@ -78,10 +72,7 @@ export function TransactionFilterSheet({
   const [savingPreset, setSavingPreset] = useState(false);
   const [presetNameInput, setPresetNameInput] = useState('');
 
-  const amountError =
-    amountMin !== '' &&
-    amountMax !== '' &&
-    Number(amountMin) > Number(amountMax);
+  const amountError = amountMin !== '' && amountMax !== '' && Number(amountMin) > Number(amountMax);
 
   const handleSavePreset = () => {
     if (!presetNameInput.trim()) return;
@@ -101,14 +92,13 @@ export function TransactionFilterSheet({
         </SheetHeader>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-
+        <div className="flex-1 space-y-6 overflow-y-auto px-6 py-4">
           {/* --- Amount Range --- */}
           <section>
-            <h3 className="text-sm font-medium mb-3">{t(locale, 'amountRange')}</h3>
+            <h3 className="mb-3 text-sm font-medium">{t(locale, 'amountRange')}</h3>
             <div className="flex gap-3">
               <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                <Label className="text-muted-foreground mb-1.5 block text-xs">
                   {t(locale, 'minAmount')}
                 </Label>
                 <Input
@@ -121,7 +111,7 @@ export function TransactionFilterSheet({
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                <Label className="text-muted-foreground mb-1.5 block text-xs">
                   {t(locale, 'maxAmount')}
                 </Label>
                 <Input
@@ -135,58 +125,56 @@ export function TransactionFilterSheet({
               </div>
             </div>
             {amountError && (
-              <p className="text-destructive mt-1.5 text-xs">
-                {t(locale, 'amountRangeError')}
-              </p>
+              <p className="text-destructive mt-1.5 text-xs">{t(locale, 'amountRangeError')}</p>
             )}
           </section>
 
           {/* --- Categories --- */}
           <section>
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-medium">{t(locale, 'multiCategory')}</h3>
               {selectedCategories.length > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={clearCategories}
-                  className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground h-auto p-0 text-xs"
                 >
                   {t(locale, 'clear')}
                 </Button>
               )}
             </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
               {categories.map((cat) => (
                 <label
                   key={cat.id}
-                  className="flex items-center gap-2.5 cursor-pointer select-none"
+                  className="flex cursor-pointer items-center gap-2.5 select-none"
                 >
                   <Checkbox
                     checked={selectedCategories.includes(cat.id)}
                     onCheckedChange={() => toggleCategory(cat.id)}
                   />
                   <span className="text-sm">{cat.name}</span>
-                  <span className="ml-auto text-xs text-muted-foreground capitalize">
+                  <span className="text-muted-foreground ml-auto text-xs capitalize">
                     {cat.type}
                   </span>
                 </label>
               ))}
               {categories.length === 0 && (
-                <p className="text-muted-foreground text-xs py-2">{t(locale, 'noData')}</p>
+                <p className="text-muted-foreground py-2 text-xs">{t(locale, 'noData')}</p>
               )}
             </div>
           </section>
 
           {/* --- Date Range --- */}
           <section>
-            <h3 className="text-sm font-medium mb-1">{t(locale, 'dateRange')}</h3>
-            <p className="text-muted-foreground text-xs mb-3">
+            <h3 className="mb-1 text-sm font-medium">{t(locale, 'dateRange')}</h3>
+            <p className="text-muted-foreground mb-3 text-xs">
               {t(locale, 'dateRangeOverridesMonth')}
             </p>
             <div className="flex gap-3">
               <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                <Label className="text-muted-foreground mb-1.5 block text-xs">
                   {t(locale, 'dateFrom')}
                 </Label>
                 <Input
@@ -197,7 +185,7 @@ export function TransactionFilterSheet({
                 />
               </div>
               <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                <Label className="text-muted-foreground mb-1.5 block text-xs">
                   {t(locale, 'dateTo')}
                 </Label>
                 <Input
@@ -217,7 +205,7 @@ export function TransactionFilterSheet({
 
           {/* --- Include Notes --- */}
           <section>
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
+            <label className="flex cursor-pointer items-center gap-2.5 select-none">
               <Checkbox
                 checked={includeNotes}
                 onCheckedChange={(checked) => setIncludeNotes(Boolean(checked))}
@@ -228,10 +216,10 @@ export function TransactionFilterSheet({
 
           {/* --- Saved Presets --- */}
           <section>
-            <h3 className="text-sm font-medium mb-3">{t(locale, 'filterPresets')}</h3>
+            <h3 className="mb-3 text-sm font-medium">{t(locale, 'filterPresets')}</h3>
 
             {presets.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="mb-3 flex flex-wrap gap-2">
                 {presets.map((preset) => (
                   <div
                     key={preset.id}
@@ -267,7 +255,7 @@ export function TransactionFilterSheet({
                     if (e.key === 'Enter') handleSavePreset();
                     if (e.key === 'Escape') setSavingPreset(false);
                   }}
-                  className="text-sm h-8"
+                  className="h-8 text-sm"
                   autoFocus
                 />
                 <Button size="sm" onClick={handleSavePreset} disabled={!presetNameInput.trim()}>
@@ -281,7 +269,7 @@ export function TransactionFilterSheet({
               <button
                 type="button"
                 onClick={() => setSavingPreset(true)}
-                className="text-primary hover:underline text-sm"
+                className="text-primary text-sm hover:underline"
               >
                 + {t(locale, 'savePreset')}
               </button>
@@ -290,16 +278,12 @@ export function TransactionFilterSheet({
         </div>
 
         {/* Sticky footer */}
-        <SheetFooter className="border-border border-t px-6 py-4 flex-row gap-2">
+        <SheetFooter className="border-border flex-row gap-2 border-t px-6 py-4">
           <Button variant="outline" size="sm" onClick={onClearAll} className="gap-1.5">
             <Trash2 className="h-3.5 w-3.5" />
             {t(locale, 'clearAllFilters')}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => onOpenChange(false)}
-            className="ml-auto"
-          >
+          <Button size="sm" onClick={() => onOpenChange(false)} className="ml-auto">
             {t(locale, 'ok')}
           </Button>
         </SheetFooter>

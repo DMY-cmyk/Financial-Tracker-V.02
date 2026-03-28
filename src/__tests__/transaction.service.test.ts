@@ -220,7 +220,9 @@ describe('listTransactions — advanced filters', () => {
     const result = await listTransactions({ amountMin: '100000', amountMax: '600000' });
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(2);
-    expect(result.data!.transactions.every((tx) => tx.amount >= 100000 && tx.amount <= 600000)).toBe(true);
+    expect(
+      result.data!.transactions.every((tx) => tx.amount >= 100000 && tx.amount <= 600000)
+    ).toBe(true);
   });
 
   it('filters by multi-category — returns transactions for all selected categories', async () => {
