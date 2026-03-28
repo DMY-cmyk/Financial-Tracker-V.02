@@ -35,13 +35,27 @@ export async function middleware(request: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET, { issuer: 'financial-tracker' });
-    // Forward user identity to API routes via header
-    const response = NextResponse.next();
-    response.headers.set('x-user-id', payload.sub as string);
-    return response;
+    if (!payload.sub) {
+      // Token missing subject claim — treat as unauthorized
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: { message: 'Invalid token' } }, { status: 401 });
+      }
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('reason', 'expired');
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.delete('auth-token');
+      return response;
+    }
+    // Forward user identity to API routes via request header (not response header)
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', payload.sub);
+    return NextResponse.next({ request: { headers: requestHeaders } });
   } catch {
+    // Invalid or expired token
     if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: { message: 'Invalid token' } }, { status: 401 });
+      const response = NextResponse.json({ error: { message: 'Invalid token' } }, { status: 401 });
+      response.cookies.delete('auth-token');
+      return response;
     }
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('reason', 'expired');
