@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { fadeInUp } from '@/lib/motion';
 import { Eye, EyeOff, Loader2, LogIn } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -157,5 +157,13 @@ export default function LoginPage() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageInner />
+    </Suspense>
   );
 }
