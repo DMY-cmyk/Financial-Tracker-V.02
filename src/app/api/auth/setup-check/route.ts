@@ -14,7 +14,8 @@ export async function GET() {
     );
     const hasUsers = Number(result.rows[0]?.count ?? 0) > 0;
     return NextResponse.json({ data: { hasUsers } });
-  } catch {
+  } catch (err) {
+    console.error('[setup-check] Failed to query user count:', err);
     return NextResponse.json({ error: { message: 'Internal server error' } }, { status: 500 });
   }
 }
