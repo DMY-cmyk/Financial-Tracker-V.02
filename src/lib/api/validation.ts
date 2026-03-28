@@ -24,18 +24,64 @@ export const bulkDeleteTransactionSchema = z.object({
   ids: z.array(z.string().min(1)).min(1).max(500),
 });
 
-export const listTransactionsQuerySchema = z.object({
-  month: z.number().int().min(0).max(11).optional(),
-  year: z.number().int().min(2000).max(2100).optional(),
-  yearOnly: z.boolean().optional(),
-  type: z.enum(['income', 'expense']).optional(),
-  categoryId: z.string().optional(),
-  paymentMethod: z.string().optional(),
-  search: z.string().optional(),
-  page: z.number().int().min(1).optional().default(1),
-  pageSize: z.number().int().min(1).max(100).optional().default(25),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
-});
+export const listTransactionsQuerySchema = z
+  .object({
+    month: z.number().int().min(0).max(11).optional(),
+    year: z.number().int().min(2000).max(2100).optional(),
+    yearOnly: z.boolean().optional(),
+    type: z.enum(['income', 'expense']).optional(),
+    categoryId: z.string().optional(),
+    paymentMethod: z.string().optional(),
+    search: z.string().optional(),
+    page: z.number().int().min(1).optional().default(1),
+    pageSize: z.number().int().min(1).max(100).optional().default(25),
+    sortOrder: z.enum(['asc', 'desc']).optional(),
+    // Advanced filters
+    amountMin: z.coerce.number().min(0).optional(),
+    amountMax: z.coerce.number().min(0).optional(),
+    categories: z.string().optional(), // comma-separated category IDs e.g. "cat-1,cat-2"
+    dateFrom: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+      .optional(),
+    dateTo: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+      .optional(),
+    includeNotes: z
+      .enum(['true', 'false'])
+      .transform((v) => v === 'true')
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.amountMin !== undefined &&
+      data.amountMax !== undefined &&
+      data.amountMin > data.amountMax
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'amountMin must be less than or equal to amountMax',
+        path: ['amountMin'],
+      });
+    }
+    const hasFrom = data.dateFrom !== undefined;
+    const hasTo = data.dateTo !== undefined;
+    if (hasFrom !== hasTo) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Both dateFrom and dateTo must be provided together',
+        path: ['dateFrom'],
+      });
+    }
+    if (data.dateFrom && data.dateTo && data.dateFrom > data.dateTo) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'dateFrom must be on or before dateTo',
+        path: ['dateFrom'],
+      });
+    }
+  });
 
 export const dashboardSummaryQuerySchema = z.object({
   month: z.number().int().min(0).max(11),

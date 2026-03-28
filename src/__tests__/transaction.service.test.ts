@@ -182,6 +182,127 @@ describe('deleteTransaction', () => {
   });
 });
 
+describe('listTransactions — advanced filters', () => {
+  beforeEach(async () => {
+    await createTransaction({
+      date: '2026-01-15',
+      description: 'Groceries',
+      category: 'Food',
+      categoryId: 'cat-food',
+      type: 'expense',
+      amount: 150000,
+      paymentMethod: 'Cash',
+      notes: 'Weekly market run',
+    });
+    await createTransaction({
+      date: '2026-01-20',
+      description: 'Electricity Bill',
+      category: 'Utilities',
+      categoryId: 'cat-utilities',
+      type: 'expense',
+      amount: 500000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+    await createTransaction({
+      date: '2026-02-05',
+      description: 'Salary',
+      category: 'Income',
+      categoryId: 'cat-salary',
+      type: 'income',
+      amount: 8500000,
+      paymentMethod: 'Bank BCA',
+      notes: '',
+    });
+  });
+
+  it('filters by amount range — returns only transactions within range', async () => {
+    const result = await listTransactions({ amountMin: '100000', amountMax: '600000' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.transactions).toHaveLength(2);
+    expect(
+      result.data!.transactions.every((tx) => tx.amount >= 100000 && tx.amount <= 600000)
+    ).toBe(true);
+  });
+
+  it('filters by multi-category — returns transactions for all selected categories', async () => {
+    const result = await listTransactions({ categories: 'cat-food,cat-utilities' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.transactions).toHaveLength(2);
+    const ids = result.data!.transactions.map((tx) => tx.categoryId);
+    expect(ids).toContain('cat-food');
+    expect(ids).toContain('cat-utilities');
+  });
+
+  it('filters by date range — overrides month/year when both provided', async () => {
+    // month=1 (Feb, 0-indexed) + year=2026 would restrict to Feb transactions only,
+    // but dateFrom+dateTo for Jan should override and return Jan transactions
+    const result = await listTransactions({
+      month: 1,
+      year: 2026,
+      dateFrom: '2026-01-01',
+      dateTo: '2026-01-31',
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.transactions.every((tx) => tx.date.startsWith('2026-01'))).toBe(true);
+    expect(result.data!.transactions).toHaveLength(2);
+  });
+
+  it('includeNotes=true — matches keyword in notes field', async () => {
+    const result = await listTransactions({ search: 'market', includeNotes: 'true' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.transactions).toHaveLength(1);
+    expect(result.data!.transactions[0].description).toBe('Groceries');
+  });
+
+  it('includeNotes not set — does NOT match keyword found only in notes', async () => {
+    const result = await listTransactions({ search: 'market' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.transactions).toHaveLength(0);
+  });
+
+  it('treats amountMin=0 as no minimum filter', async () => {
+    const result = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      amountMin: '0',
+    });
+    expect(result.error).toBeUndefined();
+    // Should return all transactions (not filtered to amount >= 0 with exclusion behavior)
+    expect(result.data!.total).toBeGreaterThan(0);
+    // Should return same count as no amount filter
+    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    expect(result.data!.total).toBe(baseline.data!.total);
+  });
+
+  it('treats empty categories string as no category filter', async () => {
+    const result = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      categories: '',
+    });
+    expect(result.error).toBeUndefined();
+    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    expect(result.data!.total).toBe(baseline.data!.total);
+  });
+
+  it('uses categories param and ignores legacy categoryId when both provided', async () => {
+    // cat-food has 1 transaction (Groceries) from the beforeEach above.
+    // If categoryId were used, the result would be 1 row.
+    // If categories is used (nonexistent), the result is 0 rows.
+    // Asserting 0 proves categories took priority over categoryId.
+    const result = await listTransactions({
+      year: 2026,
+      yearOnly: true,
+      categories: 'nonexistent-cat-id', // nonexistent → 0 rows if this wins
+      categoryId: 'cat-food', // valid → 1 row if this wins
+    });
+    expect(result.error).toBeUndefined();
+    // categories took priority (returned 0, not the cat-food transaction)
+    expect(result.data!.total).toBe(0);
+  });
+});
+
 describe('listTransactions — sortOrder', () => {
   beforeEach(async () => {
     await createTransaction({

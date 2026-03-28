@@ -32,10 +32,30 @@ export async function GET(request: NextRequest) {
   const sortOrder = searchParams.get('sortOrder');
   if (sortOrder === 'asc' || sortOrder === 'desc') query.sortOrder = sortOrder;
 
+  // Advanced filters
+  const amountMin = searchParams.get('amountMin');
+  if (amountMin) query.amountMin = amountMin;
+
+  const amountMax = searchParams.get('amountMax');
+  if (amountMax) query.amountMax = amountMax;
+
+  const categories = searchParams.get('categories');
+  if (categories) query.categories = categories;
+
+  const dateFrom = searchParams.get('dateFrom');
+  if (dateFrom) query.dateFrom = dateFrom;
+
+  const dateTo = searchParams.get('dateTo');
+  if (dateTo) query.dateTo = dateTo;
+
+  const includeNotes = searchParams.get('includeNotes');
+  if (includeNotes === 'true') query.includeNotes = true;
+
   const result = await listTransactions(query);
 
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;
+    return NextResponse.json({ error: result.error }, { status });
   }
 
   return NextResponse.json({ data: result.data });

@@ -56,6 +56,7 @@ export const api = {
     list(params?: {
       month?: number;
       year?: number;
+      yearOnly?: boolean;
       type?: string;
       categoryId?: string;
       paymentMethod?: string;
@@ -63,6 +64,13 @@ export const api = {
       page?: number;
       pageSize?: number;
       sortOrder?: 'asc' | 'desc';
+      // Advanced filters
+      amountMin?: number;
+      amountMax?: number;
+      categories?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      includeNotes?: boolean;
     }) {
       const query = new URLSearchParams();
       if (params) {

@@ -4,6 +4,7 @@ import { useRef, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAllTransactions } from '@/features/transactions/useAllTransactions';
+import { useFilterPresets } from '@/features/transactions/useFilterPresets';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
@@ -13,6 +14,7 @@ import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/features/transactions/TransactionFilters';
+import { TransactionFilterSheet } from '@/features/transactions/TransactionFilterSheet';
 import { TransactionForm } from '@/features/transactions/TransactionForm';
 import { AllTransactionsView } from '@/features/transactions/AllTransactionsView';
 import { TransactionSummary } from '@/features/transactions/TransactionSummary';
@@ -45,6 +47,7 @@ function TransactionsPageInner() {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
   const {
     transactions,
     income,
@@ -58,8 +61,6 @@ function TransactionsPageInner() {
     setSearch,
     typeFilter,
     setTypeFilter,
-    categoryFilter,
-    setCategoryFilter,
     paymentMethodFilter,
     setPaymentMethodFilter,
     allMonths,
@@ -69,6 +70,7 @@ function TransactionsPageInner() {
     sortOrder,
     toggleSortOrder,
     paymentMethods,
+    categories,
     clearFilters,
     formOpen,
     setFormOpen,
@@ -86,10 +88,29 @@ function TransactionsPageInner() {
     bulkDeleteTransactions,
     isEmpty,
     hasNoResults,
+    // Advanced filters
+    amountMin,
+    setAmountMin,
+    amountMax,
+    setAmountMax,
+    selectedCategories,
+    toggleCategory,
+    clearCategories,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    includeNotes,
+    setIncludeNotes,
+    clearAdvancedFilters,
+    activeAdvancedFilterCount,
   } = useAllTransactions({
     paymentMethod: urlPaymentMethod,
     allMonths: urlAllMonths,
   });
+
+  const { presets, savePreset, deletePreset } = useFilterPresets();
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
@@ -100,9 +121,7 @@ function TransactionsPageInner() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
-  const handleDelete = (id: string) => {
-    setDeleteId(id);
-  };
+  const handleDelete = (id: string) => setDeleteId(id);
 
   const confirmDelete = () => {
     if (deleteId) {
@@ -259,8 +278,6 @@ function TransactionsPageInner() {
               onSearchChange={setSearch}
               typeFilter={typeFilter}
               onTypeChange={setTypeFilter}
-              categoryFilter={categoryFilter}
-              onCategoryChange={setCategoryFilter}
               paymentMethodFilter={paymentMethodFilter}
               onPaymentMethodChange={setPaymentMethodFilter}
               paymentMethods={paymentMethods}
@@ -270,6 +287,8 @@ function TransactionsPageInner() {
               onYearOnlyChange={setYearOnly}
               selectedYear={year}
               searchInputRef={searchInputRef}
+              activeAdvancedFilterCount={activeAdvancedFilterCount}
+              onFiltersClick={() => setFilterSheetOpen(true)}
             />
           </div>
           <Button
@@ -326,6 +345,54 @@ function TransactionsPageInner() {
         )}
       </AnimatePresence>
 
+      {/* Advanced Filter Sheet */}
+      <TransactionFilterSheet
+        open={filterSheetOpen}
+        onOpenChange={setFilterSheetOpen}
+        amountMin={amountMin}
+        setAmountMin={setAmountMin}
+        amountMax={amountMax}
+        setAmountMax={setAmountMax}
+        selectedCategories={selectedCategories}
+        toggleCategory={toggleCategory}
+        clearCategories={clearCategories}
+        categories={categories}
+        dateFrom={dateFrom}
+        setDateFrom={setDateFrom}
+        dateTo={dateTo}
+        setDateTo={setDateTo}
+        includeNotes={includeNotes}
+        setIncludeNotes={setIncludeNotes}
+        presets={presets}
+        onSavePreset={savePreset}
+        onDeletePreset={deletePreset}
+        onApplyPreset={(filters) => {
+          clearAdvancedFilters();
+          if (filters.amountMin !== undefined) setAmountMin(String(filters.amountMin));
+          if (filters.amountMax !== undefined) setAmountMax(String(filters.amountMax));
+          if (filters.selectedCategories !== undefined) {
+            filters.selectedCategories.forEach((id) => toggleCategory(id));
+          }
+          if (filters.dateFrom !== undefined) setDateFrom(filters.dateFrom);
+          if (filters.dateTo !== undefined) setDateTo(filters.dateTo);
+          if (filters.includeNotes !== undefined) setIncludeNotes(filters.includeNotes);
+          if (filters.type) setTypeFilter(filters.type as 'all' | 'income' | 'expense');
+          if (filters.search !== undefined) setSearch(filters.search);
+        }}
+        currentFilters={{
+          amountMin: Number(amountMin) || undefined,
+          amountMax: Number(amountMax) || undefined,
+          selectedCategories: selectedCategories.length > 0 ? selectedCategories : undefined,
+          dateFrom: dateFrom || undefined,
+          dateTo: dateTo || undefined,
+          includeNotes: includeNotes ? true : undefined,
+        }}
+        onClearAll={() => {
+          clearAdvancedFilters();
+          setFilterSheetOpen(false);
+        }}
+      />
+
       {/* Sheet form */}
       <Sheet open={formOpen} onOpenChange={setFormOpen}>
         <SheetContent className="overflow-y-auto" aria-describedby={undefined}>
@@ -376,7 +443,7 @@ function TransactionsPageInner() {
         )}
       </AnimatePresence>
 
-      {/* Mobile FAB — hidden when bulk selection active */}
+      {/* Mobile FAB */}
       {selectedIds.size === 0 && (
         <button
           onClick={openAdd}

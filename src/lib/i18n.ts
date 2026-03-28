@@ -401,6 +401,26 @@ type TranslationKeys = {
   endOfMonthBody: string;
   goToTransactions: string;
   dismiss: string;
+
+  // Advanced Filters
+  advancedFilters: string;
+  amountRange: string;
+  minAmount: string;
+  maxAmount: string;
+  multiCategory: string;
+  dateRange: string;
+  dateFrom: string;
+  dateTo: string;
+  includeNotes: string;
+  filterPresets: string;
+  savePreset: string;
+  presetName: string;
+  clearAllFilters: string;
+  activeFilters: string;
+  dateRangeOverridesMonth: string;
+  dateRangeBothRequired: string;
+  amountRangeError: string;
+  deletePreset: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -759,6 +779,26 @@ const translations: Record<Locale, TranslationKeys> = {
       "Today is the last day of the month. Make sure you've recorded all transactions before midnight so next month's opening balance is accurate.",
     goToTransactions: 'Go to Transactions',
     dismiss: 'Dismiss',
+
+    // Advanced Filters
+    advancedFilters: 'Advanced Filters',
+    amountRange: 'Amount Range',
+    minAmount: 'Minimum',
+    maxAmount: 'Maximum',
+    multiCategory: 'Categories',
+    dateRange: 'Date Range',
+    dateFrom: 'From',
+    dateTo: 'To',
+    includeNotes: 'Include notes in search',
+    filterPresets: 'Saved Filters',
+    savePreset: 'Save current filters',
+    presetName: 'Preset name',
+    clearAllFilters: 'Clear All',
+    activeFilters: 'Filters ({n})',
+    dateRangeOverridesMonth: 'Overrides month selector',
+    dateRangeBothRequired: 'Both date fields are required',
+    amountRangeError: 'Minimum must be ≤ maximum',
+    deletePreset: 'Delete preset {name}',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1116,6 +1156,26 @@ const translations: Record<Locale, TranslationKeys> = {
       'Hari ini adalah hari terakhir bulan ini. Pastikan semua transaksi sudah dicatat sebelum tengah malam agar saldo awal bulan berikutnya akurat.',
     goToTransactions: 'Ke Transaksi',
     dismiss: 'Tutup',
+
+    // Advanced Filters
+    advancedFilters: 'Filter Lanjutan',
+    amountRange: 'Rentang Jumlah',
+    minAmount: 'Minimum',
+    maxAmount: 'Maksimum',
+    multiCategory: 'Kategori',
+    dateRange: 'Rentang Tanggal',
+    dateFrom: 'Dari',
+    dateTo: 'Sampai',
+    includeNotes: 'Sertakan catatan dalam pencarian',
+    filterPresets: 'Filter Tersimpan',
+    savePreset: 'Simpan filter saat ini',
+    presetName: 'Nama preset',
+    clearAllFilters: 'Hapus Semua',
+    activeFilters: 'Filter ({n})',
+    dateRangeOverridesMonth: 'Menimpa pemilih bulan',
+    dateRangeBothRequired: 'Kedua field tanggal diperlukan',
+    amountRangeError: 'Minimum harus ≤ maksimum',
+    deletePreset: 'Hapus preset {name}',
   },
 };
 

@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
-import { type Transaction, type PaymentMethod } from '@/lib/types';
+import { type Transaction, type PaymentMethod, type Category } from '@/lib/types';
 
 const PAGE_SIZE = 50;
 
@@ -26,13 +26,11 @@ interface UseAllTransactionsReturn {
   isLoading: boolean;
   isLoadingMore: boolean;
 
-  // Filters
+  // Basic filters
   search: string;
   setSearch: (v: string) => void;
   typeFilter: 'all' | 'income' | 'expense';
   setTypeFilter: (v: 'all' | 'income' | 'expense') => void;
-  categoryFilter: string;
-  setCategoryFilter: (v: string) => void;
   paymentMethodFilter: string;
   setPaymentMethodFilter: (v: string) => void;
   allMonths: boolean;
@@ -44,8 +42,26 @@ interface UseAllTransactionsReturn {
   hasActiveFilters: boolean;
   clearFilters: () => void;
 
+  // Advanced filters
+  amountMin: string;
+  setAmountMin: (v: string) => void;
+  amountMax: string;
+  setAmountMax: (v: string) => void;
+  selectedCategories: string[];
+  toggleCategory: (id: string) => void;
+  clearCategories: () => void;
+  dateFrom: string;
+  setDateFrom: (v: string) => void;
+  dateTo: string;
+  setDateTo: (v: string) => void;
+  includeNotes: boolean;
+  setIncludeNotes: (v: boolean) => void;
+  clearAdvancedFilters: () => void;
+  activeAdvancedFilterCount: number;
+
   // Reference data
   paymentMethods: PaymentMethod[];
+  categories: Category[];
 
   // Form
   formOpen: boolean;
@@ -76,40 +92,64 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   const initialized = useStore((s) => s.initialized);
   const queryClient = useQueryClient();
 
+  // Basic filter state
   const [search, setSearchState] = useState('');
   const [typeFilter, setTypeFilterState] = useState<'all' | 'income' | 'expense'>('all');
-  const [categoryFilter, setCategoryFilterState] = useState('');
   const [paymentMethodFilter, setPaymentMethodFilterState] = useState(
     initialFilters?.paymentMethod ?? ''
   );
   const [allMonths, setAllMonthsState] = useState(initialFilters?.allMonths ?? false);
   const [yearOnly, setYearOnlyState] = useState(false);
   const [sortOrder, setSortOrderState] = useState<'asc' | 'desc'>('desc');
+
+  // Advanced filter state
+  const [amountMin, setAmountMinState] = useState('');
+  const [amountMax, setAmountMaxState] = useState('');
+  const [selectedCategories, setSelectedCategoriesState] = useState<string[]>([]);
+  const [dateFrom, setDateFromState] = useState('');
+  const [dateTo, setDateToState] = useState('');
+  const [includeNotes, setIncludeNotesState] = useState(false);
+
+  // Form state
   const [formOpen, setFormOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | undefined>();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // Filter key for query cache invalidation and accumulation reset
+  // Derived: active advanced filter count
+  const activeAdvancedFilterCount = [
+    Number(amountMin) > 0,
+    Number(amountMax) > 0,
+    selectedCategories.length > 0,
+    dateFrom !== '' && dateTo !== '',
+    includeNotes,
+  ].filter(Boolean).length;
+
+  // Filter key — changing any filter resets to page 1
   const filterKey = [
-    allMonths ? 'all' : yearOnly ? `year-${year}` : `${month}-${year}`,
+    dateFrom && dateTo
+      ? `date-${dateFrom}-${dateTo}`
+      : allMonths
+        ? 'all'
+        : yearOnly
+          ? `year-${year}`
+          : `${month}-${year}`,
     typeFilter,
-    categoryFilter,
+    selectedCategories.slice().sort().join(','),
     paymentMethodFilter,
     search,
     sortOrder,
+    amountMin,
+    amountMax,
+    includeNotes,
   ].join('|');
 
-  // Filter setters — each resets selection
+  // Basic filter setters
   const setSearch = useCallback((v: string) => {
     setSearchState(v);
     setSelectedIds(new Set());
   }, []);
   const setTypeFilter = useCallback((v: 'all' | 'income' | 'expense') => {
     setTypeFilterState(v);
-    setSelectedIds(new Set());
-  }, []);
-  const setCategoryFilter = useCallback((v: string) => {
-    setCategoryFilterState(v);
     setSelectedIds(new Set());
   }, []);
   const setPaymentMethodFilter = useCallback((v: string) => {
@@ -131,25 +171,72 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     setSelectedIds(new Set());
   }, []);
 
+  // Advanced filter setters
+  const setAmountMin = useCallback((v: string) => {
+    setAmountMinState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setAmountMax = useCallback((v: string) => {
+    setAmountMaxState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const toggleCategory = useCallback((id: string) => {
+    setSelectedCategoriesState((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+    setSelectedIds(new Set());
+  }, []);
+  const clearCategories = useCallback(() => {
+    setSelectedCategoriesState([]);
+    setSelectedIds(new Set());
+  }, []);
+  const setDateFrom = useCallback((v: string) => {
+    setDateFromState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setDateTo = useCallback((v: string) => {
+    setDateToState(v);
+    setSelectedIds(new Set());
+  }, []);
+  const setIncludeNotes = useCallback((v: boolean) => {
+    setIncludeNotesState(v);
+    setSelectedIds(new Set());
+  }, []);
+
+  const clearAdvancedFilters = useCallback(() => {
+    setAmountMinState('');
+    setAmountMaxState('');
+    setSelectedCategoriesState([]);
+    setDateFromState('');
+    setDateToState('');
+    setIncludeNotesState(false);
+    setSelectedIds(new Set());
+  }, []);
+
   const clearFilters = useCallback(() => {
     setSearchState('');
     setTypeFilterState('all');
-    setCategoryFilterState('');
     setPaymentMethodFilterState('');
     setAllMonthsState(false);
     setYearOnlyState(false);
+    setAmountMinState('');
+    setAmountMaxState('');
+    setSelectedCategoriesState([]);
+    setDateFromState('');
+    setDateToState('');
+    setIncludeNotesState(false);
     setSelectedIds(new Set());
   }, []);
 
   const hasActiveFilters =
     search !== '' ||
     typeFilter !== 'all' ||
-    categoryFilter !== '' ||
     paymentMethodFilter !== '' ||
     allMonths ||
-    yearOnly;
+    yearOnly ||
+    activeAdvancedFilterCount > 0;
 
-  // Payment methods reference data
+  // Reference data — payment methods
   const { data: pmData } = useQuery({
     queryKey: ['payment-methods'],
     queryFn: async () => {
@@ -160,7 +247,18 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   });
   const paymentMethods = pmData ?? [];
 
-  // Infinite query for load-more accumulation
+  // Reference data — categories (for filter sheet)
+  const { data: catData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const result = await api.categories.list();
+      return result.data?.categories ?? [];
+    },
+    enabled: initialized,
+  });
+  const categories = catData ?? [];
+
+  // Infinite query
   const {
     data,
     isLoading: isQueryLoading,
@@ -171,18 +269,29 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     queryKey: ['all-transactions', filterKey],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, unknown> = { page: pageParam, pageSize: PAGE_SIZE };
-      if (yearOnly) {
+
+      // Date scope — date range takes priority over month/year
+      if (dateFrom && dateTo) {
+        params.dateFrom = dateFrom;
+        params.dateTo = dateTo;
+      } else if (yearOnly) {
         params.year = year;
         params.yearOnly = true;
       } else if (!allMonths) {
         params.month = month;
         params.year = year;
       }
+
       if (typeFilter !== 'all') params.type = typeFilter;
-      if (categoryFilter) params.categoryId = categoryFilter;
       if (paymentMethodFilter) params.paymentMethod = paymentMethodFilter;
       if (search) params.search = search;
       params.sortOrder = sortOrder;
+
+      // Advanced filters
+      if (Number(amountMin) > 0) params.amountMin = Number(amountMin);
+      if (Number(amountMax) > 0) params.amountMax = Number(amountMax);
+      if (selectedCategories.length > 0) params.categories = selectedCategories.join(',');
+      if (includeNotes) params.includeNotes = true;
 
       const result = await api.transactions.list(
         params as Parameters<typeof api.transactions.list>[0]
@@ -285,8 +394,6 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     setSearch,
     typeFilter,
     setTypeFilter,
-    categoryFilter,
-    setCategoryFilter,
     paymentMethodFilter,
     setPaymentMethodFilter,
     allMonths,
@@ -297,7 +404,23 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     toggleSortOrder,
     hasActiveFilters,
     clearFilters,
+    amountMin,
+    setAmountMin,
+    amountMax,
+    setAmountMax,
+    selectedCategories,
+    toggleCategory,
+    clearCategories,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    includeNotes,
+    setIncludeNotes,
+    clearAdvancedFilters,
+    activeAdvancedFilterCount,
     paymentMethods,
+    categories,
     formOpen,
     setFormOpen,
     editingTx,

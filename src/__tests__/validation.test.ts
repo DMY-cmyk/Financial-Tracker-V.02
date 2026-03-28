@@ -269,3 +269,63 @@ describe('createExportJobSchema', () => {
     );
   });
 });
+
+describe('listTransactionsQuerySchema — advanced filters', () => {
+  it('accepts amountMin and amountMax when min <= max', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      amountMin: '100000',
+      amountMax: '500000',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.amountMin).toBe(100000);
+      expect(result.data.amountMax).toBe(500000);
+    }
+  });
+
+  it('rejects when amountMin > amountMax', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      amountMin: '600000',
+      amountMax: '500000',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects when only dateFrom is provided without dateTo', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      dateFrom: '2026-01-01',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts dateFrom + dateTo together', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      dateFrom: '2026-01-01',
+      dateTo: '2026-01-31',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts amountMin alone without amountMax', () => {
+    const result = listTransactionsQuerySchema.safeParse({ amountMin: '100000' });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts amountMax alone without amountMin', () => {
+    const result = listTransactionsQuerySchema.safeParse({ amountMax: '500000' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects when only dateTo is provided without dateFrom', () => {
+    const result = listTransactionsQuerySchema.safeParse({ dateTo: '2026-01-31' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects when dateFrom is after dateTo', () => {
+    const result = listTransactionsQuerySchema.safeParse({
+      dateFrom: '2026-03-01',
+      dateTo: '2026-01-01',
+    });
+    expect(result.success).toBe(false);
+  });
+});
