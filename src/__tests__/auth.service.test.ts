@@ -20,6 +20,8 @@ describe('registerUser', () => {
     expect(result.token).toBeDefined();
     expect(typeof result.token).toBe('string');
     expect(result.token.split('.').length).toBe(3); // JWT has 3 parts
+    expect('password_hash' in result.user).toBe(false);
+    expect('password' in result.user).toBe(false);
   });
 
   it('normalizes email to lowercase', async () => {
@@ -52,6 +54,7 @@ describe('loginUser', () => {
     if ('error' in result) return;
     expect(result.user.email).toBe('bob@example.com');
     expect(result.token).toBeDefined();
+    expect(result.token.split('.').length).toBe(3); // JWT has 3 parts
   });
 
   it('login is case-insensitive for email', async () => {
