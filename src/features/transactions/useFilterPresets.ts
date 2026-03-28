@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { nanoid } from 'nanoid';
 
 const PRESET_KEY = 'tx-filter-presets';
@@ -47,7 +47,7 @@ interface UseFilterPresetsReturn {
 export function useFilterPresets(): UseFilterPresetsReturn {
   const [presets, setPresets] = useState<FilterPreset[]>(() => loadPresets());
 
-  const savePreset = (name: string, filters: FilterPresetFilters) => {
+  const savePreset = useCallback((name: string, filters: FilterPresetFilters) => {
     const newPreset: FilterPreset = {
       id: nanoid(),
       name: name.trim(),
@@ -60,15 +60,15 @@ export function useFilterPresets(): UseFilterPresetsReturn {
       persistPresets(updated);
       return updated;
     });
-  };
+  }, []);
 
-  const deletePreset = (id: string) => {
+  const deletePreset = useCallback((id: string) => {
     setPresets((prev) => {
       const updated = prev.filter((p) => p.id !== id);
       persistPresets(updated);
       return updated;
     });
-  };
+  }, []);
 
   return { presets, savePreset, deletePreset };
 }

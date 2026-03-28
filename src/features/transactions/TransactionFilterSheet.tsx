@@ -136,7 +136,7 @@ export function TransactionFilterSheet({
             </div>
             {amountError && (
               <p className="text-destructive mt-1.5 text-xs">
-                {t(locale, 'minAmount')} ≤ {t(locale, 'maxAmount')}
+                {t(locale, 'amountRangeError')}
               </p>
             )}
           </section>
@@ -146,12 +146,14 @@ export function TransactionFilterSheet({
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium">{t(locale, 'multiCategory')}</h3>
               {selectedCategories.length > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={clearCategories}
-                  className="text-muted-foreground hover:text-foreground text-xs"
+                  className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
                 >
                   {t(locale, 'clear')}
-                </button>
+                </Button>
               )}
             </div>
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -236,15 +238,17 @@ export function TransactionFilterSheet({
                     className="border-border bg-muted flex items-center gap-1 rounded-full border px-3 py-1 text-xs"
                   >
                     <button
+                      type="button"
                       onClick={() => onApplyPreset(preset.filters)}
                       className="hover:text-foreground text-muted-foreground"
                     >
                       {preset.name}
                     </button>
                     <button
+                      type="button"
                       onClick={() => onDeletePreset(preset.id)}
                       className="text-muted-foreground hover:text-destructive ml-1"
-                      aria-label={`Delete preset ${preset.name}`}
+                      aria-label={t(locale, 'deletePreset').replace('{name}', preset.name)}
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -275,6 +279,7 @@ export function TransactionFilterSheet({
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => setSavingPreset(true)}
                 className="text-primary hover:underline text-sm"
               >

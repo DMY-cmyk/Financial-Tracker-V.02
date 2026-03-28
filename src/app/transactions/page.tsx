@@ -383,7 +383,7 @@ function TransactionsPageInner() {
           selectedCategories: selectedCategories.length > 0 ? selectedCategories : undefined,
           dateFrom: dateFrom || undefined,
           dateTo: dateTo || undefined,
-          includeNotes: includeNotes || undefined,
+          includeNotes: includeNotes ? true : undefined,
         }}
         onClearAll={() => {
           clearAdvancedFilters();

@@ -419,6 +419,8 @@ type TranslationKeys = {
   activeFilters: string;
   dateRangeOverridesMonth: string;
   dateRangeBothRequired: string;
+  amountRangeError: string;
+  deletePreset: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -795,6 +797,8 @@ const translations: Record<Locale, TranslationKeys> = {
     activeFilters: 'Filters ({n})',
     dateRangeOverridesMonth: 'Overrides month selector',
     dateRangeBothRequired: 'Both date fields are required',
+    amountRangeError: 'Minimum must be ≤ maximum',
+    deletePreset: 'Delete preset {name}',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1170,6 +1174,8 @@ const translations: Record<Locale, TranslationKeys> = {
     activeFilters: 'Filter ({n})',
     dateRangeOverridesMonth: 'Menimpa pemilih bulan',
     dateRangeBothRequired: 'Kedua field tanggal diperlukan',
+    amountRangeError: 'Minimum harus ≤ maksimum',
+    deletePreset: 'Hapus preset {name}',
   },
 };
 
