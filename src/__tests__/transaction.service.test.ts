@@ -286,17 +286,20 @@ describe('listTransactions — advanced filters', () => {
     expect(result.data!.total).toBe(baseline.data!.total);
   });
 
-  it('uses categories param over legacy categoryId when both provided', async () => {
-    // Both point to nonexistent IDs → categories (multi) takes priority and yields 0 results
-    const resultMulti = await listTransactions({
+  it('uses categories param and ignores legacy categoryId when both provided', async () => {
+    // cat-food has 1 transaction (Groceries) from the beforeEach above.
+    // If categoryId were used, the result would be 1 row.
+    // If categories is used (nonexistent), the result is 0 rows.
+    // Asserting 0 proves categories took priority over categoryId.
+    const result = await listTransactions({
       year: 2026,
       yearOnly: true,
-      categories: 'nonexistent-id',
-      categoryId: 'also-nonexistent',
+      categories: 'nonexistent-cat-id', // nonexistent → 0 rows if this wins
+      categoryId: 'cat-food', // valid → 1 row if this wins
     });
-    expect(resultMulti.error).toBeUndefined();
-    // Both are nonexistent → 0 results, proving categories was used (not ignored)
-    expect(resultMulti.data!.total).toBe(0);
+    expect(result.error).toBeUndefined();
+    // categories took priority (returned 0, not the cat-food transaction)
+    expect(result.data!.total).toBe(0);
   });
 });
 
