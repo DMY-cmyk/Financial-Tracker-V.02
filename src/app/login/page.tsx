@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,27 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Show session-expired banner when redirected by middleware
+  const searchParams = useSearchParams();
+  const reason = searchParams.get('reason');
+  const sessionExpiredMessage =
+    reason === 'expired' ? 'Your session has expired. Please sign in again.' : '';
+
+  // SKIP_AUTH: auto-redirect to /register if no users exist (dev only)
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_SKIP_AUTH !== 'true') return;
+    fetch('/api/auth/setup-check')
+      .then((r) => r.json())
+      .then((data: { data?: { hasUsers: boolean } }) => {
+        if (data.data && !data.data.hasUsers) {
+          router.replace('/register');
+        }
+      })
+      .catch(() => {
+        // Ignore errors — don't block login page on setup-check failure
+      });
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +79,16 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold">Welcome Back</h1>
           <p className="text-muted-foreground mt-1 text-sm">Sign in to your financial tracker</p>
         </div>
+
+        {sessionExpiredMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400"
+          >
+            {sessionExpiredMessage}
+          </motion.div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
