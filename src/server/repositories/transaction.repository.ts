@@ -253,13 +253,23 @@ export function createTransactionRepository() {
       page?: number;
       pageSize?: number;
       sortOrder?: 'asc' | 'desc';
+      // Advanced filters
+      amountMin?: number;
+      amountMax?: number;
+      categories?: string; // comma-separated category IDs
+      dateFrom?: string; // YYYY-MM-DD
+      dateTo?: string; // YYYY-MM-DD
+      includeNotes?: boolean;
     }): Promise<{ rows: Transaction[]; total: number; income: number; expense: number }> {
       const db = await getDb();
       const conditions: string[] = [];
       const params: unknown[] = [];
 
-      if (filters.yearOnly && filters.year !== undefined) {
-        // Year-only filter: match all months in the year
+      // --- Date scope (dateFrom+dateTo takes priority over month/year) ---
+      if (filters.dateFrom && filters.dateTo) {
+        conditions.push('date >= ? AND date <= ?');
+        params.push(filters.dateFrom, filters.dateTo);
+      } else if (filters.yearOnly && filters.year !== undefined) {
         conditions.push("date LIKE ? || '%'");
         params.push(`${filters.year}`);
       } else if (filters.month !== undefined && filters.year !== undefined) {
@@ -267,30 +277,57 @@ export function createTransactionRepository() {
         conditions.push("date LIKE ? || '%'");
         params.push(prefix);
       }
+
       if (filters.type) {
         conditions.push('type = ?');
         params.push(filters.type);
       }
-      if (filters.categoryId) {
+
+      // Multi-category takes priority over single categoryId
+      if (filters.categories && filters.categories.trim().length > 0) {
+        const ids = filters.categories.split(',').filter(Boolean);
+        if (ids.length > 0) {
+          const placeholders = ids.map(() => '?').join(',');
+          conditions.push(`category_id IN (${placeholders})`);
+          params.push(...ids);
+        }
+      } else if (filters.categoryId) {
         conditions.push('category_id = ?');
         params.push(filters.categoryId);
       }
+
       if (filters.paymentMethod) {
         conditions.push('payment_method = ?');
         params.push(filters.paymentMethod);
       }
+
       if (filters.search) {
-        conditions.push(
-          '(LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(notes) LIKE ?)'
-        );
-        const q = `%${filters.search.toLowerCase()}%`;
-        params.push(q, q, q);
+        if (filters.includeNotes) {
+          conditions.push(
+            '(LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(notes) LIKE ?)'
+          );
+          const q = `%${filters.search.toLowerCase()}%`;
+          params.push(q, q, q);
+        } else {
+          conditions.push('(LOWER(description) LIKE ? OR LOWER(category) LIKE ?)');
+          const q = `%${filters.search.toLowerCase()}%`;
+          params.push(q, q);
+        }
+      }
+
+      // Amount range (0 = no filter)
+      if (filters.amountMin !== undefined && filters.amountMin > 0) {
+        conditions.push('amount >= ?');
+        params.push(filters.amountMin);
+      }
+      if (filters.amountMax !== undefined && filters.amountMax > 0) {
+        conditions.push('amount <= ?');
+        params.push(filters.amountMax);
       }
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
       const dir = filters.sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-      // Get total count + aggregates in one query
       const countResult = await db.query<{
         cnt: number;
         total_income: number;
@@ -307,7 +344,6 @@ export function createTransactionRepository() {
       const income = countResult.rows[0]?.total_income ?? 0;
       const expense = countResult.rows[0]?.total_expense ?? 0;
 
-      // Get paginated rows
       const page = filters.page ?? 1;
       const pageSize = filters.pageSize ?? 25;
       const offset = (page - 1) * pageSize;
