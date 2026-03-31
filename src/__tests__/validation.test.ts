@@ -6,6 +6,7 @@ import {
   dashboardSummaryQuerySchema,
   createCategorySchema,
   createPaymentMethodSchema,
+  updatePaymentMethodSchema,
   updateSettingsSchema,
   createUploadSchema,
   createExportJobSchema,
@@ -222,6 +223,34 @@ describe('createPaymentMethodSchema', () => {
 
   it('rejects invalid type', () => {
     expect(createPaymentMethodSchema.safeParse({ name: 'X', type: 'crypto' }).success).toBe(false);
+  });
+
+  it('defaults beginningBalance to 0 when omitted', () => {
+    const result = createPaymentMethodSchema.safeParse({ name: 'BCA', type: 'bank' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.beginningBalance).toBe(0);
+  });
+
+  it('accepts explicit beginningBalance', () => {
+    const result = createPaymentMethodSchema.safeParse({
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 5000000,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.beginningBalance).toBe(5000000);
+  });
+});
+
+describe('updatePaymentMethodSchema with beginningBalance', () => {
+  it('accepts partial beginningBalance update', () => {
+    const result = updatePaymentMethodSchema.safeParse({ beginningBalance: 1000 });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts negative beginningBalance', () => {
+    const result = updatePaymentMethodSchema.safeParse({ beginningBalance: -500000 });
+    expect(result.success).toBe(true);
   });
 });
 
