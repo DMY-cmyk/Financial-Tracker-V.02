@@ -68,10 +68,10 @@ export const DEFAULT_INCOME_CATEGORIES: Omit<Category, 'id'>[] = [
 ];
 
 export const DEFAULT_PAYMENT_METHODS: Omit<PaymentMethod, 'id'>[] = [
-  { name: 'Bank BCA', icon: 'building', type: 'bank' },
-  { name: 'Cash', icon: 'banknote', type: 'cash' },
-  { name: 'GoPay', icon: 'smartphone', type: 'ewallet' },
-  { name: 'OVO', icon: 'smartphone', type: 'ewallet' },
+  { name: 'Bank BCA', icon: 'building', type: 'bank', beginningBalance: 0 },
+  { name: 'Cash', icon: 'banknote', type: 'cash', beginningBalance: 0 },
+  { name: 'GoPay', icon: 'smartphone', type: 'ewallet', beginningBalance: 0 },
+  { name: 'OVO', icon: 'smartphone', type: 'ewallet', beginningBalance: 0 },
 ];
 
 export const PALETTE_COLORS = [
