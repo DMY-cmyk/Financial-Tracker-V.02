@@ -16,7 +16,7 @@ function rowToPm(row: PmRow): PaymentMethod {
     name: row.name,
     icon: row.icon,
     type: row.type as 'bank' | 'cash' | 'ewallet',
-    beginningBalance: Number(row.beginning_balance),
+    beginningBalance: Number(row.beginning_balance ?? 0),
   };
 }
 
