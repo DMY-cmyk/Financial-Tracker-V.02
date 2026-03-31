@@ -177,6 +177,7 @@ describe('listPaymentMethodBalances (all-time path)', () => {
       paymentMethod: 'BCA',
     });
     const r = await listPaymentMethodBalances();
+    expect(r.data![0].beginningBalance).toBe(0);
     expect(r.data![0].balance).toBe(1500000);
   });
 });
