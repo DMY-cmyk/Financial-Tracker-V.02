@@ -37,6 +37,25 @@ describe('createPaymentMethod', () => {
     expect(result.data!.icon).toBe('wallet');
   });
 
+  it('stores beginningBalance when provided', async () => {
+    const result = await createPaymentMethod({
+      name: 'Bank BCA',
+      type: 'bank',
+      beginningBalance: 250000,
+    });
+    expect(result.data).toBeDefined();
+    expect(result.data!.beginningBalance).toBe(250000);
+    // Verify persistence: re-fetch
+    const list = await listPaymentMethods();
+    const found = list.data!.find((m) => m.id === result.data!.id);
+    expect(found!.beginningBalance).toBe(250000);
+  });
+
+  it('defaults beginningBalance to 0 when not provided', async () => {
+    const result = await createPaymentMethod({ name: 'Cash', type: 'cash' });
+    expect(result.data!.beginningBalance).toBe(0);
+  });
+
   it('returns validation error for empty name', async () => {
     const result = await createPaymentMethod({ ...validInput, name: '' });
     expect(result.error).toBeDefined();
@@ -78,6 +97,24 @@ describe('updatePaymentMethod', () => {
     expect(result.error).toBeUndefined();
     expect(result.data!.name).toBe('Bank Mandiri');
     expect(result.data!.type).toBe('bank'); // unchanged
+  });
+
+  it('updates beginningBalance', async () => {
+    const created = await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 0 });
+    const result = await updatePaymentMethod(created.data!.id, { beginningBalance: 500000 });
+    expect(result.data!.beginningBalance).toBe(500000);
+  });
+
+  it('leaves beginningBalance unchanged when not in PATCH body', async () => {
+    const created = await createPaymentMethod({
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 100000,
+    });
+    await updatePaymentMethod(created.data!.id, { name: 'BCA Savings' });
+    const list = await listPaymentMethods();
+    const found = list.data!.find((m) => m.id === created.data!.id);
+    expect(found!.beginningBalance).toBe(100000);
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
