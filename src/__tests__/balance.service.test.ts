@@ -113,3 +113,70 @@ describe('listPaymentMethodBalances (monthly chain)', () => {
     expect(gopay.balance).toBe(1000000);
   });
 });
+
+describe('listPaymentMethodBalances (all-time path)', () => {
+  it('balance includes beginning_balance when no transactions exist', async () => {
+    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 500000 });
+    const r = await listPaymentMethodBalances();
+    expect(r.data).toHaveLength(1);
+    expect(r.data![0].balance).toBe(500000);
+    expect(r.data![0].beginningBalance).toBe(500000);
+  });
+
+  it('balance = beginning_balance + income − expense', async () => {
+    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 1000000 });
+    await createTransaction({
+      description: 'Salary',
+      amount: 3000000,
+      type: 'income',
+      date: '2026-01-15',
+      category: 'Gaji',
+      categoryId: 'gaji1',
+      paymentMethod: 'BCA',
+    });
+    await createTransaction({
+      description: 'Food',
+      amount: 500000,
+      type: 'expense',
+      date: '2026-01-20',
+      category: 'Makanan',
+      categoryId: 'makanan1',
+      paymentMethod: 'BCA',
+    });
+    const r = await listPaymentMethodBalances();
+    const row = r.data![0];
+    expect(row.income).toBe(3000000);
+    expect(row.expense).toBe(500000);
+    expect(row.balance).toBe(3500000); // 1000000 + 3000000 - 500000
+  });
+
+  it('negative beginning_balance reduces balance', async () => {
+    await createPaymentMethod({ name: 'CC', type: 'ewallet', beginningBalance: -200000 });
+    const r = await listPaymentMethodBalances();
+    expect(r.data![0].balance).toBe(-200000);
+  });
+
+  it('zero beginning_balance preserves income−expense behavior (regression)', async () => {
+    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 0 });
+    await createTransaction({
+      description: 'Income',
+      amount: 2000000,
+      type: 'income',
+      date: '2026-01-10',
+      category: 'Gaji',
+      categoryId: 'gaji1',
+      paymentMethod: 'BCA',
+    });
+    await createTransaction({
+      description: 'Expense',
+      amount: 500000,
+      type: 'expense',
+      date: '2026-01-11',
+      category: 'Makanan',
+      categoryId: 'makanan1',
+      paymentMethod: 'BCA',
+    });
+    const r = await listPaymentMethodBalances();
+    expect(r.data![0].balance).toBe(1500000);
+  });
+});
