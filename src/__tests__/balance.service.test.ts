@@ -181,3 +181,31 @@ describe('listPaymentMethodBalances (all-time path)', () => {
     expect(r.data![0].balance).toBe(1500000);
   });
 });
+
+describe('listPaymentMethodBalances (monthly path — beginning_balance)', () => {
+  it('beginning_balance is added to chain calculation', async () => {
+    // PM with beginning_balance of 1,000,000
+    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 1000000 });
+    // Prior month income: 500,000 (February 2026)
+    await mkTx('2026-02-10', 'income', 500000);
+    // Current month expense: 200,000 (March 2026)
+    await mkTx('2026-03-05', 'expense', 200000);
+    // Query March 2026 (month=2, year=2026)
+    const r = await listPaymentMethodBalances(2, 2026);
+    const row = r.data![0];
+    // beginningBalance for March = pm.beginning_balance + prior transactions = 1000000 + 500000 = 1500000
+    expect(row.beginningBalance).toBe(1500000);
+    // balance = 1500000 + 0 income - 200000 expense = 1300000
+    expect(row.balance).toBe(1300000);
+  });
+
+  it('zero beginning_balance leaves monthly chain unchanged (regression)', async () => {
+    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 0 });
+    await mkTx('2026-02-10', 'income', 500000);
+    await mkTx('2026-03-05', 'expense', 200000);
+    const r = await listPaymentMethodBalances(2, 2026);
+    const row = r.data![0];
+    expect(row.beginningBalance).toBe(500000); // 0 + 500000
+    expect(row.balance).toBe(300000); // 500000 - 200000
+  });
+});
