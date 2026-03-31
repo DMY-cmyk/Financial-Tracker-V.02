@@ -493,7 +493,9 @@ export default function CategoriesPage() {
               className="w-36 font-mono"
               value={newMethodBeginningBalance}
               onChange={(e) =>
-                setNewMethodBeginningBalance(formatCurrencyInput(parseCurrencyInput(e.target.value)))
+                setNewMethodBeginningBalance(
+                  formatCurrencyInput(parseCurrencyInput(e.target.value))
+                )
               }
               placeholder="0"
               aria-label={t(locale, 'beginningBalance')}

@@ -100,7 +100,11 @@ describe('updatePaymentMethod', () => {
   });
 
   it('updates beginningBalance', async () => {
-    const created = await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 50000 });
+    const created = await createPaymentMethod({
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 50000,
+    });
     const result = await updatePaymentMethod(created.data!.id, { beginningBalance: 500000 });
     expect(result.data!.beginningBalance).toBe(500000);
   });
