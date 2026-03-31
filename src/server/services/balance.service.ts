@@ -78,14 +78,15 @@ export async function listPaymentMethodBalances(
   const { rows } = await db.query<BalanceRow>(
     `SELECT
       pm.id, pm.name, pm.type, pm.icon,
-      0 AS beginning_balance,
+      pm.beginning_balance,
       COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) AS income,
       COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) AS expense,
-      COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount
-                        WHEN t.type = 'expense' THEN -t.amount ELSE 0 END), 0) AS balance
+      pm.beginning_balance +
+        COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount
+                          WHEN t.type = 'expense' THEN -t.amount ELSE 0 END), 0) AS balance
     FROM payment_methods pm
     LEFT JOIN transactions t ON t.payment_method = pm.name
-    GROUP BY pm.id, pm.name, pm.type, pm.icon
+    GROUP BY pm.id, pm.name, pm.type, pm.icon, pm.beginning_balance
     ORDER BY balance DESC`
   );
 
@@ -95,7 +96,7 @@ export async function listPaymentMethodBalances(
       name: row.name,
       type: row.type as 'bank' | 'cash' | 'ewallet',
       icon: row.icon,
-      beginningBalance: 0,
+      beginningBalance: Number(row.beginning_balance),
       income: Number(row.income),
       expense: Number(row.expense),
       balance: Number(row.balance),
