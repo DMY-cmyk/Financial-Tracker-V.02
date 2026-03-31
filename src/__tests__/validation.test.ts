@@ -246,6 +246,7 @@ describe('updatePaymentMethodSchema with beginningBalance', () => {
   it('accepts partial beginningBalance update', () => {
     const result = updatePaymentMethodSchema.safeParse({ beginningBalance: 1000 });
     expect(result.success).toBe(true);
+    if (result.success) expect(result.data.beginningBalance).toBe(1000);
   });
 
   it('accepts negative beginningBalance', () => {
