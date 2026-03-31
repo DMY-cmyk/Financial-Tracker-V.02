@@ -237,7 +237,7 @@ export default function CategoriesPage() {
     setEditName(method.name);
     setEditType(method.type);
     setEditBeginningBalance(
-      method.beginningBalance ? formatCurrencyInput(method.beginningBalance) : ''
+      method.beginningBalance !== 0 ? formatCurrencyInput(method.beginningBalance) : ''
     );
   };
 
@@ -500,7 +500,9 @@ export default function CategoriesPage() {
               placeholder="0"
               aria-label={t(locale, 'beginningBalance')}
             />
-            <p className="text-muted-foreground mt-1 text-xs">{t(locale, 'beginningBalance')}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {t(locale, 'beginningBalanceHelp')}
+            </p>
           </div>
           <Button onClick={handleAddMethod} className="gap-1" disabled={addingMethod}>
             {addingMethod ? (

@@ -278,10 +278,10 @@ export interface PaymentMethodBalance {
   name: string;
   type: 'bank' | 'cash' | 'ewallet';
   icon: string;
-  beginningBalance: number; // sum of all transactions before the queried month; 0 for all-time path
+  beginningBalance: number; // pm.beginning_balance + prior-month chain (monthly path); pm.beginning_balance alone (all-time path)
   income: number;
   expense: number;
-  balance: number; // beginningBalance + income − expense (monthly) or income − expense (all-time)
+  balance: number; // beginningBalance + income − expense
 }
 
 export interface BalanceListResponse {
