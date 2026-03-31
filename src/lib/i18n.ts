@@ -390,6 +390,9 @@ type TranslationKeys = {
 
   // Beginning Balance
   beginningBalance: string;
+  beginningBalanceHelp: string;
+  existingDebt: string;
+  existingDebtHelp: string;
   closing: string;
 
   // Sort order
@@ -778,6 +781,9 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Beginning Balance',
+    beginningBalanceHelp: 'The amount already in this account before you started tracking.',
+    existingDebt: 'Existing Debt',
+    existingDebtHelp: 'Enter how much you already owe on this card before you started tracking.',
     closing: 'Closing',
 
     // Sort order
@@ -1166,6 +1172,9 @@ const translations: Record<Locale, TranslationKeys> = {
 
     // Beginning Balance
     beginningBalance: 'Saldo Awal',
+    beginningBalanceHelp: 'Jumlah yang sudah ada di akun ini sebelum Anda mulai mencatat.',
+    existingDebt: 'Utang Awal',
+    existingDebtHelp: 'Masukkan jumlah utang kartu kredit sebelum Anda mulai mencatat.',
     closing: 'Penutupan',
 
     // Sort order
