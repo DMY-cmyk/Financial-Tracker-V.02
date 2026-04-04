@@ -48,7 +48,8 @@ export function TemplateCard({ template, onApply, onDelete }: TemplateCardProps)
           <p className="font-medium">{template.name}</p>
           <p className="text-muted-foreground truncate text-sm">{previewText}</p>
           <p className="text-muted-foreground text-xs">
-            {template.categoryCount} categories · {createdDate}
+            {t(locale, 'nCategoriesLabel').replace('{n}', String(template.categoryCount))} ·{' '}
+            {createdDate}
           </p>
         </div>
         <div className="ml-3 flex shrink-0 gap-2">

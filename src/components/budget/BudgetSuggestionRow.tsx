@@ -17,7 +17,7 @@ export function BudgetSuggestionRow({ suggestion, value, onChange }: BudgetSugge
 
   const handleChange = (raw: string) => {
     setInputValue(raw);
-    const num = parseFloat(raw.replace(/[^0-9]/g, ''));
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     if (!isNaN(num)) onChange(suggestion.categoryId, num);
   };
 

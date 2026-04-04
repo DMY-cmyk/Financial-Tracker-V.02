@@ -81,8 +81,8 @@ export function SaveTemplateDialog({
 
           <p className="text-muted-foreground text-sm">
             {categoryCount > 0
-              ? `Saving ${categoryCount} ${categoryCount === 1 ? 'category' : 'categories'} with budgets`
-              : 'No categories currently have budgets set'}
+              ? t(locale, 'savingCategories').replace('{n}', String(categoryCount))
+              : t(locale, 'noBudgetsSet')}
           </p>
         </div>
 

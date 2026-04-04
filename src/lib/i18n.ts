@@ -451,6 +451,10 @@ type TranslationKeys = {
   deleteTemplateConfirm: string;
   notEnoughData: string;
   noExpenseCategories: string;
+  savingCategories: string;
+  noBudgetsSet: string;
+  nCategoriesLabel: string;
+  failedToUpdateCategories: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -702,6 +706,10 @@ const translations: Record<Locale, TranslationKeys> = {
     deleteTemplateConfirm: 'Delete "{name}"? This cannot be undone.',
     notEnoughData: 'Not enough data',
     noExpenseCategories: 'No expense categories found',
+    savingCategories: 'Saving {n} categories with budgets',
+    noBudgetsSet: 'No categories currently have budgets set',
+    nCategoriesLabel: '{n} categories',
+    failedToUpdateCategories: 'Failed to update {n} categories',
 
     // Savings page
     savingsPage: 'Savings Goals',
@@ -1108,6 +1116,10 @@ const translations: Record<Locale, TranslationKeys> = {
     deleteTemplateConfirm: 'Hapus "{name}"? Tindakan ini tidak dapat dibatalkan.',
     notEnoughData: 'Data tidak cukup',
     noExpenseCategories: 'Tidak ada kategori pengeluaran',
+    savingCategories: 'Menyimpan {n} kategori dengan anggaran',
+    noBudgetsSet: 'Belum ada kategori dengan anggaran',
+    nCategoriesLabel: '{n} kategori',
+    failedToUpdateCategories: 'Gagal memperbarui {n} kategori',
 
     // Savings page
     savingsPage: 'Target Tabungan',

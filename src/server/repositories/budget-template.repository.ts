@@ -49,7 +49,7 @@ export function createBudgetTemplateRepository() {
     async findAll(): Promise<TemplateSummary[]> {
       const db = await getDb();
       const result = await db.query<TemplateRow>(
-        'SELECT id, name, category_budgets, created_at FROM budget_templates ORDER BY created_at DESC, rowid DESC'
+        'SELECT id, name, category_budgets, created_at FROM budget_templates ORDER BY created_at DESC, id DESC'
       );
       return result.rows.map(rowToSummary);
     },
@@ -125,13 +125,13 @@ export function createBudgetTemplateRepository() {
          LEFT JOIN (
            SELECT
              category_id,
-             strftime('%Y-%m', date) AS month_key,
+             SUBSTR(date, 1, 7) AS month_key,
              SUM(amount) AS total
            FROM transactions
            WHERE type = 'expense'
              AND date >= ?
              AND date < ?
-           GROUP BY category_id, month_key
+           GROUP BY category_id, SUBSTR(date, 1, 7)
          ) monthly ON monthly.category_id = c.id
          WHERE c.type = 'expense'
          GROUP BY c.id, c.name, c.color

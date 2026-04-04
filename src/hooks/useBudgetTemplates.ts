@@ -73,7 +73,7 @@ export function useBudgetTemplates() {
       );
       const failed = results.filter((r) => r.error);
       if (failed.length > 0) {
-        toast.error(`Failed to update ${failed.length} categories`);
+        toast.error(t(locale, 'failedToUpdateCategories').replace('{n}', String(failed.length)));
         return false;
       }
       toast.success(t(locale, 'budgetUpdated'));
