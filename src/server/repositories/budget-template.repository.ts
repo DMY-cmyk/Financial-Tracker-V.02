@@ -99,8 +99,8 @@ export function createBudgetTemplateRepository() {
     ): Promise<{ categoryId: string; categoryName: string; color: string; suggestedBudget: number; basedOnMonths: number }[]> {
       const db = await getDb();
       const now = new Date();
-      const startDate = new Date(now.getFullYear(), now.getMonth() - months, 1);
-      const endDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months, 1));
+      const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
       const startStr = startDate.toISOString().slice(0, 10);
       const endStr = endDate.toISOString().slice(0, 10);
