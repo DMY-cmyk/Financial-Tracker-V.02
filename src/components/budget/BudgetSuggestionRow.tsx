@@ -24,7 +24,7 @@ export function BudgetSuggestionRow({ suggestion, value, onChange }: BudgetSugge
   const basedOnText =
     suggestion.basedOnMonths > 0
       ? t(locale, 'suggestionsBasedOn').replace('{n}', String(suggestion.basedOnMonths))
-      : 'Not enough data';
+      : t(locale, 'notEnoughData');
 
   return (
     <div className="border-border flex items-center gap-3 border-b py-3 last:border-0">

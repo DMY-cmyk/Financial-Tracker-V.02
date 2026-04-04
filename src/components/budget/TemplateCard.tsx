@@ -89,7 +89,7 @@ export function TemplateCard({ template, onApply, onDelete }: TemplateCardProps)
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
         title={t(locale, 'delete')}
-        description={`Delete template "${template.name}"? This cannot be undone.`}
+        description={t(locale, 'deleteTemplateConfirm').replace('{name}', template.name)}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={handleDelete}

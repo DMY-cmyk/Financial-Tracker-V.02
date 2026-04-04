@@ -86,7 +86,7 @@ export function BudgetSuggestionSheet({
             <motion.div {...fadeInUp} className="flex flex-col items-center gap-3 py-12">
               <Lightbulb className="text-muted-foreground h-12 w-12" />
               <p className="text-muted-foreground text-center text-sm">
-                No expense categories found.
+                {t(locale, 'noExpenseCategories')}
               </p>
             </motion.div>
           )}

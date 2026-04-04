@@ -448,6 +448,9 @@ type TranslationKeys = {
   noTemplates: string;
   applySuggestions: string;
   templateSaved: string;
+  deleteTemplateConfirm: string;
+  notEnoughData: string;
+  noExpenseCategories: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -696,6 +699,9 @@ const translations: Record<Locale, TranslationKeys> = {
     noTemplates: 'No templates saved yet',
     applySuggestions: 'Apply Suggestions',
     templateSaved: 'Template saved',
+    deleteTemplateConfirm: 'Delete "{name}"? This cannot be undone.',
+    notEnoughData: 'Not enough data',
+    noExpenseCategories: 'No expense categories found',
 
     // Savings page
     savingsPage: 'Savings Goals',
@@ -1099,6 +1105,9 @@ const translations: Record<Locale, TranslationKeys> = {
     noTemplates: 'Belum ada template tersimpan',
     applySuggestions: 'Terapkan Saran',
     templateSaved: 'Template disimpan',
+    deleteTemplateConfirm: 'Hapus "{name}"? Tindakan ini tidak dapat dibatalkan.',
+    notEnoughData: 'Data tidak cukup',
+    noExpenseCategories: 'Tidak ada kategori pengeluaran',
 
     // Savings page
     savingsPage: 'Target Tabungan',
