@@ -30,6 +30,10 @@ import type {
   MonthlyReportResponse,
   AnnualReportData,
   ApiResult,
+  BudgetTemplateListResponse,
+  BudgetTemplate,
+  ApplyTemplateResponse,
+  BudgetSuggestionListResponse,
 } from './contracts';
 
 const BASE_URL = '/api';
@@ -347,6 +351,35 @@ export const api = {
 
     annual(year: number) {
       return fetchApi<AnnualReportData>(`/reports/annual?year=${year}`);
+    },
+  },
+
+  budgetTemplates: {
+    list() {
+      return fetchApi<BudgetTemplateListResponse>('/budget-templates');
+    },
+
+    create(name: string) {
+      return fetchApi<BudgetTemplate>('/budget-templates', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+      });
+    },
+
+    delete(id: string) {
+      return fetchApi<{ success: boolean }>(`/budget-templates/${id}`, {
+        method: 'DELETE',
+      });
+    },
+
+    apply(id: string) {
+      return fetchApi<ApplyTemplateResponse>(`/budget-templates/${id}/apply`, {
+        method: 'POST',
+      });
+    },
+
+    suggestions(months = 3) {
+      return fetchApi<BudgetSuggestionListResponse>(`/budget/suggestions?months=${months}`);
     },
   },
 };
