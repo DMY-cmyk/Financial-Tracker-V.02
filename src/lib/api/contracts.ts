@@ -386,3 +386,7 @@ export interface ApplyTemplateResponse {
 export interface BudgetSuggestionListResponse {
   suggestions: BudgetSuggestion[];
 }
+
+export interface CreateBudgetTemplateRequest {
+  name: string;
+}

@@ -241,8 +241,6 @@ export const createBudgetTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50),
 });
 
-export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
-
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -265,3 +263,4 @@ export type UpdateSavingsGoalInput = z.infer<typeof updateSavingsGoalSchema>;
 export type CreateRecurringTransactionInput = z.infer<typeof createRecurringTransactionSchema>;
 export type UpdateRecurringTransactionInput = z.infer<typeof updateRecurringTransactionSchema>;
 export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransactionsQuerySchema>;
+export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
