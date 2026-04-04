@@ -49,7 +49,7 @@ export function createBudgetTemplateRepository() {
     async findAll(): Promise<TemplateSummary[]> {
       const db = await getDb();
       const result = await db.query<TemplateRow>(
-        'SELECT id, name, category_budgets, created_at FROM budget_templates ORDER BY created_at DESC'
+        'SELECT id, name, category_budgets, created_at FROM budget_templates ORDER BY created_at DESC, rowid DESC'
       );
       return result.rows.map(rowToSummary);
     },
