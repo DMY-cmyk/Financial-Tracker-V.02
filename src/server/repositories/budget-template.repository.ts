@@ -97,9 +97,7 @@ export function createBudgetTemplateRepository() {
       return result.rowCount > 0;
     },
 
-    async getBudgetSuggestions(
-      months: number
-    ): Promise<
+    async getBudgetSuggestions(months: number): Promise<
       {
         categoryId: string;
         categoryName: string;
