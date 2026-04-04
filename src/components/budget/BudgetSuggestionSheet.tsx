@@ -20,6 +20,14 @@ interface BudgetSuggestionSheetProps {
   onApplied: () => void;
 }
 
+function buildOverrides(suggestions: BudgetSuggestion[]): Record<string, number> {
+  const initial: Record<string, number> = {};
+  for (const s of suggestions) {
+    initial[s.categoryId] = s.suggestedBudget;
+  }
+  return initial;
+}
+
 export function BudgetSuggestionSheet({
   open,
   onOpenChange,
@@ -30,22 +38,24 @@ export function BudgetSuggestionSheet({
   onApplied,
 }: BudgetSuggestionSheetProps) {
   const locale = useLocale();
+  const suggestionsKey = suggestions.map((s) => s.categoryId).join(',');
+  // loadedKey tracks which suggestion set the overrides state was seeded from
+  const [loadedKey, setLoadedKey] = useState('');
   const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [isApplying, setIsApplying] = useState(false);
+
+  // Canonical React pattern: derive state from props when a tracked key changes.
+  // This avoids calling setState inside a useEffect (which triggers an extra render cycle).
+  if (loadedKey !== suggestionsKey) {
+    setLoadedKey(suggestionsKey);
+    setOverrides(buildOverrides(suggestions));
+  }
 
   useEffect(() => {
     if (open) {
       onLoad();
     }
   }, [open, onLoad]);
-
-  useEffect(() => {
-    const initial: Record<string, number> = {};
-    for (const s of suggestions) {
-      initial[s.categoryId] = s.suggestedBudget;
-    }
-    setOverrides(initial);
-  }, [suggestions]);
 
   const handleChange = (categoryId: string, value: number) => {
     setOverrides((prev) => ({ ...prev, [categoryId]: value }));
