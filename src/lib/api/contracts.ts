@@ -349,3 +349,40 @@ export interface MonthlyReportResponse {
 }
 
 export type AnnualReportResponse = AnnualReportData;
+
+// === Budget template contracts ===
+
+export interface CategoryBudgetEntry {
+  categoryId: string;
+  categoryName: string;
+  budget: number;
+}
+
+export interface BudgetTemplate {
+  id: string;
+  name: string;
+  categoryCount: number;
+  createdAt: string;
+  preview: string[]; // first 3 category names
+}
+
+export interface BudgetSuggestion {
+  categoryId: string;
+  category: string;
+  color: string;
+  suggestedBudget: number;
+  basedOnMonths: number;
+}
+
+export interface BudgetTemplateListResponse {
+  templates: BudgetTemplate[];
+}
+
+export interface ApplyTemplateResponse {
+  applied: number;
+  skipped: number;
+}
+
+export interface BudgetSuggestionListResponse {
+  suggestions: BudgetSuggestion[];
+}

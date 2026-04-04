@@ -153,6 +153,12 @@ async function initializeSchema(client: DbClient): Promise<void> {
       password_hash TEXT NOT NULL,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
+    `CREATE TABLE IF NOT EXISTS budget_templates (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      category_budgets TEXT NOT NULL,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
   ];
 
   for (const ddl of tables) {

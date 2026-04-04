@@ -235,6 +235,14 @@ export const listRecurringTransactionsQuerySchema = z.object({
   frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
 });
 
+// === Budget template schemas ===
+
+export const createBudgetTemplateSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(50),
+});
+
+export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;

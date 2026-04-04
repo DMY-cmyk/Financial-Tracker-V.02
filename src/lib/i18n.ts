@@ -435,6 +435,19 @@ type TranslationKeys = {
   invalidCredentials: string;
   sessionExpired: string;
   loginRequired: string;
+
+  // Budget templates
+  saveAsTemplate: string;
+  applyTemplate: string;
+  smartSuggest: string;
+  templateName: string;
+  budgetTemplates: string;
+  applyConfirm: string;
+  templateApplied: string;
+  suggestionsBasedOn: string;
+  noTemplates: string;
+  applySuggestions: string;
+  templateSaved: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -670,6 +683,19 @@ const translations: Record<Locale, TranslationKeys> = {
     noBudgetCategories: 'No budget set for any category',
     budgetOverview: 'Budget Overview',
     percentUsed: 'used',
+
+    // Budget templates
+    saveAsTemplate: 'Save as Template',
+    applyTemplate: 'Apply Template',
+    smartSuggest: 'Smart Suggest',
+    templateName: 'Template Name',
+    budgetTemplates: 'Budget Templates',
+    applyConfirm: 'This will overwrite all current budget amounts. Continue?',
+    templateApplied: '{n} budgets updated',
+    suggestionsBasedOn: 'Based on last {n} months',
+    noTemplates: 'No templates saved yet',
+    applySuggestions: 'Apply Suggestions',
+    templateSaved: 'Template saved',
 
     // Savings page
     savingsPage: 'Savings Goals',
@@ -1060,6 +1086,19 @@ const translations: Record<Locale, TranslationKeys> = {
     noBudgetCategories: 'Belum ada anggaran untuk kategori',
     budgetOverview: 'Ringkasan Anggaran',
     percentUsed: 'terpakai',
+
+    // Budget templates
+    saveAsTemplate: 'Simpan sebagai Template',
+    applyTemplate: 'Terapkan Template',
+    smartSuggest: 'Saran Cerdas',
+    templateName: 'Nama Template',
+    budgetTemplates: 'Template Anggaran',
+    applyConfirm: 'Ini akan menimpa semua anggaran saat ini. Lanjutkan?',
+    templateApplied: '{n} anggaran diperbarui',
+    suggestionsBasedOn: 'Berdasarkan {n} bulan terakhir',
+    noTemplates: 'Belum ada template tersimpan',
+    applySuggestions: 'Terapkan Saran',
+    templateSaved: 'Template disimpan',
 
     // Savings page
     savingsPage: 'Target Tabungan',
