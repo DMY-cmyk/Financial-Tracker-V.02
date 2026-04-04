@@ -56,7 +56,9 @@ export function createBudgetTemplateRepository() {
 
     async findById(
       id: string
-    ): Promise<{ id: string; name: string; entries: CategoryBudgetEntry[]; createdAt: string } | undefined> {
+    ): Promise<
+      { id: string; name: string; entries: CategoryBudgetEntry[]; createdAt: string } | undefined
+    > {
       const db = await getDb();
       const result = await db.query<TemplateRow>(
         'SELECT id, name, category_budgets, created_at FROM budget_templates WHERE id = ?',
@@ -75,10 +77,11 @@ export function createBudgetTemplateRepository() {
     async create(name: string, entries: CategoryBudgetEntry[]): Promise<TemplateSummary> {
       const id = nanoid();
       const db = await getDb();
-      await db.query(
-        'INSERT INTO budget_templates (id, name, category_budgets) VALUES (?, ?, ?)',
-        [id, name, JSON.stringify(entries)]
-      );
+      await db.query('INSERT INTO budget_templates (id, name, category_budgets) VALUES (?, ?, ?)', [
+        id,
+        name,
+        JSON.stringify(entries),
+      ]);
       return {
         id,
         name,
@@ -96,7 +99,15 @@ export function createBudgetTemplateRepository() {
 
     async getBudgetSuggestions(
       months: number
-    ): Promise<{ categoryId: string; categoryName: string; color: string; suggestedBudget: number; basedOnMonths: number }[]> {
+    ): Promise<
+      {
+        categoryId: string;
+        categoryName: string;
+        color: string;
+        suggestedBudget: number;
+        basedOnMonths: number;
+      }[]
+    > {
       const db = await getDb();
       const now = new Date();
       const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months, 1));

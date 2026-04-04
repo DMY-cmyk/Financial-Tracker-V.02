@@ -22,12 +22,7 @@ async function makeCategory(name: string, budget: number, type: 'expense' | 'inc
   return result.data!;
 }
 
-async function makeTransaction(
-  categoryId: string,
-  category: string,
-  amount: number,
-  date: string
-) {
+async function makeTransaction(categoryId: string, category: string, amount: number, date: string) {
   const txRepo = createTransactionRepository();
   await txRepo.create({
     date,

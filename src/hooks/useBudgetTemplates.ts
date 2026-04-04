@@ -41,26 +41,21 @@ export function useBudgetTemplates() {
         toast.error(result.error.message);
         return null;
       }
-      toast.success(
-        t(locale, 'templateApplied').replace('{n}', String(result.data.applied))
-      );
+      toast.success(t(locale, 'templateApplied').replace('{n}', String(result.data.applied)));
       return result.data;
     },
     [locale]
   );
 
-  const removeTemplate = useCallback(
-    async (id: string): Promise<boolean> => {
-      const result = await api.budgetTemplates.delete(id);
-      if (result.error) {
-        toast.error(result.error.message);
-        return false;
-      }
-      setTemplates((prev) => prev.filter((tmpl) => tmpl.id !== id));
-      return true;
-    },
-    []
-  );
+  const removeTemplate = useCallback(async (id: string): Promise<boolean> => {
+    const result = await api.budgetTemplates.delete(id);
+    if (result.error) {
+      toast.error(result.error.message);
+      return false;
+    }
+    setTemplates((prev) => prev.filter((tmpl) => tmpl.id !== id));
+    return true;
+  }, []);
 
   const loadSuggestions = useCallback(async (months = 3) => {
     setIsLoadingSuggestions(true);
@@ -74,9 +69,7 @@ export function useBudgetTemplates() {
   const applySuggestions = useCallback(
     async (overrides: { categoryId: string; budget: number }[]): Promise<boolean> => {
       const results = await Promise.all(
-        overrides.map(({ categoryId, budget }) =>
-          api.categories.update(categoryId, { budget })
-        )
+        overrides.map(({ categoryId, budget }) => api.categories.update(categoryId, { budget }))
       );
       const failed = results.filter((r) => r.error);
       if (failed.length > 0) {

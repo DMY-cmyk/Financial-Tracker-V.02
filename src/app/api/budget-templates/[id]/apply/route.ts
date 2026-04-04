@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyTemplate } from '@/server/services/budget-template.service';
 
-export async function POST(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const result = await applyTemplate(id);
   if (result.error) {
