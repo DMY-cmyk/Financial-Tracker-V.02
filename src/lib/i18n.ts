@@ -455,6 +455,19 @@ type TranslationKeys = {
   noBudgetsSet: string;
   nCategoriesLabel: string;
   failedToUpdateCategories: string;
+
+  // Forecast
+  forecast: string;
+  cashFlowForecast: string;
+  expectedThisMonth: string;
+  actualSoFar: string;
+  projected: string;
+  projectedIncome: string;
+  projectedExpense: string;
+  projectedNet: string;
+  forecastBasis: string;
+  noRecurringForForecast: string;
+  forecastMonths: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -866,6 +879,19 @@ const translations: Record<Locale, TranslationKeys> = {
     fullName: 'Full Name',
     invalidCredentials: 'Invalid email or password',
     sessionExpired: 'Your session has expired. Please sign in again.',
+    // Forecast
+    forecast: 'Forecast',
+    cashFlowForecast: 'Cash Flow Forecast',
+    expectedThisMonth: 'Expected This Month',
+    actualSoFar: 'Actual so far',
+    projected: 'Projected',
+    projectedIncome: 'Projected Income',
+    projectedExpense: 'Projected Expense',
+    projectedNet: 'Projected Net',
+    forecastBasis: 'Based on recurring transactions only',
+    noRecurringForForecast: 'No recurring transactions to project',
+    forecastMonths: '{n} month forecast',
+
     loginRequired: 'Please sign in to continue',
   },
   id: {
@@ -1277,6 +1303,19 @@ const translations: Record<Locale, TranslationKeys> = {
     fullName: 'Nama Lengkap',
     invalidCredentials: 'Email atau kata sandi salah',
     sessionExpired: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
+    // Forecast
+    forecast: 'Proyeksi',
+    cashFlowForecast: 'Proyeksi Arus Kas',
+    expectedThisMonth: 'Proyeksi Bulan Ini',
+    actualSoFar: 'Aktual sejauh ini',
+    projected: 'Proyeksi',
+    projectedIncome: 'Proyeksi Pemasukan',
+    projectedExpense: 'Proyeksi Pengeluaran',
+    projectedNet: 'Proyeksi Bersih',
+    forecastBasis: 'Berdasarkan transaksi berulang saja',
+    noRecurringForForecast: 'Tidak ada transaksi berulang untuk diproyeksikan',
+    forecastMonths: 'Proyeksi {n} bulan',
+
     loginRequired: 'Silakan masuk untuk melanjutkan',
   },
 };
