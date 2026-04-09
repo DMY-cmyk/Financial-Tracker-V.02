@@ -226,7 +226,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
               stroke="var(--border)"
               strokeDasharray="3 3"
               label={{
-                value: 'Today',
+                value: t(locale, 'today'),
                 position: 'top',
                 fontSize: 10,
                 fill: 'var(--muted-foreground)',

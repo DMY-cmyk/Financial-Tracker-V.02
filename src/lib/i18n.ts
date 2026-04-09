@@ -468,6 +468,8 @@ type TranslationKeys = {
   forecastBasis: string;
   noRecurringForForecast: string;
   forecastMonths: string;
+  total: string;
+  today: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -891,6 +893,8 @@ const translations: Record<Locale, TranslationKeys> = {
     forecastBasis: 'Based on recurring transactions only',
     noRecurringForForecast: 'No recurring transactions to project',
     forecastMonths: '{n} month forecast',
+    total: 'Total',
+    today: 'Today',
 
     loginRequired: 'Please sign in to continue',
   },
@@ -1315,6 +1319,8 @@ const translations: Record<Locale, TranslationKeys> = {
     forecastBasis: 'Berdasarkan transaksi berulang saja',
     noRecurringForForecast: 'Tidak ada transaksi berulang untuk diproyeksikan',
     forecastMonths: 'Proyeksi {n} bulan',
+    total: 'Total',
+    today: 'Hari Ini',
 
     loginRequired: 'Silakan masuk untuk melanjutkan',
   },

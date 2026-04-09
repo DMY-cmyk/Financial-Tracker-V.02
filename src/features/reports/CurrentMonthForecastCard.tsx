@@ -69,7 +69,7 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
                 <p className="font-mono font-semibold">{formatCurrency(row.projected)}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-[10px]">Total</p>
+                <p className="text-muted-foreground text-[10px]">{t(locale, 'total')}</p>
                 <p className={`font-mono font-semibold ${row.color}`}>
                   {formatCurrency(row.total)}
                 </p>

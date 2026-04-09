@@ -272,9 +272,8 @@ export default function ReportsPage() {
               <CurrentMonthForecastCard currentMonth={forecastData.currentMonth} />
 
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
+                {...fadeInUp}
+                transition={{ delay: 0.1 }}
                 className="border-border bg-card rounded-2xl border p-6"
               >
                 <h3 className="mb-4 text-sm font-semibold">{t(locale, 'cashFlowForecast')}</h3>
@@ -282,9 +281,8 @@ export default function ReportsPage() {
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
+                {...fadeInUp}
+                transition={{ delay: 0.2 }}
                 className="border-border bg-card rounded-2xl border p-6"
               >
                 <h3 className="mb-4 text-sm font-semibold">
