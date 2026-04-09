@@ -5,6 +5,7 @@ import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import type { DashboardSummaryResponse } from '@/lib/api/contracts';
 import type { Category } from '@/lib/types';
+import { computeBudgetAlerts, type BudgetAlert } from '@/lib/budget-alerts';
 
 export interface BudgetCategory {
   id: string;
@@ -76,6 +77,21 @@ export function useBudgetData() {
     return categories.filter((c) => c.type === 'expense' && c.budget === 0);
   }, [categories]);
 
+  const budgetAlerts = useMemo((): BudgetAlert[] => {
+    if (!summary) return [];
+    return computeBudgetAlerts(
+      categories
+        .filter((c) => c.type === 'expense')
+        .map((c) => ({
+          id: c.id,
+          name: c.name,
+          color: c.color,
+          budget: c.budget,
+          spent: summary.categoryTotals[c.id] || 0,
+        }))
+    );
+  }, [summary, categories]);
+
   const totalBudget = useMemo(
     () => budgetedCategories.reduce((sum, c) => sum + c.budget, 0),
     [budgetedCategories]
@@ -111,6 +127,7 @@ export function useBudgetData() {
     unbudgetedCategories,
     totalBudget,
     totalSpent,
+    budgetAlerts,
     updateBudget,
     refetch,
     isLoading,
