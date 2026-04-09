@@ -7,6 +7,8 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { MONTH_NAMES } from '@/lib/constants';
 import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/lib/motion';
+import { BudgetAlertBanner } from '@/features/dashboard/BudgetAlertBanner';
+import { useBudgetAlertToasts } from '@/hooks/useBudgetAlertToasts';
 import { BillsChecklist } from '@/features/dashboard/BillsChecklist';
 import { SavingsGoals } from '@/features/dashboard/SavingsGoals';
 import { RecentTransactions } from '@/features/dashboard/RecentTransactions';
@@ -69,7 +71,10 @@ export function DashboardContent() {
     isLoading,
     isEmpty,
     updateBudget,
+    budgetAlerts,
   } = useDashboardData();
+
+  useBudgetAlertToasts(budgetAlerts);
 
   if (isLoading) {
     return <PageSkeleton />;
@@ -161,6 +166,11 @@ export function DashboardContent() {
         </motion.div>
       ) : (
         <>
+          {/* Budget Alert Banner */}
+          {budgetAlerts.length > 0 && (
+            <BudgetAlertBanner alerts={budgetAlerts} />
+          )}
+
           {/* Charts Section */}
           <motion.div
             className="grid gap-4 lg:grid-cols-3"
