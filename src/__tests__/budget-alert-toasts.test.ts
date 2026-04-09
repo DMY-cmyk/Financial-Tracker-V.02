@@ -9,8 +9,9 @@ vi.mock('sonner', () => ({
   },
 }));
 
+import { renderHook } from '@testing-library/react';
 import { toast } from 'sonner';
-import { getShownIds, markShown, clearShownIds } from '@/hooks/useBudgetAlertToasts';
+import { getShownIds, markShown, clearShownIds, useBudgetAlertToasts } from '@/hooks/useBudgetAlertToasts';
 
 const exceededAlert = (id: string, name: string) => ({
   categoryId: id,
@@ -63,60 +64,37 @@ describe('sessionStorage helpers', () => {
   });
 });
 
-describe('toast logic (standalone)', () => {
+describe('useBudgetAlertToasts', () => {
   beforeEach(() => {
     sessionStorage.clear();
     vi.clearAllMocks();
   });
 
   it('shows singular toast for one newly exceeded category', () => {
-    const shownIds = getShownIds();
-    const alerts = [exceededAlert('cat-1', 'Dining')];
-    const newlyExceeded = alerts.filter((a) => a.level === 'exceeded' && !shownIds.has(a.categoryId));
-
-    if (newlyExceeded.length === 1) {
-      toast.warning(`${newlyExceeded[0].categoryName} is over budget this month`);
-    }
-
+    renderHook(() => useBudgetAlertToasts([exceededAlert('cat-1', 'Dining')]));
     expect(toast.warning).toHaveBeenCalledWith('Dining is over budget this month');
   });
 
   it('shows plural toast for multiple newly exceeded categories', () => {
-    const shownIds = getShownIds();
-    const alerts = [exceededAlert('cat-1', 'Dining'), exceededAlert('cat-2', 'Shopping')];
-    const newlyExceeded = alerts.filter((a) => a.level === 'exceeded' && !shownIds.has(a.categoryId));
-
-    if (newlyExceeded.length > 1) {
-      toast.warning(`${newlyExceeded.length} categories are over budget this month`);
-    }
-
+    renderHook(() =>
+      useBudgetAlertToasts([exceededAlert('cat-1', 'Dining'), exceededAlert('cat-2', 'Shopping')])
+    );
     expect(toast.warning).toHaveBeenCalledWith('2 categories are over budget this month');
   });
 
   it('does not show toast for warning-level alerts', () => {
-    const shownIds = getShownIds();
-    const alerts = [warningAlert('cat-1')];
-    const newlyExceeded = alerts.filter((a) => a.level === 'exceeded' && !shownIds.has(a.categoryId));
-
-    if (newlyExceeded.length === 1) {
-      toast.warning(`${newlyExceeded[0].categoryName} is over budget this month`);
-    } else if (newlyExceeded.length > 1) {
-      toast.warning(`${newlyExceeded.length} categories are over budget this month`);
-    }
-
+    renderHook(() => useBudgetAlertToasts([warningAlert('cat-1')]));
     expect(toast.warning).not.toHaveBeenCalled();
   });
 
   it('does not re-show toast for already-shown category', () => {
     markShown(['cat-1']);
-    const shownIds = getShownIds();
-    const alerts = [exceededAlert('cat-1', 'Dining')];
-    const newlyExceeded = alerts.filter((a) => a.level === 'exceeded' && !shownIds.has(a.categoryId));
-
-    if (newlyExceeded.length === 1) {
-      toast.warning(`${newlyExceeded[0].categoryName} is over budget this month`);
-    }
-
+    renderHook(() => useBudgetAlertToasts([exceededAlert('cat-1', 'Dining')]));
     expect(toast.warning).not.toHaveBeenCalled();
+  });
+
+  it('marks newly exceeded categories as shown in sessionStorage', () => {
+    renderHook(() => useBudgetAlertToasts([exceededAlert('cat-1', 'Dining')]));
+    expect(getShownIds().has('cat-1')).toBe(true);
   });
 });
