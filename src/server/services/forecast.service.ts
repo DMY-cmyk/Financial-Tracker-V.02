@@ -12,6 +12,7 @@ interface ServiceResult<T> {
   error?: { message: string; code: string };
 }
 
+// month is 0-based (0 = January); adds 1 internally for ISO date format
 function formatDateStr(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
@@ -68,6 +69,7 @@ export function computeOccurrences(
       const numDays = daysInMonth(year, month);
       if (!tx.endDate || tx.endDate >= lastDay) return numDays;
       if (tx.endDate < firstDay) return 0;
+      // Days start at 1, so day-of-month == count of days elapsed since month start
       return parseInt(tx.endDate.split('-')[2], 10);
     }
 
@@ -79,6 +81,9 @@ export function computeOccurrences(
 export async function getForecast(months: number): Promise<ServiceResult<ForecastResponse>> {
   await ensureSeeded();
 
+  // Uses the system clock; forecast months are relative to today.
+  // Tests that check array length are unaffected; tests asserting specific
+  // month/year values on forecast entries will need a date-override param if added later.
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
