@@ -6,6 +6,7 @@ import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import type { DashboardSummaryResponse } from '@/lib/api/contracts';
 import type { Bill, Category, SavingsGoal } from '@/lib/types';
+import { computeBudgetAlerts, type BudgetAlert } from '@/lib/budget-alerts';
 
 interface DashboardData {
   summary: DashboardSummaryResponse | null;
@@ -84,6 +85,21 @@ export function useDashboardData() {
       });
   }, [summary, data]);
 
+  const budgetAlerts = useMemo((): BudgetAlert[] => {
+    if (!summary) return [];
+    return computeBudgetAlerts(
+      (data?.categories ?? [])
+        .filter((c) => c.type === 'expense')
+        .map((c) => ({
+          id: c.id,
+          name: c.name,
+          color: c.color,
+          budget: c.budget,
+          spent: summary.categoryTotals[c.id] || 0,
+        }))
+    );
+  }, [summary, data]);
+
   const updateBudget = useCallback(
     async (categoryId: string, budget: number) => {
       // Optimistic update
@@ -118,6 +134,7 @@ export function useDashboardData() {
     cashFlow: summary?.cashFlow ?? [],
     categoryTotals: summary?.categoryTotals ?? {},
     budgetStatus,
+    budgetAlerts,
     paymentMethodTotals: summary?.paymentMethodTotals ?? {},
     bills,
     savingsGoals,
