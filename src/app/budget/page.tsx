@@ -32,6 +32,7 @@ export default function BudgetPage() {
     updateBudget,
     refetch,
     isLoading,
+    budgetAlerts,
   } = useBudgetData();
 
   const {
@@ -111,11 +112,18 @@ export default function BudgetPage() {
               animate="show"
               className="grid grid-cols-1 gap-3 sm:grid-cols-2"
             >
-              {budgetedCategories.map((cat) => (
-                <motion.div key={cat.id} variants={staggerGridItem}>
-                  <BudgetCategoryCard category={cat} onUpdateBudget={updateBudget} />
-                </motion.div>
-              ))}
+              {(() => {
+                const alertMap = new Map(budgetAlerts.map((a) => [a.categoryId, a]));
+                return budgetedCategories.map((cat) => (
+                  <motion.div key={cat.id} variants={staggerGridItem}>
+                    <BudgetCategoryCard
+                      category={cat}
+                      alert={alertMap.get(cat.id)}
+                      onUpdateBudget={updateBudget}
+                    />
+                  </motion.div>
+                ));
+              })()}
             </motion.div>
           )}
 

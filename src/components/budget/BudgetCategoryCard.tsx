@@ -9,13 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import type { BudgetCategory } from '@/hooks/useBudgetData';
+import type { BudgetAlert } from '@/lib/budget-alerts';
 
 interface BudgetCategoryCardProps {
   category: BudgetCategory;
+  alert?: BudgetAlert;
   onUpdateBudget: (id: string, budget: number) => Promise<boolean>;
 }
 
-export function BudgetCategoryCard({ category, onUpdateBudget }: BudgetCategoryCardProps) {
+export function BudgetCategoryCard({ category, alert, onUpdateBudget }: BudgetCategoryCardProps) {
   const locale = useLocale();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
@@ -53,18 +55,28 @@ export function BudgetCategoryCard({ category, onUpdateBudget }: BudgetCategoryC
       <div className="mb-3 flex items-center gap-2">
         <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: color }} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{name}</span>
-        <span
-          className={cn(
-            'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-            isOver
-              ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
-              : isWarning
-                ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
-                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
-          )}
-        >
-          {percentage.toFixed(0)}%
-        </span>
+        {alert?.level === 'exceeded' ? (
+          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
+            {t(locale, 'overBudget')}
+          </span>
+        ) : alert?.level === 'warning' ? (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+            {Math.round(alert.spentPct * 100)}%
+          </span>
+        ) : (
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              isOver
+                ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
+                : isWarning
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+            )}
+          >
+            {percentage.toFixed(0)}%
+          </span>
+        )}
         {!editing && (
           <Button
             variant="ghost"
