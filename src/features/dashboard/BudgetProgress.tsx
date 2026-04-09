@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import type { BudgetAlert } from '@/lib/budget-alerts';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -20,10 +21,12 @@ interface BudgetItem {
 
 interface BudgetProgressProps {
   budgets: BudgetItem[];
+  alerts?: BudgetAlert[];
   onUpdateBudget?: (categoryId: string, budget: number) => Promise<boolean>;
 }
 
-export function BudgetProgress({ budgets, onUpdateBudget }: BudgetProgressProps) {
+export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetProgressProps) {
+  const alertMap = new Map(alerts.map((a) => [a.categoryId, a]));
   const locale = useLocale();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -83,6 +86,24 @@ export function BudgetProgress({ budgets, onUpdateBudget }: BudgetProgressProps)
                       style={{ backgroundColor: b.color }}
                     />
                     <span className="font-medium">{b.category}</span>
+                    {(() => {
+                      const alert = alertMap.get(b.id);
+                      if (alert?.level === 'exceeded') {
+                        return (
+                          <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
+                            OVER
+                          </span>
+                        );
+                      }
+                      if (alert?.level === 'warning') {
+                        return (
+                          <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                            {Math.round(alert.spentPct * 100)}%
+                          </span>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                   {isEditing ? (
                     <input

@@ -194,7 +194,7 @@ export function DashboardContent() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BudgetProgress budgets={budgetStatus} onUpdateBudget={updateBudget} />
+              <BudgetProgress budgets={budgetStatus} alerts={budgetAlerts} onUpdateBudget={updateBudget} />
             </motion.div>
             <motion.div variants={staggerItem}>
               <RecentTransactions transactions={recentTransactions} categories={categories} />
