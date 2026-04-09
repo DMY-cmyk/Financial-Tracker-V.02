@@ -84,7 +84,7 @@ describe('useBudgetAlertToasts', () => {
     renderHook(() =>
       useBudgetAlertToasts([exceededAlert('cat-1', 'Dining'), exceededAlert('cat-2', 'Shopping')])
     );
-    expect(toast.warning).toHaveBeenCalledWith('2 categories are over budget this month');
+    expect(toast.warning).toHaveBeenCalledWith('2 categories over budget this month');
   });
 
   it('does not show toast for warning-level alerts', () => {

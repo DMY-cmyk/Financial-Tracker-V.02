@@ -121,6 +121,7 @@ type TranslationKeys = {
   categoriesOverBudget: string;
   categoriesAtLimit: string;
   viewBudget: string;
+  categoryOverBudget: string;
 
   // Validation
   required: string;
@@ -571,6 +572,7 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesOverBudget: '{n} categories over budget this month',
     categoriesAtLimit: '{n} categories approaching budget limit',
     viewBudget: 'View Budget',
+    categoryOverBudget: '{name} is over budget this month',
     required: 'This field is required',
     invalidAmount: 'Enter a valid amount',
     selectCategory: 'Select a category',
@@ -1000,6 +1002,7 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesOverBudget: '{n} kategori melebihi anggaran bulan ini',
     categoriesAtLimit: '{n} kategori mendekati batas anggaran',
     viewBudget: 'Lihat Anggaran',
+    categoryOverBudget: '{name} melebihi anggaran bulan ini',
     required: 'Kolom ini wajib diisi',
     invalidAmount: 'Masukkan jumlah yang valid',
     selectCategory: 'Pilih kategori',

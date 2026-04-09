@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import type { BudgetAlert } from '@/lib/budget-alerts';
+import { t, useLocale } from '@/lib/i18n';
 
 const SESSION_KEY = 'budget-alert-toasts-shown';
 
@@ -35,6 +36,8 @@ export function clearShownIds(): void {
 }
 
 export function useBudgetAlertToasts(alerts: BudgetAlert[]): void {
+  const locale = useLocale();
+
   useEffect(() => {
     const shownIds = getShownIds();
     const newlyExceeded = alerts.filter(
@@ -42,13 +45,17 @@ export function useBudgetAlertToasts(alerts: BudgetAlert[]): void {
     );
 
     if (newlyExceeded.length === 1) {
-      toast.warning(`${newlyExceeded[0].categoryName} is over budget this month`);
+      toast.warning(
+        t(locale, 'categoryOverBudget').replace('{name}', newlyExceeded[0].categoryName)
+      );
     } else if (newlyExceeded.length > 1) {
-      toast.warning(`${newlyExceeded.length} categories are over budget this month`);
+      toast.warning(
+        t(locale, 'categoriesOverBudget').replace('{n}', String(newlyExceeded.length))
+      );
     }
 
     if (newlyExceeded.length > 0) {
       markShown(newlyExceeded.map((a) => a.categoryId));
     }
-  }, [alerts]);
+  }, [alerts, locale]);
 }
