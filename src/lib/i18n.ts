@@ -117,6 +117,10 @@ type TranslationKeys = {
   // Budget
   overBudget: string;
   onTrack: string;
+  budgetWarning: string;
+  categoriesOverBudget: string;
+  categoriesAtLimit: string;
+  viewBudget: string;
 
   // Validation
   required: string;
@@ -563,6 +567,10 @@ const translations: Record<Locale, TranslationKeys> = {
     reviewExtracted: 'Review extracted data before saving',
     overBudget: 'Over Budget',
     onTrack: 'On Track',
+    budgetWarning: 'approaching budget limit',
+    categoriesOverBudget: '{n} categories over budget this month',
+    categoriesAtLimit: '{n} categories approaching budget limit',
+    viewBudget: 'View Budget',
     required: 'This field is required',
     invalidAmount: 'Enter a valid amount',
     selectCategory: 'Select a category',
@@ -988,6 +996,10 @@ const translations: Record<Locale, TranslationKeys> = {
     reviewExtracted: 'Periksa data terekstrak sebelum menyimpan',
     overBudget: 'Melebihi Anggaran',
     onTrack: 'Sesuai',
+    budgetWarning: 'mendekati batas anggaran',
+    categoriesOverBudget: '{n} kategori melebihi anggaran bulan ini',
+    categoriesAtLimit: '{n} kategori mendekati batas anggaran',
+    viewBudget: 'Lihat Anggaran',
     required: 'Kolom ini wajib diisi',
     invalidAmount: 'Masukkan jumlah yang valid',
     selectCategory: 'Pilih kategori',
