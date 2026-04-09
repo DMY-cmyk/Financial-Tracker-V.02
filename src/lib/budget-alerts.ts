@@ -1,3 +1,5 @@
+import type { Category } from '@/lib/types';
+
 export type BudgetAlertLevel = 'warning' | 'exceeded';
 
 export interface BudgetAlert {
@@ -6,19 +8,18 @@ export interface BudgetAlert {
   color: string;
   budgetAmount: number;
   spentAmount: number;
-  spentPct: number; // e.g. 1.2 = 120%
+  spentPct: number; // ratio, e.g. 1.2 = 120%; not clamped — values > 1.0 indicate overspend
   level: BudgetAlertLevel;
 }
 
-interface CategoryInput {
-  id: string;
-  name: string;
-  color: string;
-  budget: number;
-  spent: number;
-}
+type CategoryWithSpent = Pick<Category, 'id' | 'name' | 'color' | 'budget'> & { spent: number };
 
-export function computeBudgetAlerts(categories: CategoryInput[]): BudgetAlert[] {
+/**
+ * Computes budget alerts for a given set of categories.
+ * @param categories - Categories with a computed `spent` amount for the period.
+ *   `budget` must be >= 0 (enforced by API). `spent` is assumed >= 0.
+ */
+export function computeBudgetAlerts(categories: CategoryWithSpent[]): BudgetAlert[] {
   return categories
     .filter((c) => c.budget > 0)
     .flatMap((c): BudgetAlert[] => {

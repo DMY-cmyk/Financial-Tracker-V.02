@@ -32,7 +32,7 @@ describe('computeBudgetAlerts', () => {
     expect(result[0].spentPct).toBeCloseTo(0.8);
   });
 
-  it('returns warning between 80% and 99%', () => {
+  it('returns warning at 95% (between 80% and exclusive 100%)', () => {
     const result = computeBudgetAlerts([makeCategory({ budget: 1_000_000, spent: 950_000 })]);
     expect(result).toHaveLength(1);
     expect(result[0].level).toBe('warning');
