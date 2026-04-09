@@ -76,17 +76,17 @@ export function createBudgetTemplateRepository() {
 
     async create(name: string, entries: CategoryBudgetEntry[]): Promise<TemplateSummary> {
       const id = nanoid();
+      const createdAt = new Date().toISOString();
       const db = await getDb();
-      await db.query('INSERT INTO budget_templates (id, name, category_budgets) VALUES (?, ?, ?)', [
-        id,
-        name,
-        JSON.stringify(entries),
-      ]);
+      await db.query(
+        'INSERT INTO budget_templates (id, name, category_budgets, created_at) VALUES (?, ?, ?, ?)',
+        [id, name, JSON.stringify(entries), createdAt]
+      );
       return {
         id,
         name,
         categoryCount: entries.length,
-        createdAt: new Date().toISOString(),
+        createdAt,
         preview: entries.slice(0, 3).map((e) => e.categoryName),
       };
     },
