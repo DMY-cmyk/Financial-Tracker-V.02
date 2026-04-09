@@ -4,6 +4,7 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'node',
+    setupFiles: ['./src/__tests__/setup-session-storage.ts'],
     exclude: ['.worktrees/**', '.claude/**', '.superpowers/**', 'node_modules/**'],
     testTimeout: 15000,
   },
