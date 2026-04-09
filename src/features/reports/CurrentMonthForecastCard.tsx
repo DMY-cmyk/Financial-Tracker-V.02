@@ -41,10 +41,7 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
   ];
 
   return (
-    <motion.div
-      {...fadeInUp}
-      className="border-border bg-card rounded-2xl border p-6"
-    >
+    <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-6">
       <div className="mb-4 flex items-center gap-2">
         <Wallet className="text-primary h-4 w-4" />
         <h3 className="text-sm font-semibold">{t(locale, 'expectedThisMonth')}</h3>

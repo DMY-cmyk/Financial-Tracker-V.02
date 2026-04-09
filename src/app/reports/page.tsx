@@ -80,13 +80,8 @@ export default function ReportsPage() {
       value: formatCurrency(totalBalance),
       icon: Wallet,
       color:
-        totalBalance >= 0
-          ? 'text-blue-600 dark:text-blue-400'
-          : 'text-red-600 dark:text-red-400',
-      bg:
-        totalBalance >= 0
-          ? 'bg-blue-50 dark:bg-blue-950/30'
-          : 'bg-red-50 dark:bg-red-950/30',
+        totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400',
+      bg: totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
     },
     {
       label: t(locale, 'avgSavingsRate'),
@@ -189,9 +184,7 @@ export default function ReportsPage() {
                       <th className="py-2 text-right font-medium">{t(locale, 'income')}</th>
                       <th className="py-2 text-right font-medium">{t(locale, 'expense')}</th>
                       <th className="py-2 text-right font-medium">{t(locale, 'netBalance')}</th>
-                      <th className="py-2 text-right font-medium">
-                        {t(locale, 'avgSavingsRate')}
-                      </th>
+                      <th className="py-2 text-right font-medium">{t(locale, 'avgSavingsRate')}</th>
                     </tr>
                   </thead>
                   <tbody>

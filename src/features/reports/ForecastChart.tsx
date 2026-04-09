@@ -75,8 +75,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
   if (forecast) {
     const currentKey = buildMonthKey(forecast.currentMonth.month, forecast.currentMonth.year);
     const existing = pointsMap.get(currentKey);
-    const bridgeIncome =
-      forecast.currentMonth.actualIncome + forecast.currentMonth.projectedIncome;
+    const bridgeIncome = forecast.currentMonth.actualIncome + forecast.currentMonth.projectedIncome;
     const bridgeExpense =
       forecast.currentMonth.actualExpense + forecast.currentMonth.projectedExpense;
     // Bridge point: current month appears in both series so lines connect

@@ -13,8 +13,18 @@ interface ForecastBreakdownListProps {
 }
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 interface ForecastMonthItemProps {
@@ -36,10 +46,7 @@ function ForecastMonthItem({ forecastMonth }: ForecastMonthItemProps) {
         aria-expanded={open}
       >
         <div className="flex items-center gap-3">
-          <motion.div
-            animate={{ rotate: open ? 90 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div animate={{ rotate: open ? 90 : 0 }} transition={{ duration: 0.2 }}>
             <ChevronRight className="text-muted-foreground h-4 w-4" />
           </motion.div>
           <span className="text-sm font-medium">{monthLabel}</span>
@@ -134,10 +141,7 @@ export function ForecastBreakdownList({ forecast }: ForecastBreakdownListProps) 
   return (
     <div className="space-y-2">
       {forecast.map((f) => (
-        <ForecastMonthItem
-          key={`${f.year}-${f.month}`}
-          forecastMonth={f}
-        />
+        <ForecastMonthItem key={`${f.year}-${f.month}`} forecastMonth={f} />
       ))}
     </div>
   );

@@ -29,11 +29,7 @@ function lastDayOfMonth(year: number, month: number): string {
   return formatDateStr(year, month, daysInMonth(year, month));
 }
 
-export function computeOccurrences(
-  tx: RecurringTransaction,
-  month: number,
-  year: number
-): number {
+export function computeOccurrences(tx: RecurringTransaction, month: number, year: number): number {
   const firstDay = firstDayOfMonth(year, month);
   const lastDay = lastDayOfMonth(year, month);
 
@@ -117,8 +113,7 @@ export async function getForecast(months: number): Promise<ServiceResult<Forecas
     actualExpense,
     projectedIncome: currentProjIncome,
     projectedExpense: currentProjExpense,
-    projectedNet:
-      actualIncome + currentProjIncome - (actualExpense + currentProjExpense),
+    projectedNet: actualIncome + currentProjIncome - (actualExpense + currentProjExpense),
   };
 
   const forecast = [];
