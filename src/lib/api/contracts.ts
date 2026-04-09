@@ -390,3 +390,37 @@ export interface BudgetSuggestionListResponse {
 export interface CreateBudgetTemplateRequest {
   name: string;
 }
+
+// === Forecast contracts ===
+
+export interface ForecastRecurringItem {
+  description: string;
+  type: 'income' | 'expense';
+  amount: number;
+  frequency: string;
+  occurrences: number;
+}
+
+export interface ForecastMonth {
+  month: number;
+  year: number;
+  projectedIncome: number;
+  projectedExpense: number;
+  projectedNet: number;
+  recurringItems: ForecastRecurringItem[];
+}
+
+export interface ForecastCurrentMonth {
+  month: number;
+  year: number;
+  actualIncome: number;
+  actualExpense: number;
+  projectedIncome: number;
+  projectedExpense: number;
+  projectedNet: number;
+}
+
+export interface ForecastResponse {
+  currentMonth: ForecastCurrentMonth;
+  forecast: ForecastMonth[];
+}
