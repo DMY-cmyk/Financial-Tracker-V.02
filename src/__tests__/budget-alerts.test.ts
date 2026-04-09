@@ -63,7 +63,13 @@ describe('computeBudgetAlerts', () => {
   });
 
   it('includes correct fields in returned alert', () => {
-    const input = makeCategory({ id: 'c1', name: 'Food', color: '#F00', budget: 500_000, spent: 450_000 });
+    const input = makeCategory({
+      id: 'c1',
+      name: 'Food',
+      color: '#F00',
+      budget: 500_000,
+      spent: 450_000,
+    });
     const [alert] = computeBudgetAlerts([input]);
     expect(alert).toMatchObject({
       categoryId: 'c1',

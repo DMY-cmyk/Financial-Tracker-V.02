@@ -38,7 +38,7 @@ export function useBudgetAlertToasts(alerts: BudgetAlert[]): void {
   useEffect(() => {
     const shownIds = getShownIds();
     const newlyExceeded = alerts.filter(
-      (a) => a.level === 'exceeded' && !shownIds.has(a.categoryId),
+      (a) => a.level === 'exceeded' && !shownIds.has(a.categoryId)
     );
 
     if (newlyExceeded.length === 1) {

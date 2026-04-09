@@ -167,9 +167,7 @@ export function DashboardContent() {
       ) : (
         <>
           {/* Budget Alert Banner */}
-          {budgetAlerts.length > 0 && (
-            <BudgetAlertBanner alerts={budgetAlerts} />
-          )}
+          {budgetAlerts.length > 0 && <BudgetAlertBanner alerts={budgetAlerts} />}
 
           {/* Charts Section */}
           <motion.div
@@ -194,7 +192,11 @@ export function DashboardContent() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BudgetProgress budgets={budgetStatus} alerts={budgetAlerts} onUpdateBudget={updateBudget} />
+              <BudgetProgress
+                budgets={budgetStatus}
+                alerts={budgetAlerts}
+                onUpdateBudget={updateBudget}
+              />
             </motion.div>
             <motion.div variants={staggerItem}>
               <RecentTransactions transactions={recentTransactions} categories={categories} />

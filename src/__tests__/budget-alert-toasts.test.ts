@@ -11,7 +11,12 @@ vi.mock('sonner', () => ({
 
 import { renderHook } from '@testing-library/react';
 import { toast } from 'sonner';
-import { getShownIds, markShown, clearShownIds, useBudgetAlertToasts } from '@/hooks/useBudgetAlertToasts';
+import {
+  getShownIds,
+  markShown,
+  clearShownIds,
+  useBudgetAlertToasts,
+} from '@/hooks/useBudgetAlertToasts';
 
 const exceededAlert = (id: string, name: string) => ({
   categoryId: id,
