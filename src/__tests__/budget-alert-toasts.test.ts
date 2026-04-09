@@ -1,4 +1,6 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { BudgetAlert } from '@/lib/budget-alerts';
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -20,7 +22,7 @@ const exceededAlert = (id: string, name: string) => ({
   level: 'exceeded' as const,
 });
 
-const warningAlert = (id: string) => ({
+const warningAlert = (id: string): BudgetAlert => ({
   categoryId: id,
   categoryName: 'Food',
   color: '#F00',
