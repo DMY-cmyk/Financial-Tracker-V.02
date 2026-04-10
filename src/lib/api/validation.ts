@@ -243,17 +243,15 @@ export const createBudgetTemplateSchema = z.object({
 
 // === Liability schemas ===
 
+// Liabilities can be zero (e.g., fully paid-off loan still being tracked)
+// so nonnegative() is intentional here instead of positive()
 export const createLiabilitySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   amount: z.number().nonnegative('Amount must be 0 or greater'),
   category: z.enum(['loan', 'credit_card', 'other']).default('other'),
 });
 
-export const updateLiabilitySchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  amount: z.number().nonnegative().optional(),
-  category: z.enum(['loan', 'credit_card', 'other']).optional(),
-});
+export const updateLiabilitySchema = createLiabilitySchema.partial();
 
 // === Inferred types ===
 

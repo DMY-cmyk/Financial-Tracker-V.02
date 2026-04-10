@@ -477,8 +477,8 @@ type TranslationKeys = {
   today: string;
 
   // Net Worth
-  netWorth: string;
-  netWorthPage: string;
+  netWorth: string; // widget title + nav label
+  netWorthPage: string; // PageHeader title (same value, different context)
   assets: string;
   liabilities: string;
   totalAssets: string;
