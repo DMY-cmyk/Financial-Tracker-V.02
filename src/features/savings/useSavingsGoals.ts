@@ -135,6 +135,7 @@ export function useSavingsGoals() {
     if (result.data) {
       setGoals((prev) => prev.filter((g) => g.id !== deleteId));
       toast.success(t(locale, 'goalDeleted'), {
+        // deletedGoal may be undefined if the list was stale; omit undo action in that case
         action: deletedGoal
           ? {
               label: t(locale, 'undo'),
