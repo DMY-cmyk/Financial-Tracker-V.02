@@ -2,7 +2,11 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { nanoid } from 'nanoid';
 import { resetDb, getDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
-import { getCurrentNetWorth, recordSnapshot, getNetWorthHistory } from '@/server/services/net-worth.service';
+import {
+  getCurrentNetWorth,
+  recordSnapshot,
+  getNetWorthHistory,
+} from '@/server/services/net-worth.service';
 import { createLiability } from '@/server/services/liability.service';
 
 beforeEach(async () => {

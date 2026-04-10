@@ -20,12 +20,7 @@ interface LiabilitiesListProps {
   onDelete: (id: string) => void;
 }
 
-export function LiabilitiesList({
-  liabilities,
-  onAdd,
-  onEdit,
-  onDelete,
-}: LiabilitiesListProps) {
+export function LiabilitiesList({ liabilities, onAdd, onEdit, onDelete }: LiabilitiesListProps) {
   const locale = useLocale();
 
   const total = liabilities.reduce((sum, l) => sum + l.amount, 0);
@@ -33,7 +28,7 @@ export function LiabilitiesList({
   return (
     <div className="border-border bg-card rounded-2xl border p-5">
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-muted-foreground text-xs font-bold uppercase tracking-wide">
+        <p className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
           {t(locale, 'liabilities')}
         </p>
         <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={onAdd}>
@@ -61,11 +56,13 @@ export function LiabilitiesList({
                     CATEGORY_STYLES[liability.category]
                   )}
                 >
-                  {t(locale, liability.category === 'loan'
-                    ? 'loanType'
-                    : liability.category === 'credit_card'
-                    ? 'creditCardType'
-                    : 'otherType'
+                  {t(
+                    locale,
+                    liability.category === 'loan'
+                      ? 'loanType'
+                      : liability.category === 'credit_card'
+                        ? 'creditCardType'
+                        : 'otherType'
                   )}
                 </span>
               </div>

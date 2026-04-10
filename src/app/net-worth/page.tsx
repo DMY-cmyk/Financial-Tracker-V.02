@@ -14,8 +14,17 @@ import { SnapshotButton } from '@/features/net-worth/SnapshotButton';
 
 export default function NetWorthPage() {
   const locale = useLocale();
-  const { current, history, liabilities, isLoading, error, form, deleteConfirm, recordSnapshot, isRecording } =
-    useNetWorth();
+  const {
+    current,
+    history,
+    liabilities,
+    isLoading,
+    error,
+    form,
+    deleteConfirm,
+    recordSnapshot,
+    isRecording,
+  } = useNetWorth();
 
   if (error) {
     return (

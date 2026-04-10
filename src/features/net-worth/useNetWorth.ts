@@ -40,50 +40,47 @@ export function useNetWorth() {
     if (!initialized) return;
     let cancelled = false;
 
-    Promise.all([api.netWorth.get(), api.liabilities.list()]).then(
-      ([nwResult, liabResult]) => {
-        if (cancelled) return;
+    Promise.all([api.netWorth.get(), api.liabilities.list()]).then(([nwResult, liabResult]) => {
+      if (cancelled) return;
 
-        if (nwResult.data) {
-          setCurrent(nwResult.data.current);
-          setHistory(nwResult.data.history);
-          setError(null);
+      if (nwResult.data) {
+        setCurrent(nwResult.data.current);
+        setHistory(nwResult.data.history);
+        setError(null);
 
-          // Auto-snapshot: if no entry for current month, record one silently
-          const now = new Date();
-          const hasCurrentMonth = nwResult.data.history.some(
-            (s) => s.month === now.getMonth() && s.year === now.getFullYear()
-          );
-          if (!hasCurrentMonth) {
-            api.netWorth.recordSnapshot().then((snapResult) => {
+        // Auto-snapshot: if no entry for current month, record one silently
+        const now = new Date();
+        const hasCurrentMonth = nwResult.data.history.some(
+          (s) => s.month === now.getMonth() && s.year === now.getFullYear()
+        );
+        if (!hasCurrentMonth) {
+          api.netWorth
+            .recordSnapshot()
+            .then((snapResult) => {
               if (!cancelled && snapResult.data) {
                 setHistory((prev) => {
                   const without = prev.filter(
-                    (s) =>
-                      !(
-                        s.month === snapResult.data!.month &&
-                        s.year === snapResult.data!.year
-                      )
+                    (s) => !(s.month === snapResult.data!.month && s.year === snapResult.data!.year)
                   );
                   return [...without, snapResult.data!].sort((a, b) =>
                     a.year !== b.year ? a.year - b.year : a.month - b.month
                   );
                 });
               }
-            }).catch(() => {});
-          }
-        } else if (nwResult.error) {
-          setError(nwResult.error.message);
+            })
+            .catch(() => {});
         }
-
-        if (liabResult.data) {
-          setLiabilities(liabResult.data.liabilities);
-        } else if (liabResult.error) {
-          setError(liabResult.error.message);
-        }
-        setLoadedKey(String(fetchKey));
+      } else if (nwResult.error) {
+        setError(nwResult.error.message);
       }
-    );
+
+      if (liabResult.data) {
+        setLiabilities(liabResult.data.liabilities);
+      } else if (liabResult.error) {
+        setError(liabResult.error.message);
+      }
+      setLoadedKey(String(fetchKey));
+    });
 
     return () => {
       cancelled = true;

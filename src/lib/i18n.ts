@@ -1403,7 +1403,8 @@ const translations: Record<Locale, TranslationKeys> = {
     otherType: 'Lainnya',
     recordSnapshot: 'Catat ulang snapshot',
     netWorthHistory: 'Riwayat Kekayaan Bersih',
-    noSnapshotsYet: 'Kunjungi halaman ini setiap bulan untuk membangun riwayat kekayaan bersih Anda.',
+    noSnapshotsYet:
+      'Kunjungi halaman ini setiap bulan untuk membangun riwayat kekayaan bersih Anda.',
     liabilityDeleted: 'Kewajiban dihapus',
     liabilitySaved: 'Kewajiban disimpan',
     snapshotRecorded: 'Snapshot dicatat',

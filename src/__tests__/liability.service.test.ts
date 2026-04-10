@@ -16,7 +16,11 @@ beforeEach(async () => {
 
 describe('createLiability', () => {
   it('creates a liability with valid data', async () => {
-    const result = await createLiability({ name: 'KPR BCA', amount: 450_000_000, category: 'loan' });
+    const result = await createLiability({
+      name: 'KPR BCA',
+      amount: 450_000_000,
+      category: 'loan',
+    });
     expect(result.error).toBeUndefined();
     expect(result.data?.id).toBeDefined();
     expect(result.data?.name).toBe('KPR BCA');

@@ -17,8 +17,34 @@ interface NetWorthTrendChartProps {
   history: NetWorthSnapshot[];
 }
 
-const MONTH_NAMES_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const MONTH_NAMES_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const MONTH_NAMES_EN = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+const MONTH_NAMES_ID = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mei',
+  'Jun',
+  'Jul',
+  'Agu',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
+];
 
 function CustomTooltip({
   active,
@@ -34,20 +60,32 @@ function CustomTooltip({
 
   return (
     <div className="bg-popover border-border rounded-xl border p-3 text-xs shadow-lg">
-      <p className="mb-2 font-semibold">{snap.label} · {formatCurrency(snap.netWorth)}</p>
+      <p className="mb-2 font-semibold">
+        {snap.label} · {formatCurrency(snap.netWorth)}
+      </p>
       {snap.snapshotData && (
         <div className="space-y-1 text-[11px]">
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">{locale === 'id' ? 'Rekening' : 'Accounts'}</span>
-            <span className="font-mono">{formatCurrency(snap.snapshotData.paymentMethodBalances)}</span>
+            <span className="text-muted-foreground">
+              {locale === 'id' ? 'Rekening' : 'Accounts'}
+            </span>
+            <span className="font-mono">
+              {formatCurrency(snap.snapshotData.paymentMethodBalances)}
+            </span>
           </div>
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">{locale === 'id' ? 'Tabungan' : 'Savings'}</span>
+            <span className="text-muted-foreground">
+              {locale === 'id' ? 'Tabungan' : 'Savings'}
+            </span>
             <span className="font-mono">{formatCurrency(snap.snapshotData.savingsGoals)}</span>
           </div>
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">{locale === 'id' ? 'Kewajiban' : 'Liabilities'}</span>
-            <span className="font-mono text-red-500">−{formatCurrency(snap.snapshotData.liabilities)}</span>
+            <span className="text-muted-foreground">
+              {locale === 'id' ? 'Kewajiban' : 'Liabilities'}
+            </span>
+            <span className="font-mono text-red-500">
+              −{formatCurrency(snap.snapshotData.liabilities)}
+            </span>
           </div>
         </div>
       )}
@@ -87,12 +125,7 @@ export function NetWorthTrendChart({ history }: NetWorthTrendChartProps) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-          <XAxis
-            dataKey="label"
-            tick={{ fontSize: 10 }}
-            tickLine={false}
-            axisLine={false}
-          />
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
           <YAxis
             tickFormatter={(v: number) => {
               if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toFixed(0)}jt`;

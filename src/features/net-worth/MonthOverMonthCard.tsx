@@ -31,11 +31,8 @@ export function MonthOverMonthCard({ history, isLoading }: MonthOverMonthCardPro
   const positive = delta !== null && delta >= 0;
 
   return (
-    <motion.div
-      {...fadeInUp}
-      className="border-border bg-card rounded-2xl border p-6"
-    >
-      <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
+    <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-6">
+      <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
         {t(locale, 'vsLastMonth')}
       </p>
       {delta === null ? (
@@ -52,8 +49,8 @@ export function MonthOverMonthCard({ history, isLoading }: MonthOverMonthCardPro
           </p>
           {pct && (
             <p className="text-muted-foreground mt-1 text-xs">
-              {positive ? '+' : ''}{pct}% {locale === 'id' ? 'dari' : 'from'}{' '}
-              {formatCurrency(prev!.netWorth)}
+              {positive ? '+' : ''}
+              {pct}% {locale === 'id' ? 'dari' : 'from'} {formatCurrency(prev!.netWorth)}
             </p>
           )}
         </>

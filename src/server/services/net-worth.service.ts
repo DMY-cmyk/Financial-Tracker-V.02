@@ -14,10 +14,7 @@ export async function getCurrentNetWorth(): Promise<ServiceResult<NetWorthCurren
 
   const balancesResult = await listPaymentMethodBalances();
   if (balancesResult.error) return { error: balancesResult.error };
-  const paymentMethodTotal = (balancesResult.data ?? []).reduce(
-    (sum, b) => sum + b.balance,
-    0
-  );
+  const paymentMethodTotal = (balancesResult.data ?? []).reduce((sum, b) => sum + b.balance, 0);
 
   const db = await getDb();
 

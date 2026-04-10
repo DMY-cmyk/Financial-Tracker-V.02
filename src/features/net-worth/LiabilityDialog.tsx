@@ -4,12 +4,7 @@ import { t, useLocale } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { Liability } from '@/lib/types';
 
 interface LiabilityDialogProps {
@@ -81,7 +76,7 @@ export function LiabilityDialog({
               id="liab-category"
               value={category}
               onChange={(e) => setCategory(e.target.value as 'loan' | 'credit_card' | 'other')}
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+              className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
             >
               <option value="loan">{t(locale, 'loanType')}</option>
               <option value="credit_card">{t(locale, 'creditCardType')}</option>

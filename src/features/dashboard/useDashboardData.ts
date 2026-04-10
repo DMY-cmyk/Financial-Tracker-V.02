@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
 import { api } from '@/lib/api/client';
 import type { DashboardSummaryResponse } from '@/lib/api/contracts';
-import type { Bill, Category, SavingsGoal } from '@/lib/types';
+import type { Bill, Category, SavingsGoal, NetWorthCurrent, NetWorthSnapshot } from '@/lib/types';
 import { computeBudgetAlerts, type BudgetAlert } from '@/lib/budget-alerts';
 
 interface DashboardData {
@@ -13,6 +13,8 @@ interface DashboardData {
   categories: Category[];
   bills: Bill[];
   savingsGoals: SavingsGoal[];
+  netWorthCurrent: NetWorthCurrent | null;
+  netWorthHistory: NetWorthSnapshot[];
 }
 
 export function useDashboardData() {
@@ -24,17 +26,21 @@ export function useDashboardData() {
   const { data, isLoading: isQueryLoading } = useQuery<DashboardData>({
     queryKey: ['dashboard', month, year],
     queryFn: async () => {
-      const [summaryResult, catResult, billsResult, savingsResult] = await Promise.all([
-        api.dashboard.summary(month, year),
-        api.categories.list(),
-        api.bills.list({ month, year }),
-        api.savings.list(),
-      ]);
+      const [summaryResult, catResult, billsResult, savingsResult, netWorthResult] =
+        await Promise.all([
+          api.dashboard.summary(month, year),
+          api.categories.list(),
+          api.bills.list({ month, year }),
+          api.savings.list(),
+          api.netWorth.get(),
+        ]);
       return {
         summary: summaryResult.data ?? null,
         categories: catResult.data?.categories ?? [],
         bills: billsResult.data?.bills ?? [],
         savingsGoals: savingsResult.data?.goals ?? [],
+        netWorthCurrent: netWorthResult.data?.current ?? null,
+        netWorthHistory: netWorthResult.data?.history ?? [],
       };
     },
     enabled: initialized,
@@ -44,6 +50,8 @@ export function useDashboardData() {
   const categories = data?.categories ?? [];
   const bills = data?.bills ?? [];
   const savingsGoals = data?.savingsGoals ?? [];
+  const netWorthCurrent = data?.netWorthCurrent ?? null;
+  const netWorthHistory = data?.netWorthHistory ?? [];
 
   const onToggleBill = useCallback(
     async (id: string) => {
@@ -139,6 +147,8 @@ export function useDashboardData() {
     bills,
     savingsGoals,
     categories,
+    netWorthCurrent,
+    netWorthHistory,
     onToggleBill,
     updateBudget,
     isLoading,

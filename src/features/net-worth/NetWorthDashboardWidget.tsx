@@ -34,26 +34,18 @@ export function NetWorthDashboardWidget({
   const positive = delta !== null && delta >= 0;
 
   return (
-    <motion.div
-      {...fadeInUp}
-    >
+    <motion.div {...fadeInUp}>
       <Link href="/net-worth" className="block">
         <div className="rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#2563eb] p-5 text-white transition-opacity hover:opacity-90">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide opacity-70">
+          <p className="mb-1 text-[10px] font-semibold tracking-wide uppercase opacity-70">
             {t(locale, 'netWorth')}
           </p>
           <p className="font-mono text-2xl font-extrabold">
             {formatCurrency(current?.netWorth ?? 0)}
           </p>
           {delta !== null && (
-            <p
-              className={cn(
-                'mt-2 text-xs',
-                positive ? 'text-emerald-300' : 'text-red-300'
-              )}
-            >
-              {positive ? '▲' : '▼'} {formatCurrency(Math.abs(delta))}{' '}
-              {t(locale, 'vsLastMonth')}
+            <p className={cn('mt-2 text-xs', positive ? 'text-emerald-300' : 'text-red-300')}>
+              {positive ? '▲' : '▼'} {formatCurrency(Math.abs(delta))} {t(locale, 'vsLastMonth')}
             </p>
           )}
           <div className="mt-3 flex gap-4 border-t border-white/20 pt-3 text-[10px]">

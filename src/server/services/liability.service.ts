@@ -64,9 +64,7 @@ export async function updateLiability(
   return { data: updated };
 }
 
-export async function deleteLiability(
-  id: string
-): Promise<ServiceResult<{ success: true }>> {
+export async function deleteLiability(id: string): Promise<ServiceResult<{ success: true }>> {
   await ensureSeeded();
   const deleted = await repo.delete(id);
   if (!deleted) {

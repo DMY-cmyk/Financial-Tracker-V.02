@@ -1,4 +1,13 @@
-import type { Transaction, Category, PaymentMethod, RecurringTransaction, Bill, Liability, NetWorthCurrent, NetWorthSnapshot } from '@/lib/types';
+import type {
+  Transaction,
+  Category,
+  PaymentMethod,
+  RecurringTransaction,
+  Bill,
+  Liability,
+  NetWorthCurrent,
+  NetWorthSnapshot,
+} from '@/lib/types';
 
 // === Request types ===
 
