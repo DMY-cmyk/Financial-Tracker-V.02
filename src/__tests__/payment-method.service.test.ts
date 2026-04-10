@@ -34,7 +34,7 @@ describe('createPaymentMethod', () => {
   it('creates with default icon', async () => {
     const result = await createPaymentMethod({ name: 'Cash', type: 'cash' });
     expect(result.data).toBeDefined();
-    expect(result.data!.icon).toBe('wallet');
+    expect(result.data!.icon).toBe('initials');
   });
 
   it('stores beginningBalance when provided', async () => {
@@ -54,6 +54,16 @@ describe('createPaymentMethod', () => {
   it('defaults beginningBalance to 0 when not provided', async () => {
     const result = await createPaymentMethod({ name: 'Cash', type: 'cash' });
     expect(result.data!.beginningBalance).toBe(0);
+  });
+
+  it('stores an explicit lucide icon value correctly', async () => {
+    const result = await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'lucide:landmark',
+      type: 'bank',
+    });
+    expect(result.data).toBeDefined();
+    expect(result.data!.icon).toBe('lucide:landmark');
   });
 
   it('returns validation error for empty name', async () => {
@@ -87,6 +97,15 @@ describe('listPaymentMethods', () => {
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(3);
   });
+
+  it('returns icon field on every item', async () => {
+    const result = await listPaymentMethods();
+    expect(result.data).toBeDefined();
+    for (const pm of result.data!) {
+      expect(typeof pm.icon).toBe('string');
+      expect(pm.icon.length).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe('updatePaymentMethod', () => {
@@ -119,6 +138,17 @@ describe('updatePaymentMethod', () => {
     const list = await listPaymentMethods();
     const found = list.data!.find((m) => m.id === created.data!.id);
     expect(found!.beginningBalance).toBe(100000);
+  });
+
+  it('updates the icon field', async () => {
+    const created = await createPaymentMethod({
+      name: 'Bank BCA',
+      icon: 'lucide:landmark',
+      type: 'bank',
+    });
+    const result = await updatePaymentMethod(created.data!.id, { icon: 'lucide:wallet' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.icon).toBe('lucide:wallet');
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {

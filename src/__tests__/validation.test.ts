@@ -218,7 +218,7 @@ describe('createPaymentMethodSchema', () => {
       type: 'bank',
     });
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data.icon).toBe('wallet');
+    if (result.success) expect(result.data.icon).toBe('initials');
   });
 
   it('rejects invalid type', () => {

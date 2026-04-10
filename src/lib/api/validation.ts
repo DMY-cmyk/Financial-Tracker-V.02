@@ -104,7 +104,7 @@ export const updateCategorySchema = createCategorySchema.partial();
 
 export const createPaymentMethodSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  icon: z.string().max(50).optional().default('wallet'),
+  icon: z.string().max(50).optional().default('initials'),
   type: z.enum(['bank', 'cash', 'ewallet']),
   beginningBalance: z.number().default(0),
 });
