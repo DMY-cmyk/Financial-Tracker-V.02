@@ -152,12 +152,25 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] `bcryptjs` password hashing (cost 12 in production, 4 in tests)
 - [x] Bilingual auth strings (EN/ID) via i18n system
 
+### Payment Method Icons
+
+- [x] `PaymentMethodIcon` component — renders a Lucide icon (landmark, smartphone, banknote, etc.) or an auto-generated initials badge based on the payment method name
+- [x] `IconPicker` component — 3-column grid with 9 icon options; solid ring on selected, dashed border on auto-suggested icon
+- [x] `computeInitials(name)` — space-separated → first letter per word (max 3, uppercase); single word → first 3 chars
+- [x] `suggestIconFromName(name)` — auto-suggests icon from name keywords (bank names, e-wallets, cash/tunai)
+- [x] `normalizeIconValue(icon)` — normalises legacy bare icon names (e.g. `'wallet'`) to `'lucide:wallet'` format
+- [x] Icon picker wired into Settings → add and edit payment method dialogs
+- [x] `PaymentMethodIcon` shown in BalanceCard (replaces generic type icon) and TransactionForm payment method picker
+- [x] Seed script assigns meaningful icons to common Indonesian banks (BCA, BRI, BNI, Mandiri…) and e-wallets (GoPay, OVO, Dana…)
+- [x] Icon value stored as `'initials'` or `'lucide:<name>'` in `payment_methods.icon` column
+- [x] 36 new tests (25 utility + 8 component + 3 regression)
+
 ### Settings
 - [x] Theme: Light / Dark / System
 - [x] Language: English / Bahasa Indonesia
 - [x] Category & payment method management (CRUD, color picker, budget)
 - [x] Beginning Balance (Saldo Awal) per payment method — real-world account starting balance
-- [x] Edit dialog for payment methods (name, type, beginning balance)
+- [x] Edit dialog for payment methods (name, type, beginning balance, icon)
 - [x] Data management section (export, import, clear/reset)
 - [x] Import data from JSON/CSV with validation and preview
 - [x] SaaS-style sectioned layout with SettingsSection component
@@ -197,7 +210,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (374 tests: validation, all services, balance, reports, auth, advanced filters, net worth) |
+| **Testing** | Vitest (410 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -228,7 +241,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 374 tests)
+npm run test         # Run tests (Vitest, 410 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -284,7 +297,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (374 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth)
+  __tests__/                  # Vitest tests (410 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons)
 ```
 
 ## Documentation
