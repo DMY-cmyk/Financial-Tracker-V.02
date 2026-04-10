@@ -19,6 +19,7 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 ### Dashboard
 - [x] 4 summary metric cards (balance, income, expense, savings rate)
 - [x] 9 bento widgets: cash flow chart, category donut, budget bars, payment methods, bills checklist, savings rings, recent transactions
+- [x] Net Worth KPI widget — current net worth + month-over-month delta (green/red)
 - [x] Clickable balance cards — show monthly flow overlay on click
 - [x] Quick Actions section (add transaction, upload receipt, export data)
 - [x] Animated counter with Framer Motion spring
@@ -121,6 +122,22 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - `src/lib/xlsx-template-builder.ts` — shared Laporan sheet builder; chart contract cells H10/H12/B13/D18:D{n}/E18:E{n} locked for chart XML references
 - `src/lib/chart-xml-injector.ts` — JSZip post-processor: injects 3 DrawingML charts + Grafik worksheet into the XLSX buffer
 
+### Net Worth Tracker
+
+- [x] `/net-worth` page accessible from Finance group in sidebar navigation
+- [x] **Liabilities CRUD** — add/edit/delete named liabilities (loans, credit cards, other) with amount and category badge
+- [x] **Net Worth Summary Card** — gradient KPI card showing total assets, total liabilities, and current net worth
+- [x] **Month-over-Month Card** — amount and % change vs prior snapshot; shows `—` when fewer than 2 snapshots exist
+- [x] **Assets breakdown** — read-only list of payment method balances and savings goals with subtotals
+- [x] **12-month AreaChart** — `NetWorthTrendChart` with custom tooltip showing per-month breakdown (payment methods, savings, liabilities)
+- [x] **Snapshot system** — auto-records on first monthly page visit; manual "Re-record" button overwrites mid-month
+- [x] `snapshot_data` JSON column stores asset/liability breakdown at snapshot time for historical tooltips
+- [x] Undo toast on liability delete (consistent with savings goals pattern)
+- [x] ConfirmDialog before delete (CLAUDE.md requirement)
+- [x] Two new DB tables: `liabilities` + `net_worth_snapshots` (upsert via `ON CONFLICT(month, year)`)
+- [x] API: `GET/POST /api/liabilities`, `PATCH/DELETE /api/liabilities/[id]`, `GET /api/net-worth`, `POST /api/net-worth/snapshot`
+- [x] Bilingual labels (EN/ID) for all net worth strings
+
 ### Authentication
 
 - [x] JWT-based auth enforced by Next.js Edge Middleware on every request
@@ -180,7 +197,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (269 tests: validation, all services, balance, reports, auth, advanced filters) |
+| **Testing** | Vitest (374 tests: validation, all services, balance, reports, auth, advanced filters, net worth) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -211,7 +228,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 269 tests)
+npm run test         # Run tests (Vitest, 374 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -233,6 +250,8 @@ src/
       transactions/           # GET (list) + POST (create), [id] PATCH/DELETE
       categories/             # GET (list) + POST, [id] PATCH/DELETE
       payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
+      liabilities/            # GET + POST, [id] PATCH/DELETE
+      net-worth/              # GET (current + history), snapshot/ POST
       settings/               # GET + PATCH
       uploads/                # GET (list) + POST, [id] PATCH
       export-jobs/            # GET (list) + POST
@@ -241,14 +260,15 @@ src/
     transactions/new/page.tsx # Add transaction form
     bills/page.tsx            # Bills management
     savings/page.tsx          # Savings goals
+    net-worth/page.tsx        # Net worth tracker (liabilities CRUD, trend chart)
     upload/page.tsx           # OCR receipt upload
     export/page.tsx           # Multi-format export
     settings/page.tsx         # Theme, language, data
     settings/categories/      # Category & payment method CRUD
   server/
     db/                       # Database connection (Neon Postgres or SQLite) + seed
-    repositories/             # CRUD repositories (transaction, category, payment-method, settings, upload, export-job)
-    services/                 # Business logic (transaction, dashboard, category, payment-method, settings, upload, export-job)
+    repositories/             # CRUD repositories (transaction, category, payment-method, settings, upload, export-job, liability, net-worth)
+    services/                 # Business logic (transaction, dashboard, category, payment-method, settings, upload, export-job, liability, net-worth)
   components/
     dashboard/                # 8 bento widgets
     transactions/             # Table, form, filters, category chip
@@ -264,7 +284,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (269 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters)
+  __tests__/                  # Vitest tests (374 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth)
 ```
 
 ## Documentation
