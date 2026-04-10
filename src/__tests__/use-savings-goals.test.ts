@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { useSavingsGoals } from '@/features/savings/useSavingsGoals';
@@ -47,5 +47,33 @@ describe('useSavingsGoals — initial state', () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.goals).toEqual([]);
     expect(result.current.error).toBeNull();
+  });
+});
+
+describe('useSavingsGoals — data loading', () => {
+  it('populates goals and sets isLoading=false after fetch resolves', async () => {
+    const goal: SavingsGoal = {
+      id: '1',
+      name: 'Emergency Fund',
+      targetAmount: 10_000_000,
+      savedAmount: 5_000_000,
+      color: '#2563EB',
+    };
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+
+    const { result } = renderHook(() => useSavingsGoals());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.goals).toEqual([goal]);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('does not call api.savings.list when initialized=false', () => {
+    vi.mocked(useStore).mockImplementation(
+      (selector: (s: { initialized: boolean }) => unknown) =>
+        selector({ initialized: false })
+    );
+    renderHook(() => useSavingsGoals());
+    expect(api.savings.list).not.toHaveBeenCalled();
   });
 });

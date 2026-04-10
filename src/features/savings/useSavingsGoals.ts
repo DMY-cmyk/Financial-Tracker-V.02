@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '@/lib/api/client';
+import { useStore } from '@/store';
+import { useLocale } from '@/lib/i18n';
 import type { SavingsGoal } from '@/lib/types';
 
 export const COLOR_OPTIONS = [
@@ -15,14 +18,40 @@ export const COLOR_OPTIONS = [
 ];
 
 export function useSavingsGoals() {
-  const [goals] = useState<SavingsGoal[]>([]);
-  const [error] = useState<string | null>(null);
+  const locale = useLocale();
+  const initialized = useStore((s) => s.initialized);
+
+  const [goals, setGoals] = useState<SavingsGoal[]>([]);
+  const [fetchKey, setFetchKey] = useState(0);
+  const [loadedKey, setLoadedKey] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const isLoading = loadedKey !== String(fetchKey);
+
+  useEffect(() => {
+    if (!initialized) return;
+    let cancelled = false;
+    setError(null);
+    api.savings.list().then((result) => {
+      if (cancelled) return;
+      if (result.data) {
+        setGoals(result.data.goals);
+      } else if (result.error) {
+        setError(result.error.message);
+      }
+      setLoadedKey(String(fetchKey));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [initialized, fetchKey]);
+
+  void locale; // used in Tasks 5–9 for toast messages
 
   return {
     goals,
-    isLoading: true,
+    isLoading,
     error,
-    reload: () => {},
+    reload: () => setFetchKey((k) => k + 1),
     form: {
       open: false,
       editingGoal: null as SavingsGoal | null,
