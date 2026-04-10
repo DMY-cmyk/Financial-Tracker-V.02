@@ -105,6 +105,7 @@ export default function CategoriesPage() {
   const [editName, setEditName] = useState('');
   const [editType, setEditType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
   const [editBeginningBalance, setEditBeginningBalance] = useState('');
+  const [editIcon, setEditIcon] = useState('initials');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const refetch = useCallback(() => setFetchCount((c) => c + 1), []);
@@ -239,6 +240,7 @@ export default function CategoriesPage() {
     setEditingMethod(method);
     setEditName(method.name);
     setEditType(method.type);
+    setEditIcon(method.icon);
     setEditBeginningBalance(
       method.beginningBalance !== 0 ? formatCurrencyInput(method.beginningBalance) : ''
     );
@@ -250,6 +252,7 @@ export default function CategoriesPage() {
     const result = await api.paymentMethods.update(editingMethod.id, {
       name: editName,
       type: editType,
+      icon: editIcon,
       beginningBalance: parseCurrencyInput(editBeginningBalance),
     });
     if (result.data) {
@@ -548,6 +551,18 @@ export default function CategoriesPage() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder={t(locale, 'methodName')}
+              />
+            </div>
+            <div>
+              <label className="text-muted-foreground mb-1 block text-xs">
+                {t(locale, 'paymentMethodIcon')}
+              </label>
+              <IconPicker
+                value={editIcon}
+                onChange={setEditIcon}
+                paymentMethodName={editName}
+                type={editType}
+                locale={locale}
               />
             </div>
             <div>
