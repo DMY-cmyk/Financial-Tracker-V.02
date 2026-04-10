@@ -131,6 +131,7 @@ describe('useSavingsGoals — form.openAdd', () => {
     expect(result.current.form.name).toBe('');
     expect(result.current.form.target).toBe('');
     expect(result.current.form.saved).toBe('');
+    expect(result.current.form.color).toBe('#2563EB');
     expect(result.current.form.errors).toEqual({});
   });
 
@@ -145,6 +146,8 @@ describe('useSavingsGoals — form.openAdd', () => {
 
     expect(result.current.form.open).toBe(false);
     expect(result.current.form.name).toBe('');
+    expect(result.current.form.editingGoal).toBeNull();
+    expect(result.current.form.color).toBe('#2563EB');
   });
 });
 
