@@ -21,11 +21,28 @@ export function useSavingsGoals() {
   const locale = useLocale();
   const initialized = useStore((s) => s.initialized);
 
+  // Data state
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [fetchKey, setFetchKey] = useState(0);
   const [loadedKey, setLoadedKey] = useState('');
   const [error, setError] = useState<string | null>(null);
   const isLoading = loadedKey !== String(fetchKey);
+
+  // Form state
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
+  const [formName, setFormName] = useState('');
+  const [formTarget, setFormTarget] = useState('');
+  const [formSaved, setFormSaved] = useState('');
+  const [formColor, setFormColor] = useState(COLOR_OPTIONS[0]);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Delete state
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Quick edit state
+  const [quickEditGoalId, setQuickEditGoalId] = useState<string | null>(null);
+  const [quickEditValue, setQuickEditValue] = useState('');
 
   useEffect(() => {
     if (!initialized) return;
@@ -45,43 +62,75 @@ export function useSavingsGoals() {
     };
   }, [initialized, fetchKey]);
 
-  void locale; // used in Tasks 5–9 for toast messages
-
   const reload = useCallback(() => setFetchKey((k) => k + 1), []);
+
+  const resetForm = () => {
+    setFormName('');
+    setFormTarget('');
+    setFormSaved('');
+    setFormColor(COLOR_OPTIONS[0]);
+    setFormErrors({});
+    setEditingGoal(null);
+  };
+
+  const openAdd = () => {
+    resetForm();
+    setFormOpen(true);
+  };
+
+  const openEdit = (goal: SavingsGoal) => {
+    setEditingGoal(goal);
+    setFormName(goal.name);
+    setFormTarget(String(goal.targetAmount));
+    setFormSaved(String(goal.savedAmount));
+    setFormColor(goal.color);
+    setFormErrors({});
+    setFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setFormOpen(false);
+    resetForm();
+  };
+
+  void locale; // used in Tasks 5–9
 
   return {
     goals,
     isLoading,
     error,
     reload,
+
     form: {
-      open: false,
-      editingGoal: null as SavingsGoal | null,
-      name: '',
-      setName: (_v: string) => {},
-      target: '',
-      setTarget: (_v: string) => {},
-      saved: '',
-      setSaved: (_v: string) => {},
-      color: COLOR_OPTIONS[0],
-      setColor: (_v: string) => {},
-      errors: {} as Record<string, string>,
-      openAdd: () => {},
-      openEdit: (_goal: SavingsGoal) => {},
-      close: () => {},
+      open: formOpen,
+      editingGoal,
+      name: formName,
+      setName: setFormName,
+      target: formTarget,
+      setTarget: setFormTarget,
+      saved: formSaved,
+      setSaved: setFormSaved,
+      color: formColor,
+      setColor: setFormColor,
+      errors: formErrors,
+      openAdd,
+      openEdit,
+      close: closeForm,
       submit: async () => {},
     },
+
     deleteConfirm: {
-      id: null as string | null,
-      setId: (_id: string | null) => {},
+      id: deleteId,
+      setId: setDeleteId,
       confirm: async () => {},
     },
+
     quickEdit: {
-      goalId: null as string | null,
-      value: '',
+      goalId: quickEditGoalId,
+      value: quickEditValue,
       open: (_goal: SavingsGoal) => {},
       close: () => {},
-      setValue: (_v: string) => {},
+      setValue: setQuickEditValue,
       submit: async (_goal: SavingsGoal) => {},
     },
   };

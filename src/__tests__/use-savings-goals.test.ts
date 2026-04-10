@@ -115,3 +115,59 @@ describe('useSavingsGoals — data loading', () => {
     await waitFor(() => expect(result.current.goals).toEqual([goal]));
   });
 });
+
+describe('useSavingsGoals — form.openAdd', () => {
+  it('openAdd sets form.open=true and clears all fields', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.form.open).toBe(false);
+
+    act(() => result.current.form.openAdd());
+
+    expect(result.current.form.open).toBe(true);
+    expect(result.current.form.editingGoal).toBeNull();
+    expect(result.current.form.name).toBe('');
+    expect(result.current.form.target).toBe('');
+    expect(result.current.form.saved).toBe('');
+    expect(result.current.form.errors).toEqual({});
+  });
+
+  it('form.close sets form.open=false and clears fields', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openAdd());
+    act(() => result.current.form.setName('My Goal'));
+    act(() => result.current.form.close());
+
+    expect(result.current.form.open).toBe(false);
+    expect(result.current.form.name).toBe('');
+  });
+});
+
+describe('useSavingsGoals — form.openEdit', () => {
+  it('openEdit pre-populates all fields from the goal', async () => {
+    const goal: SavingsGoal = {
+      id: '1',
+      name: 'Emergency Fund',
+      targetAmount: 10_000_000,
+      savedAmount: 5_000_000,
+      color: '#EF4444',
+    };
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openEdit(goal));
+
+    expect(result.current.form.open).toBe(true);
+    expect(result.current.form.editingGoal).toEqual(goal);
+    expect(result.current.form.name).toBe('Emergency Fund');
+    expect(result.current.form.target).toBe('10000000');
+    expect(result.current.form.saved).toBe('5000000');
+    expect(result.current.form.color).toBe('#EF4444');
+  });
+});
