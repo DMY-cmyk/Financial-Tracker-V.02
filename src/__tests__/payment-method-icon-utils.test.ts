@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   computeInitials,
   suggestIconFromName,
+  normalizeIconValue,
 } from '@/lib/payment-method-icon-utils';
 
 describe('computeInitials', () => {
@@ -39,4 +40,15 @@ describe('suggestIconFromName', () => {
     expect(suggestIconFromName('Investasi')).toBe('initials'));
   it('"gopay" → lucide:smartphone (case-insensitive)', () =>
     expect(suggestIconFromName('gopay')).toBe('lucide:smartphone'));
+});
+
+describe('normalizeIconValue', () => {
+  it("bare 'wallet' → 'lucide:wallet' (legacy row normalization)", () =>
+    expect(normalizeIconValue('wallet')).toBe('lucide:wallet'));
+  it("'lucide:landmark' → 'lucide:landmark' (already prefixed, unchanged)", () =>
+    expect(normalizeIconValue('lucide:landmark')).toBe('lucide:landmark'));
+  it("null → 'initials'", () => expect(normalizeIconValue(null)).toBe('initials'));
+  it("'' → 'initials'", () => expect(normalizeIconValue('')).toBe('initials'));
+  it("'initials' → 'initials' (unchanged)", () =>
+    expect(normalizeIconValue('initials')).toBe('initials'));
 });

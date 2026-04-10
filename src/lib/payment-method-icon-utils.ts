@@ -69,3 +69,21 @@ export function suggestIconFromName(name: string): string {
 
   return 'initials';
 }
+
+/**
+ * Normalises a raw icon value from the database to a canonical form.
+ *
+ * - null or empty string  → 'initials'
+ * - 'initials'            → 'initials' (unchanged)
+ * - 'lucide:*'            → unchanged (already canonical)
+ * - bare word (no ':')    → prepend 'lucide:' (handles legacy rows saved as e.g. 'wallet')
+ *
+ * This is a read-time transform only; it never writes back to the DB.
+ */
+export function normalizeIconValue(icon: string | null): string {
+  if (!icon) return 'initials';
+  if (icon === 'initials') return 'initials';
+  if (icon.startsWith('lucide:')) return icon;
+  // Legacy bare name (e.g. 'wallet') → treat as Lucide icon
+  return `lucide:${icon}`;
+}
