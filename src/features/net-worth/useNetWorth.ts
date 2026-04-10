@@ -110,6 +110,8 @@ export function useNetWorth() {
         if (r.data) setCurrent(r.data.current);
       });
       toast.success(t(locale, 'snapshotRecorded'));
+    } else {
+      toast.error(t(locale, 'failedSave'));
     }
   }, [locale]);
 
@@ -179,13 +181,17 @@ export function useNetWorth() {
           ? {
               label: t(locale, 'undo'),
               onClick: async () => {
-                await api.liabilities.create({
+                const r = await api.liabilities.create({
                   name: deletedLiability.name,
                   amount: deletedLiability.amount,
                   category: deletedLiability.category,
                 });
-                reload();
-                toast.success(t(locale, 'itemRestored'));
+                if (r.data) {
+                  reload();
+                  toast.success(t(locale, 'itemRestored'));
+                } else {
+                  toast.error(t(locale, 'failedSave'));
+                }
               },
             }
           : undefined,
