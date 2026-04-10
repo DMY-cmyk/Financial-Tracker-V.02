@@ -19,9 +19,8 @@ vi.mock('@/lib/api/client', () => ({
 }));
 
 vi.mock('@/store', () => ({
-  useStore: vi.fn((selector: (s: { initialized: boolean }) => unknown) =>
-    selector({ initialized: true })
-  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useStore: vi.fn((selector: (s: any) => unknown) => selector({ initialized: true })),
 }));
 
 vi.mock('sonner', () => ({
@@ -70,16 +69,16 @@ describe('useSavingsGoals — data loading', () => {
   });
 
   it('does not call api.savings.list when initialized=false', () => {
-    vi.mocked(useStore).mockImplementation(
-      (selector: (s: { initialized: boolean }) => unknown) =>
-        selector({ initialized: false })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(useStore).mockImplementation((selector: (s: any) => unknown) =>
+      selector({ initialized: false })
     );
     renderHook(() => useSavingsGoals());
     expect(api.savings.list).not.toHaveBeenCalled();
     // Restore default so subsequent tests get initialized=true
-    vi.mocked(useStore).mockImplementation(
-      (selector: (s: { initialized: boolean }) => unknown) =>
-        selector({ initialized: true })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(useStore).mockImplementation((selector: (s: any) => unknown) =>
+      selector({ initialized: true })
     );
   });
 
@@ -184,7 +183,9 @@ describe('useSavingsGoals — form.submit validation', () => {
 
     act(() => result.current.form.openAdd());
     // name is empty, target is also empty
-    await act(async () => { await result.current.form.submit(); });
+    await act(async () => {
+      await result.current.form.submit();
+    });
 
     expect(result.current.form.errors.name).toBe('required');
     expect(api.savings.create).not.toHaveBeenCalled();
@@ -198,7 +199,9 @@ describe('useSavingsGoals — form.submit validation', () => {
     act(() => result.current.form.openAdd());
     act(() => result.current.form.setName('My Goal'));
     act(() => result.current.form.setTarget('0'));
-    await act(async () => { await result.current.form.submit(); });
+    await act(async () => {
+      await result.current.form.submit();
+    });
 
     expect(result.current.form.errors.target).toBe('invalidAmount');
     expect(api.savings.create).not.toHaveBeenCalled();
@@ -209,7 +212,13 @@ describe('useSavingsGoals — form.submit create', () => {
   it('calls api.savings.create with form data and closes form on success', async () => {
     vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
     vi.mocked(api.savings.create).mockResolvedValue({
-      data: { id: '99', name: 'New Goal', targetAmount: 5_000_000, savedAmount: 0, color: '#2563EB' },
+      data: {
+        id: '99',
+        name: 'New Goal',
+        targetAmount: 5_000_000,
+        savedAmount: 0,
+        color: '#2563EB',
+      },
     });
 
     const { result } = renderHook(() => useSavingsGoals());
@@ -219,7 +228,9 @@ describe('useSavingsGoals — form.submit create', () => {
     act(() => result.current.form.setName('New Goal'));
     act(() => result.current.form.setTarget('5000000'));
 
-    await act(async () => { await result.current.form.submit(); });
+    await act(async () => {
+      await result.current.form.submit();
+    });
 
     expect(api.savings.create).toHaveBeenCalledWith({
       name: 'New Goal',
@@ -244,7 +255,9 @@ describe('useSavingsGoals — form.submit create', () => {
     act(() => result.current.form.setName('New Goal'));
     act(() => result.current.form.setTarget('5000000'));
 
-    await act(async () => { await result.current.form.submit(); });
+    await act(async () => {
+      await result.current.form.submit();
+    });
 
     expect(result.current.form.open).toBe(true);
     expect(toast.error).toHaveBeenCalledWith('failedSave');
@@ -271,7 +284,9 @@ describe('useSavingsGoals — form.submit update', () => {
     act(() => result.current.form.openEdit(goal));
     act(() => result.current.form.setName('New Name'));
 
-    await act(async () => { await result.current.form.submit(); });
+    await act(async () => {
+      await result.current.form.submit();
+    });
 
     expect(api.savings.update).toHaveBeenCalledWith('goal-1', {
       name: 'New Name',
@@ -303,7 +318,9 @@ describe('useSavingsGoals — deleteConfirm', () => {
     act(() => result.current.deleteConfirm.setId('del-1'));
     expect(result.current.deleteConfirm.id).toBe('del-1');
 
-    await act(async () => { await result.current.deleteConfirm.confirm(); });
+    await act(async () => {
+      await result.current.deleteConfirm.confirm();
+    });
 
     expect(api.savings.delete).toHaveBeenCalledWith('del-1');
     expect(result.current.goals).toEqual([]);
@@ -316,7 +333,9 @@ describe('useSavingsGoals — deleteConfirm', () => {
     const { result } = renderHook(() => useSavingsGoals());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    await act(async () => { await result.current.deleteConfirm.confirm(); });
+    await act(async () => {
+      await result.current.deleteConfirm.confirm();
+    });
 
     expect(api.savings.delete).not.toHaveBeenCalled();
   });
@@ -366,7 +385,9 @@ describe('useSavingsGoals — quickEdit', () => {
     act(() => result.current.quickEdit.open(goal));
     act(() => result.current.quickEdit.setValue('4000000'));
 
-    await act(async () => { await result.current.quickEdit.submit(goal); });
+    await act(async () => {
+      await result.current.quickEdit.submit(goal);
+    });
 
     expect(api.savings.update).toHaveBeenCalledWith('qe-1', { savedAmount: 4_000_000 });
     expect(result.current.goals[0].savedAmount).toBe(4_000_000);

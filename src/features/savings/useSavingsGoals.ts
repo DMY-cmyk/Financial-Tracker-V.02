@@ -48,10 +48,10 @@ export function useSavingsGoals() {
   useEffect(() => {
     if (!initialized) return;
     let cancelled = false;
-    setError(null);
     api.savings.list().then((result) => {
       if (cancelled) return;
       if (result.data) {
+        setError(null);
         setGoals(result.data.goals);
       } else if (result.error) {
         setError(result.error.message);

@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { fadeInUp, staggerGrid, staggerGridItem } from '@/lib/motion';
-import { api } from '@/lib/api/client';
-import { useStore } from '@/store';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -17,177 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Plus, Pencil, Trash2, PiggyBank } from 'lucide-react';
-import { toast } from 'sonner';
-import type { SavingsGoal } from '@/lib/types';
-
-const COLOR_OPTIONS = [
-  '#2563EB',
-  '#10B981',
-  '#F59E0B',
-  '#EF4444',
-  '#8B5CF6',
-  '#EC4899',
-  '#06B6D4',
-  '#F97316',
-];
+import { useSavingsGoals, COLOR_OPTIONS } from '@/features/savings/useSavingsGoals';
 
 export default function SavingsPage() {
   const locale = useLocale();
-  const initialized = useStore((s) => s.initialized);
-
-  const [goals, setGoals] = useState<SavingsGoal[]>([]);
-  const [fetchKey, setFetchKey] = useState(0);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [updatingSavedId, setUpdatingSavedId] = useState<string | null>(null);
-  const [savedInput, setSavedInput] = useState('');
-
-  const [loadedKey, setLoadedKey] = useState('');
-  const targetKey = `${fetchKey}`;
-  const isLoading = loadedKey !== targetKey;
-
-  // Form state
-  const [formName, setFormName] = useState('');
-  const [formTarget, setFormTarget] = useState('');
-  const [formSaved, setFormSaved] = useState('');
-  const [formColor, setFormColor] = useState(COLOR_OPTIONS[0]);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (!initialized) return;
-
-    let cancelled = false;
-
-    api.savings.list().then((result) => {
-      if (cancelled) return;
-      if (result.data) {
-        setGoals(result.data.goals);
-      }
-      setLoadedKey(`${fetchKey}`);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [initialized, fetchKey]);
-
-  const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
-
-  const resetForm = () => {
-    setFormName('');
-    setFormTarget('');
-    setFormSaved('');
-    setFormColor(COLOR_OPTIONS[0]);
-    setFormErrors({});
-    setEditingGoal(null);
-  };
-
-  const openAdd = () => {
-    resetForm();
-    setFormOpen(true);
-  };
-
-  const openEdit = (goal: SavingsGoal) => {
-    setEditingGoal(goal);
-    setFormName(goal.name);
-    setFormTarget(String(goal.targetAmount));
-    setFormSaved(String(goal.savedAmount));
-    setFormColor(goal.color);
-    setFormOpen(true);
-  };
-
-  const closeForm = () => {
-    setFormOpen(false);
-    resetForm();
-  };
-
-  const validateForm = (): boolean => {
-    const errors: Record<string, string> = {};
-    if (!formName.trim()) errors.name = t(locale, 'required');
-    const target = Number(formTarget);
-    if (!formTarget || isNaN(target) || target <= 0) errors.target = t(locale, 'invalidAmount');
-    const saved = Number(formSaved || '0');
-    if (isNaN(saved) || saved < 0) errors.saved = t(locale, 'invalidAmount');
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
-    if (editingGoal) {
-      const result = await api.savings.update(editingGoal.id, {
-        name: formName.trim(),
-        targetAmount: Number(formTarget),
-        savedAmount: Number(formSaved || '0'),
-        color: formColor,
-      });
-      if (result.data) {
-        toast.success(t(locale, 'goalSaved'));
-        refetch();
-        closeForm();
-      } else {
-        toast.error(t(locale, 'failedSave'));
-      }
-    } else {
-      const result = await api.savings.create({
-        name: formName.trim(),
-        targetAmount: Number(formTarget),
-        savedAmount: Number(formSaved || '0'),
-        color: formColor,
-      });
-      if (result.data) {
-        toast.success(t(locale, 'goalSaved'));
-        refetch();
-        closeForm();
-      } else {
-        toast.error(t(locale, 'failedSave'));
-      }
-    }
-  };
-
-  const handleUpdateSaved = async (goal: SavingsGoal) => {
-    const newAmount = Number(savedInput);
-    if (isNaN(newAmount) || newAmount < 0) return;
-
-    const result = await api.savings.update(goal.id, { savedAmount: newAmount });
-    if (result.data) {
-      setGoals((prev) =>
-        prev.map((g) => (g.id === goal.id ? { ...g, savedAmount: newAmount } : g))
-      );
-      toast.success(t(locale, 'goalSaved'));
-    }
-    setUpdatingSavedId(null);
-    setSavedInput('');
-  };
-
-  const confirmDelete = async () => {
-    if (!deleteId) return;
-    const deletedGoal = goals.find((g) => g.id === deleteId);
-    const result = await api.savings.delete(deleteId);
-    if (result.data) {
-      setGoals((prev) => prev.filter((g) => g.id !== deleteId));
-      toast.success(t(locale, 'goalDeleted'), {
-        action: deletedGoal
-          ? {
-              label: t(locale, 'undo'),
-              onClick: async () => {
-                await api.savings.create({
-                  name: deletedGoal.name,
-                  targetAmount: deletedGoal.targetAmount,
-                  savedAmount: deletedGoal.savedAmount,
-                  color: deletedGoal.color,
-                });
-                setFetchKey((k) => k + 1);
-                toast.success(t(locale, 'itemRestored'));
-              },
-            }
-          : undefined,
-      });
-    }
-    setDeleteId(null);
-  };
+  const { goals, isLoading, form, deleteConfirm, quickEdit } = useSavingsGoals();
 
   if (isLoading) {
     return (
@@ -211,7 +42,7 @@ export default function SavingsPage() {
             goals.length > 0 ? `${goals.length} ${locale === 'id' ? 'target' : 'goals'}` : undefined
           }
         >
-          <Button onClick={openAdd} className="gap-2 shadow-sm">
+          <Button onClick={form.openAdd} className="gap-2 shadow-sm">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">{t(locale, 'addSavingsGoal')}</span>
             <span className="sm:hidden">{t(locale, 'add')}</span>
@@ -227,7 +58,7 @@ export default function SavingsPage() {
                 title={t(locale, 'noSavingsGoals')}
                 icon={<PiggyBank className="h-12 w-12" />}
               >
-                <Button onClick={openAdd} className="gap-2">
+                <Button onClick={form.openAdd} className="gap-2">
                   <Plus className="h-4 w-4" />
                   {t(locale, 'addSavingsGoal')}
                 </Button>
@@ -265,7 +96,7 @@ export default function SavingsPage() {
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7"
-                              onClick={() => openEdit(goal)}
+                              onClick={() => form.openEdit(goal)}
                               aria-label={t(locale, 'edit')}
                             >
                               <Pencil className="h-3 w-3" />
@@ -274,7 +105,7 @@ export default function SavingsPage() {
                               variant="ghost"
                               size="icon"
                               className="text-destructive h-7 w-7"
-                              onClick={() => setDeleteId(goal.id)}
+                              onClick={() => deleteConfirm.setId(goal.id)}
                               aria-label={t(locale, 'delete')}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -286,38 +117,31 @@ export default function SavingsPage() {
                           {formatCurrency(goal.targetAmount)}
                         </p>
 
-                        {/* Inline saved amount update */}
-                        {updatingSavedId === goal.id ? (
+                        {quickEdit.goalId === goal.id ? (
                           <div className="mt-2 flex gap-1.5">
                             <Input
                               type="number"
-                              value={savedInput}
-                              onChange={(e) => setSavedInput(e.target.value)}
+                              value={quickEdit.value}
+                              onChange={(e) => quickEdit.setValue(e.target.value)}
                               className="h-7 text-xs"
                               min={0}
                               autoFocus
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleUpdateSaved(goal);
-                                if (e.key === 'Escape') {
-                                  setUpdatingSavedId(null);
-                                  setSavedInput('');
-                                }
+                                if (e.key === 'Enter') quickEdit.submit(goal);
+                                if (e.key === 'Escape') quickEdit.close();
                               }}
                             />
                             <Button
                               size="sm"
                               className="h-7 px-2 text-xs"
-                              onClick={() => handleUpdateSaved(goal)}
+                              onClick={() => quickEdit.submit(goal)}
                             >
                               {t(locale, 'save')}
                             </Button>
                           </div>
                         ) : (
                           <button
-                            onClick={() => {
-                              setUpdatingSavedId(goal.id);
-                              setSavedInput(String(goal.savedAmount));
-                            }}
+                            onClick={() => quickEdit.open(goal)}
                             className="text-primary mt-1.5 text-[11px] font-medium hover:underline"
                           >
                             {t(locale, 'updateSaved')}
@@ -334,11 +158,11 @@ export default function SavingsPage() {
       </div>
 
       {/* Add/Edit Sheet */}
-      <Sheet open={formOpen} onOpenChange={setFormOpen}>
+      <Sheet open={form.open} onOpenChange={(o) => !o && form.close()}>
         <SheetContent className="overflow-y-auto" aria-describedby={undefined}>
           <SheetHeader>
             <SheetTitle>
-              {editingGoal ? t(locale, 'editSavingsGoal') : t(locale, 'addSavingsGoal')}
+              {form.editingGoal ? t(locale, 'editSavingsGoal') : t(locale, 'addSavingsGoal')}
             </SheetTitle>
           </SheetHeader>
           <div className="mt-6 space-y-4">
@@ -346,35 +170,37 @@ export default function SavingsPage() {
               <Label htmlFor="goal-name">{t(locale, 'goalName')}</Label>
               <Input
                 id="goal-name"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
+                value={form.name}
+                onChange={(e) => form.setName(e.target.value)}
                 placeholder={locale === 'id' ? 'cth. Dana Darurat' : 'e.g. Emergency Fund'}
               />
-              {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
+              {form.errors.name && <p className="text-destructive text-xs">{form.errors.name}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="goal-target">{t(locale, 'targetAmount')}</Label>
               <Input
                 id="goal-target"
                 type="number"
-                value={formTarget}
-                onChange={(e) => setFormTarget(e.target.value)}
+                value={form.target}
+                onChange={(e) => form.setTarget(e.target.value)}
                 placeholder="10000000"
                 min={0}
               />
-              {formErrors.target && <p className="text-destructive text-xs">{formErrors.target}</p>}
+              {form.errors.target && (
+                <p className="text-destructive text-xs">{form.errors.target}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="goal-saved">{t(locale, 'savedAmount')}</Label>
               <Input
                 id="goal-saved"
                 type="number"
-                value={formSaved}
-                onChange={(e) => setFormSaved(e.target.value)}
+                value={form.saved}
+                onChange={(e) => form.setSaved(e.target.value)}
                 placeholder="0"
                 min={0}
               />
-              {formErrors.saved && <p className="text-destructive text-xs">{formErrors.saved}</p>}
+              {form.errors.saved && <p className="text-destructive text-xs">{form.errors.saved}</p>}
             </div>
             <div className="space-y-2">
               <Label>{t(locale, 'goalColor')}</Label>
@@ -383,10 +209,10 @@ export default function SavingsPage() {
                   <button
                     key={color}
                     type="button"
-                    onClick={() => setFormColor(color)}
+                    onClick={() => form.setColor(color)}
                     className={cn(
                       'h-8 w-8 rounded-full border-2 transition-transform',
-                      formColor === color
+                      form.color === color
                         ? 'border-foreground scale-110'
                         : 'border-transparent hover:scale-105'
                     )}
@@ -397,10 +223,10 @@ export default function SavingsPage() {
               </div>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmit} className="flex-1">
+              <Button onClick={form.submit} className="flex-1">
                 {t(locale, 'save')}
               </Button>
-              <Button variant="outline" onClick={closeForm}>
+              <Button variant="outline" onClick={form.close}>
                 {t(locale, 'cancel')}
               </Button>
             </div>
@@ -410,18 +236,18 @@ export default function SavingsPage() {
 
       {/* Delete confirmation */}
       <ConfirmDialog
-        open={!!deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
+        open={!!deleteConfirm.id}
+        onOpenChange={(open) => !open && deleteConfirm.setId(null)}
         title={t(locale, 'deleteSavingsGoal')}
         description={t(locale, 'deleteConfirmDescription')}
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
-        onConfirm={confirmDelete}
+        onConfirm={deleteConfirm.confirm}
       />
 
       {/* Mobile FAB */}
       <button
-        onClick={openAdd}
+        onClick={form.openAdd}
         className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
         aria-label={t(locale, 'addSavingsGoal')}
       >
