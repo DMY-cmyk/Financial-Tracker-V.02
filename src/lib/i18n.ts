@@ -331,6 +331,10 @@ type TranslationKeys = {
 
   // Category icons
   selectIcon: string;
+  chooseIcon: string;
+  iconStyle: string;
+  autoInitials: string;
+  paymentMethodIcon: string;
 
   // Reorder
   reorderCategories: string;
@@ -809,6 +813,10 @@ const translations: Record<Locale, TranslationKeys> = {
     uploadDate: 'Upload Date',
     extracted: 'Extracted',
     selectIcon: 'Select Icon',
+    chooseIcon: 'Choose Icon',
+    iconStyle: 'Icon Style',
+    autoInitials: 'Auto (Initials)',
+    paymentMethodIcon: 'Payment Method Icon',
     reorderCategories: 'Reorder Categories',
     browseByYear: 'Browse by Year',
     selectMonth: 'Select Month',
@@ -1262,6 +1270,10 @@ const translations: Record<Locale, TranslationKeys> = {
     uploadDate: 'Tanggal Unggah',
     extracted: 'Diekstrak',
     selectIcon: 'Pilih Ikon',
+    chooseIcon: 'Pilih Ikon',
+    iconStyle: 'Gaya Ikon',
+    autoInitials: 'Otomatis (Inisial)',
+    paymentMethodIcon: 'Ikon Metode Pembayaran',
     reorderCategories: 'Urutkan Kategori',
     browseByYear: 'Jelajahi per Tahun',
     selectMonth: 'Pilih Bulan',
