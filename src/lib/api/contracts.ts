@@ -1,4 +1,4 @@
-import type { Transaction, Category, PaymentMethod, RecurringTransaction, Bill } from '@/lib/types';
+import type { Transaction, Category, PaymentMethod, RecurringTransaction, Bill, Liability, NetWorthCurrent, NetWorthSnapshot } from '@/lib/types';
 
 // === Request types ===
 
@@ -428,7 +428,7 @@ export interface ForecastResponse {
 // === Liability contracts ===
 
 export interface LiabilityListResponse {
-  liabilities: import('@/lib/types').Liability[];
+  liabilities: Liability[];
 }
 
 export interface CreateLiabilityRequest {
@@ -446,6 +446,6 @@ export interface UpdateLiabilityRequest {
 // === Net Worth contracts ===
 
 export interface NetWorthDataResponse {
-  current: import('@/lib/types').NetWorthCurrent;
-  history: import('@/lib/types').NetWorthSnapshot[];
+  current: NetWorthCurrent;
+  history: NetWorthSnapshot[];
 }
