@@ -13,6 +13,14 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PaymentMethodIcon } from '@/components/shared/PaymentMethodIcon';
 
 interface TransactionFormProps {
   transaction?: Transaction;
@@ -296,27 +304,41 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       {/* Payment Method */}
       <div>
         <Label htmlFor="paymentMethod">{t(locale, 'paymentMethod')}</Label>
-        <select
-          id="paymentMethod"
+        <Select
           value={paymentMethod}
-          onChange={(e) => {
-            setPaymentMethod(e.target.value);
-            if (fieldError('paymentMethod'))
-              setErrors(errors.filter((e) => e.field !== 'paymentMethod'));
+          onValueChange={(val) => {
+            if (val !== null) {
+              setPaymentMethod(val);
+              if (fieldError('paymentMethod'))
+                setErrors(errors.filter((e) => e.field !== 'paymentMethod'));
+            }
           }}
-          className={cn(
-            'bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm',
-            fieldError('paymentMethod') ? 'border-red-500' : 'border-input'
-          )}
-          aria-invalid={!!fieldError('paymentMethod')}
         >
-          <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
-          {paymentMethods.map((p) => (
-            <option key={p.id} value={p.name}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger
+            id="paymentMethod"
+            className={cn(
+              'mt-1 w-full',
+              fieldError('paymentMethod') ? 'border-red-500' : ''
+            )}
+            aria-invalid={!!fieldError('paymentMethod')}
+          >
+            <SelectValue placeholder={locale === 'id' ? 'Pilih...' : 'Select...'} />
+          </SelectTrigger>
+          <SelectContent>
+            {paymentMethods.map((p) => (
+              <SelectItem key={p.id} value={p.name}>
+                <PaymentMethodIcon
+                  name={p.name}
+                  icon={p.icon}
+                  type={p.type}
+                  size="sm"
+                  aria-hidden="true"
+                />
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {fieldError('paymentMethod') && (
           <p className="mt-1 text-xs text-red-500">{fieldError('paymentMethod')}</p>
         )}
