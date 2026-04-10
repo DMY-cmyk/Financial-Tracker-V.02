@@ -7,6 +7,7 @@ import {
   Target,
   CalendarCheck,
   PiggyBank,
+  TrendingUp,
   BarChart3,
   Upload,
   Download,
@@ -44,6 +45,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/budget', labelKey: 'budgetPage', icon: Target },
       { href: '/bills', labelKey: 'bills', icon: CalendarCheck },
       { href: '/savings', labelKey: 'savingsPage', icon: PiggyBank },
+      { href: '/net-worth', labelKey: 'netWorth', icon: TrendingUp },
     ],
   },
   {
