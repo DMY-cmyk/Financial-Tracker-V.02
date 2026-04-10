@@ -46,6 +46,39 @@ export interface SavingsGoal {
   color: string;
 }
 
+export interface Liability {
+  id: string;
+  name: string;
+  amount: number;
+  category: 'loan' | 'credit_card' | 'other';
+  createdAt: string;
+}
+
+export interface NetWorthCurrent {
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+  breakdown: {
+    paymentMethodBalances: number;
+    savingsGoals: number;
+  };
+}
+
+export interface NetWorthSnapshot {
+  id: string;
+  month: number;
+  year: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+  snapshotData: {
+    paymentMethodBalances: number;
+    savingsGoals: number;
+    liabilities: number;
+  } | null;
+  createdAt: string;
+}
+
 export interface RecurringTransaction {
   id: string;
   description: string;

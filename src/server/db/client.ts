@@ -159,6 +159,25 @@ async function initializeSchema(client: DbClient): Promise<void> {
       category_budgets TEXT NOT NULL,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
+    `CREATE TABLE IF NOT EXISTS liabilities (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      amount DOUBLE PRECISION NOT NULL DEFAULT 0,
+      category TEXT NOT NULL DEFAULT 'other',
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+      updated_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
+    `CREATE TABLE IF NOT EXISTS net_worth_snapshots (
+      id TEXT PRIMARY KEY,
+      month INTEGER NOT NULL,
+      year INTEGER NOT NULL,
+      total_assets DOUBLE PRECISION NOT NULL,
+      total_liabilities DOUBLE PRECISION NOT NULL,
+      net_worth DOUBLE PRECISION NOT NULL,
+      snapshot_data TEXT,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+      UNIQUE(month, year)
+    )`,
   ];
 
   for (const ddl of tables) {
