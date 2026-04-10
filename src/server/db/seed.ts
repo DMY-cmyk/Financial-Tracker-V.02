@@ -67,10 +67,36 @@ export async function ensureSeeded() {
     );
   }
 
+  // Icon overrides for seeded payment methods.
+  // Keys are lowercased fragments of the name.
+  const SEED_ICON_MAP: Record<string, string> = {
+    bca: 'lucide:landmark',
+    bri: 'lucide:landmark',
+    bni: 'lucide:landmark',
+    mandiri: 'lucide:landmark',
+    bsi: 'lucide:landmark',
+    maybank: 'lucide:landmark',
+    cimb: 'lucide:landmark',
+    danamon: 'lucide:landmark',
+    permata: 'lucide:landmark',
+    gopay: 'lucide:smartphone',
+    ovo: 'lucide:smartphone',
+    dana: 'lucide:smartphone',
+    shopeepay: 'lucide:smartphone',
+    linkaja: 'lucide:smartphone',
+    cash: 'lucide:banknote',
+    tunai: 'lucide:banknote',
+  };
+
   for (const p of data.paymentMethods) {
+    const lowerName = p.name.toLowerCase();
+    const icon =
+      Object.entries(SEED_ICON_MAP).find(([key]) => lowerName.includes(key))?.[1] ??
+      p.icon ??
+      'initials';
     await db.query(
       'INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [p.id, p.name, p.icon, p.type]
+      [p.id, p.name, icon, p.type]
     );
   }
   for (const b of data.bills) {
