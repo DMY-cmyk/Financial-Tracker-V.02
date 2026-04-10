@@ -18,7 +18,7 @@ import { useSavingsGoals, COLOR_OPTIONS } from '@/features/savings/useSavingsGoa
 
 export default function SavingsPage() {
   const locale = useLocale();
-  const { goals, isLoading, form, deleteConfirm, quickEdit } = useSavingsGoals();
+  const { goals, isLoading, error, form, deleteConfirm, quickEdit } = useSavingsGoals();
 
   if (isLoading) {
     return (
@@ -28,6 +28,17 @@ export default function SavingsPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="border-border bg-card h-40 animate-pulse rounded-2xl border" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t(locale, 'savingsPage')} />
+        <div className="mx-auto max-w-2xl">
+          <p className="text-destructive py-8 text-center text-sm">{t(locale, 'error')}</p>
         </div>
       </div>
     );
