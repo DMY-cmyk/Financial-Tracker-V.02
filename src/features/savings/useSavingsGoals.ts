@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
-import { useLocale } from '@/lib/i18n';
+import { useLocale, t } from '@/lib/i18n';
 import type { SavingsGoal } from '@/lib/types';
 
 export const COLOR_OPTIONS = [
@@ -93,7 +93,21 @@ export function useSavingsGoals() {
     resetForm();
   };
 
-  void locale; // used in Tasks 5–9
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!formName.trim()) errors.name = t(locale, 'required');
+    const target = Number(formTarget);
+    if (!formTarget || isNaN(target) || target <= 0) errors.target = t(locale, 'invalidAmount');
+    const saved = Number(formSaved || '0');
+    if (isNaN(saved) || saved < 0) errors.saved = t(locale, 'invalidAmount');
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validateForm()) return;
+    // create/update flows implemented in Tasks 6-7
+  };
 
   return {
     goals,
@@ -116,7 +130,7 @@ export function useSavingsGoals() {
       openAdd,
       openEdit,
       close: closeForm,
-      submit: async () => {},
+      submit,
     },
 
     deleteConfirm: {

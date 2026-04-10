@@ -174,3 +174,32 @@ describe('useSavingsGoals — form.openEdit', () => {
     expect(result.current.form.color).toBe('#EF4444');
   });
 });
+
+describe('useSavingsGoals — form.submit validation', () => {
+  it('sets errors.name when name is empty and does not call API', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openAdd());
+    // name is empty, target is also empty
+    await act(async () => { await result.current.form.submit(); });
+
+    expect(result.current.form.errors.name).toBe('required');
+    expect(api.savings.create).not.toHaveBeenCalled();
+  });
+
+  it('sets errors.target when target is zero and does not call API', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openAdd());
+    act(() => result.current.form.setName('My Goal'));
+    act(() => result.current.form.setTarget('0'));
+    await act(async () => { await result.current.form.submit(); });
+
+    expect(result.current.form.errors.target).toBe('invalidAmount');
+    expect(api.savings.create).not.toHaveBeenCalled();
+  });
+});
