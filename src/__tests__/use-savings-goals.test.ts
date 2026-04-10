@@ -284,3 +284,40 @@ describe('useSavingsGoals — form.submit update', () => {
     expect(toast.success).toHaveBeenCalledWith('goalSaved');
   });
 });
+
+describe('useSavingsGoals — deleteConfirm', () => {
+  it('confirm() calls api.savings.delete and removes goal from list', async () => {
+    const goal: SavingsGoal = {
+      id: 'del-1',
+      name: 'Goal To Delete',
+      targetAmount: 1_000_000,
+      savedAmount: 0,
+      color: '#EF4444',
+    };
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    vi.mocked(api.savings.delete).mockResolvedValue({ data: { success: true } });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.goals).toEqual([goal]));
+
+    act(() => result.current.deleteConfirm.setId('del-1'));
+    expect(result.current.deleteConfirm.id).toBe('del-1');
+
+    await act(async () => { await result.current.deleteConfirm.confirm(); });
+
+    expect(api.savings.delete).toHaveBeenCalledWith('del-1');
+    expect(result.current.goals).toEqual([]);
+    expect(result.current.deleteConfirm.id).toBeNull();
+    expect(toast.success).toHaveBeenCalledWith('goalDeleted', expect.any(Object));
+  });
+
+  it('confirm() does nothing when id is null', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => { await result.current.deleteConfirm.confirm(); });
+
+    expect(api.savings.delete).not.toHaveBeenCalled();
+  });
+});

@@ -128,6 +128,33 @@ export function useSavingsGoals() {
     }
   };
 
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    const deletedGoal = goals.find((g) => g.id === deleteId);
+    const result = await api.savings.delete(deleteId);
+    if (result.data) {
+      setGoals((prev) => prev.filter((g) => g.id !== deleteId));
+      toast.success(t(locale, 'goalDeleted'), {
+        action: deletedGoal
+          ? {
+              label: t(locale, 'undo'),
+              onClick: async () => {
+                await api.savings.create({
+                  name: deletedGoal.name,
+                  targetAmount: deletedGoal.targetAmount,
+                  savedAmount: deletedGoal.savedAmount,
+                  color: deletedGoal.color,
+                });
+                reload();
+                toast.success(t(locale, 'itemRestored'));
+              },
+            }
+          : undefined,
+      });
+    }
+    setDeleteId(null);
+  };
+
   return {
     goals,
     isLoading,
@@ -155,7 +182,7 @@ export function useSavingsGoals() {
     deleteConfirm: {
       id: deleteId,
       setId: setDeleteId,
-      confirm: async () => {}, // TODO: Task 8
+      confirm: confirmDelete,
     },
 
     quickEdit: {
