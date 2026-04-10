@@ -75,5 +75,10 @@ describe('useSavingsGoals — data loading', () => {
     );
     renderHook(() => useSavingsGoals());
     expect(api.savings.list).not.toHaveBeenCalled();
+    // Restore default so subsequent tests get initialized=true
+    vi.mocked(useStore).mockImplementation(
+      (selector: (s: { initialized: boolean }) => unknown) =>
+        selector({ initialized: true })
+    );
   });
 });

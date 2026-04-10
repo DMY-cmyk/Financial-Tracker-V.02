@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { useLocale } from '@/lib/i18n';
@@ -47,11 +47,13 @@ export function useSavingsGoals() {
 
   void locale; // used in Tasks 5–9 for toast messages
 
+  const reload = useCallback(() => setFetchKey((k) => k + 1), []);
+
   return {
     goals,
     isLoading,
     error,
-    reload: () => setFetchKey((k) => k + 1),
+    reload,
     form: {
       open: false,
       editingGoal: null as SavingsGoal | null,
