@@ -49,9 +49,7 @@ export function useBudgetAlertToasts(alerts: BudgetAlert[]): void {
         t(locale, 'categoryOverBudget').replace('{name}', newlyExceeded[0].categoryName)
       );
     } else if (newlyExceeded.length > 1) {
-      toast.warning(
-        t(locale, 'categoriesOverBudget').replace('{n}', String(newlyExceeded.length))
-      );
+      toast.warning(t(locale, 'categoriesOverBudget').replace('{n}', String(newlyExceeded.length)));
     }
 
     if (newlyExceeded.length > 0) {
