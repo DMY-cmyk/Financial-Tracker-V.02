@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { useSavingsGoals } from '@/features/savings/useSavingsGoals';
@@ -80,5 +80,38 @@ describe('useSavingsGoals — data loading', () => {
       (selector: (s: { initialized: boolean }) => unknown) =>
         selector({ initialized: true })
     );
+  });
+
+  it('sets error when API returns an error', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({
+      error: { message: 'Network error', code: 'FETCH_ERROR' },
+    });
+
+    const { result } = renderHook(() => useSavingsGoals());
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBe('Network error');
+    expect(result.current.goals).toEqual([]);
+  });
+
+  it('reload() triggers a new fetch', async () => {
+    const goal: SavingsGoal = {
+      id: '2',
+      name: 'Vacation',
+      targetAmount: 5_000_000,
+      savedAmount: 1_000_000,
+      color: '#10B981',
+    };
+    vi.mocked(api.savings.list)
+      .mockResolvedValueOnce({ data: { goals: [] } })
+      .mockResolvedValueOnce({ data: { goals: [goal] } });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.goals).toEqual([]);
+
+    act(() => result.current.reload());
+
+    await waitFor(() => expect(result.current.goals).toEqual([goal]));
   });
 });
