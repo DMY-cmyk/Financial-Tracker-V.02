@@ -371,5 +371,6 @@ describe('useSavingsGoals — quickEdit', () => {
     expect(api.savings.update).toHaveBeenCalledWith('qe-1', { savedAmount: 4_000_000 });
     expect(result.current.goals[0].savedAmount).toBe(4_000_000);
     expect(result.current.quickEdit.goalId).toBeNull();
+    expect(toast.success).toHaveBeenCalledWith('goalSaved');
   });
 });
