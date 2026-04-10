@@ -321,3 +321,55 @@ describe('useSavingsGoals — deleteConfirm', () => {
     expect(api.savings.delete).not.toHaveBeenCalled();
   });
 });
+
+describe('useSavingsGoals — quickEdit', () => {
+  const goal: SavingsGoal = {
+    id: 'qe-1',
+    name: 'Quick Goal',
+    targetAmount: 10_000_000,
+    savedAmount: 3_000_000,
+    color: '#8B5CF6',
+  };
+
+  it('open() sets goalId and pre-fills value from goal.savedAmount', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.quickEdit.open(goal));
+
+    expect(result.current.quickEdit.goalId).toBe('qe-1');
+    expect(result.current.quickEdit.value).toBe('3000000');
+  });
+
+  it('close() clears goalId and value', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.quickEdit.open(goal));
+    act(() => result.current.quickEdit.close());
+
+    expect(result.current.quickEdit.goalId).toBeNull();
+    expect(result.current.quickEdit.value).toBe('');
+  });
+
+  it('submit() patches savedAmount and updates local goals list', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    vi.mocked(api.savings.update).mockResolvedValue({
+      data: { ...goal, savedAmount: 4_000_000 },
+    });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.quickEdit.open(goal));
+    act(() => result.current.quickEdit.setValue('4000000'));
+
+    await act(async () => { await result.current.quickEdit.submit(goal); });
+
+    expect(api.savings.update).toHaveBeenCalledWith('qe-1', { savedAmount: 4_000_000 });
+    expect(result.current.goals[0].savedAmount).toBe(4_000_000);
+    expect(result.current.quickEdit.goalId).toBeNull();
+  });
+});

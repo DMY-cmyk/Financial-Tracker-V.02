@@ -128,6 +128,29 @@ export function useSavingsGoals() {
     }
   };
 
+  const openQuickEdit = (goal: SavingsGoal) => {
+    setQuickEditGoalId(goal.id);
+    setQuickEditValue(String(goal.savedAmount));
+  };
+
+  const closeQuickEdit = () => {
+    setQuickEditGoalId(null);
+    setQuickEditValue('');
+  };
+
+  const submitQuickEdit = async (goal: SavingsGoal) => {
+    const newAmount = Number(quickEditValue);
+    if (isNaN(newAmount) || newAmount < 0) return;
+    const result = await api.savings.update(goal.id, { savedAmount: newAmount });
+    if (result.data) {
+      setGoals((prev) =>
+        prev.map((g) => (g.id === goal.id ? { ...g, savedAmount: newAmount } : g))
+      );
+      toast.success(t(locale, 'goalSaved'));
+    }
+    closeQuickEdit();
+  };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     const deletedGoal = goals.find((g) => g.id === deleteId);
@@ -189,10 +212,10 @@ export function useSavingsGoals() {
     quickEdit: {
       goalId: quickEditGoalId,
       value: quickEditValue,
-      open: (_goal: SavingsGoal) => {}, // TODO: Task 9
-      close: () => {}, // TODO: Task 9
+      open: openQuickEdit,
+      close: closeQuickEdit,
       setValue: setQuickEditValue,
-      submit: async (_goal: SavingsGoal) => {}, // TODO: Task 9
+      submit: submitQuickEdit,
     },
   };
 }
