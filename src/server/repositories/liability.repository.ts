@@ -74,7 +74,7 @@ export function createLiabilityRepository() {
         'UPDATE liabilities SET name = ?, amount = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
         [updated.name, updated.amount, updated.category, id]
       );
-      return { ...current, ...updated };
+      return { ...current, ...updated } as Liability;
     },
 
     async delete(id: string): Promise<boolean> {
