@@ -250,3 +250,37 @@ describe('useSavingsGoals — form.submit create', () => {
     expect(toast.error).toHaveBeenCalledWith('failedSave');
   });
 });
+
+describe('useSavingsGoals — form.submit update', () => {
+  it('calls api.savings.update with goal id in edit mode', async () => {
+    const goal: SavingsGoal = {
+      id: 'goal-1',
+      name: 'Old Name',
+      targetAmount: 5_000_000,
+      savedAmount: 1_000_000,
+      color: '#10B981',
+    };
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
+    vi.mocked(api.savings.update).mockResolvedValue({
+      data: { ...goal, name: 'New Name' },
+    });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openEdit(goal));
+    act(() => result.current.form.setName('New Name'));
+
+    await act(async () => { await result.current.form.submit(); });
+
+    expect(api.savings.update).toHaveBeenCalledWith('goal-1', {
+      name: 'New Name',
+      targetAmount: 5_000_000,
+      savedAmount: 1_000_000,
+      color: '#10B981',
+    });
+    expect(result.current.form.open).toBe(false);
+    expect(api.savings.create).not.toHaveBeenCalled();
+    expect(toast.success).toHaveBeenCalledWith('goalSaved');
+  });
+});
