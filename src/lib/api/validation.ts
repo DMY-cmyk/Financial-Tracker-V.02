@@ -241,6 +241,20 @@ export const createBudgetTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50),
 });
 
+// === Liability schemas ===
+
+export const createLiabilitySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  amount: z.number().nonnegative('Amount must be 0 or greater'),
+  category: z.enum(['loan', 'credit_card', 'other']).default('other'),
+});
+
+export const updateLiabilitySchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  amount: z.number().nonnegative().optional(),
+  category: z.enum(['loan', 'credit_card', 'other']).optional(),
+});
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -264,3 +278,5 @@ export type CreateRecurringTransactionInput = z.infer<typeof createRecurringTran
 export type UpdateRecurringTransactionInput = z.infer<typeof updateRecurringTransactionSchema>;
 export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransactionsQuerySchema>;
 export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
+export type CreateLiabilityInput = z.infer<typeof createLiabilitySchema>;
+export type UpdateLiabilityInput = z.infer<typeof updateLiabilitySchema>;
