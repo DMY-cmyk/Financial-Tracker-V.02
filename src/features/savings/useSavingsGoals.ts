@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { useLocale, t } from '@/lib/i18n';
@@ -106,7 +107,36 @@ export function useSavingsGoals() {
 
   const submit = async () => {
     if (!validateForm()) return;
-    // create/update flows implemented in Tasks 6-7
+
+    if (editingGoal) {
+      const result = await api.savings.update(editingGoal.id, {
+        name: formName.trim(),
+        targetAmount: Number(formTarget),
+        savedAmount: Number(formSaved || '0'),
+        color: formColor,
+      });
+      if (result.data) {
+        toast.success(t(locale, 'goalSaved'));
+        reload();
+        closeForm();
+      } else {
+        toast.error(t(locale, 'failedSave'));
+      }
+    } else {
+      const result = await api.savings.create({
+        name: formName.trim(),
+        targetAmount: Number(formTarget),
+        savedAmount: Number(formSaved || '0'),
+        color: formColor,
+      });
+      if (result.data) {
+        toast.success(t(locale, 'goalSaved'));
+        reload();
+        closeForm();
+      } else {
+        toast.error(t(locale, 'failedSave'));
+      }
+    }
   };
 
   return {

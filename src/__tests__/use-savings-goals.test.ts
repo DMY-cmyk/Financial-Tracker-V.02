@@ -5,6 +5,7 @@ import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { useSavingsGoals } from '@/features/savings/useSavingsGoals';
 import type { SavingsGoal } from '@/lib/types';
+import { toast } from 'sonner';
 
 vi.mock('@/lib/api/client', () => ({
   api: {
@@ -201,5 +202,51 @@ describe('useSavingsGoals — form.submit validation', () => {
 
     expect(result.current.form.errors.target).toBe('invalidAmount');
     expect(api.savings.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('useSavingsGoals — form.submit create', () => {
+  it('calls api.savings.create with form data and closes form on success', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    vi.mocked(api.savings.create).mockResolvedValue({
+      data: { id: '99', name: 'New Goal', targetAmount: 5_000_000, savedAmount: 0, color: '#2563EB' },
+    });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openAdd());
+    act(() => result.current.form.setName('New Goal'));
+    act(() => result.current.form.setTarget('5000000'));
+
+    await act(async () => { await result.current.form.submit(); });
+
+    expect(api.savings.create).toHaveBeenCalledWith({
+      name: 'New Goal',
+      targetAmount: 5_000_000,
+      savedAmount: 0,
+      color: '#2563EB',
+    });
+    expect(result.current.form.open).toBe(false);
+    expect(toast.success).toHaveBeenCalled();
+  });
+
+  it('keeps form open and shows error toast when create API fails', async () => {
+    vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [] } });
+    vi.mocked(api.savings.create).mockResolvedValue({
+      error: { message: 'Server error', code: 'INTERNAL_ERROR' },
+    });
+
+    const { result } = renderHook(() => useSavingsGoals());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => result.current.form.openAdd());
+    act(() => result.current.form.setName('New Goal'));
+    act(() => result.current.form.setTarget('5000000'));
+
+    await act(async () => { await result.current.form.submit(); });
+
+    expect(result.current.form.open).toBe(true);
+    expect(toast.error).toHaveBeenCalled();
   });
 });
