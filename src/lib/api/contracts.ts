@@ -1,4 +1,13 @@
-import type { Transaction, Category, PaymentMethod, RecurringTransaction, Bill } from '@/lib/types';
+import type {
+  Transaction,
+  Category,
+  PaymentMethod,
+  RecurringTransaction,
+  Bill,
+  Liability,
+  NetWorthCurrent,
+  NetWorthSnapshot,
+} from '@/lib/types';
 
 // === Request types ===
 
@@ -423,4 +432,29 @@ export interface ForecastCurrentMonth {
 export interface ForecastResponse {
   currentMonth: ForecastCurrentMonth;
   forecast: ForecastMonth[];
+}
+
+// === Liability contracts ===
+
+export interface LiabilityListResponse {
+  liabilities: Liability[];
+}
+
+export interface CreateLiabilityRequest {
+  name: string;
+  amount: number;
+  category?: 'loan' | 'credit_card' | 'other';
+}
+
+export interface UpdateLiabilityRequest {
+  name?: string;
+  amount?: number;
+  category?: 'loan' | 'credit_card' | 'other';
+}
+
+// === Net Worth contracts ===
+
+export interface NetWorthDataResponse {
+  current: NetWorthCurrent;
+  history: NetWorthSnapshot[];
 }

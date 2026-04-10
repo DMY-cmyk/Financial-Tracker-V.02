@@ -1,4 +1,11 @@
-import type { Transaction, Category, PaymentMethod, RecurringTransaction } from '@/lib/types';
+import type {
+  Transaction,
+  Category,
+  PaymentMethod,
+  RecurringTransaction,
+  Liability,
+  NetWorthSnapshot,
+} from '@/lib/types';
 import type {
   CreateTransactionRequest,
   BulkCreateTransactionRequest,
@@ -34,6 +41,10 @@ import type {
   BudgetTemplate,
   ApplyTemplateResponse,
   BudgetSuggestionListResponse,
+  LiabilityListResponse,
+  CreateLiabilityRequest,
+  UpdateLiabilityRequest,
+  NetWorthDataResponse,
 } from './contracts';
 
 const BASE_URL = '/api';
@@ -380,6 +391,38 @@ export const api = {
 
     suggestions(months = 3) {
       return fetchApi<BudgetSuggestionListResponse>(`/budget/suggestions?months=${months}`);
+    },
+  },
+
+  liabilities: {
+    list() {
+      return fetchApi<LiabilityListResponse>('/liabilities');
+    },
+    create(data: CreateLiabilityRequest) {
+      return fetchApi<Liability>('/liabilities', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+    update(id: string, data: UpdateLiabilityRequest) {
+      return fetchApi<Liability>(`/liabilities/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    },
+    delete(id: string) {
+      return fetchApi<{ success: boolean }>(`/liabilities/${id}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
+  netWorth: {
+    get() {
+      return fetchApi<NetWorthDataResponse>('/net-worth');
+    },
+    recordSnapshot() {
+      return fetchApi<NetWorthSnapshot>('/net-worth/snapshot', { method: 'POST' });
     },
   },
 };

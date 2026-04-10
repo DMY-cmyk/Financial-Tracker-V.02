@@ -475,6 +475,30 @@ type TranslationKeys = {
   forecastMonths: string;
   total: string;
   today: string;
+
+  // Net Worth
+  netWorth: string; // widget title + nav label
+  netWorthPage: string; // PageHeader title (same value, different context)
+  assets: string;
+  liabilities: string;
+  totalAssets: string;
+  totalLiabilities: string;
+  noLiabilities: string;
+  addLiability: string;
+  editLiability: string;
+  deleteLiability: string;
+  liabilityName: string;
+  liabilityCategory: string;
+  loanType: string;
+  creditCardType: string;
+  otherType: string;
+  recordSnapshot: string;
+  netWorthHistory: string;
+  noSnapshotsYet: string;
+  liabilityDeleted: string;
+  liabilitySaved: string;
+  snapshotRecorded: string;
+  vsLastMonth: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -907,6 +931,29 @@ const translations: Record<Locale, TranslationKeys> = {
     today: 'Today',
 
     loginRequired: 'Please sign in to continue',
+
+    netWorth: 'Net Worth',
+    netWorthPage: 'Net Worth',
+    assets: 'Assets',
+    liabilities: 'Liabilities',
+    totalAssets: 'Total Assets',
+    totalLiabilities: 'Total Liabilities',
+    noLiabilities: 'No liabilities added yet',
+    addLiability: 'Add Liability',
+    editLiability: 'Edit Liability',
+    deleteLiability: 'Delete Liability',
+    liabilityName: 'Liability Name',
+    liabilityCategory: 'Category',
+    loanType: 'Loan',
+    creditCardType: 'Credit Card Debt',
+    otherType: 'Other',
+    recordSnapshot: 'Re-record snapshot',
+    netWorthHistory: 'Net Worth History',
+    noSnapshotsYet: 'Visit this page monthly to build your net worth history.',
+    liabilityDeleted: 'Liability deleted',
+    liabilitySaved: 'Liability saved',
+    snapshotRecorded: 'Snapshot recorded',
+    vsLastMonth: 'vs last month',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1338,6 +1385,30 @@ const translations: Record<Locale, TranslationKeys> = {
     today: 'Hari Ini',
 
     loginRequired: 'Silakan masuk untuk melanjutkan',
+
+    netWorth: 'Kekayaan Bersih',
+    netWorthPage: 'Kekayaan Bersih',
+    assets: 'Aset',
+    liabilities: 'Kewajiban',
+    totalAssets: 'Total Aset',
+    totalLiabilities: 'Total Kewajiban',
+    noLiabilities: 'Belum ada kewajiban',
+    addLiability: 'Tambah Kewajiban',
+    editLiability: 'Edit Kewajiban',
+    deleteLiability: 'Hapus Kewajiban',
+    liabilityName: 'Nama Kewajiban',
+    liabilityCategory: 'Kategori',
+    loanType: 'Pinjaman',
+    creditCardType: 'Hutang Kartu Kredit',
+    otherType: 'Lainnya',
+    recordSnapshot: 'Catat ulang snapshot',
+    netWorthHistory: 'Riwayat Kekayaan Bersih',
+    noSnapshotsYet:
+      'Kunjungi halaman ini setiap bulan untuk membangun riwayat kekayaan bersih Anda.',
+    liabilityDeleted: 'Kewajiban dihapus',
+    liabilitySaved: 'Kewajiban disimpan',
+    snapshotRecorded: 'Snapshot dicatat',
+    vsLastMonth: 'vs bulan lalu',
   },
 };
 

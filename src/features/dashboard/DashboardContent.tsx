@@ -13,6 +13,7 @@ import { BillsChecklist } from '@/features/dashboard/BillsChecklist';
 import { SavingsGoals } from '@/features/dashboard/SavingsGoals';
 import { RecentTransactions } from '@/features/dashboard/RecentTransactions';
 import { AccountBalancesWidget } from '@/features/balances/AccountBalancesWidget';
+import { NetWorthDashboardWidget } from '@/features/net-worth/NetWorthDashboardWidget';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -68,6 +69,8 @@ export function DashboardContent() {
     bills,
     savingsGoals,
     categories,
+    netWorthCurrent,
+    netWorthHistory,
     isLoading,
     isEmpty,
     updateBudget,
@@ -228,6 +231,19 @@ export function DashboardContent() {
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <AccountBalancesWidget />
+          </motion.div>
+
+          {/* Net Worth */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+          >
+            <NetWorthDashboardWidget
+              current={netWorthCurrent}
+              history={netWorthHistory}
+              isLoading={isLoading}
+            />
           </motion.div>
         </>
       )}

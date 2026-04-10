@@ -241,6 +241,18 @@ export const createBudgetTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50),
 });
 
+// === Liability schemas ===
+
+// Liabilities can be zero (e.g., fully paid-off loan still being tracked)
+// so nonnegative() is intentional here instead of positive()
+export const createLiabilitySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  amount: z.number().nonnegative('Amount must be 0 or greater'),
+  category: z.enum(['loan', 'credit_card', 'other']).default('other'),
+});
+
+export const updateLiabilitySchema = createLiabilitySchema.partial();
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -264,3 +276,5 @@ export type CreateRecurringTransactionInput = z.infer<typeof createRecurringTran
 export type UpdateRecurringTransactionInput = z.infer<typeof updateRecurringTransactionSchema>;
 export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransactionsQuerySchema>;
 export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
+export type CreateLiabilityInput = z.infer<typeof createLiabilitySchema>;
+export type UpdateLiabilityInput = z.infer<typeof updateLiabilitySchema>;
