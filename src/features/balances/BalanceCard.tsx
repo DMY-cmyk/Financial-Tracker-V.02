@@ -1,23 +1,18 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Building2, Wallet, Smartphone, TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { staggerGridItem, tapScale } from '@/lib/motion';
 import { t } from '@/lib/i18n';
+import { PaymentMethodIcon } from '@/components/shared/PaymentMethodIcon';
 import type { PaymentMethodBalance } from './types';
 
 const TYPE_LABELS: Record<PaymentMethodBalance['type'], { en: string; id: string }> = {
   bank: { en: 'Bank', id: 'Bank' },
   cash: { en: 'Cash', id: 'Tunai' },
   ewallet: { en: 'E-Wallet', id: 'E-Wallet' },
-};
-
-const TYPE_ICONS: Record<PaymentMethodBalance['type'], typeof Building2> = {
-  bank: Building2,
-  cash: Wallet,
-  ewallet: Smartphone,
 };
 
 interface BalanceCardProps {
@@ -27,7 +22,6 @@ interface BalanceCardProps {
 }
 
 export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
-  const Icon = TYPE_ICONS[balance.type];
   const typeLabel = TYPE_LABELS[balance.type][locale];
   const closingPositive = balance.balance >= 0;
 
@@ -55,9 +49,12 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
     >
       {/* Header */}
       <div className="mb-3 flex items-center gap-2">
-        <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-          <Icon className="text-primary h-4 w-4" />
-        </div>
+        <PaymentMethodIcon
+          name={balance.name}
+          icon={balance.icon}
+          type={balance.type}
+          size="md"
+        />
         <div>
           <p className="text-sm font-medium">{balance.name}</p>
           <p className="text-muted-foreground text-xs">{typeLabel}</p>
