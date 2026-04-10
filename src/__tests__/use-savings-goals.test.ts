@@ -228,7 +228,7 @@ describe('useSavingsGoals — form.submit create', () => {
       color: '#2563EB',
     });
     expect(result.current.form.open).toBe(false);
-    expect(toast.success).toHaveBeenCalled();
+    expect(toast.success).toHaveBeenCalledWith('goalSaved');
   });
 
   it('keeps form open and shows error toast when create API fails', async () => {
@@ -247,6 +247,6 @@ describe('useSavingsGoals — form.submit create', () => {
     await act(async () => { await result.current.form.submit(); });
 
     expect(result.current.form.open).toBe(true);
-    expect(toast.error).toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith('failedSave');
   });
 });

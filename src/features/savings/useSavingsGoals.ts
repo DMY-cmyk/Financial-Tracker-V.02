@@ -108,34 +108,23 @@ export function useSavingsGoals() {
   const submit = async () => {
     if (!validateForm()) return;
 
-    if (editingGoal) {
-      const result = await api.savings.update(editingGoal.id, {
-        name: formName.trim(),
-        targetAmount: Number(formTarget),
-        savedAmount: Number(formSaved || '0'),
-        color: formColor,
-      });
-      if (result.data) {
-        toast.success(t(locale, 'goalSaved'));
-        reload();
-        closeForm();
-      } else {
-        toast.error(t(locale, 'failedSave'));
-      }
+    const payload = {
+      name: formName.trim(),
+      targetAmount: Number(formTarget),
+      savedAmount: Number(formSaved || '0'),
+      color: formColor,
+    };
+
+    const result = editingGoal
+      ? await api.savings.update(editingGoal.id, payload)
+      : await api.savings.create(payload);
+
+    if (result.data) {
+      toast.success(t(locale, 'goalSaved'));
+      reload();
+      closeForm();
     } else {
-      const result = await api.savings.create({
-        name: formName.trim(),
-        targetAmount: Number(formTarget),
-        savedAmount: Number(formSaved || '0'),
-        color: formColor,
-      });
-      if (result.data) {
-        toast.success(t(locale, 'goalSaved'));
-        reload();
-        closeForm();
-      } else {
-        toast.error(t(locale, 'failedSave'));
-      }
+      toast.error(t(locale, 'failedSave'));
     }
   };
 
@@ -166,16 +155,16 @@ export function useSavingsGoals() {
     deleteConfirm: {
       id: deleteId,
       setId: setDeleteId,
-      confirm: async () => {},
+      confirm: async () => {}, // TODO: Task 8
     },
 
     quickEdit: {
       goalId: quickEditGoalId,
       value: quickEditValue,
-      open: (_goal: SavingsGoal) => {},
-      close: () => {},
+      open: (_goal: SavingsGoal) => {}, // TODO: Task 9
+      close: () => {}, // TODO: Task 9
       setValue: setQuickEditValue,
-      submit: async (_goal: SavingsGoal) => {},
+      submit: async (_goal: SavingsGoal) => {}, // TODO: Task 9
     },
   };
 }
