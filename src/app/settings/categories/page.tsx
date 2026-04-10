@@ -48,6 +48,7 @@ import {
 import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { toast } from 'sonner';
 import type { Category, PaymentMethod } from '@/lib/types';
+import { IconPicker } from '@/components/shared/IconPicker';
 
 const ICON_OPTIONS: { name: string; icon: typeof Circle }[] = [
   { name: 'circle', icon: Circle },
@@ -97,6 +98,7 @@ export default function CategoriesPage() {
   const [newMethodName, setNewMethodName] = useState('');
   const [newMethodType, setNewMethodType] = useState<'bank' | 'cash' | 'ewallet'>('bank');
   const [newMethodBeginningBalance, setNewMethodBeginningBalance] = useState('');
+  const [newMethodIcon, setNewMethodIcon] = useState('initials');
   const [addingMethod, setAddingMethod] = useState(false);
 
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
@@ -208,7 +210,7 @@ export default function CategoriesPage() {
     setAddingMethod(true);
     const result = await api.paymentMethods.create({
       name: newMethodName,
-      icon: 'wallet',
+      icon: newMethodIcon,
       type: newMethodType,
       beginningBalance: parseCurrencyInput(newMethodBeginningBalance),
     });
@@ -216,6 +218,7 @@ export default function CategoriesPage() {
       setPaymentMethods((prev) => [...prev, result.data!]);
       setNewMethodName('');
       setNewMethodBeginningBalance('');
+      setNewMethodIcon('initials');
       toast.success(t(locale, 'saved'));
     } else {
       toast.error(result.error?.message || t(locale, 'failedSave'));
@@ -477,6 +480,15 @@ export default function CategoriesPage() {
               value={newMethodName}
               onChange={(e) => setNewMethodName(e.target.value)}
               placeholder={t(locale, 'methodName')}
+            />
+          </div>
+          <div className="w-full">
+            <IconPicker
+              value={newMethodIcon}
+              onChange={setNewMethodIcon}
+              paymentMethodName={newMethodName}
+              type={newMethodType}
+              locale={locale}
             />
           </div>
           <select
