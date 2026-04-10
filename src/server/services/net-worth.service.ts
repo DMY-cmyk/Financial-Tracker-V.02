@@ -47,14 +47,32 @@ export async function getCurrentNetWorth(): Promise<ServiceResult<NetWorthCurren
 }
 
 export async function recordSnapshot(): Promise<ServiceResult<NetWorthSnapshot>> {
-  // Implemented in Task 6
-  throw new Error('Not implemented yet');
+  await ensureSeeded();
+  const currentResult = await getCurrentNetWorth();
+  if (currentResult.error) return { error: currentResult.error };
+  const current = currentResult.data!;
+
+  const now = new Date();
+  const repo = createNetWorthRepository();
+
+  const snapshot = await repo.upsert({
+    month: now.getMonth(),
+    year: now.getFullYear(),
+    totalAssets: current.totalAssets,
+    totalLiabilities: current.totalLiabilities,
+    netWorth: current.netWorth,
+    snapshotData: JSON.stringify({
+      paymentMethodBalances: current.breakdown.paymentMethodBalances,
+      savingsGoals: current.breakdown.savingsGoals,
+      liabilities: current.totalLiabilities,
+    }),
+  });
+
+  return { data: snapshot };
 }
 
 export async function getNetWorthHistory(): Promise<ServiceResult<NetWorthSnapshot[]>> {
-  // Implemented in Task 6
-  throw new Error('Not implemented yet');
+  await ensureSeeded();
+  const repo = createNetWorthRepository();
+  return { data: await repo.getHistory(12) };
 }
-
-// Re-export repository factory for consumers that need direct repo access
-export { createNetWorthRepository };
