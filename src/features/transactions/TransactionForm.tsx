@@ -316,10 +316,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
         >
           <SelectTrigger
             id="paymentMethod"
-            className={cn(
-              'mt-1 w-full',
-              fieldError('paymentMethod') ? 'border-red-500' : ''
-            )}
+            className={cn('mt-1 w-full', fieldError('paymentMethod') ? 'border-red-500' : '')}
             aria-invalid={!!fieldError('paymentMethod')}
           >
             <SelectValue placeholder={locale === 'id' ? 'Pilih...' : 'Select...'} />

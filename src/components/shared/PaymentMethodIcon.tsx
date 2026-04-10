@@ -99,7 +99,7 @@ export function PaymentMethodIcon({
       )}
       aria-hidden="true"
     >
-      <span className={cn('font-semibold leading-none', SIZE_TEXT[size])}>{initials}</span>
+      <span className={cn('leading-none font-semibold', SIZE_TEXT[size])}>{initials}</span>
     </div>
   );
 }

@@ -60,8 +60,8 @@ export function IconPicker({ value, onChange, paymentMethodName = '', locale }: 
               aria-pressed={isSelected}
               onClick={() => onChange(opt.value)}
               className={cn(
-                'flex h-10 flex-col items-center justify-center gap-0.5 rounded-lg border transition-colors hover:bg-accent',
-                isSelected && 'border-primary ring-2 ring-primary ring-offset-1',
+                'hover:bg-accent flex h-10 flex-col items-center justify-center gap-0.5 rounded-lg border transition-colors',
+                isSelected && 'border-primary ring-primary ring-2 ring-offset-1',
                 !isSelected && isSuggested && 'border-primary/40',
                 !isSelected && !isSuggested && 'border-border'
               )}
@@ -69,7 +69,7 @@ export function IconPicker({ value, onChange, paymentMethodName = '', locale }: 
               {opt.Icon ? (
                 <opt.Icon className="h-4 w-4" />
               ) : (
-                <span className="font-mono text-[9px] font-semibold leading-none">
+                <span className="font-mono text-[9px] leading-none font-semibold">
                   {paymentMethodName
                     ? computeInitials(paymentMethodName)
                     : t(locale, 'autoInitials').slice(0, 2)}

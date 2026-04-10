@@ -49,12 +49,7 @@ export function BalanceCard({ balance, locale, onClick }: BalanceCardProps) {
     >
       {/* Header */}
       <div className="mb-3 flex items-center gap-2">
-        <PaymentMethodIcon
-          name={balance.name}
-          icon={balance.icon}
-          type={balance.type}
-          size="md"
-        />
+        <PaymentMethodIcon name={balance.name} icon={balance.icon} type={balance.type} size="md" />
         <div>
           <p className="text-sm font-medium">{balance.name}</p>
           <p className="text-muted-foreground text-xs">{typeLabel}</p>

@@ -58,9 +58,7 @@ describe('PaymentMethodIcon — size variants', () => {
 
 describe('PaymentMethodIcon — edge cases', () => {
   it('icon="wallet" (legacy bare name) renders Wallet SVG via normalization', () => {
-    const { container } = render(
-      <PaymentMethodIcon name="My Wallet" icon="wallet" type="cash" />
-    );
+    const { container } = render(<PaymentMethodIcon name="My Wallet" icon="wallet" type="cash" />);
     // normalizeIconValue('wallet') → 'lucide:wallet', which is in ICON_MAP → renders SVG
     expect(container.querySelector('svg')).not.toBeNull();
   });
