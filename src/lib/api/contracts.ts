@@ -424,3 +424,28 @@ export interface ForecastResponse {
   currentMonth: ForecastCurrentMonth;
   forecast: ForecastMonth[];
 }
+
+// === Liability contracts ===
+
+export interface LiabilityListResponse {
+  liabilities: import('@/lib/types').Liability[];
+}
+
+export interface CreateLiabilityRequest {
+  name: string;
+  amount: number;
+  category?: 'loan' | 'credit_card' | 'other';
+}
+
+export interface UpdateLiabilityRequest {
+  name?: string;
+  amount?: number;
+  category?: 'loan' | 'credit_card' | 'other';
+}
+
+// === Net Worth contracts ===
+
+export interface NetWorthDataResponse {
+  current: import('@/lib/types').NetWorthCurrent;
+  history: import('@/lib/types').NetWorthSnapshot[];
+}
