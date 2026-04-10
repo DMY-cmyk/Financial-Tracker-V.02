@@ -70,13 +70,17 @@ export function useNetWorth() {
                   );
                 });
               }
-            });
+            }).catch(() => {});
           }
         } else if (nwResult.error) {
           setError(nwResult.error.message);
         }
 
-        if (liabResult.data) setLiabilities(liabResult.data.liabilities);
+        if (liabResult.data) {
+          setLiabilities(liabResult.data.liabilities);
+        } else if (liabResult.error) {
+          setError(liabResult.error.message);
+        }
         setLoadedKey(String(fetchKey));
       }
     );
