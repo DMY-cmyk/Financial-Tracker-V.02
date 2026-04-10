@@ -110,7 +110,7 @@ describe('useSavingsGoals — data loading', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.goals).toEqual([]);
 
-    act(() => result.current.reload());
+    await act(() => result.current.reload());
 
     await waitFor(() => expect(result.current.goals).toEqual([goal]));
   });
