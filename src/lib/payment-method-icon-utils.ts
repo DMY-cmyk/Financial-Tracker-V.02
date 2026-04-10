@@ -12,7 +12,8 @@ export function computeInitials(name: string): string {
   const words = trimmed.split(/\s+/);
   if (words.length > 1) {
     return words
-      .map((w) => w[0].toUpperCase())
+      .map((word) => word[0]?.toUpperCase() ?? '')
+      .filter(Boolean)
       .slice(0, 3)
       .join('');
   }

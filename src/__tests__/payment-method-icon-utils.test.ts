@@ -15,6 +15,8 @@ describe('computeInitials', () => {
   // Multi-word: first letter of each word, max 3, uppercase
   it('"CIMB Niaga" → "CN"', () => expect(computeInitials('CIMB Niaga')).toBe('CN'));
   it('"BCA Syariah" → "BS"', () => expect(computeInitials('BCA Syariah')).toBe('BS'));
+  it('"Bank BRI Syariah" → "BBS"', () => expect(computeInitials('Bank BRI Syariah')).toBe('BBS'));
+  it('"Bank Rakyat Indonesia Baru" → "BRI"', () => expect(computeInitials('Bank Rakyat Indonesia Baru')).toBe('BRI'));
 
   // Edge cases
   it('empty string → "?"', () => expect(computeInitials('')).toBe('?'));
