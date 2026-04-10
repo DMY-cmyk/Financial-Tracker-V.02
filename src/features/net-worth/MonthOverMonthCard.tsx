@@ -36,7 +36,7 @@ export function MonthOverMonthCard({ history, isLoading }: MonthOverMonthCardPro
       className="border-border bg-card rounded-2xl border p-6"
     >
       <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
-        {locale === 'id' ? 'vs Bulan Lalu' : 'vs Last Month'}
+        {t(locale, 'vsLastMonth')}
       </p>
       {delta === null ? (
         <p className="text-muted-foreground text-2xl font-bold">—</p>

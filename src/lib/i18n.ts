@@ -498,6 +498,7 @@ type TranslationKeys = {
   liabilityDeleted: string;
   liabilitySaved: string;
   snapshotRecorded: string;
+  vsLastMonth: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -952,6 +953,7 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilityDeleted: 'Liability deleted',
     liabilitySaved: 'Liability saved',
     snapshotRecorded: 'Snapshot recorded',
+    vsLastMonth: 'vs last month',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1405,6 +1407,7 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilityDeleted: 'Kewajiban dihapus',
     liabilitySaved: 'Kewajiban disimpan',
     snapshotRecorded: 'Snapshot dicatat',
+    vsLastMonth: 'vs bulan lalu',
   },
 };
 
