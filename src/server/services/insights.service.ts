@@ -4,6 +4,7 @@ import type {
   SpendingInsightsResponse,
   HealthScore,
   DayOfWeekItem,
+  BiggestTransaction,
   CategoryComparisonItem,
 } from '@/lib/api/contracts';
 
@@ -218,23 +219,106 @@ async function computeCategoryComparison(
   return top7;
 }
 
+interface BiggestTransactionRow {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  payment_method: string;
+  color: string;
+}
+
+async function computeBiggestTransactions(
+  month: number,
+  year: number
+): Promise<BiggestTransaction[]> {
+  const db = await getDb();
+  const prefix = buildMonthPrefix(month, year);
+  const result = await db.query<BiggestTransactionRow>(
+    `SELECT t.id, t.description, t.amount, t.date, t.category, t.payment_method,
+            COALESCE(c.color, '#64748B') as color
+     FROM transactions t
+     LEFT JOIN categories c ON c.id = t.category_id
+     WHERE t.type = 'expense' AND t.date LIKE ? || '%'
+     ORDER BY t.amount DESC
+     LIMIT 5`,
+    [prefix]
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    description: row.description,
+    amount: row.amount,
+    date: row.date,
+    category: row.category,
+    color: row.color,
+    paymentMethod: row.payment_method,
+  }));
+}
+
+interface DayOfWeekRow {
+  day_index: number;
+  total_amount: number;
+  count: number;
+}
+
+async function computeDayOfWeekPattern(month: number, year: number): Promise<DayOfWeekItem[]> {
+  const db = await getDb();
+  const prefix = buildMonthPrefix(month, year);
+  const result = await db.query<DayOfWeekRow>(
+    `SELECT CAST(strftime('%w', date) AS INTEGER) as day_index,
+            SUM(amount) as total_amount,
+            COUNT(*) as count
+     FROM transactions
+     WHERE type = 'expense' AND date LIKE ? || '%'
+     GROUP BY strftime('%w', date)`,
+    [prefix]
+  );
+
+  // Build lookup from query results
+  const dayMap = new Map<number, { totalAmount: number; count: number }>();
+  for (const row of result.rows) {
+    dayMap.set(row.day_index, {
+      totalAmount: row.total_amount,
+      count: row.count,
+    });
+  }
+
+  // Zero-fill all 7 days
+  return Array.from({ length: 7 }, (_, i) => {
+    const data = dayMap.get(i);
+    if (!data) {
+      return { dayIndex: i, totalAmount: 0, count: 0, avgAmount: 0 };
+    }
+    return {
+      dayIndex: i,
+      totalAmount: data.totalAmount,
+      count: data.count,
+      avgAmount: Math.round(data.totalAmount / data.count),
+    };
+  });
+}
+
 export async function getSpendingInsights(
   month: number,
   year: number
 ): Promise<ServiceResult<SpendingInsightsResponse>> {
   await ensureSeeded();
 
-  const [healthScore, categoryComparison] = await Promise.all([
-    computeHealthScore(month, year),
-    computeCategoryComparison(month, year),
-  ]);
+  const [healthScore, categoryComparison, biggestTransactions, dayOfWeekPattern] =
+    await Promise.all([
+      computeHealthScore(month, year),
+      computeCategoryComparison(month, year),
+      computeBiggestTransactions(month, year),
+      computeDayOfWeekPattern(month, year),
+    ]);
 
   return {
     data: {
       healthScore,
       categoryComparison,
-      biggestTransactions: [],
-      dayOfWeekPattern: emptyDayOfWeekPattern(),
+      biggestTransactions,
+      dayOfWeekPattern,
       outliers: [],
       period: { month, year },
     },

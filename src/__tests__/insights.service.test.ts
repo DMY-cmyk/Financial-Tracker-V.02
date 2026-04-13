@@ -129,6 +129,46 @@ describe('getSpendingInsights', () => {
     });
   });
 
+  describe('biggestTransactions', () => {
+    it('returns top 5 expense transactions sorted by amount DESC', async () => {
+      for (let i = 1; i <= 7; i++) {
+        await createExpense(1, 2026, i, i * 100000);
+      }
+      const result = await getSpendingInsights(1, 2026);
+      expect(result.data!.biggestTransactions).toHaveLength(5);
+      expect(result.data!.biggestTransactions[0].amount).toBe(700000);
+      expect(result.data!.biggestTransactions[4].amount).toBe(300000);
+    });
+
+    it('excludes income transactions', async () => {
+      await createIncome(1, 2026, 1, 10000000);
+      await createExpense(1, 2026, 5, 500000);
+      const result = await getSpendingInsights(1, 2026);
+      expect(result.data!.biggestTransactions).toHaveLength(1);
+      expect(result.data!.biggestTransactions[0].amount).toBe(500000);
+    });
+  });
+
+  describe('dayOfWeekPattern', () => {
+    it('returns 7 items even if some days have 0 spend', async () => {
+      await createExpense(1, 2026, 2, 500000); // Feb 2, 2026 = Monday (dayIndex 1)
+      const result = await getSpendingInsights(1, 2026);
+      expect(result.data!.dayOfWeekPattern).toHaveLength(7);
+      const zeroDays = result.data!.dayOfWeekPattern.filter((d) => d.totalAmount === 0);
+      expect(zeroDays.length).toBe(6);
+    });
+
+    it('computes avgAmount = totalAmount / count for each day', async () => {
+      await createExpense(1, 2026, 2, 400000); // Monday Feb 2
+      await createExpense(1, 2026, 9, 600000); // Monday Feb 9
+      const result = await getSpendingInsights(1, 2026);
+      const monday = result.data!.dayOfWeekPattern.find((d) => d.dayIndex === 1);
+      expect(monday!.totalAmount).toBe(1000000);
+      expect(monday!.count).toBe(2);
+      expect(monday!.avgAmount).toBe(500000);
+    });
+  });
+
   describe('categoryComparison', () => {
     it('returns correct thisMonth/lastMonth totals with changePct', async () => {
       await createExpense(0, 2026, 5, 500000, 'Food', 'cat-food'); // Jan (last month)
