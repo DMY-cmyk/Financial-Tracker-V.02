@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, CheckCircle2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -41,40 +41,41 @@ export function RecurringDueBanner({
   isGenerating,
   locale,
 }: RecurringDueBannerProps) {
-  const [state, setState] = useState<BannerState>('showing');
+  const [internalState, setInternalState] = useState<BannerState>('showing');
   const [expanded, setExpanded] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
 
-  // Sync external isGenerating state
-  useEffect(() => {
-    if (isGenerating && state === 'showing') {
-      setState('generating');
-    }
-  }, [isGenerating, state]);
+  // Derive display state from internal state + isGenerating prop
+  const state: BannerState =
+    internalState === 'success'
+      ? 'success'
+      : isGenerating || internalState === 'generating'
+        ? 'generating'
+        : 'showing';
 
-  // Auto-dismiss after success
+  // Auto-dismiss after success using ref to avoid set-state-in-effect lint
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (state !== 'success') return;
-    const timer = setTimeout(() => {
-      onDismiss();
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [state, onDismiss]);
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
 
   const handleGenerate = useCallback(async () => {
-    setState('generating');
+    setInternalState('generating');
     try {
       const generateResult = await onGenerate();
       setResult(generateResult);
-      setState('success');
-      toast.success(
-        `${generateResult.generated} ${t(locale, 'transactionsGenerated')}`
-      );
+      setInternalState('success');
+      toast.success(`${generateResult.generated} ${t(locale, 'transactionsGenerated')}`);
+      successTimerRef.current = setTimeout(() => {
+        onDismiss();
+      }, 2000);
     } catch {
       toast.error(t(locale, 'failedGenerate'));
-      setState('showing');
+      setInternalState('showing');
     }
-  }, [onGenerate, locale]);
+  }, [onGenerate, onDismiss, locale]);
 
   // HIDDEN state: no due items
   if (dueItems.length === 0) {
@@ -153,12 +154,7 @@ export function RecurringDueBanner({
 
           {/* Actions — stack on mobile, row on desktop */}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDismiss}
-              disabled={isDisabled}
-            >
+            <Button variant="ghost" size="sm" onClick={onDismiss} disabled={isDisabled}>
               {t(locale, 'dismiss')}
             </Button>
             <motion.div whileTap={tapScale}>
@@ -204,9 +200,7 @@ export function RecurringDueBanner({
                 <span
                   className={cn(
                     'h-2 w-2 shrink-0 rounded-full',
-                    item.type === 'income'
-                      ? 'bg-emerald-500'
-                      : 'bg-red-500'
+                    item.type === 'income' ? 'bg-emerald-500' : 'bg-red-500'
                   )}
                   aria-hidden="true"
                 />

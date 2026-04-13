@@ -60,9 +60,8 @@ describe('generateRecurringTransactions with idempotency', () => {
       nextDueDate: '2026-03-01',
     });
     await generateRecurringTransactions();
-    const { updateRecurringTransaction } = await import(
-      '@/server/services/recurring-transaction.service'
-    );
+    const { updateRecurringTransaction } =
+      await import('@/server/services/recurring-transaction.service');
     await updateRecurringTransaction(rule.data!.id, { nextDueDate: '2026-03-01' });
     const result = await generateRecurringTransactions();
     expect(result.data!.skipped).toBeGreaterThan(0);
@@ -75,9 +74,8 @@ describe('generateRecurringTransactions with idempotency', () => {
       nextDueDate: '2026-03-01',
     });
     await generateRecurringTransactions();
-    const { updateRecurringTransaction, getRecurringTransaction } = await import(
-      '@/server/services/recurring-transaction.service'
-    );
+    const { updateRecurringTransaction, getRecurringTransaction } =
+      await import('@/server/services/recurring-transaction.service');
     await updateRecurringTransaction(rule.data!.id, { nextDueDate: '2026-03-01' });
     await generateRecurringTransactions();
     const updated = await getRecurringTransaction(rule.data!.id);
@@ -120,9 +118,8 @@ describe('generateRecurringTransactions with idempotency', () => {
       endDate: '2026-02-15',
     });
     await generateRecurringTransactions();
-    const { getRecurringTransaction } = await import(
-      '@/server/services/recurring-transaction.service'
-    );
+    const { getRecurringTransaction } =
+      await import('@/server/services/recurring-transaction.service');
     const updated = await getRecurringTransaction(rule.data!.id);
     expect(updated.data!.isActive).toBe(false);
   });
