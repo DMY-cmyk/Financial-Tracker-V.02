@@ -503,6 +503,17 @@ type TranslationKeys = {
   liabilitySaved: string;
   snapshotRecorded: string;
   vsLastMonth: string;
+
+  // Recurring due banner
+  recurringDue: string;
+  recurringDueDesc: string;
+  generateAll: string;
+  generating: string;
+  transactionsGenerated: string;
+  moreRules: string;
+  showAll: string;
+  showLess: string;
+  failedGenerate: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -962,6 +973,15 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilitySaved: 'Liability saved',
     snapshotRecorded: 'Snapshot recorded',
     vsLastMonth: 'vs last month',
+    recurringDue: 'Recurring Transactions Due',
+    recurringDueDesc: 'Generate to add them to your records',
+    generateAll: 'Generate All',
+    generating: 'Generating...',
+    transactionsGenerated: 'transactions generated',
+    moreRules: 'more rules',
+    showAll: 'Show all',
+    showLess: 'Show less',
+    failedGenerate: 'Failed to generate transactions',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1421,6 +1441,15 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilitySaved: 'Kewajiban disimpan',
     snapshotRecorded: 'Snapshot dicatat',
     vsLastMonth: 'vs bulan lalu',
+    recurringDue: 'Transaksi Berulang Jatuh Tempo',
+    recurringDueDesc: 'Buat untuk menambahkan ke catatan Anda',
+    generateAll: 'Buat Semua',
+    generating: 'Membuat...',
+    transactionsGenerated: 'transaksi dibuat',
+    moreRules: 'aturan lagi',
+    showAll: 'Tampilkan semua',
+    showLess: 'Tampilkan sedikit',
+    failedGenerate: 'Gagal membuat transaksi',
   },
 };
 

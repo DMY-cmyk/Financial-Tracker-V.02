@@ -33,6 +33,8 @@ import type {
   RecurringTransactionListResponse,
   CreateRecurringTransactionRequest,
   UpdateRecurringTransactionRequest,
+  DueRecurringResponse,
+  GenerateResult,
   BalanceListResponse,
   MonthlyReportResponse,
   AnnualReportData,
@@ -338,8 +340,12 @@ export const api = {
       });
     },
 
+    due() {
+      return fetchApi<DueRecurringResponse>('/recurring-transactions/due');
+    },
+
     generate() {
-      return fetchApi<{ generated: number }>('/recurring-transactions/generate', {
+      return fetchApi<GenerateResult>('/recurring-transactions/generate', {
         method: 'POST',
       });
     },
