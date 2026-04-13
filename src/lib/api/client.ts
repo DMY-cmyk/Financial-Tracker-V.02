@@ -47,6 +47,7 @@ import type {
   CreateLiabilityRequest,
   UpdateLiabilityRequest,
   NetWorthDataResponse,
+  SpendingInsightsResponse,
 } from './contracts';
 
 const BASE_URL = '/api';
@@ -429,6 +430,14 @@ export const api = {
     },
     recordSnapshot() {
       return fetchApi<NetWorthSnapshot>('/net-worth/snapshot', { method: 'POST' });
+    },
+  },
+
+  insights: {
+    spending(month: number, year: number) {
+      return fetchApi<SpendingInsightsResponse>(
+        `/insights/spending?month=${month}&year=${year}`
+      );
     },
   },
 };
