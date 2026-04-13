@@ -435,9 +435,7 @@ export const api = {
 
   insights: {
     spending(month: number, year: number) {
-      return fetchApi<SpendingInsightsResponse>(
-        `/insights/spending?month=${month}&year=${year}`
-      );
+      return fetchApi<SpendingInsightsResponse>(`/insights/spending?month=${month}&year=${year}`);
     },
   },
 };

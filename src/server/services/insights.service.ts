@@ -28,15 +28,6 @@ function computeSavingsRate(income: number, expense: number): number {
   return Math.round(((income - expense) / income) * 100);
 }
 
-function emptyDayOfWeekPattern(): DayOfWeekItem[] {
-  return Array.from({ length: 7 }, (_, i) => ({
-    dayIndex: i,
-    totalAmount: 0,
-    count: 0,
-    avgAmount: 0,
-  }));
-}
-
 async function getMonthTotals(prefix: string): Promise<MonthTotals> {
   const db = await getDb();
   const result = await db.query<{ total_income: number; total_expense: number }>(
