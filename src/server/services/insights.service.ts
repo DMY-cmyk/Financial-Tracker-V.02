@@ -4,6 +4,7 @@ import type {
   SpendingInsightsResponse,
   HealthScore,
   DayOfWeekItem,
+  CategoryComparisonItem,
 } from '@/lib/api/contracts';
 
 interface ServiceResult<T> {
@@ -90,18 +91,148 @@ async function computeHealthScore(month: number, year: number): Promise<HealthSc
   };
 }
 
+interface CategoryTotalRow {
+  category_id: string;
+  category: string;
+  total: number;
+}
+
+interface CategoryColorRow {
+  id: string;
+  color: string;
+}
+
+async function getCategoryExpenseTotals(prefix: string): Promise<CategoryTotalRow[]> {
+  const db = await getDb();
+  const result = await db.query<CategoryTotalRow>(
+    `SELECT category_id, category, SUM(amount) AS total
+     FROM transactions
+     WHERE type = 'expense' AND date LIKE ? || '%'
+     GROUP BY category_id`,
+    [prefix]
+  );
+  return result.rows;
+}
+
+async function computeCategoryComparison(
+  month: number,
+  year: number
+): Promise<CategoryComparisonItem[]> {
+  const currentPrefix = buildMonthPrefix(month, year);
+  const prev = getPreviousMonthAndYear(month, year);
+  const prevPrefix = buildMonthPrefix(prev.month, prev.year);
+
+  const [thisMonthRows, lastMonthRows] = await Promise.all([
+    getCategoryExpenseTotals(currentPrefix),
+    getCategoryExpenseTotals(prevPrefix),
+  ]);
+
+  // Build lookup of last month totals by categoryId
+  const lastMonthMap = new Map<string, number>();
+  for (const row of lastMonthRows) {
+    lastMonthMap.set(row.category_id, row.total);
+  }
+
+  // Collect all category IDs from both months
+  const allCategoryIds = new Set<string>();
+  const categoryNames = new Map<string, string>();
+  for (const row of thisMonthRows) {
+    allCategoryIds.add(row.category_id);
+    categoryNames.set(row.category_id, row.category);
+  }
+  for (const row of lastMonthRows) {
+    allCategoryIds.add(row.category_id);
+    if (!categoryNames.has(row.category_id)) {
+      categoryNames.set(row.category_id, row.category);
+    }
+  }
+
+  // Fetch category colors
+  const db = await getDb();
+  const categoryIds = Array.from(allCategoryIds);
+  const colorMap = new Map<string, string>();
+  if (categoryIds.length > 0) {
+    const placeholders = categoryIds.map(() => '?').join(',');
+    const colorResult = await db.query<CategoryColorRow>(
+      `SELECT id, color FROM categories WHERE id IN (${placeholders})`,
+      categoryIds
+    );
+    for (const row of colorResult.rows) {
+      colorMap.set(row.id, row.color);
+    }
+  }
+
+  // Build merged items
+  const thisMonthMap = new Map<string, number>();
+  for (const row of thisMonthRows) {
+    thisMonthMap.set(row.category_id, row.total);
+  }
+
+  const items: CategoryComparisonItem[] = [];
+  for (const catId of allCategoryIds) {
+    const thisTotal = thisMonthMap.get(catId) ?? 0;
+    const lastTotal = lastMonthMap.get(catId) ?? 0;
+    const changePct =
+      lastTotal > 0 ? Math.round(((thisTotal - lastTotal) / lastTotal) * 100) : null;
+    const changeDelta = thisTotal - lastTotal;
+
+    items.push({
+      categoryId: catId,
+      category: categoryNames.get(catId) ?? 'Unknown',
+      color: colorMap.get(catId) ?? '#6B7280',
+      thisMonth: thisTotal,
+      lastMonth: lastTotal,
+      changePct,
+      changeDelta,
+    });
+  }
+
+  // Sort by thisMonth DESC
+  items.sort((a, b) => b.thisMonth - a.thisMonth);
+
+  // Bucket into top 7 + Other if more than 8
+  if (items.length <= 8) {
+    return items;
+  }
+
+  const top7 = items.slice(0, 7);
+  const rest = items.slice(7);
+
+  const otherThisMonth = rest.reduce((sum, c) => sum + c.thisMonth, 0);
+  const otherLastMonth = rest.reduce((sum, c) => sum + c.lastMonth, 0);
+  const otherChangePct =
+    otherLastMonth > 0
+      ? Math.round(((otherThisMonth - otherLastMonth) / otherLastMonth) * 100)
+      : null;
+
+  top7.push({
+    categoryId: 'other',
+    category: 'Other',
+    color: '#64748B',
+    thisMonth: otherThisMonth,
+    lastMonth: otherLastMonth,
+    changePct: otherChangePct,
+    changeDelta: otherThisMonth - otherLastMonth,
+  });
+
+  return top7;
+}
+
 export async function getSpendingInsights(
   month: number,
   year: number
 ): Promise<ServiceResult<SpendingInsightsResponse>> {
   await ensureSeeded();
 
-  const healthScore = await computeHealthScore(month, year);
+  const [healthScore, categoryComparison] = await Promise.all([
+    computeHealthScore(month, year),
+    computeCategoryComparison(month, year),
+  ]);
 
   return {
     data: {
       healthScore,
-      categoryComparison: [],
+      categoryComparison,
       biggestTransactions: [],
       dayOfWeekPattern: emptyDayOfWeekPattern(),
       outliers: [],

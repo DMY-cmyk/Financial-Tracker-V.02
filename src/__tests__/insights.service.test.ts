@@ -128,4 +128,33 @@ describe('getSpendingInsights', () => {
       }
     });
   });
+
+  describe('categoryComparison', () => {
+    it('returns correct thisMonth/lastMonth totals with changePct', async () => {
+      await createExpense(0, 2026, 5, 500000, 'Food', 'cat-food'); // Jan (last month)
+      await createExpense(1, 2026, 5, 700000, 'Food', 'cat-food'); // Feb (this month)
+      const result = await getSpendingInsights(1, 2026);
+      const food = result.data!.categoryComparison.find((c) => c.categoryId === 'cat-food');
+      expect(food).toBeDefined();
+      expect(food!.thisMonth).toBe(700000);
+      expect(food!.lastMonth).toBe(500000);
+      expect(food!.changePct).toBe(40);
+      expect(food!.changeDelta).toBe(200000);
+    });
+
+    it('returns changePct as null when lastMonth is 0', async () => {
+      await createExpense(1, 2026, 5, 300000, 'Shopping', 'cat-shop');
+      const result = await getSpendingInsights(1, 2026);
+      const shop = result.data!.categoryComparison.find((c) => c.categoryId === 'cat-shop');
+      expect(shop!.changePct).toBeNull();
+    });
+
+    it('limits to 8 categories and buckets rest as Other', async () => {
+      for (let i = 0; i < 10; i++) {
+        await createExpense(1, 2026, 5, (10 - i) * 100000, `Cat${i}`, `cat-${i}`);
+      }
+      const result = await getSpendingInsights(1, 2026);
+      expect(result.data!.categoryComparison.length).toBeLessThanOrEqual(8);
+    });
+  });
 });
