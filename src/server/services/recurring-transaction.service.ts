@@ -173,3 +173,56 @@ export async function generateRecurringTransactions(): Promise<
 
   return { data: { generated } };
 }
+
+// Compute overdue counts per rule for the dashboard banner (read-only, no side effects)
+export async function getDueItems(): Promise<
+  ServiceResult<{
+    dueItems: Array<{
+      id: string;
+      description: string;
+      type: 'income' | 'expense';
+      amount: number;
+      frequency: string;
+      paymentMethod: string;
+      overdueCount: number;
+      totalAmount: number;
+    }>;
+    totalTransactions: number;
+    totalIncome: number;
+    totalExpense: number;
+  }>
+> {
+  await ensureSeeded();
+  const today = new Date().toISOString().slice(0, 10);
+  const dueRules = await repo.findDue(today);
+
+  const dueItems = dueRules.map((rule) => {
+    let count = 0;
+    let date = rule.nextDueDate;
+    while (date <= today) {
+      if (rule.endDate && date > rule.endDate) break;
+      count++;
+      date = advanceDate(date, rule.frequency);
+    }
+    return {
+      id: rule.id,
+      description: rule.description,
+      type: rule.type,
+      amount: rule.amount,
+      frequency: rule.frequency,
+      paymentMethod: rule.paymentMethod,
+      overdueCount: count,
+      totalAmount: rule.amount * count,
+    };
+  });
+
+  const totalTransactions = dueItems.reduce((s, i) => s + i.overdueCount, 0);
+  const totalIncome = dueItems
+    .filter((i) => i.type === 'income')
+    .reduce((s, i) => s + i.totalAmount, 0);
+  const totalExpense = dueItems
+    .filter((i) => i.type === 'expense')
+    .reduce((s, i) => s + i.totalAmount, 0);
+
+  return { data: { dueItems, totalTransactions, totalIncome, totalExpense } };
+}
