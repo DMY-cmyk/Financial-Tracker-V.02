@@ -66,6 +66,8 @@ async function initializeSchema(client: DbClient): Promise<void> {
       amount DOUBLE PRECISION NOT NULL,
       payment_method TEXT NOT NULL,
       notes TEXT DEFAULT '',
+      source_recurring_id TEXT DEFAULT NULL,
+      source_due_date TEXT DEFAULT NULL,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       updated_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
@@ -193,6 +195,8 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS budget DOUBLE PRECISION DEFAULT 0`,
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'wallet'`,
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS beginning_balance DOUBLE PRECISION NOT NULL DEFAULT 0`,
+    `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_recurring_id TEXT DEFAULT NULL`,
+    `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_due_date TEXT DEFAULT NULL`,
   ];
 
   for (const migration of columnMigrations) {
@@ -212,6 +216,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_bills_month_year ON bills(month, year)',
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_next_due ON recurring_transactions(next_due_date)',
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_active ON recurring_transactions(is_active)',
+    'CREATE INDEX IF NOT EXISTS idx_transactions_source ON transactions(source_recurring_id, source_due_date) WHERE source_recurring_id IS NOT NULL',
   ];
 
   for (const idx of indexes) {

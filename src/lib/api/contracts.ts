@@ -280,6 +280,33 @@ export interface UpdateRecurringTransactionRequest {
   isActive?: boolean;
 }
 
+// === Due recurring / auto-generate contracts ===
+
+export interface DueItem {
+  id: string;
+  description: string;
+  type: 'income' | 'expense';
+  amount: number;
+  frequency: string;
+  paymentMethod: string;
+  overdueCount: number;
+  totalAmount: number;
+}
+
+export interface DueRecurringResponse {
+  dueItems: DueItem[];
+  totalTransactions: number;
+  totalIncome: number;
+  totalExpense: number;
+}
+
+export interface GenerateResult {
+  generated: number;
+  skipped: number;
+  totalIncome: number;
+  totalExpense: number;
+}
+
 // === Balance contracts ===
 
 export interface PaymentMethodBalance {

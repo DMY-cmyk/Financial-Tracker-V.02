@@ -8,6 +8,8 @@ export interface Transaction {
   amount: number;
   paymentMethod: string;
   notes: string;
+  sourceRecurringId?: string;
+  sourceDueDate?: string;
 }
 
 export interface Category {
