@@ -485,3 +485,61 @@ export interface NetWorthDataResponse {
   current: NetWorthCurrent;
   history: NetWorthSnapshot[];
 }
+
+// === Spending Insights contracts ===
+
+export interface CategoryComparisonItem {
+  categoryId: string;
+  category: string;
+  color: string;
+  thisMonth: number;
+  lastMonth: number;
+  changePct: number | null;
+  changeDelta: number;
+}
+
+export interface BiggestTransaction {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  color: string;
+  paymentMethod: string;
+}
+
+export interface DayOfWeekItem {
+  dayIndex: number;
+  totalAmount: number;
+  count: number;
+  avgAmount: number;
+}
+
+export interface SpendingOutlier {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  color: string;
+  categoryAvg: number;
+  delta: number;
+  multiplier: number;
+}
+
+export interface HealthScore {
+  income: number;
+  expense: number;
+  savingsRate: number;
+  lastMonthRate: number | null;
+  rateChange: number | null;
+}
+
+export interface SpendingInsightsResponse {
+  categoryComparison: CategoryComparisonItem[];
+  biggestTransactions: BiggestTransaction[];
+  dayOfWeekPattern: DayOfWeekItem[];
+  outliers: SpendingOutlier[];
+  healthScore: HealthScore;
+  period: { month: number; year: number };
+}

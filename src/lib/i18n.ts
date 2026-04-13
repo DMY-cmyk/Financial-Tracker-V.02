@@ -514,6 +514,22 @@ type TranslationKeys = {
   showAll: string;
   showLess: string;
   failedGenerate: string;
+
+  // Spending Insights
+  insights: string;
+  spendingInsights: string;
+  healthScore: string;
+  fromLastMonth: string;
+  categoryComparison: string;
+  biggestTransactions: string;
+  spendingByDay: string;
+  youSpendMostOn: string;
+  unusualSpending: string;
+  noAnomalies: string;
+  timesTypical: string;
+  typicalSpend: string;
+  noExpensesThisMonth: string;
+  other: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -982,6 +998,22 @@ const translations: Record<Locale, TranslationKeys> = {
     showAll: 'Show all',
     showLess: 'Show less',
     failedGenerate: 'Failed to generate transactions',
+
+    // Spending Insights
+    insights: 'Insights',
+    spendingInsights: 'Spending Insights',
+    healthScore: 'Monthly Health Score',
+    fromLastMonth: 'from last month',
+    categoryComparison: 'Category Comparison',
+    biggestTransactions: 'Biggest Transactions',
+    spendingByDay: 'Spending by Day of Week',
+    youSpendMostOn: 'You spend most on',
+    unusualSpending: 'Unusual Spending',
+    noAnomalies: 'No unusual spending this month',
+    timesTypical: 'your typical',
+    typicalSpend: 'typical',
+    noExpensesThisMonth: 'No expenses this month',
+    other: 'Other',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1450,6 +1482,22 @@ const translations: Record<Locale, TranslationKeys> = {
     showAll: 'Tampilkan semua',
     showLess: 'Tampilkan sedikit',
     failedGenerate: 'Gagal membuat transaksi',
+
+    // Spending Insights
+    insights: 'Analitik',
+    spendingInsights: 'Analitik Pengeluaran',
+    healthScore: 'Skor Kesehatan Bulanan',
+    fromLastMonth: 'dari bulan lalu',
+    categoryComparison: 'Perbandingan Kategori',
+    biggestTransactions: 'Transaksi Terbesar',
+    spendingByDay: 'Pengeluaran per Hari',
+    youSpendMostOn: 'Paling banyak di hari',
+    unusualSpending: 'Pengeluaran Tidak Biasa',
+    noAnomalies: 'Tidak ada pengeluaran tidak biasa',
+    timesTypical: 'biasanya',
+    typicalSpend: 'tipikal',
+    noExpensesThisMonth: 'Tidak ada pengeluaran bulan ini',
+    other: 'Lainnya',
   },
 };
 
