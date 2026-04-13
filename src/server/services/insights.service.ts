@@ -6,6 +6,7 @@ import type {
   DayOfWeekItem,
   BiggestTransaction,
   CategoryComparisonItem,
+  SpendingOutlier,
 } from '@/lib/api/contracts';
 
 interface ServiceResult<T> {
@@ -299,18 +300,127 @@ async function computeDayOfWeekPattern(month: number, year: number): Promise<Day
   });
 }
 
+const OUTLIER_MIN_DELTA = 50000;
+const OUTLIER_LIMIT = 5;
+const BASELINE_MONTHS = 3;
+
+interface CategoryAvgRow {
+  category_id: string;
+  avg_amount: number;
+}
+
+interface OutlierTransactionRow {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+  category_id: string;
+  color: string;
+}
+
+/**
+ * Compute the 3 month prefixes immediately before the target month,
+ * handling year-wrap for months 0, 1, 2.
+ */
+function getBaselinePrefixes(month: number, year: number): string[] {
+  const prefixes: string[] = [];
+  for (let i = 1; i <= BASELINE_MONTHS; i++) {
+    let m = month - i;
+    let y = year;
+    if (m < 0) {
+      m += 12;
+      y -= 1;
+    }
+    prefixes.push(buildMonthPrefix(m, y));
+  }
+  return prefixes;
+}
+
+async function computeOutliers(month: number, year: number): Promise<SpendingOutlier[]> {
+  const db = await getDb();
+  const prefixes = getBaselinePrefixes(month, year);
+
+  // Check how many of the 3 baseline months actually have expense data
+  const placeholders = prefixes.map(() => '?').join(',');
+  const monthCountResult = await db.query<{ month_count: number }>(
+    `SELECT COUNT(DISTINCT substr(date, 1, 7)) AS month_count
+     FROM transactions
+     WHERE type = 'expense'
+       AND substr(date, 1, 7) IN (${placeholders})`,
+    prefixes
+  );
+
+  const monthCount = monthCountResult.rows[0]?.month_count ?? 0;
+  if (monthCount < BASELINE_MONTHS) {
+    return [];
+  }
+
+  // Per-category average expense transaction amount across the 3 baseline months
+  const avgResult = await db.query<CategoryAvgRow>(
+    `SELECT category_id, AVG(amount) AS avg_amount
+     FROM transactions
+     WHERE type = 'expense'
+       AND substr(date, 1, 7) IN (${placeholders})
+     GROUP BY category_id`,
+    prefixes
+  );
+
+  const categoryAvgMap = new Map<string, number>();
+  for (const row of avgResult.rows) {
+    categoryAvgMap.set(row.category_id, row.avg_amount);
+  }
+
+  // This month's expense transactions
+  const currentPrefix = buildMonthPrefix(month, year);
+  const txResult = await db.query<OutlierTransactionRow>(
+    `SELECT t.id, t.description, t.amount, t.date, t.category, t.category_id,
+            COALESCE(c.color, '#64748B') AS color
+     FROM transactions t
+     LEFT JOIN categories c ON c.id = t.category_id
+     WHERE t.type = 'expense' AND t.date LIKE ? || '%'`,
+    [currentPrefix]
+  );
+
+  // Compute delta and filter
+  const candidates: SpendingOutlier[] = [];
+  for (const tx of txResult.rows) {
+    const categoryAvg = categoryAvgMap.get(tx.category_id);
+    if (categoryAvg === undefined) continue; // no baseline for this category
+    const delta = tx.amount - categoryAvg;
+    if (delta < OUTLIER_MIN_DELTA) continue;
+    const multiplier = categoryAvg > 0 ? tx.amount / categoryAvg : 0;
+    candidates.push({
+      id: tx.id,
+      description: tx.description,
+      amount: tx.amount,
+      date: tx.date,
+      category: tx.category,
+      color: tx.color,
+      categoryAvg: Math.round(categoryAvg),
+      delta: Math.round(delta),
+      multiplier: Math.round(multiplier * 100) / 100,
+    });
+  }
+
+  // Sort by delta DESC, take top 5
+  candidates.sort((a, b) => b.delta - a.delta);
+  return candidates.slice(0, OUTLIER_LIMIT);
+}
+
 export async function getSpendingInsights(
   month: number,
   year: number
 ): Promise<ServiceResult<SpendingInsightsResponse>> {
   await ensureSeeded();
 
-  const [healthScore, categoryComparison, biggestTransactions, dayOfWeekPattern] =
+  const [healthScore, categoryComparison, biggestTransactions, dayOfWeekPattern, outliers] =
     await Promise.all([
       computeHealthScore(month, year),
       computeCategoryComparison(month, year),
       computeBiggestTransactions(month, year),
       computeDayOfWeekPattern(month, year),
+      computeOutliers(month, year),
     ]);
 
   return {
@@ -319,7 +429,7 @@ export async function getSpendingInsights(
       categoryComparison,
       biggestTransactions,
       dayOfWeekPattern,
-      outliers: [],
+      outliers,
       period: { month, year },
     },
   };

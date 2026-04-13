@@ -197,4 +197,59 @@ describe('getSpendingInsights', () => {
       expect(result.data!.categoryComparison.length).toBeLessThanOrEqual(8);
     });
   });
+
+  describe('outliers', () => {
+    it('returns top outliers by absolute delta, filtered by Rp 50K minimum', async () => {
+      // Build 3-month baseline: avg 200K per transaction in Food
+      for (let m = 10; m <= 11; m++) {
+        await createExpense(m, 2025, 5, 200000, 'Food', 'cat-food');
+      }
+      await createExpense(0, 2026, 5, 200000, 'Food', 'cat-food');
+      // This month: big outlier (500K, delta = 300K > 50K)
+      await createExpense(1, 2026, 10, 500000, 'Food', 'cat-food');
+      // Small outlier (220K, delta = 20K < 50K — should NOT appear)
+      await createExpense(1, 2026, 15, 220000, 'Food', 'cat-food');
+
+      const result = await getSpendingInsights(1, 2026);
+      const bigOutlier = result.data!.outliers.find((o) => o.amount === 500000);
+      expect(bigOutlier).toBeDefined();
+      expect(bigOutlier!.delta).toBeGreaterThanOrEqual(50000);
+      const smallOutlier = result.data!.outliers.find((o) => o.amount === 220000);
+      expect(smallOutlier).toBeUndefined();
+    });
+
+    it('returns empty array when less than 3 months of data', async () => {
+      await createExpense(1, 2026, 5, 500000, 'Food', 'cat-food');
+      const result = await getSpendingInsights(1, 2026);
+      expect(result.data!.outliers).toHaveLength(0);
+    });
+
+    it('computes multiplier = amount / categoryAvg correctly', async () => {
+      for (let m = 10; m <= 11; m++) {
+        await createExpense(m, 2025, 5, 100000, 'Food', 'cat-food');
+      }
+      await createExpense(0, 2026, 5, 100000, 'Food', 'cat-food');
+      await createExpense(1, 2026, 10, 400000, 'Food', 'cat-food');
+
+      const result = await getSpendingInsights(1, 2026);
+      const outlier = result.data!.outliers.find((o) => o.amount === 400000);
+      expect(outlier).toBeDefined();
+      expect(outlier!.multiplier).toBeCloseTo(4, 0);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('returns all sections empty/zeroed for a month with no transactions', async () => {
+      const result = await getSpendingInsights(5, 2026);
+      expect(result.error).toBeUndefined();
+      expect(result.data!.categoryComparison).toHaveLength(0);
+      expect(result.data!.biggestTransactions).toHaveLength(0);
+      expect(result.data!.dayOfWeekPattern).toHaveLength(7);
+      expect(result.data!.dayOfWeekPattern.every((d) => d.totalAmount === 0)).toBe(true);
+      expect(result.data!.outliers).toHaveLength(0);
+      expect(result.data!.healthScore.savingsRate).toBe(0);
+      expect(result.data!.healthScore.income).toBe(0);
+      expect(result.data!.healthScore.expense).toBe(0);
+    });
+  });
 });
