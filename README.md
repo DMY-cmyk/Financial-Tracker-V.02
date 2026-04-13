@@ -156,6 +156,22 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] Accessible: `role="region"`, `aria-busy`, `aria-live="polite"`, +/- prefix (not color-only)
 - [x] 20 new tests (due items service, idempotent generation, cron auth)
 
+### Spending Insights Page
+
+- [x] `/insights` page — dedicated analytics page answering "what's changing in my spending?"
+- [x] **Monthly Health Score** — SVG ring KPI card with savings rate %, color zones (emerald >20%, amber 0-20%, red <0%), comparison to last month
+- [x] **Category Comparison** — Recharts horizontal BarChart (this month vs last month per category), % change badges (red for increase, green for decrease)
+- [x] **Biggest Transactions** — top 5 expense transactions with category chip, date, and IDR amount
+- [x] **Day-of-Week Pattern** — 7-pill inline heatmap row with opacity-based intensity, amber highlight for top 2 days, summary sentence ("You spend most on Saturdays")
+- [x] **Unusual Spending** — top 5 outliers ranked by absolute delta from 3-month category average (Rp 50K floor), multiplier text ("4.2x your typical Shopping")
+- [x] `GET /api/insights/spending?month=&year=` — single server-side endpoint computing all 5 widgets via SQL aggregation
+- [x] Max 8 categories in comparison chart; remainder bucketed into "Other"
+- [x] Outlier detection: per-category 3-month average baseline, requires 3+ months of data
+- [x] Responsive: 2/3 + 1/3 grid on desktop, single column on mobile
+- [x] Navigation: Insights first in sidebar Tools group + mobile More drawer
+- [x] All strings bilingual (EN/ID) via 14 new i18n keys
+- [x] 18 new tests (category comparison, biggest, day-of-week, outliers, health score, edge cases)
+
 ### Authentication
 
 - [x] JWT-based auth enforced by Next.js Edge Middleware on every request
@@ -208,7 +224,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] ConfirmDialog for destructive actions
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
-- [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets, useDueRecurring)
+- [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets, useDueRecurring, useInsightsData)
 - [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
 - [x] App-level error boundary and custom 404 page
 - [x] Skip link for keyboard navigation
@@ -227,7 +243,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (430 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate) |
+| **Testing** | Vitest (448 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -259,7 +275,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 430 tests)
+npm run test         # Run tests (Vitest, 448 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -317,7 +333,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (430 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons, recurring-auto-generate)
+  __tests__/                  # Vitest tests (448 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons, recurring-auto-generate, spending-insights)
 ```
 
 ## Documentation
