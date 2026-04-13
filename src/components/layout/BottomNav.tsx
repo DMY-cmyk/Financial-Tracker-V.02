@@ -15,6 +15,7 @@ import {
   CalendarCheck,
   PiggyBank,
   Repeat,
+  TrendingUp,
   BarChart3,
   Upload,
   Download,
@@ -31,6 +32,7 @@ type NavKey =
   | 'bills'
   | 'recurringTransactions'
   | 'savingsPage'
+  | 'insights'
   | 'reports'
   | 'upload'
   | 'export'
@@ -48,6 +50,7 @@ const moreItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] =
   { href: '/bills', key: 'bills', icon: CalendarCheck },
   { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
   { href: '/savings', key: 'savingsPage', icon: PiggyBank },
+  { href: '/insights', key: 'insights', icon: TrendingUp },
   { href: '/reports', key: 'reports', icon: BarChart3 },
   { href: '/upload', key: 'upload', icon: Upload },
   { href: '/export', key: 'export', icon: Download },

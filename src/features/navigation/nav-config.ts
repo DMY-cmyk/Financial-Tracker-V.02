@@ -53,6 +53,7 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: 'groupTools',
     defaultCollapsed: false,
     items: [
+      { href: '/insights', labelKey: 'insights', icon: TrendingUp },
       { href: '/reports', labelKey: 'reports', icon: BarChart3 },
       { href: '/upload', labelKey: 'upload', icon: Upload },
       { href: '/export', labelKey: 'downloadReport', icon: Download },
