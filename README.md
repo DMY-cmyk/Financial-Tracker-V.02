@@ -138,6 +138,24 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] API: `GET/POST /api/liabilities`, `PATCH/DELETE /api/liabilities/[id]`, `GET /api/net-worth`, `POST /api/net-worth/snapshot`
 - [x] Bilingual labels (EN/ID) for all net worth strings
 
+### Recurring Transaction Auto-Generate
+
+- [x] **Vercel Cron Job** — daily at 01:00 WIB (18:00 UTC) auto-generates all due recurring transactions
+- [x] **Dashboard Banner** — card banner shows overdue recurring rules with amounts, frequency badges, and x×N multipliers
+- [x] 4-state banner UX: hidden → showing → generating (spinner) → success (green card, auto-collapse after 2s)
+- [x] **Source tracking idempotency** — `source_recurring_id` + `source_due_date` columns on transactions table prevent duplicates
+- [x] **Dual auth cron endpoint** — accepts `CRON_SECRET` Bearer token OR `x-vercel-cron-signature` Vercel header
+- [x] `/api/cron/*` whitelisted from JWT middleware (handles own auth)
+- [x] `GET /api/recurring-transactions/due` — returns overdue rules with `overdueCount` and `totalAmount` per rule
+- [x] Multi-period catch-up: generates all missed periods in one call (e.g., 3 months of missed salary)
+- [x] Max 5 rules visible in banner; "Show all" toggle for overflow with stagger animation
+- [x] `sessionStorage` dismiss — banner hidden for today per-tab; reappears in new session if items still due
+- [x] `useDueRecurring` hook with React Query — cache invalidation on generate (recurring, transactions, dashboard)
+- [x] Sonner toast on success/error; success card shows +income / -expense totals
+- [x] Responsive: actions stack full-width on mobile; right-aligned on desktop
+- [x] Accessible: `role="region"`, `aria-busy`, `aria-live="polite"`, +/- prefix (not color-only)
+- [x] 20 new tests (due items service, idempotent generation, cron auth)
+
 ### Authentication
 
 - [x] JWT-based auth enforced by Next.js Edge Middleware on every request
@@ -184,13 +202,13 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 - [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
 - [x] Motion presets (fadeIn, stagger, spring, panel variants, ease curves)
-- [x] i18n dictionary with ~140+ keys (EN/ID bilingual)
+- [x] i18n dictionary with ~185+ keys (EN/ID bilingual)
 - [x] Skeleton loading states (page, card, chart, list, transaction row)
 - [x] Empty/NoResults/InlineError shared state components
 - [x] ConfirmDialog for destructive actions
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
-- [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets)
+- [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets, useDueRecurring)
 - [x] API boundary placeholders (services.ts)
 - [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
 - [x] App-level error boundary and custom 404 page
@@ -210,7 +228,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (410 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons) |
+| **Testing** | Vitest (430 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -234,6 +252,7 @@ npm run build                # Production build
 |----------|----------|-------------|
 | `DATABASE_URL` | Production | Neon Postgres connection string. Leave empty to use SQLite (dev/tests). |
 | `JWT_SECRET` | Production | Random 32+ character string for signing JWT tokens. Required for auth to work. |
+| `CRON_SECRET` | Production | Random 32-char string for Vercel Cron auth. Generate with `openssl rand -hex 16`. |
 | `NEXT_PUBLIC_SKIP_AUTH` | Dev only | Set to `true` to auto-redirect to `/register` when no users exist in DB. |
 | `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
 | `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
@@ -241,7 +260,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 410 tests)
+npm run test         # Run tests (Vitest, 430 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -265,6 +284,8 @@ src/
       payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
       liabilities/            # GET + POST, [id] PATCH/DELETE
       net-worth/              # GET (current + history), snapshot/ POST
+      cron/generate-recurring/ # POST (Vercel Cron, dual auth)
+      recurring-transactions/  # GET/POST + [id] PATCH/DELETE + generate/ POST + due/ GET
       settings/               # GET + PATCH
       uploads/                # GET (list) + POST, [id] PATCH
       export-jobs/            # GET (list) + POST
@@ -297,7 +318,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (410 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons)
+  __tests__/                  # Vitest tests (430 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons, recurring-auto-generate)
 ```
 
 ## Documentation
