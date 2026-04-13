@@ -209,7 +209,6 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] Sonner toast system for feedback
 - [x] Form validation with bilingual error messages
 - [x] Custom hooks (useDashboardData, useTransactions, useAllTransactions, useUpload, useExport, useImport, useFilterPresets, useDueRecurring)
-- [x] API boundary placeholders (services.ts)
 - [x] Category auto-suggestion for OCR (keyword matching, EN/ID)
 - [x] App-level error boundary and custom 404 page
 - [x] Skip link for keyboard navigation
