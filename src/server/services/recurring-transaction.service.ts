@@ -132,13 +132,16 @@ function advanceDate(dateStr: string, frequency: RecurringTransaction['frequency
 
 // Generate pending transactions from all active recurring rules up to today
 export async function generateRecurringTransactions(): Promise<
-  ServiceResult<{ generated: number }>
+  ServiceResult<{ generated: number; skipped: number; totalIncome: number; totalExpense: number }>
 > {
   await ensureSeeded();
   const today = new Date().toISOString().slice(0, 10);
   const dueRules = await repo.findDue(today);
 
   let generated = 0;
+  let skipped = 0;
+  let totalIncome = 0;
+  let totalExpense = 0;
 
   for (const rule of dueRules) {
     let nextDate = rule.nextDueDate;
@@ -147,6 +150,14 @@ export async function generateRecurringTransactions(): Promise<
     while (nextDate <= today) {
       // Don't generate past endDate
       if (rule.endDate && nextDate > rule.endDate) break;
+
+      // Idempotency check: skip if a transaction already exists for this rule + due date
+      const existing = await txRepo.findBySource(rule.id, nextDate);
+      if (existing) {
+        skipped++;
+        nextDate = advanceDate(nextDate, rule.frequency);
+        continue;
+      }
 
       await txRepo.create({
         date: nextDate,
@@ -157,8 +168,16 @@ export async function generateRecurringTransactions(): Promise<
         amount: rule.amount,
         paymentMethod: rule.paymentMethod,
         notes: rule.notes,
+        sourceRecurringId: rule.id,
+        sourceDueDate: nextDate,
       });
       generated++;
+
+      if (rule.type === 'income') {
+        totalIncome += rule.amount;
+      } else {
+        totalExpense += rule.amount;
+      }
 
       nextDate = advanceDate(nextDate, rule.frequency);
     }
@@ -171,7 +190,7 @@ export async function generateRecurringTransactions(): Promise<
     }
   }
 
-  return { data: { generated } };
+  return { data: { generated, skipped, totalIncome, totalExpense } };
 }
 
 // Compute overdue counts per rule for the dashboard banner (read-only, no side effects)
