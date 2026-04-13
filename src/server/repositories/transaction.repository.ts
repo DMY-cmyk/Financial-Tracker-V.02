@@ -12,6 +12,8 @@ interface TxRow {
   amount: number;
   payment_method: string;
   notes: string;
+  source_recurring_id: string | null;
+  source_due_date: string | null;
 }
 
 function rowToTransaction(row: TxRow): Transaction {
@@ -25,6 +27,8 @@ function rowToTransaction(row: TxRow): Transaction {
     amount: row.amount,
     paymentMethod: row.payment_method,
     notes: row.notes || '',
+    sourceRecurringId: row.source_recurring_id ?? undefined,
+    sourceDueDate: row.source_due_date ?? undefined,
   };
 }
 
@@ -42,6 +46,18 @@ export function createTransactionRepository() {
       return result.rows[0] ? rowToTransaction(result.rows[0]) : undefined;
     },
 
+    async findBySource(
+      sourceRecurringId: string,
+      sourceDueDate: string
+    ): Promise<Transaction | null> {
+      const db = await getDb();
+      const result = await db.query<TxRow>(
+        'SELECT * FROM transactions WHERE source_recurring_id = ? AND source_due_date = ? LIMIT 1',
+        [sourceRecurringId, sourceDueDate]
+      );
+      return result.rows.length > 0 ? rowToTransaction(result.rows[0]) : null;
+    },
+
     async findByMonth(month: number, year: number): Promise<Transaction[]> {
       const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
       const db = await getDb();
@@ -56,7 +72,7 @@ export function createTransactionRepository() {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, source_recurring_id, source_due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           id,
           data.date,
@@ -67,6 +83,8 @@ export function createTransactionRepository() {
           data.amount,
           data.paymentMethod,
           data.notes,
+          data.sourceRecurringId ?? null,
+          data.sourceDueDate ?? null,
         ]
       );
       return { ...data, id };
