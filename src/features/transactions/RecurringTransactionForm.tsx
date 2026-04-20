@@ -125,7 +125,10 @@ export function RecurringTransactionForm({
 
       {/* Description */}
       <div className="space-y-1.5">
-        <Label htmlFor="rtf-description">{t(locale, 'description')}</Label>
+        <Label htmlFor="rtf-description">
+          {t(locale, 'description')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <Input
           id="rtf-description"
           value={description}
@@ -137,7 +140,10 @@ export function RecurringTransactionForm({
 
       {/* Amount */}
       <div className="space-y-1.5">
-        <Label htmlFor="rtf-amount">{t(locale, 'amount')}</Label>
+        <Label htmlFor="rtf-amount">
+          {t(locale, 'amount')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <Input
           id="rtf-amount"
           value={amountStr}
@@ -151,7 +157,10 @@ export function RecurringTransactionForm({
 
       {/* Category */}
       <div className="space-y-1.5">
-        <Label htmlFor="rtf-category">{t(locale, 'category')}</Label>
+        <Label htmlFor="rtf-category">
+          {t(locale, 'category')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <select
           id="rtf-category"
           value={category}
@@ -170,7 +179,10 @@ export function RecurringTransactionForm({
 
       {/* Payment Method */}
       <div className="space-y-1.5">
-        <Label htmlFor="rtf-paymentMethod">{t(locale, 'paymentMethod')}</Label>
+        <Label htmlFor="rtf-paymentMethod">
+          {t(locale, 'paymentMethod')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <select
           id="rtf-paymentMethod"
           value={paymentMethod}
@@ -189,7 +201,10 @@ export function RecurringTransactionForm({
 
       {/* Frequency */}
       <div className="space-y-1.5">
-        <Label htmlFor="rtf-frequency">{t(locale, 'frequency')}</Label>
+        <Label htmlFor="rtf-frequency">
+          {t(locale, 'frequency')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <select
           id="rtf-frequency"
           value={frequency}
@@ -206,7 +221,10 @@ export function RecurringTransactionForm({
       {/* Dates */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="rtf-startDate">{t(locale, 'startDate')}</Label>
+          <Label htmlFor="rtf-startDate">
+            {t(locale, 'startDate')}
+            <span className="ml-0.5 text-red-500">*</span>
+          </Label>
           <Input
             id="rtf-startDate"
             type="date"
