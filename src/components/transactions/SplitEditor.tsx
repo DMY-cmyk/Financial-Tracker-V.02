@@ -60,7 +60,7 @@ export function SplitEditor({
     >
       {/* Header */}
       <div className="flex items-center justify-between rounded-t-xl border-b border-blue-200 bg-blue-100 px-3 py-2 dark:border-blue-900 dark:bg-blue-900/40">
-        <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+        <span className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-blue-700 uppercase dark:text-blue-300">
           <PieChart className="h-3 w-3" />
           {t(locale, 'splitAllocation')}
         </span>
@@ -103,11 +103,11 @@ export function SplitEditor({
         <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs dark:border-blue-800 dark:bg-blue-950/50">
           <span className="text-muted-foreground">
             Total:{' '}
-            <span className="font-mono font-semibold text-foreground">{fmt(totalAmount)}</span>
+            <span className="text-foreground font-mono font-semibold">{fmt(totalAmount)}</span>
           </span>
           <span className="text-muted-foreground">
             Allocated:{' '}
-            <span className="font-mono font-semibold text-foreground">{fmt(allocated)}</span>
+            <span className="text-foreground font-mono font-semibold">{fmt(allocated)}</span>
           </span>
           <span className={cn('font-semibold', remainingColor)}>
             {t(locale, 'remainingAmount')}: {remaining === 0 ? '✓ 0' : fmt(remaining)}
@@ -116,7 +116,7 @@ export function SplitEditor({
 
         {splits.length === 1 && (
           <p className="text-xs text-amber-600 dark:text-amber-400">
-            {t(locale, 'totalMustMatch')} — add another line or remove the split.
+            {t(locale, 'totalMustMatch')}
           </p>
         )}
       </div>
