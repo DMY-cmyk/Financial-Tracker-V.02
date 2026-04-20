@@ -40,7 +40,6 @@ function getBorderColor(pct: number, hasOverride: boolean, effectiveBudget: numb
 export function BudgetCell({
   effectiveBudget,
   hasOverride,
-  spent,
   percentage,
   isPast,
   isCurrent,

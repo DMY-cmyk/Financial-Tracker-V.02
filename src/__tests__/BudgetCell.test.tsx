@@ -55,6 +55,6 @@ describe('BudgetCell', () => {
   it('applies opacity-70 class when isPast=true', () => {
     const { container } = render(<BudgetCell {...defaultProps} isPast={true} />);
     const root = container.firstChild as HTMLElement;
-    expect(root.className).toContain('opacity-70');
+    expect(root.classList.contains('opacity-70')).toBe(true);
   });
 });
