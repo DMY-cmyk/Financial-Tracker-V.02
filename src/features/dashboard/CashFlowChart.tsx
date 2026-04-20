@@ -10,6 +10,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import { motion } from 'framer-motion';
@@ -51,61 +52,81 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
               clipPath: revealed ? 'inset(0 0% 0 0)' : 'inset(0 100% 0 0)',
             }}
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={filtered} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#059669" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#059669" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#DC2626" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#DC2626" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 11 }}
-                  className="fill-muted-foreground"
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11 }}
-                  className="fill-muted-foreground"
-                  tickFormatter={(v) => formatCurrencyShort(v)}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '12px',
-                    border: '1px solid var(--border)',
-                    background: 'var(--card)',
-                    fontSize: '12px',
-                  }}
-                  formatter={(value, name) => [
-                    formatCurrencyShort(Number(value)),
-                    String(name) === 'income' ? 'Income' : 'Expense',
-                  ]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#059669"
-                  strokeWidth={2}
-                  fill="url(#incomeGrad)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#DC2626"
-                  strokeWidth={2}
-                  fill="url(#expenseGrad)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div role="img" aria-label={t(locale, 'cashFlow')} className="h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={filtered} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        style={{ stopColor: 'var(--chart-income)', stopOpacity: 0.2 }}
+                      />
+                      <stop
+                        offset="100%"
+                        style={{ stopColor: 'var(--chart-income)', stopOpacity: 0 }}
+                      />
+                    </linearGradient>
+                    <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0.2 }}
+                      />
+                      <stop
+                        offset="100%"
+                        style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0 }}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 11 }}
+                    className="fill-muted-foreground"
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11 }}
+                    className="fill-muted-foreground"
+                    tickFormatter={(v) => formatCurrencyShort(v)}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: '1px solid var(--border)',
+                      background: 'var(--card)',
+                      fontSize: '12px',
+                    }}
+                    itemStyle={{ fontFamily: 'monospace' }}
+                    formatter={(value, name) => [
+                      formatCurrencyShort(Number(value)),
+                      String(name) === 'income' ? 'Income' : 'Expense',
+                    ]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="income"
+                    stroke="var(--chart-income)"
+                    strokeWidth={2}
+                    fill="url(#incomeGrad)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="expense"
+                    stroke="var(--chart-expense)"
+                    strokeWidth={2}
+                    fill="url(#expenseGrad)"
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    formatter={(value: string) => t(locale, value as Parameters<typeof t>[1])}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
       </div>
