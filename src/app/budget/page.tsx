@@ -58,8 +58,14 @@ export default function BudgetPage() {
   const [view, setView] = useState<'monthly' | 'annual'>('monthly');
   const setYear = useStore((s) => s.setYear);
 
-  const { rows, summary, monthlyTotals, upsertCell, deleteCell, isLoading: isAnnualLoading } =
-    useAnnualBudget();
+  const {
+    rows,
+    summary,
+    monthlyTotals,
+    upsertCell,
+    deleteCell,
+    isLoading: isAnnualLoading,
+  } = useAnnualBudget();
 
   if (isLoading) {
     return (
@@ -85,26 +91,29 @@ export default function BudgetPage() {
     <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6">
       <motion.div {...fadeInUp}>
         <div className="flex items-center justify-between">
-          <PageHeader title={t(locale, 'budgetPage')} description={`${MONTH_NAMES[month]} ${year}`} />
+          <PageHeader
+            title={t(locale, 'budgetPage')}
+            description={`${MONTH_NAMES[month]} ${year}`}
+          />
           <div className="flex items-center gap-2">
             {view === 'annual' && (
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setYear(year - 1)}
-                  className="rounded-lg border px-2 py-1 text-sm text-muted-foreground hover:bg-muted"
+                  className="text-muted-foreground hover:bg-muted rounded-lg border px-2 py-1 text-sm"
                 >
                   ‹
                 </button>
                 <span className="min-w-[3rem] text-center text-sm font-medium">{year}</span>
                 <button
                   onClick={() => setYear(year + 1)}
-                  className="rounded-lg border px-2 py-1 text-sm text-muted-foreground hover:bg-muted"
+                  className="text-muted-foreground hover:bg-muted rounded-lg border px-2 py-1 text-sm"
                 >
                   ›
                 </button>
               </div>
             )}
-            <div className="flex rounded-lg border bg-muted/50 p-0.5">
+            <div className="bg-muted/50 flex rounded-lg border p-0.5">
               <button
                 onClick={() => setView('monthly')}
                 className={cn(
@@ -186,7 +195,10 @@ export default function BudgetPage() {
               )}
 
               {unbudgetedCategories.length > 0 && (
-                <UnbudgetedCategories categories={unbudgetedCategories} onSetBudget={updateBudget} />
+                <UnbudgetedCategories
+                  categories={unbudgetedCategories}
+                  onSetBudget={updateBudget}
+                />
               )}
             </>
           )}
@@ -195,11 +207,7 @@ export default function BudgetPage() {
 
       {view === 'annual' && (
         <motion.div {...fadeInUp} className="space-y-6">
-          <AnnualBudgetSummary
-            summary={summary}
-            locale={locale}
-            isLoading={isAnnualLoading}
-          />
+          <AnnualBudgetSummary summary={summary} locale={locale} isLoading={isAnnualLoading} />
           <AnnualBudgetGrid
             rows={rows}
             monthlyTotals={monthlyTotals}

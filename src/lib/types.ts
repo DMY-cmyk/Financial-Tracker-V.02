@@ -102,14 +102,14 @@ export type DashboardView = 'years' | 'months' | 'dashboard';
 export interface MonthlyBudget {
   id: string;
   categoryId: string;
-  month: number;  // 0–11
+  month: number; // 0–11
   year: number;
   budgetAmount: number;
 }
 
 export interface MonthlySpending {
   categoryId: string;
-  month: number;  // 0–11
+  month: number; // 0–11
   spent: number;
 }
 

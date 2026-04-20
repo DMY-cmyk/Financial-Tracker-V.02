@@ -37,7 +37,6 @@ export function AnnualBudgetGrid({
   rows,
   monthlyTotals,
   currentMonth,
-  currentYear: _currentYear,
   locale,
   onSave,
   onClear,
@@ -61,7 +60,7 @@ export function AnnualBudgetGrid({
     return (
       <div className="animate-pulse space-y-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-16 rounded-2xl bg-muted" />
+          <div key={i} className="bg-muted h-16 rounded-2xl" />
         ))}
       </div>
     );
@@ -71,34 +70,34 @@ export function AnnualBudgetGrid({
     <div className="overflow-x-auto rounded-2xl border">
       <table className="w-full border-collapse text-sm" style={{ minWidth: '900px' }}>
         <thead>
-          <tr className="border-b bg-muted/50">
-            <th className="sticky left-0 z-10 bg-muted/50 px-4 py-3 text-left font-medium text-muted-foreground">
+          <tr className="bg-muted/50 border-b">
+            <th className="bg-muted/50 text-muted-foreground sticky left-0 z-10 px-4 py-3 text-left font-medium">
               {t(locale, 'category')}
             </th>
             {MONTH_ABBR.map((abbr, m) => (
               <th
                 key={m}
                 className={cn(
-                  'px-2 py-3 text-center font-medium text-muted-foreground',
-                  m === currentMonth && 'border-l-2 border-primary/40 text-primary'
+                  'text-muted-foreground px-2 py-3 text-center font-medium',
+                  m === currentMonth && 'border-primary/40 text-primary border-l-2'
                 )}
               >
                 {abbr}
               </th>
             ))}
-            <th className="px-3 py-3 text-center font-medium text-muted-foreground">Σ</th>
+            <th className="text-muted-foreground px-3 py-3 text-center font-medium">Σ</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.category.id} className="border-b last:border-0 hover:bg-muted/20">
-              <td className="sticky left-0 z-10 bg-card px-4 py-2">
+            <tr key={row.category.id} className="hover:bg-muted/20 border-b last:border-0">
+              <td className="bg-card sticky left-0 z-10 px-4 py-2">
                 <div className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
                     style={{ background: row.category.color }}
                   />
-                  <span className="font-medium text-foreground">{row.category.name}</span>
+                  <span className="text-foreground font-medium">{row.category.name}</span>
                 </div>
               </td>
               {row.cells.map((cell) => (
@@ -106,7 +105,7 @@ export function AnnualBudgetGrid({
                   key={cell.month}
                   className={cn(
                     'px-1 py-1.5 text-center',
-                    cell.month === currentMonth && 'border-l-2 border-primary/20'
+                    cell.month === currentMonth && 'border-primary/20 border-l-2'
                   )}
                 >
                   <BudgetCell
@@ -123,23 +122,23 @@ export function AnnualBudgetGrid({
                   />
                 </td>
               ))}
-              <td className="px-3 py-2 text-center font-mono text-xs text-muted-foreground">
+              <td className="text-muted-foreground px-3 py-2 text-center font-mono text-xs">
                 {formatCurrency(row.annualTotal)}
               </td>
             </tr>
           ))}
         </tbody>
         <tfoot>
-          <tr className="border-t bg-muted/30">
-            <td className="sticky left-0 z-10 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+          <tr className="bg-muted/30 border-t">
+            <td className="bg-muted/30 text-muted-foreground sticky left-0 z-10 px-4 py-2 text-xs">
               {t(locale, 'monthlyTotal')}
             </td>
             {monthlyTotals.map((total, m) => (
               <td
                 key={m}
                 className={cn(
-                  'px-2 py-2 text-center font-mono text-xs text-muted-foreground',
-                  m === currentMonth && 'border-l-2 border-primary/20'
+                  'text-muted-foreground px-2 py-2 text-center font-mono text-xs',
+                  m === currentMonth && 'border-primary/20 border-l-2'
                 )}
               >
                 {formatCurrency(total)}

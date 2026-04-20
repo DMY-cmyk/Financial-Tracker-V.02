@@ -238,8 +238,20 @@ describe('findWithEffectiveBudget', () => {
 
   it('only returns the requested type', async () => {
     const catRepo = createCategoryRepository();
-    await catRepo.create({ name: 'Salary', type: 'income', color: '#22C55E', icon: 'wallet', budget: 0 });
-    await catRepo.create({ name: 'Food', type: 'expense', color: '#F59E0B', icon: 'utensils', budget: 1000000 });
+    await catRepo.create({
+      name: 'Salary',
+      type: 'income',
+      color: '#22C55E',
+      icon: 'wallet',
+      budget: 0,
+    });
+    await catRepo.create({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'utensils',
+      budget: 1000000,
+    });
 
     const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
     expect(results.every((c) => c.type === 'expense')).toBe(true);
@@ -269,11 +281,15 @@ describe('listCategories with month/year', () => {
       icon: 'car',
       budget: 1800000,
     });
-    const { createMonthlyBudgetRepository } = await import(
-      '@/server/repositories/monthly-budget.repository'
-    );
+    const { createMonthlyBudgetRepository } =
+      await import('@/server/repositories/monthly-budget.repository');
     const mbRepo = createMonthlyBudgetRepository();
-    await mbRepo.upsert({ categoryId: catResult.data!.id, month: 3, year: 2026, budgetAmount: 2500000 });
+    await mbRepo.upsert({
+      categoryId: catResult.data!.id,
+      month: 3,
+      year: 2026,
+      budgetAmount: 2500000,
+    });
 
     const result = await listCategories({ type: 'expense', month: 3, year: 2026 });
     const found = result.data!.find((c) => c.id === catResult.data!.id);

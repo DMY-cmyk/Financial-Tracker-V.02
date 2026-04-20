@@ -8,10 +8,7 @@ import {
   deleteMonthlyBudget,
 } from '@/server/services/annual-budget.service';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
-import {
-  computeAnnualBudgetSummary,
-  buildAnnualBudgetRows,
-} from '@/hooks/useAnnualBudget';
+import { computeAnnualBudgetSummary, buildAnnualBudgetRows } from '@/hooks/useAnnualBudget';
 import type { Category, MonthlyBudget, MonthlySpending } from '@/lib/types';
 
 beforeEach(async () => {
@@ -63,7 +60,12 @@ describe('createMonthlyBudgetRepository', () => {
   it('updates an existing override on upsert', async () => {
     const repo = createMonthlyBudgetRepository();
     await repo.upsert({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 1000000 });
-    const updated = await repo.upsert({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 2000000 });
+    const updated = await repo.upsert({
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2026,
+      budgetAmount: 2000000,
+    });
     expect(updated.budgetAmount).toBe(2000000);
   });
 
@@ -189,9 +191,7 @@ describe('buildAnnualBudgetRows', () => {
   });
 
   it('computes spent and percentage per cell', () => {
-    const spending: MonthlySpending[] = [
-      { categoryId: 'cat-1', month: 3, spent: 900000 },
-    ];
+    const spending: MonthlySpending[] = [{ categoryId: 'cat-1', month: 3, spent: 900000 }];
     const rows = buildAnnualBudgetRows([mockCat], [], spending);
     expect(rows[0].cells[3].spent).toBe(900000);
     expect(rows[0].cells[3].percentage).toBeCloseTo(50);

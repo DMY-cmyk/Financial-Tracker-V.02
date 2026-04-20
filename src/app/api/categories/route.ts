@@ -12,9 +12,7 @@ export async function GET(request: NextRequest) {
   const year = yearRaw !== undefined && !isNaN(yearRaw) ? yearRaw : undefined;
 
   const result = await listCategories(
-    type || month !== undefined || year !== undefined
-      ? { type, month, year }
-      : undefined
+    type || month !== undefined || year !== undefined ? { type, month, year } : undefined
   );
 
   if (result.error) {

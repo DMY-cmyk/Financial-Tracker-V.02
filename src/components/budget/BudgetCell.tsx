@@ -84,14 +84,14 @@ export function BudgetCell({
 
   if (editing) {
     return (
-      <div className="w-20 rounded-xl border-2 border-primary bg-card p-2 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]">
+      <div className="border-primary bg-card w-20 rounded-xl border-2 p-2 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]">
         <input
           ref={inputRef}
           type="number"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="mb-1 w-full rounded bg-background px-1 py-0.5 text-center font-mono text-xs text-foreground outline-none ring-1 ring-primary"
+          className="bg-background text-foreground ring-primary mb-1 w-full rounded px-1 py-0.5 text-center font-mono text-xs ring-1 outline-none"
           disabled={saving}
         />
         <div className="flex justify-center gap-1">
@@ -105,7 +105,7 @@ export function BudgetCell({
           <button
             onClick={handleClear}
             disabled={saving}
-            className="rounded bg-destructive/20 px-1.5 py-0.5 text-[10px] text-destructive hover:bg-destructive/30 disabled:opacity-50"
+            className="bg-destructive/20 text-destructive hover:bg-destructive/30 rounded px-1.5 py-0.5 text-[10px] disabled:opacity-50"
           >
             {t(locale, 'clearBudgetOverride')}
           </button>
@@ -118,26 +118,26 @@ export function BudgetCell({
     <button
       onClick={handleClick}
       className={cn(
-        'w-20 cursor-pointer rounded-xl border bg-card p-2 text-left transition-opacity hover:ring-1 hover:ring-primary/40',
+        'bg-card hover:ring-primary/40 w-20 cursor-pointer rounded-xl border p-2 text-left transition-opacity hover:ring-1',
         borderClass,
         isPast && 'opacity-70',
-        isCurrent && 'ring-1 ring-primary/30'
+        isCurrent && 'ring-primary/30 ring-1'
       )}
     >
       {isZeroNoOverride ? (
-        <div className="font-mono text-[11px] font-semibold text-muted-foreground">—</div>
+        <div className="text-muted-foreground font-mono text-[11px] font-semibold">—</div>
       ) : (
         <>
           <div
             className={cn(
               'font-mono text-[11px]',
-              hasOverride ? 'font-semibold text-foreground' : 'italic text-muted-foreground'
+              hasOverride ? 'text-foreground font-semibold' : 'text-muted-foreground italic'
             )}
           >
             {formatCompact(effectiveBudget)}
           </div>
           {!hasOverride && (
-            <div className="text-[9px] italic text-muted-foreground/60">
+            <div className="text-muted-foreground/60 text-[9px] italic">
               {t(locale, 'inheritedBudget')}
             </div>
           )}
@@ -158,7 +158,7 @@ export function BudgetCell({
         </>
       )}
       {effectiveBudget > 0 && (
-        <div className="mt-1 h-0.5 w-full overflow-hidden rounded-full bg-muted">
+        <div className="bg-muted mt-1 h-0.5 w-full overflow-hidden rounded-full">
           <div
             className={cn('h-full rounded-full transition-all', getBarColor(percentage))}
             style={{ width: `${Math.min(percentage, 100)}%` }}
