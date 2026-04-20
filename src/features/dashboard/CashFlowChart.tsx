@@ -102,7 +102,7 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                     itemStyle={{ fontFamily: 'monospace' }}
                     formatter={(value, name) => [
                       formatCurrencyShort(Number(value)),
-                      String(name) === 'income' ? 'Income' : 'Expense',
+                      t(locale, String(name) === 'income' ? 'income' : 'expense'),
                     ]}
                   />
                   <Area
