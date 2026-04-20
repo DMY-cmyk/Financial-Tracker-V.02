@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 import type { Category, TransactionSplitInput } from '@/lib/types';
-import { tapScale, fadeIn } from '@/lib/motion';
+import { tapScale, splitRowAnimation } from '@/lib/motion';
 
 interface SplitLineRowProps {
   index: number;
@@ -39,17 +39,14 @@ export function SplitLineRow({
   }
 
   function handleAmountBlur(e: React.FocusEvent<HTMLInputElement>) {
-    const val = parseFloat(e.target.value.replace(/[^\d.]/g, ''));
+    const val = parseInt(e.target.value.replace(/[^\d]/g, ''), 10);
     onChange(index, { ...split, amount: isNaN(val) ? 0 : val });
   }
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 4 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={fadeIn.transition}
+      {...splitRowAnimation}
       className="grid grid-cols-[2fr_2fr_1.5fr_auto] gap-2 items-center"
     >
       <select
@@ -90,7 +87,7 @@ export function SplitLineRow({
         type="button"
         onClick={() => onRemove(index)}
         className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-        aria-label="Remove split line"
+        aria-label={t(locale, 'removeSplit')}
       >
         <X className="h-3.5 w-3.5" />
       </motion.button>
