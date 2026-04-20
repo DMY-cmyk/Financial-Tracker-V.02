@@ -330,6 +330,5 @@ export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransac
 export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
 export type CreateLiabilityInput = z.infer<typeof createLiabilitySchema>;
 export type UpdateLiabilityInput = z.infer<typeof updateLiabilitySchema>;
-export type TransactionSplitInput = z.infer<typeof transactionSplitInputSchema>;
 export type CreateTransactionWithSplitsInput = z.infer<typeof createTransactionWithSplitsSchema>;
 export type UpdateTransactionWithSplitsInput = z.infer<typeof updateTransactionWithSplitsSchema>;
