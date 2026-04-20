@@ -37,7 +37,10 @@ type NavKey =
   | 'upload'
   | 'export'
   | 'settings'
-  | 'categories';
+  | 'categories'
+  | 'groupFinance'
+  | 'groupTools'
+  | 'groupSettings';
 
 const mainItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/home', key: 'home', icon: Home },
@@ -49,11 +52,13 @@ const mainItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] =
 const moreGroups: {
   label: string;
   labelId: string;
+  labelKey: NavKey;
   items: { href: string; key: NavKey; icon: typeof LayoutDashboard }[];
 }[] = [
   {
     label: 'Finance',
     labelId: 'finance',
+    labelKey: 'groupFinance',
     items: [
       { href: '/bills', key: 'bills', icon: CalendarCheck },
       { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
@@ -64,6 +69,7 @@ const moreGroups: {
   {
     label: 'Tools',
     labelId: 'tools',
+    labelKey: 'groupTools',
     items: [
       { href: '/reports', key: 'reports', icon: BarChart3 },
       { href: '/upload', key: 'upload', icon: Upload },
@@ -73,6 +79,7 @@ const moreGroups: {
   {
     label: 'Settings',
     labelId: 'settings',
+    labelKey: 'groupSettings',
     items: [
       { href: '/settings', key: 'settings', icon: Settings },
       { href: '/settings/categories', key: 'categories', icon: Tag },
@@ -148,7 +155,7 @@ export function BottomNav() {
               <div key={group.labelId}>
                 {gi > 0 && <div className="border-border border-t" />}
                 <p className="text-muted-foreground mb-2 px-1 pt-2 text-[10px] font-semibold tracking-widest uppercase">
-                  {group.label}
+                  {t(locale, group.labelKey)}
                 </p>
                 <div className="grid grid-cols-4 gap-3">
                   {group.items.map(({ href, key, icon: Icon }) => (

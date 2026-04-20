@@ -397,6 +397,7 @@ type TranslationKeys = {
   // Sidebar group keys
   groupFinance: string;
   groupTools: string;
+  groupSettings: string;
 
   // Beginning Balance
   beginningBalance: string;
@@ -918,6 +919,7 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Finance',
     groupTools: 'Tools',
+    groupSettings: 'Settings',
 
     // Beginning Balance
     beginningBalance: 'Beginning Balance',
@@ -1416,6 +1418,7 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Keuangan',
     groupTools: 'Alat',
+    groupSettings: 'Pengaturan',
 
     // Beginning Balance
     beginningBalance: 'Saldo Awal',
