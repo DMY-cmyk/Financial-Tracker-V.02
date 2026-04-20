@@ -68,6 +68,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       notes TEXT DEFAULT '',
       source_recurring_id TEXT DEFAULT NULL,
       source_due_date TEXT DEFAULT NULL,
+      is_split INTEGER NOT NULL DEFAULT 0,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       updated_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
@@ -180,6 +181,15 @@ async function initializeSchema(client: DbClient): Promise<void> {
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       UNIQUE(month, year)
     )`,
+    `CREATE TABLE IF NOT EXISTS transaction_splits (
+      id             TEXT PRIMARY KEY,
+      transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+      category_id    TEXT,
+      category       TEXT NOT NULL DEFAULT '',
+      amount         DOUBLE PRECISION NOT NULL CHECK (amount > 0),
+      description    TEXT,
+      created_at     TEXT NOT NULL
+    )`,
   ];
 
   for (const ddl of tables) {
@@ -197,6 +207,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS beginning_balance DOUBLE PRECISION NOT NULL DEFAULT 0`,
     `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_recurring_id TEXT DEFAULT NULL`,
     `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_due_date TEXT DEFAULT NULL`,
+    `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS is_split INTEGER NOT NULL DEFAULT 0`,
   ];
 
   for (const migration of columnMigrations) {
@@ -217,6 +228,8 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_next_due ON recurring_transactions(next_due_date)',
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_active ON recurring_transactions(is_active)',
     'CREATE INDEX IF NOT EXISTS idx_transactions_source ON transactions(source_recurring_id, source_due_date) WHERE source_recurring_id IS NOT NULL',
+    'CREATE INDEX IF NOT EXISTS idx_splits_transaction_id ON transaction_splits(transaction_id)',
+    'CREATE INDEX IF NOT EXISTS idx_splits_category_id ON transaction_splits(category_id)',
   ];
 
   for (const idx of indexes) {

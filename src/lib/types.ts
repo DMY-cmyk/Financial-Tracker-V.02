@@ -10,6 +10,25 @@ export interface Transaction {
   notes: string;
   sourceRecurringId?: string;
   sourceDueDate?: string;
+  isSplit: boolean;
+  splits?: TransactionSplit[];
+}
+
+export interface TransactionSplit {
+  id: string;
+  transactionId: string;
+  categoryId: string | null;
+  category: string;
+  amount: number;
+  description: string | null;
+  createdAt: string;
+}
+
+export interface TransactionSplitInput {
+  categoryId: string | null;
+  category: string;
+  amount: number;
+  description?: string | null;
 }
 
 export interface Category {
