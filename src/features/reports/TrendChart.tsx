@@ -53,12 +53,12 @@ export function TrendChart({ data }: TrendChartProps) {
         <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="trendIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#059669" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#059669" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0.2 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0 }} />
             </linearGradient>
             <linearGradient id="trendExpenseGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#DC2626" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#DC2626" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0.2 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0 }} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -96,14 +96,14 @@ export function TrendChart({ data }: TrendChartProps) {
           <Area
             type="monotone"
             dataKey="income"
-            stroke="#059669"
+            stroke="var(--chart-income)"
             strokeWidth={2}
             fill="url(#trendIncomeGrad)"
           />
           <Area
             type="monotone"
             dataKey="expense"
-            stroke="#DC2626"
+            stroke="var(--chart-expense)"
             strokeWidth={2}
             fill="url(#trendExpenseGrad)"
           />
