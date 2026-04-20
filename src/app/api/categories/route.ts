@@ -6,8 +6,10 @@ export async function GET(request: NextRequest) {
   const type = params.get('type') || undefined;
   const monthParam = params.get('month');
   const yearParam = params.get('year');
-  const month = monthParam !== null ? parseInt(monthParam, 10) : undefined;
-  const year = yearParam !== null ? parseInt(yearParam, 10) : undefined;
+  const monthRaw = monthParam !== null ? parseInt(monthParam, 10) : undefined;
+  const yearRaw = yearParam !== null ? parseInt(yearParam, 10) : undefined;
+  const month = monthRaw !== undefined && !isNaN(monthRaw) ? monthRaw : undefined;
+  const year = yearRaw !== undefined && !isNaN(yearRaw) ? yearRaw : undefined;
 
   const result = await listCategories(
     type || month !== undefined || year !== undefined
