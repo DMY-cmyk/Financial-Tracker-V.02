@@ -13,4 +13,8 @@ describe('i18n keys — audit fixes', () => {
   it('thisMonth still returns correct EN string (regression)', () => {
     expect(t('en', 'thisMonth')).toBe('This Month');
   });
+
+  it('thisMonth still returns correct ID string (regression)', () => {
+    expect(t('id', 'thisMonth')).toBe('Bulan Ini');
+  });
 });
