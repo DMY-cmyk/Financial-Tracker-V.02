@@ -8,6 +8,11 @@ import {
   deleteMonthlyBudget,
 } from '@/server/services/annual-budget.service';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
+import {
+  computeAnnualBudgetSummary,
+  buildAnnualBudgetRows,
+} from '@/hooks/useAnnualBudget';
+import type { Category, MonthlyBudget, MonthlySpending } from '@/lib/types';
 
 beforeEach(async () => {
   await resetDb();
@@ -153,5 +158,73 @@ describe('deleteMonthlyBudget', () => {
     const result = await deleteMonthlyBudget({ categoryId: 'cat-99', month: 3, year: 2026 });
     expect(result.error).toBeUndefined();
     expect(result.data!.success).toBe(false);
+  });
+});
+
+const mockCat: Category = {
+  id: 'cat-1',
+  name: 'Food',
+  type: 'expense',
+  color: '#F59E0B',
+  icon: 'utensils',
+  budget: 1800000,
+};
+
+describe('buildAnnualBudgetRows', () => {
+  it('builds 12 cells per category', () => {
+    const rows = buildAnnualBudgetRows([mockCat], [], []);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].cells).toHaveLength(12);
+  });
+
+  it('uses override budget when override exists for that month', () => {
+    const overrides: MonthlyBudget[] = [
+      { id: 'mb-1', categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 2500000 },
+    ];
+    const rows = buildAnnualBudgetRows([mockCat], overrides, []);
+    expect(rows[0].cells[3].effectiveBudget).toBe(2500000);
+    expect(rows[0].cells[3].hasOverride).toBe(true);
+    expect(rows[0].cells[0].effectiveBudget).toBe(1800000);
+    expect(rows[0].cells[0].hasOverride).toBe(false);
+  });
+
+  it('computes spent and percentage per cell', () => {
+    const spending: MonthlySpending[] = [
+      { categoryId: 'cat-1', month: 3, spent: 900000 },
+    ];
+    const rows = buildAnnualBudgetRows([mockCat], [], spending);
+    expect(rows[0].cells[3].spent).toBe(900000);
+    expect(rows[0].cells[3].percentage).toBeCloseTo(50);
+  });
+
+  it('computes annual totals', () => {
+    const overrides: MonthlyBudget[] = [
+      { id: 'mb-1', categoryId: 'cat-1', month: 0, year: 2026, budgetAmount: 2000000 },
+    ];
+    const rows = buildAnnualBudgetRows([mockCat], overrides, []);
+    expect(rows[0].annualTotal).toBe(2000000 + 11 * 1800000);
+  });
+});
+
+describe('computeAnnualBudgetSummary', () => {
+  it('counts on-track, at-risk, over-budget categories', () => {
+    const rows = buildAnnualBudgetRows([mockCat], [], []);
+    const summary = computeAnnualBudgetSummary(rows);
+    expect(summary.totalAnnualBudget).toBe(12 * 1800000);
+    expect(summary.totalAnnualSpent).toBe(0);
+    expect(summary.categoriesOnTrack).toBe(1);
+    expect(summary.categoriesAtRisk).toBe(0);
+    expect(summary.categoriesOver).toBe(0);
+  });
+
+  it('marks category at-risk when spent > 80% of annual budget', () => {
+    const spending: MonthlySpending[] = Array.from({ length: 12 }, (_, m) => ({
+      categoryId: 'cat-1',
+      month: m,
+      spent: 1800000 * 0.85,
+    }));
+    const rows = buildAnnualBudgetRows([mockCat], [], spending);
+    const summary = computeAnnualBudgetSummary(rows);
+    expect(summary.categoriesAtRisk).toBe(1);
   });
 });
