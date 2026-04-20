@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { t } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 import type { Category, TransactionSplitInput } from '@/lib/types';
-import { tapScale } from '@/lib/motion';
+import { tapScale, fadeIn } from '@/lib/motion';
 
 interface SplitLineRowProps {
   index: number;
@@ -49,7 +49,7 @@ export function SplitLineRow({
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={fadeIn.transition}
       className="grid grid-cols-[2fr_2fr_1.5fr_auto] gap-2 items-center"
     >
       <select
