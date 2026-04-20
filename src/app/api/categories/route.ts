@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { listCategories, createCategory } from '@/server/services/category.service';
 
 export async function GET(request: NextRequest) {
-  const type = request.nextUrl.searchParams.get('type') || undefined;
-  const result = await listCategories(type ? { type } : undefined);
+  const params = request.nextUrl.searchParams;
+  const type = params.get('type') || undefined;
+  const monthParam = params.get('month');
+  const yearParam = params.get('year');
+  const month = monthParam !== null ? parseInt(monthParam, 10) : undefined;
+  const year = yearParam !== null ? parseInt(yearParam, 10) : undefined;
+
+  const result = await listCategories(
+    type || month !== undefined || year !== undefined
+      ? { type, month, year }
+      : undefined
+  );
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
