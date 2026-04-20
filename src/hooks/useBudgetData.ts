@@ -36,7 +36,10 @@ export function useBudgetData() {
 
     let cancelled = false;
 
-    Promise.all([api.dashboard.summary(month, year), api.categories.list()]).then(
+    Promise.all([
+      api.dashboard.summary(month, year),
+      api.categories.list({ type: 'expense', month, year }),
+    ]).then(
       ([summaryResult, catResult]) => {
         if (cancelled) return;
         if (summaryResult.data) setSummary(summaryResult.data);
