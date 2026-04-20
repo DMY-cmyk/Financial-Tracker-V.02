@@ -40,6 +40,8 @@ export function HealthScoreCard({ healthScore, locale }: HealthScoreCardProps) {
         {/* SVG Circular Ring */}
         <div className="relative flex-shrink-0">
           <svg
+            role="img"
+            aria-label={`${t(locale, 'healthScore')}: ${Math.round(savingsRate)}%`}
             width={RING_RADIUS * 2 + RING_STROKE * 2}
             height={RING_RADIUS * 2 + RING_STROKE * 2}
             className="-rotate-90"
@@ -65,7 +67,7 @@ export function HealthScoreCard({ healthScore, locale }: HealthScoreCardProps) {
               strokeLinecap="round"
               strokeDasharray={RING_CIRCUMFERENCE}
               strokeDashoffset={dashOffset}
-              className={cn(ringColor, 'transition-all duration-700')}
+              className={cn(ringColor, 'transition-all duration-500')}
             />
           </svg>
           {/* Rate number in center */}
