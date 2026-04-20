@@ -194,7 +194,7 @@ export default function BudgetPage() {
       )}
 
       {view === 'annual' && (
-        <motion.div variants={fadeInUp} className="space-y-6">
+        <motion.div {...fadeInUp} className="space-y-6">
           <AnnualBudgetSummary
             summary={summary}
             locale={locale}
