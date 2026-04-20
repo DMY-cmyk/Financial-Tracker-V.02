@@ -48,6 +48,8 @@ import type {
   UpdateLiabilityRequest,
   NetWorthDataResponse,
   SpendingInsightsResponse,
+  AnnualBudgetGridResponse,
+  MonthlyBudget,
 } from './contracts';
 
 const BASE_URL = '/api';
@@ -149,9 +151,13 @@ export const api = {
   },
 
   categories: {
-    list(type?: 'income' | 'expense') {
-      const qs = type ? `?type=${type}` : '';
-      return fetchApi<CategoryListResponse>(`/categories${qs}`);
+    list(params?: { type?: 'income' | 'expense'; month?: number; year?: number }) {
+      const query = new URLSearchParams();
+      if (params?.type) query.set('type', params.type);
+      if (params?.month !== undefined) query.set('month', String(params.month));
+      if (params?.year !== undefined) query.set('year', String(params.year));
+      const qs = query.toString();
+      return fetchApi<CategoryListResponse>(`/categories${qs ? `?${qs}` : ''}`);
     },
 
     create(data: Omit<Category, 'id'>) {
@@ -436,6 +442,26 @@ export const api = {
   insights: {
     spending(month: number, year: number) {
       return fetchApi<SpendingInsightsResponse>(`/insights/spending?month=${month}&year=${year}`);
+    },
+  },
+
+  annualBudget: {
+    getGrid(year: number) {
+      return fetchApi<AnnualBudgetGridResponse>(`/budget/annual?year=${year}`);
+    },
+
+    upsert(data: { categoryId: string; month: number; year: number; budgetAmount: number }) {
+      return fetchApi<MonthlyBudget>('/budget/annual', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+
+    delete(data: { categoryId: string; month: number; year: number }) {
+      return fetchApi<{ success: boolean }>('/budget/annual', {
+        method: 'DELETE',
+        body: JSON.stringify(data),
+      });
     },
   },
 };
