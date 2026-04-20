@@ -51,6 +51,25 @@ export function createCategoryRepository() {
       return result.rows.map(rowToCategory);
     },
 
+    async findWithEffectiveBudget(
+      type: 'income' | 'expense',
+      month: number,
+      year: number
+    ): Promise<Category[]> {
+      const db = await getDb();
+      const result = await db.query<CatRow>(
+        `SELECT c.id, c.name, c.type, c.color, c.icon,
+           COALESCE(mb.budget_amount, c.budget) AS budget
+         FROM categories c
+         LEFT JOIN monthly_budgets mb
+           ON mb.category_id = c.id AND mb.month = ? AND mb.year = ?
+         WHERE c.type = ?
+         ORDER BY c.name`,
+        [month, year, type]
+      );
+      return result.rows.map(rowToCategory);
+    },
+
     async create(data: Omit<Category, 'id'>): Promise<Category> {
       const id = nanoid();
       const db = await getDb();

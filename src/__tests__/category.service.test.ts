@@ -8,6 +8,8 @@ import {
   deleteCategory,
 } from '@/server/services/category.service';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
+import { createCategoryRepository } from '@/server/repositories/category.repository';
+import { createMonthlyBudgetRepository } from '@/server/repositories/monthly-budget.repository';
 
 beforeEach(async () => {
   await resetDb();
@@ -197,5 +199,49 @@ describe('deleteCategory', () => {
 
     const list = await listCategories();
     expect(list.data!.length).toBe(0);
+  });
+});
+
+describe('findWithEffectiveBudget', () => {
+  it('returns default budget when no override exists', async () => {
+    const catRepo = createCategoryRepository();
+    const cat = await catRepo.create({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'utensils',
+      budget: 1800000,
+    });
+
+    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    const found = results.find((c) => c.id === cat.id);
+    expect(found).toBeDefined();
+    expect(found!.budget).toBe(1800000);
+  });
+
+  it('returns override budget when monthly override exists', async () => {
+    const catRepo = createCategoryRepository();
+    const mbRepo = createMonthlyBudgetRepository();
+    const cat = await catRepo.create({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'utensils',
+      budget: 1800000,
+    });
+    await mbRepo.upsert({ categoryId: cat.id, month: 3, year: 2026, budgetAmount: 2500000 });
+
+    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    const found = results.find((c) => c.id === cat.id);
+    expect(found!.budget).toBe(2500000);
+  });
+
+  it('only returns the requested type', async () => {
+    const catRepo = createCategoryRepository();
+    await catRepo.create({ name: 'Salary', type: 'income', color: '#22C55E', icon: 'wallet', budget: 0 });
+    await catRepo.create({ name: 'Food', type: 'expense', color: '#F59E0B', icon: 'utensils', budget: 1000000 });
+
+    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    expect(results.every((c) => c.type === 'expense')).toBe(true);
   });
 });
