@@ -117,20 +117,20 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
         <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="fcIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#059669" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#059669" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0.2 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0 }} />
             </linearGradient>
             <linearGradient id="fcExpenseGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#DC2626" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#DC2626" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0.2 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0 }} />
             </linearGradient>
             <linearGradient id="fcProjIncomeGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#059669" stopOpacity={0.1} />
-              <stop offset="100%" stopColor="#059669" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0.1 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-income)', stopOpacity: 0 }} />
             </linearGradient>
             <linearGradient id="fcProjExpenseGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#DC2626" stopOpacity={0.1} />
-              <stop offset="100%" stopColor="#DC2626" stopOpacity={0} />
+              <stop offset="0%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0.1 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--chart-expense)', stopOpacity: 0 }} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -180,7 +180,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
           <Area
             type="monotone"
             dataKey="income"
-            stroke="#059669"
+            stroke="var(--chart-income)"
             strokeWidth={2}
             fill="url(#fcIncomeGrad)"
             connectNulls={false}
@@ -189,7 +189,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
           <Area
             type="monotone"
             dataKey="expense"
-            stroke="#DC2626"
+            stroke="var(--chart-expense)"
             strokeWidth={2}
             fill="url(#fcExpenseGrad)"
             connectNulls={false}
@@ -199,7 +199,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
           <Area
             type="monotone"
             dataKey="projectedIncome"
-            stroke="#059669"
+            stroke="var(--chart-income)"
             strokeWidth={2}
             strokeDasharray="5 4"
             strokeOpacity={0.6}
@@ -210,7 +210,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
           <Area
             type="monotone"
             dataKey="projectedExpense"
-            stroke="#DC2626"
+            stroke="var(--chart-expense)"
             strokeWidth={2}
             strokeDasharray="5 4"
             strokeOpacity={0.6}
