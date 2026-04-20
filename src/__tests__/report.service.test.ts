@@ -440,3 +440,42 @@ describe('getAnnualReportData', () => {
     expect(march.balance).toBe(march.net);
   });
 });
+
+describe('getMonthlyReportData with split transactions', () => {
+  it('uses split line amounts for category breakdown, not parent total', async () => {
+    const db = await (await import('@/server/db/client')).getDb();
+    const { createTransactionSplitRepository } =
+      await import('@/server/repositories/transaction-split.repository');
+    const splitRepo = createTransactionSplitRepository();
+
+    const txId = 'tx-report-split';
+    await db.query(
+      'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, is_split) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [txId, '2026-03-15', 'Supermarket', '', '', 'expense', 500000, 'Cash', '', 1]
+    );
+    await splitRepo.createSplits(txId, [
+      { categoryId: 'cat-food', category: 'Food', amount: 200000 },
+      { categoryId: 'cat-home', category: 'Household', amount: 150000 },
+      { categoryId: 'cat-personal', category: 'Personal Care', amount: 150000 },
+    ]);
+
+    const result = await getMonthlyReportData(2, 2026); // month=2 = March (0-indexed)
+    const data = result.data!;
+
+    // Total expense = parent amount (authoritative)
+    expect(data.totalExpense).toBe(500000);
+
+    // Category breakdown uses split lines
+    const food = data.expenseSummaryByCategory.find((c) => c.category === 'Food');
+    const household = data.expenseSummaryByCategory.find((c) => c.category === 'Household');
+    const personal = data.expenseSummaryByCategory.find((c) => c.category === 'Personal Care');
+
+    expect(food?.total).toBe(200000);
+    expect(household?.total).toBe(150000);
+    expect(personal?.total).toBe(150000);
+
+    // Empty-string parent category must NOT appear
+    const emptyCategory = data.expenseSummaryByCategory.find((c) => c.category === '');
+    expect(emptyCategory).toBeUndefined();
+  });
+});

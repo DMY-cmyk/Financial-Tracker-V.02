@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@/store';
-import { Transaction, Category, PaymentMethod } from '@/lib/types';
+import { Transaction, Category, PaymentMethod, TransactionSplitInput } from '@/lib/types';
 import { parseCurrencyInput, formatCurrencyInput } from '@/lib/formatters';
 import { validateTransactionForm, getFieldError, type FieldError } from '@/lib/validation';
 import { api } from '@/lib/api/client';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PieChart } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Select,
@@ -21,6 +21,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PaymentMethodIcon } from '@/components/shared/PaymentMethodIcon';
+import { SplitEditor } from '@/components/transactions/SplitEditor';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface TransactionFormProps {
   transaction?: Transaction;
@@ -57,6 +68,17 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
   const [notes, setNotes] = useState(transaction?.notes || '');
   const [errors, setErrors] = useState<FieldError[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  const [isSplitMode, setIsSplitMode] = useState<boolean>(transaction?.isSplit ?? false);
+  const [splits, setSplits] = useState<TransactionSplitInput[]>(
+    transaction?.splits?.map((s) => ({
+      categoryId: s.categoryId,
+      category: s.category,
+      amount: s.amount,
+      description: s.description,
+    })) ?? []
+  );
+  const [showRemoveSplitAlert, setShowRemoveSplitAlert] = useState(false);
 
   const [pastDescriptions, setPastDescriptions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -98,7 +120,15 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     e.preventDefault();
 
     const validationErrors = validateTransactionForm(
-      { type, amount: amountStr, description, date, category, paymentMethod, notes },
+      {
+        type,
+        amount: amountStr,
+        description,
+        date,
+        category: isSplitMode ? 'split' : category,
+        paymentMethod,
+        notes,
+      },
       locale
     );
 
@@ -113,7 +143,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     const amount = parseCurrencyInput(amountStr);
     const selectedCategory = categories.find((c) => c.id === category);
     const categoryName = selectedCategory?.name || '';
-    const data = {
+    const baseData = {
       date,
       description,
       category: categoryName,
@@ -123,6 +153,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       paymentMethod,
       notes,
     };
+    const data = isSplitMode ? { ...baseData, splits } : baseData;
 
     try {
       if (transaction?.id) {
@@ -141,6 +172,11 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       setSubmitting(false);
     }
   };
+
+  const splitUnbalanced =
+    isSplitMode &&
+    (splits.length < 2 ||
+      Math.abs(splits.reduce((s, x) => s + x.amount, 0) - parseCurrencyInput(amountStr)) > 1);
 
   const fieldError = (field: string) => getFieldError(errors, field);
 
@@ -225,33 +261,91 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           />
           {fieldError('date') && <p className="mt-1 text-xs text-red-500">{fieldError('date')}</p>}
         </div>
-        <div>
-          <Label htmlFor="category">{t(locale, 'category')}</Label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              if (fieldError('category')) setErrors(errors.filter((e) => e.field !== 'category'));
-            }}
-            className={cn(
-              'bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm',
-              fieldError('category') ? 'border-red-500' : 'border-input'
+        {!isSplitMode && (
+          <div>
+            <Label htmlFor="category">{t(locale, 'category')}</Label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                if (fieldError('category')) setErrors(errors.filter((e) => e.field !== 'category'));
+              }}
+              className={cn(
+                'bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm',
+                fieldError('category') ? 'border-red-500' : 'border-input'
+              )}
+              aria-invalid={!!fieldError('category')}
+            >
+              <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
+              {filteredCategories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            {fieldError('category') && (
+              <p className="mt-1 text-xs text-red-500">{fieldError('category')}</p>
             )}
-            aria-invalid={!!fieldError('category')}
-          >
-            <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
-            {filteredCategories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          {fieldError('category') && (
-            <p className="mt-1 text-xs text-red-500">{fieldError('category')}</p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
+
+      {/* Split toggle / SplitEditor */}
+      {!isSplitMode ? (
+        <div className="border-border flex justify-center border-y border-dashed py-2">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSplitMode(true);
+              setSplits([
+                {
+                  categoryId: category || null,
+                  category: filteredCategories.find((c) => c.id === category)?.name ?? '',
+                  amount: parseCurrencyInput(amountStr),
+                  description: null,
+                },
+                { categoryId: null, category: '', amount: 0, description: null },
+              ]);
+            }}
+            className="border-border bg-background text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs"
+          >
+            <PieChart className="h-3.5 w-3.5" />
+            {t(locale, 'splitTransaction')}
+          </button>
+        </div>
+      ) : (
+        <>
+          <SplitEditor
+            splits={splits}
+            totalAmount={parseCurrencyInput(amountStr)}
+            categories={filteredCategories}
+            transactionType={type}
+            locale={locale}
+            onChange={setSplits}
+            onRemoveSplit={() => setShowRemoveSplitAlert(true)}
+          />
+          <AlertDialog open={showRemoveSplitAlert} onOpenChange={setShowRemoveSplitAlert}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t(locale, 'removeSplit')}</AlertDialogTitle>
+                <AlertDialogDescription>{t(locale, 'removeSplitConfirm')}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t(locale, 'cancel')}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setIsSplitMode(false);
+                    setSplits([]);
+                  }}
+                >
+                  {t(locale, 'confirm')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
 
       {/* Description */}
       <div>
@@ -363,7 +457,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
         >
           {t(locale, 'cancel')}
         </Button>
-        <Button type="submit" className="flex-1 gap-2" disabled={submitting}>
+        <Button type="submit" className="flex-1 gap-2" disabled={submitting || splitUnbalanced}>
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
           {t(locale, 'save')}
         </Button>

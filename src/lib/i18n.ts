@@ -530,6 +530,18 @@ type TranslationKeys = {
   typicalSpend: string;
   noExpensesThisMonth: string;
   other: string;
+
+  // Split transactions
+  splitTransaction: string;
+  splitAllocation: string;
+  addSplit: string;
+  removeSplit: string;
+  removeSplitConfirm: string;
+  splitDescription: string;
+  remainingAmount: string;
+  multipleCategoriesSplit: string;
+  totalMustMatch: string;
+  expandSplits: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -1014,6 +1026,18 @@ const translations: Record<Locale, TranslationKeys> = {
     typicalSpend: 'typical',
     noExpensesThisMonth: 'No expenses this month',
     other: 'Other',
+
+    // Split transactions
+    splitTransaction: 'Split this transaction',
+    splitAllocation: 'Split Allocation',
+    addSplit: 'Add split line',
+    removeSplit: 'Remove split',
+    removeSplitConfirm: 'Remove all splits and revert to single category?',
+    splitDescription: 'Sub-description (optional)',
+    remainingAmount: 'Remaining',
+    multipleCategoriesSplit: 'Multiple',
+    totalMustMatch: 'Split amounts must equal total',
+    expandSplits: 'Expand split transactions in export',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1498,6 +1522,18 @@ const translations: Record<Locale, TranslationKeys> = {
     typicalSpend: 'tipikal',
     noExpensesThisMonth: 'Tidak ada pengeluaran bulan ini',
     other: 'Lainnya',
+
+    // Split transactions
+    splitTransaction: 'Pisah transaksi ini',
+    splitAllocation: 'Alokasi Pisahan',
+    addSplit: 'Tambah baris pisahan',
+    removeSplit: 'Hapus pisahan',
+    removeSplitConfirm: 'Hapus semua pisahan dan kembalikan ke satu kategori?',
+    splitDescription: 'Sub-deskripsi (opsional)',
+    remainingAmount: 'Sisa',
+    multipleCategoriesSplit: 'Beberapa kategori',
+    totalMustMatch: 'Jumlah pisahan harus sama dengan total',
+    expandSplits: 'Perluas transaksi pisahan saat ekspor',
   },
 };
 

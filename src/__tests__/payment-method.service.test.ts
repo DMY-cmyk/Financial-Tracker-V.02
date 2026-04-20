@@ -186,6 +186,7 @@ describe('deletePaymentMethod', () => {
       amount: 50000,
       paymentMethod: 'Cash',
       notes: '',
+      isSplit: false,
     });
 
     const result = await deletePaymentMethod(pm.data!.id);

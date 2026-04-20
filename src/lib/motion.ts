@@ -159,6 +159,13 @@ export const slideUpBar = {
   transition: { type: 'spring', stiffness: 300, damping: 30 },
 } as const;
 
+export const splitRowAnimation = {
+  initial: { opacity: 0, y: 4 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, height: 0 },
+  transition: { duration: 0.2 },
+} as const;
+
 // --- Reduced motion helper ---
 
 export const reduceMotionProps = {

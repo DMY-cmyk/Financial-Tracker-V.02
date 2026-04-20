@@ -13,7 +13,8 @@ export function exportCSV(
   scopeLabel: string,
   totalIncome: number,
   totalExpense: number,
-  totalAssets: number
+  totalAssets: number,
+  expandSplits = false
 ): void {
   const fmtAmount = (n: number) => 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
 
@@ -21,10 +22,27 @@ export function exportCSV(
   const commentTotals = `"// Total Pemasukan: ${fmtAmount(totalIncome)} | Total Pengeluaran: ${fmtAmount(totalExpense)} | Saldo: ${fmtAmount(totalAssets)}"`;
 
   const headers = 'Tanggal,Deskripsi,Kategori,Tipe,Jumlah,Metode Pembayaran,Catatan';
-  const rows = transactions.map(
-    (tx) =>
-      `${formatDateID(tx.date)},"${tx.description.replace(/"/g, '""')}","${tx.category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(tx.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
-  );
+
+  const rows: string[] = [];
+
+  for (const tx of transactions) {
+    if (expandSplits && tx.isSplit && tx.splits && tx.splits.length > 0) {
+      // Expand: one row per split line, parent row omitted
+      for (const s of tx.splits) {
+        const desc = s.description ? `${tx.description} — ${s.description}` : tx.description;
+        rows.push(
+          `${formatDateID(tx.date)},"${desc.replace(/"/g, '""')}","${s.category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(s.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
+        );
+      }
+    } else {
+      // Collapsed (default): one row per transaction
+      const category = tx.isSplit ? '' : tx.category;
+      rows.push(
+        `${formatDateID(tx.date)},"${tx.description.replace(/"/g, '""')}","${category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(tx.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
+      );
+    }
+  }
+
   // \uFEFF = UTF-8 BOM — required for correct Indonesian character rendering in Excel on Windows
   const content = '\uFEFF' + [commentScope, commentTotals, headers, ...rows].join('\n');
   downloadBlob(content, filename, 'text/csv;charset=utf-8');

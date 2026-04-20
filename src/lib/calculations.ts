@@ -31,8 +31,15 @@ export function categoryTotals(
   transactions
     .filter((t) => t.type === type)
     .forEach((t) => {
-      const key = t.categoryId || t.category;
-      totals[key] = (totals[key] || 0) + t.amount;
+      if (t.isSplit && t.splits && t.splits.length > 0) {
+        t.splits.forEach((s) => {
+          const key = s.categoryId || s.category;
+          if (key) totals[key] = (totals[key] || 0) + s.amount;
+        });
+      } else if (!t.isSplit) {
+        const key = t.categoryId || t.category;
+        if (key) totals[key] = (totals[key] || 0) + t.amount;
+      }
     });
   return totals;
 }

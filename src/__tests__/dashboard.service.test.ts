@@ -135,3 +135,37 @@ describe('getDashboardSummary', () => {
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
+
+describe('getDashboardSummary with split transactions', () => {
+  it('includes split line amounts in category totals, not parent total', async () => {
+    const db = await (await import('@/server/db/client')).getDb();
+    const { createTransactionSplitRepository } =
+      await import('@/server/repositories/transaction-split.repository');
+    const splitRepo = createTransactionSplitRepository();
+
+    const txId = 'tx-dash-split';
+    await db.query(
+      'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, is_split) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [txId, '2026-01-20', 'Supermarket', '', '', 'expense', 500000, 'Cash', '', 1]
+    );
+    await splitRepo.createSplits(txId, [
+      { categoryId: 'cat-food', category: 'Food', amount: 200000 },
+      { categoryId: 'cat-home', category: 'Household', amount: 150000 },
+      { categoryId: 'cat-personal', category: 'Personal Care', amount: 150000 },
+    ]);
+
+    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const data = result.data!;
+
+    // Total expense still uses parent amount (correct)
+    expect(data.expense).toBe(500000);
+
+    // Category totals use split line amounts, not parent
+    expect(data.categoryTotals['cat-food']).toBe(200000);
+    expect(data.categoryTotals['cat-home']).toBe(150000);
+    expect(data.categoryTotals['cat-personal']).toBe(150000);
+
+    // Empty-string parent category must NOT appear
+    expect(data.categoryTotals['']).toBeUndefined();
+  });
+});

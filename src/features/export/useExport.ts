@@ -54,6 +54,7 @@ export function useExport(): UseExportReturn {
   const [endDate, setEndDate] = useState('');
   const [options, setOptions] = useState<ExportOptionsState>({
     groupByDate: false,
+    expandSplits: false,
   });
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -125,7 +126,8 @@ export function useExport(): UseExportReturn {
           scopeLabel,
           totalIncome,
           totalExpense,
-          totalAssets
+          totalAssets,
+          options.expandSplits
         );
       } else {
         const incomeCategories = Object.entries(
@@ -205,6 +207,7 @@ export function useExport(): UseExportReturn {
     }
   }, [
     format,
+    options,
     scopedTransactions,
     buildFilename,
     scopeLabel,

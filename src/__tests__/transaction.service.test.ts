@@ -354,3 +354,172 @@ describe('listTransactions — sortOrder', () => {
     expect(r.data!.transactions[0].description).toBe('Newest');
   });
 });
+
+describe('createTransaction with splits', () => {
+  const splitBase = {
+    date: '2026-03-27',
+    description: 'Indomaret',
+    type: 'expense' as const,
+    amount: 500000,
+    paymentMethod: 'Cash',
+  };
+
+  it('creates a split transaction with valid splits', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 200000, description: 'Groceries' },
+        { categoryId: 'cat-home', category: 'Household', amount: 150000, description: null },
+        { categoryId: 'cat-personal', category: 'Personal Care', amount: 150000 },
+      ],
+    });
+
+    expect(result.error).toBeUndefined();
+    const tx = result.data!;
+    expect(tx.isSplit).toBe(true);
+    expect(tx.category).toBe('');
+    expect(tx.categoryId).toBe('');
+    expect(tx.splits).toHaveLength(3);
+    expect(tx.splits![0].category).toBe('Food');
+    expect(tx.splits![0].amount).toBe(200000);
+  });
+
+  it('returns SPLIT_SUM_MISMATCH when splits do not sum to total', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 100000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 100000 },
+      ],
+    });
+    expect(result.error?.code).toBe('SPLIT_SUM_MISMATCH');
+  });
+
+  it('returns INVALID_SPLIT_COUNT when only one split line provided', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      splits: [{ categoryId: 'cat-food', category: 'Food', amount: 500000 }],
+    });
+    expect(result.error?.code).toBe('INVALID_SPLIT_COUNT');
+  });
+
+  it('returns INVALID_SPLIT_AMOUNT when a split amount is zero', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 500000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 0 },
+      ],
+    });
+    expect(result.error?.code).toBe('INVALID_SPLIT_AMOUNT');
+  });
+
+  it('creates a single-category transaction when splits absent', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      category: 'Food',
+      categoryId: 'cat-food',
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.isSplit).toBe(false);
+    expect(result.data!.splits).toBeUndefined();
+  });
+
+  it('uses ±1 IDR tolerance for sum check', async () => {
+    const result = await createTransaction({
+      ...splitBase,
+      amount: 333333,
+      splits: [
+        { categoryId: 'cat-a', category: 'A', amount: 111111 },
+        { categoryId: 'cat-b', category: 'B', amount: 111111 },
+        { categoryId: 'cat-c', category: 'C', amount: 111111 },
+      ],
+    });
+    // Sum = 333333, total = 333333, within tolerance
+    expect(result.error).toBeUndefined();
+    expect(result.data!.isSplit).toBe(true);
+  });
+});
+
+describe('updateTransaction with splits', () => {
+  async function createSplitTx() {
+    return createTransaction({
+      date: '2026-03-27',
+      description: 'Supermarket',
+      type: 'expense' as const,
+      amount: 500000,
+      paymentMethod: 'Cash',
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 300000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 200000 },
+      ],
+    });
+  }
+
+  it('updates split lines atomically (delete-then-recreate)', async () => {
+    const created = await createSplitTx();
+    const id = created.data!.id;
+
+    const result = await updateTransaction(id, {
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 100000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 200000 },
+        { categoryId: 'cat-personal', category: 'Personal Care', amount: 200000 },
+      ],
+    });
+
+    expect(result.error).toBeUndefined();
+    expect(result.data!.splits).toHaveLength(3);
+    expect(result.data!.splits![0].amount).toBe(100000);
+  });
+
+  it('reverts to single-category when splits: null + categoryId provided', async () => {
+    const created = await createSplitTx();
+    const id = created.data!.id;
+
+    const result = await updateTransaction(id, {
+      splits: null,
+      category: 'Food',
+      categoryId: 'cat-food',
+    });
+
+    expect(result.error).toBeUndefined();
+    const tx = result.data!;
+    expect(tx.isSplit).toBe(false);
+    expect(tx.category).toBe('Food');
+    expect(tx.splits).toBeUndefined();
+  });
+
+  it('returns CATEGORY_REQUIRED when reverting without categoryId', async () => {
+    const created = await createSplitTx();
+    const result = await updateTransaction(created.data!.id, { splits: null });
+    expect(result.error?.code).toBe('CATEGORY_REQUIRED');
+  });
+
+  it('returns INVALID_SPLIT_COUNT when splits array has only 1 item', async () => {
+    const created = await createSplitTx();
+    const result = await updateTransaction(created.data!.id, {
+      splits: [{ categoryId: 'cat-food', category: 'Food', amount: 500000 }],
+    });
+    expect(result.error?.code).toBe('INVALID_SPLIT_COUNT');
+  });
+
+  it('returns SPLIT_SUM_MISMATCH on update with wrong sum', async () => {
+    const created = await createSplitTx();
+    const result = await updateTransaction(created.data!.id, {
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 100000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 100000 },
+      ],
+    });
+    expect(result.error?.code).toBe('SPLIT_SUM_MISMATCH');
+  });
+
+  it('normal field update without splits key leaves splits unchanged', async () => {
+    const created = await createSplitTx();
+    const result = await updateTransaction(created.data!.id, { description: 'Updated Desc' });
+    expect(result.error).toBeUndefined();
+    expect(result.data!.description).toBe('Updated Desc');
+    expect(result.data!.splits).toHaveLength(2);
+  });
+});

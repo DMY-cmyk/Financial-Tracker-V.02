@@ -170,6 +170,7 @@ export async function generateRecurringTransactions(): Promise<
         notes: rule.notes,
         sourceRecurringId: rule.id,
         sourceDueDate: nextDate,
+        isSplit: false,
       });
       generated++;
 

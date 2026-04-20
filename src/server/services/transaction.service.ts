@@ -1,9 +1,10 @@
-import type { Transaction } from '@/lib/types';
+import type { Transaction, TransactionSplitInput } from '@/lib/types';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
+import { createTransactionSplitRepository } from '@/server/repositories/transaction-split.repository';
 import { ensureSeeded } from '@/server/db/seed';
 import {
-  createTransactionSchema,
-  updateTransactionSchema,
+  createTransactionWithSplitsSchema,
+  updateTransactionWithSplitsSchema,
   listTransactionsQuerySchema,
   bulkCreateTransactionSchema,
   bulkDeleteTransactionSchema,
@@ -63,7 +64,39 @@ export async function listTransactions(
 export async function createTransaction(body: unknown): Promise<ServiceResult<Transaction>> {
   await ensureSeeded();
 
-  const parsed = createTransactionSchema.safeParse(body);
+  // Extract splits from raw body for early business-rule validation before Zod parse.
+  const rawSplits =
+    body !== null && typeof body === 'object' && 'splits' in body
+      ? (body as Record<string, unknown>).splits
+      : undefined;
+
+  if (Array.isArray(rawSplits)) {
+    // Business-rule: must have at least 2 split lines
+    if (rawSplits.length < 2) {
+      return {
+        error: { message: 'A split requires at least 2 lines', code: 'INVALID_SPLIT_COUNT' },
+      };
+    }
+    // Business-rule: every split amount must be > 0
+    for (const s of rawSplits) {
+      if (
+        s !== null &&
+        typeof s === 'object' &&
+        'amount' in s &&
+        typeof (s as Record<string, unknown>).amount === 'number' &&
+        ((s as Record<string, unknown>).amount as number) <= 0
+      ) {
+        return {
+          error: {
+            message: 'Each split amount must be greater than zero',
+            code: 'INVALID_SPLIT_AMOUNT',
+          },
+        };
+      }
+    }
+  }
+
+  const parsed = createTransactionWithSplitsSchema.safeParse(body);
   if (!parsed.success) {
     return {
       error: {
@@ -74,8 +107,45 @@ export async function createTransaction(body: unknown): Promise<ServiceResult<Tr
     };
   }
 
-  const transaction = await repo.create(parsed.data);
-  return { data: transaction };
+  const { splits, ...txData } = parsed.data;
+
+  if (!splits) {
+    // No splits — standard single-category path
+    const transaction = await repo.create({ ...txData, isSplit: false });
+    return { data: transaction };
+  }
+
+  // Split path — validate sum after Zod parse (amounts are guaranteed positive here)
+  const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
+  if (Math.abs(splitSum - txData.amount) > 1) {
+    return {
+      error: {
+        message: `Split amounts (${splitSum}) must equal transaction total (${txData.amount})`,
+        code: 'SPLIT_SUM_MISMATCH',
+      },
+    };
+  }
+
+  const db = await (await import('@/server/db/client')).getDb();
+  const splitRepo = createTransactionSplitRepository();
+
+  await db.exec('BEGIN');
+  try {
+    const transaction = await repo.create({
+      ...txData,
+      category: '',
+      categoryId: '',
+      isSplit: true,
+    });
+    await splitRepo.createSplits(transaction.id, splits as TransactionSplitInput[]);
+    await db.exec('COMMIT');
+    return {
+      data: { ...transaction, splits: await splitRepo.getSplitsByTransactionId(transaction.id) },
+    };
+  } catch (err) {
+    await db.exec('ROLLBACK');
+    throw err;
+  }
 }
 
 export async function updateTransaction(
@@ -84,7 +154,18 @@ export async function updateTransaction(
 ): Promise<ServiceResult<Transaction>> {
   await ensureSeeded();
 
-  const parsed = updateTransactionSchema.safeParse(body);
+  // Pre-validate splits count before Zod parse (schema min(2) would return VALIDATION_ERROR,
+  // but we want INVALID_SPLIT_COUNT for business-rule clarity)
+  const rawSplits =
+    body !== null && typeof body === 'object' && 'splits' in body
+      ? (body as Record<string, unknown>).splits
+      : undefined;
+
+  if (Array.isArray(rawSplits) && rawSplits.length < 2) {
+    return { error: { message: 'A split requires at least 2 lines', code: 'INVALID_SPLIT_COUNT' } };
+  }
+
+  const parsed = updateTransactionWithSplitsSchema.safeParse(body);
   if (!parsed.success) {
     return {
       error: {
@@ -95,12 +176,84 @@ export async function updateTransaction(
     };
   }
 
-  const transaction = await repo.update(id, parsed.data);
-  if (!transaction) {
+  const existing = await repo.findById(id);
+  if (!existing) {
     return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
   }
 
-  return { data: transaction };
+  const { splits, ...txFields } = parsed.data;
+  const db = await (await import('@/server/db/client')).getDb();
+  const splitRepo = createTransactionSplitRepository();
+
+  // splits: null → revert to single category
+  if (splits === null) {
+    if (!txFields.categoryId) {
+      return {
+        error: {
+          message: 'categoryId is required when reverting a split',
+          code: 'CATEGORY_REQUIRED',
+        },
+      };
+    }
+    await db.exec('BEGIN');
+    try {
+      await splitRepo.deleteSplits(id);
+      const updated = await repo.update(id, { ...txFields, isSplit: false });
+      await db.exec('COMMIT');
+      return { data: updated! };
+    } catch (err) {
+      await db.exec('ROLLBACK');
+      throw err;
+    }
+  }
+
+  // splits: [...] → set/replace splits
+  if (Array.isArray(splits)) {
+    for (const s of splits) {
+      if (s.amount <= 0) {
+        return {
+          error: {
+            message: 'Each split amount must be greater than zero',
+            code: 'INVALID_SPLIT_AMOUNT',
+          },
+        };
+      }
+    }
+    const total = txFields.amount ?? existing.amount;
+    const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
+    if (Math.abs(splitSum - total) > 1) {
+      return {
+        error: {
+          message: `Split amounts (${splitSum}) must equal transaction total (${total})`,
+          code: 'SPLIT_SUM_MISMATCH',
+        },
+      };
+    }
+    await db.exec('BEGIN');
+    try {
+      await splitRepo.deleteSplits(id);
+      await splitRepo.createSplits(id, splits as TransactionSplitInput[]);
+      const updated = await repo.update(id, {
+        ...txFields,
+        category: '',
+        categoryId: '',
+        isSplit: true,
+      });
+      await db.exec('COMMIT');
+      return { data: { ...updated!, splits: await splitRepo.getSplitsByTransactionId(id) } };
+    } catch (err) {
+      await db.exec('ROLLBACK');
+      throw err;
+    }
+  }
+
+  // splits absent (undefined) → normal field update, preserve existing split state
+  const updated = await repo.update(id, txFields);
+  if (!updated) return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
+  if (updated.isSplit) {
+    return { data: { ...updated, splits: await splitRepo.getSplitsByTransactionId(id) } };
+  }
+  return { data: updated };
 }
 
 export async function bulkCreateTransactions(
@@ -119,7 +272,9 @@ export async function bulkCreateTransactions(
     };
   }
 
-  const result = await repo.createMany(parsed.data.transactions);
+  const result = await repo.createMany(
+    parsed.data.transactions.map((t) => ({ ...t, isSplit: false }))
+  );
 
   return {
     data: {
