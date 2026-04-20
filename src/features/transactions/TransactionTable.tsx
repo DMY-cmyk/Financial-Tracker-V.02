@@ -29,8 +29,8 @@ interface TransactionTableProps {
 
 const rowVariants = {
   initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
-  exit: { opacity: 0, x: -16, transition: { duration: 0.2 } },
+  animate: { opacity: 1, y: 0, transition: fadeIn.transition },
+  exit: { opacity: 0, x: -16, transition: fadeIn.transition },
 };
 
 export function TransactionTable({
