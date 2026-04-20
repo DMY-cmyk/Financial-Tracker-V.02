@@ -78,6 +78,7 @@ type TranslationKeys = {
   // Filters
   all: string;
   thisMonth: string;
+  lastMonth: string;
 
   // Settings
   language: string;
@@ -606,6 +607,7 @@ const translations: Record<Locale, TranslationKeys> = {
     of: 'of',
     all: 'All',
     thisMonth: 'This Month',
+    lastMonth: 'Last Month',
     language: 'Language',
     theme: 'Theme',
     light: 'Light',
@@ -1102,6 +1104,7 @@ const translations: Record<Locale, TranslationKeys> = {
     of: 'dari',
     all: 'Semua',
     thisMonth: 'Bulan Ini',
+    lastMonth: 'Bulan Lalu',
     language: 'Bahasa',
     theme: 'Tema',
     light: 'Terang',
