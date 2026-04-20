@@ -12,7 +12,6 @@ import {
   createExportJobSchema,
   transactionSplitInputSchema,
   createTransactionWithSplitsSchema,
-  updateTransactionWithSplitsSchema,
 } from '@/lib/api/validation';
 
 describe('createTransactionSchema', () => {

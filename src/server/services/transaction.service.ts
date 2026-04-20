@@ -3,7 +3,6 @@ import { createTransactionRepository } from '@/server/repositories/transaction.r
 import { createTransactionSplitRepository } from '@/server/repositories/transaction-split.repository';
 import { ensureSeeded } from '@/server/db/seed';
 import {
-  createTransactionSchema,
   createTransactionWithSplitsSchema,
   updateTransactionWithSplitsSchema,
   listTransactionsQuerySchema,
