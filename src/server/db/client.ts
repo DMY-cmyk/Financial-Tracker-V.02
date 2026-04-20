@@ -180,6 +180,15 @@ async function initializeSchema(client: DbClient): Promise<void> {
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
       UNIQUE(month, year)
     )`,
+    `CREATE TABLE IF NOT EXISTS monthly_budgets (
+      id TEXT PRIMARY KEY,
+      category_id TEXT NOT NULL,
+      month INTEGER NOT NULL,
+      year INTEGER NOT NULL,
+      budget_amount DOUBLE PRECISION NOT NULL DEFAULT 0,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+      UNIQUE(category_id, month, year)
+    )`,
   ];
 
   for (const ddl of tables) {
@@ -217,6 +226,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_next_due ON recurring_transactions(next_due_date)',
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_active ON recurring_transactions(is_active)',
     'CREATE INDEX IF NOT EXISTS idx_transactions_source ON transactions(source_recurring_id, source_due_date) WHERE source_recurring_id IS NOT NULL',
+    'CREATE INDEX IF NOT EXISTS idx_monthly_budgets_year ON monthly_budgets(year)',
   ];
 
   for (const idx of indexes) {
