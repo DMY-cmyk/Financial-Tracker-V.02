@@ -199,4 +199,35 @@ describe('deleteCategory', () => {
     const list = await listCategories();
     expect(list.data!.length).toBe(0);
   });
+
+  it('blocks deletion when splits reference the category', async () => {
+    const cat = await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'circle',
+      budget: 500000,
+    });
+
+    // Insert a parent split transaction directly
+    const db = await (await import('@/server/db/client')).getDb();
+    const txId = 'tx-cat-guard-split';
+    await db.query(
+      'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, is_split) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [txId, '2026-01-01', 'Split tx', '', '', 'expense', 500000, 'Cash', '', 1]
+    );
+
+    const { createTransactionSplitRepository } = await import(
+      '@/server/repositories/transaction-split.repository'
+    );
+    const splitRepo = createTransactionSplitRepository();
+    await splitRepo.createSplits(txId, [
+      { categoryId: cat.data!.id, category: 'Food', amount: 300000 },
+      { categoryId: null, category: 'Other', amount: 200000 },
+    ]);
+
+    const result = await deleteCategory(cat.data!.id);
+    expect(result.error).toBeDefined();
+    expect(result.error!.code).toBe('CONFLICT');
+  });
 });

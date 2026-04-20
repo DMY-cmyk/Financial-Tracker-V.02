@@ -1,6 +1,7 @@
 import { ensureSeeded } from '@/server/db/seed';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
+import { createTransactionSplitRepository } from '@/server/repositories/transaction-split.repository';
 import { createCategorySchema, updateCategorySchema } from '@/lib/api/validation';
 import type { Category } from '@/lib/types';
 
@@ -77,11 +78,17 @@ export async function deleteCategory(id: string): Promise<ServiceResult<{ succes
   if (!category) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
 
   const txRepo = createTransactionRepository();
-  const count = await txRepo.countByCategory(id);
-  if (count > 0) {
+  const splitRepo = createTransactionSplitRepository();
+
+  const [txCount, splitCount] = await Promise.all([
+    txRepo.countByCategory(id),
+    splitRepo.countByCategory(id),
+  ]);
+
+  if (txCount > 0 || splitCount > 0) {
     return {
       error: {
-        message: `Cannot delete "${category.name}" — ${count} transaction(s) still use it`,
+        message: `Cannot delete "${category.name}" — ${txCount + splitCount} transaction(s) still use it`,
         code: 'CONFLICT',
       },
     };
