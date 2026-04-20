@@ -23,9 +23,10 @@ interface CustomTooltipProps {
   active?: boolean;
   payload?: TooltipPayloadItem[];
   label?: string;
+  locale?: 'en' | 'id';
 }
 
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, label, locale = 'en' }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
@@ -35,7 +36,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         <div key={entry.dataKey} className="flex items-center gap-2 text-xs">
           <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-muted-foreground">
-            {entry.dataKey === 'thisMonth' ? 'This Month' : 'Last Month'}:
+            {t(locale, entry.dataKey === 'thisMonth' ? 'thisMonth' : 'lastMonth')}:
           </span>
           <span className="font-mono font-medium">{formatCurrency(entry.value)}</span>
         </div>
@@ -104,7 +105,7 @@ export function CategoryComparisonChart({ data, locale }: CategoryComparisonChar
       </div>
 
       {/* Chart */}
-      <div style={{ height: chartHeight }}>
+      <div role="img" aria-label={t(locale, 'categoryComparison')} style={{ height: chartHeight }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 8 }}>
             <XAxis
@@ -126,13 +127,20 @@ export function CategoryComparisonChart({ data, locale }: CategoryComparisonChar
               axisLine={false}
               tickLine={false}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+            <Tooltip content={<CustomTooltip locale={locale} />} cursor={{ fill: 'transparent' }} />
             <Legend
               wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
-              formatter={(value: string) => (value === 'thisMonth' ? 'This Month' : 'Last Month')}
+              formatter={(value: string) =>
+                t(locale, value === 'thisMonth' ? 'thisMonth' : 'lastMonth')
+              }
             />
-            <Bar dataKey="thisMonth" fill="#3B82F6" radius={[0, 4, 4, 0]} barSize={10} />
-            <Bar dataKey="lastMonth" fill="#475569" radius={[0, 4, 4, 0]} barSize={10} />
+            <Bar
+              dataKey="thisMonth"
+              fill="var(--chart-primary)"
+              radius={[0, 4, 4, 0]}
+              barSize={10}
+            />
+            <Bar dataKey="lastMonth" fill="var(--chart-muted)" radius={[0, 4, 4, 0]} barSize={10} />
           </BarChart>
         </ResponsiveContainer>
       </div>
