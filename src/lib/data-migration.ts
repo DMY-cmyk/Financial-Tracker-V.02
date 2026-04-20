@@ -77,6 +77,7 @@ function parseTransactions(sheet: WorkbookSheet, month: number, year: number): T
       amount,
       paymentMethod: paymentMethod || 'Cash',
       notes: notes || '',
+      isSplit: false,
     });
   }
 

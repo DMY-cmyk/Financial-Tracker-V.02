@@ -1,6 +1,7 @@
 import type { Transaction } from '@/lib/types';
 import { getDb } from '@/server/db/client';
 import { nanoid } from 'nanoid';
+import { createTransactionSplitRepository } from './transaction-split.repository';
 
 interface TxRow {
   id: string;
@@ -14,6 +15,7 @@ interface TxRow {
   notes: string;
   source_recurring_id: string | null;
   source_due_date: string | null;
+  is_split: number;
 }
 
 function rowToTransaction(row: TxRow): Transaction {
@@ -29,7 +31,16 @@ function rowToTransaction(row: TxRow): Transaction {
     notes: row.notes || '',
     sourceRecurringId: row.source_recurring_id ?? undefined,
     sourceDueDate: row.source_due_date ?? undefined,
+    isSplit: row.is_split === 1,
   };
+}
+
+async function enrichWithSplits(transactions: Transaction[]): Promise<Transaction[]> {
+  const splitIds = transactions.filter((t) => t.isSplit).map((t) => t.id);
+  if (splitIds.length === 0) return transactions;
+  const splitRepo = createTransactionSplitRepository();
+  const splitsMap = await splitRepo.getSplitsForTransactions(splitIds);
+  return transactions.map((t) => (t.isSplit ? { ...t, splits: splitsMap.get(t.id) ?? [] } : t));
 }
 
 export function createTransactionRepository() {
@@ -37,13 +48,15 @@ export function createTransactionRepository() {
     async findAll(): Promise<Transaction[]> {
       const db = await getDb();
       const result = await db.query<TxRow>('SELECT * FROM transactions ORDER BY date DESC');
-      return result.rows.map(rowToTransaction);
+      return enrichWithSplits(result.rows.map(rowToTransaction));
     },
 
     async findById(id: string): Promise<Transaction | undefined> {
       const db = await getDb();
       const result = await db.query<TxRow>('SELECT * FROM transactions WHERE id = ?', [id]);
-      return result.rows[0] ? rowToTransaction(result.rows[0]) : undefined;
+      if (!result.rows[0]) return undefined;
+      const [enriched] = await enrichWithSplits([rowToTransaction(result.rows[0])]);
+      return enriched;
     },
 
     async findBySource(
@@ -65,14 +78,14 @@ export function createTransactionRepository() {
         "SELECT * FROM transactions WHERE date LIKE ? || '%' ORDER BY date DESC",
         [prefix]
       );
-      return result.rows.map(rowToTransaction);
+      return enrichWithSplits(result.rows.map(rowToTransaction));
     },
 
     async create(data: Omit<Transaction, 'id'>): Promise<Transaction> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, source_recurring_id, source_due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, source_recurring_id, source_due_date, is_split) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           id,
           data.date,
@@ -85,6 +98,7 @@ export function createTransactionRepository() {
           data.notes,
           data.sourceRecurringId ?? null,
           data.sourceDueDate ?? null,
+          data.isSplit ? 1 : 0,
         ]
       );
       return { ...data, id };
@@ -97,7 +111,7 @@ export function createTransactionRepository() {
 
       const updated = { ...rowToTransaction(existing.rows[0]), ...data };
       await db.query(
-        'UPDATE transactions SET date=?, description=?, category=?, category_id=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
+        'UPDATE transactions SET date=?, description=?, category=?, category_id=?, type=?, amount=?, payment_method=?, notes=?, is_split=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
         [
           updated.date,
           updated.description,
@@ -107,6 +121,7 @@ export function createTransactionRepository() {
           updated.amount,
           updated.paymentMethod,
           updated.notes,
+          updated.isSplit ? 1 : 0,
           id,
         ]
       );
@@ -374,12 +389,8 @@ export function createTransactionRepository() {
         [...params, pageSize, offset]
       );
 
-      return {
-        rows: dataResult.rows.map(rowToTransaction),
-        total,
-        income,
-        expense,
-      };
+      const transactions = await enrichWithSplits(dataResult.rows.map(rowToTransaction));
+      return { rows: transactions, total, income, expense };
     },
   };
 }

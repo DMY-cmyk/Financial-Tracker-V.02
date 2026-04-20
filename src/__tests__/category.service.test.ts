@@ -173,6 +173,7 @@ describe('deleteCategory', () => {
       amount: 50000,
       paymentMethod: 'Cash',
       notes: '',
+      isSplit: false,
     });
 
     const result = await deleteCategory(cat.data!.id);

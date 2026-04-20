@@ -74,7 +74,7 @@ export async function createTransaction(body: unknown): Promise<ServiceResult<Tr
     };
   }
 
-  const transaction = await repo.create(parsed.data);
+  const transaction = await repo.create({ ...parsed.data, isSplit: false });
   return { data: transaction };
 }
 
@@ -119,7 +119,9 @@ export async function bulkCreateTransactions(
     };
   }
 
-  const result = await repo.createMany(parsed.data.transactions);
+  const result = await repo.createMany(
+    parsed.data.transactions.map((t) => ({ ...t, isSplit: false }))
+  );
 
   return {
     data: {

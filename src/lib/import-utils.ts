@@ -103,6 +103,7 @@ export function parseCsvImport(content: string): ImportResult {
       amount,
       paymentMethod: cols[colMap.paymentMethod]?.trim() || 'Cash',
       notes: cols[colMap.notes]?.trim() || '',
+      isSplit: false,
     });
   }
 
@@ -152,6 +153,7 @@ function validateTransactionRow(row: Record<string, unknown>, index: number): Tr
     amount,
     paymentMethod: typeof row.paymentMethod === 'string' ? row.paymentMethod : 'Cash',
     notes: typeof row.notes === 'string' ? row.notes : '',
+    isSplit: false,
   };
 }
 

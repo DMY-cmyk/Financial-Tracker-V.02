@@ -33,6 +33,7 @@ async function makeTransaction(categoryId: string, category: string, amount: num
     amount,
     paymentMethod: 'Cash',
     notes: '',
+    isSplit: false,
   });
 }
 
