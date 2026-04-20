@@ -17,5 +17,6 @@ describe('ForecastChart — CSS vars', () => {
 
   it('gradient stops use style prop (not stopColor attribute)', () => {
     expect(src).toContain("style={{ stopColor: 'var(--chart-income)'");
+    expect(src).toContain("style={{ stopColor: 'var(--chart-expense)'");
   });
 });
