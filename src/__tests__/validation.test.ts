@@ -10,6 +10,9 @@ import {
   updateSettingsSchema,
   createUploadSchema,
   createExportJobSchema,
+  transactionSplitInputSchema,
+  createTransactionWithSplitsSchema,
+  updateTransactionWithSplitsSchema,
 } from '@/lib/api/validation';
 
 describe('createTransactionSchema', () => {
@@ -355,6 +358,82 @@ describe('listTransactionsQuerySchema — advanced filters', () => {
     const result = listTransactionsQuerySchema.safeParse({
       dateFrom: '2026-03-01',
       dateTo: '2026-01-01',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('transactionSplitInputSchema', () => {
+  it('accepts valid split line', () => {
+    const result = transactionSplitInputSchema.safeParse({
+      categoryId: 'cat-food',
+      category: 'Food',
+      amount: 200000,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts null categoryId', () => {
+    const result = transactionSplitInputSchema.safeParse({
+      categoryId: null,
+      category: 'Food',
+      amount: 200000,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty category string', () => {
+    const result = transactionSplitInputSchema.safeParse({
+      categoryId: null,
+      category: '',
+      amount: 200000,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects zero amount', () => {
+    const result = transactionSplitInputSchema.safeParse({
+      categoryId: 'cat-food',
+      category: 'Food',
+      amount: 0,
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('createTransactionWithSplitsSchema', () => {
+  const base = {
+    date: '2026-01-15',
+    description: 'Test',
+    type: 'expense' as const,
+    amount: 500000,
+    paymentMethod: 'Cash',
+  };
+
+  it('accepts request with splits (no category required)', () => {
+    const result = createTransactionWithSplitsSchema.safeParse({
+      ...base,
+      splits: [
+        { categoryId: 'cat-food', category: 'Food', amount: 300000 },
+        { categoryId: 'cat-home', category: 'Household', amount: 200000 },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('requires category when no splits', () => {
+    const result = createTransactionWithSplitsSchema.safeParse(base);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const paths = result.error.issues.map((i) => i.path.join('.'));
+      expect(paths).toContain('category');
+    }
+  });
+
+  it('rejects splits array with only one item', () => {
+    const result = createTransactionWithSplitsSchema.safeParse({
+      ...base,
+      splits: [{ categoryId: 'cat-food', category: 'Food', amount: 500000 }],
     });
     expect(result.success).toBe(false);
   });

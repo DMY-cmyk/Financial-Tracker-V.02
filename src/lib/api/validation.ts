@@ -253,6 +253,58 @@ export const createLiabilitySchema = z.object({
 
 export const updateLiabilitySchema = createLiabilitySchema.partial();
 
+// === Transaction split schemas ===
+
+export const transactionSplitInputSchema = z.object({
+  categoryId: z.string().nullable(),
+  category: z.string().min(1, 'Category name is required'),
+  amount: z.number().positive('Split amount must be greater than zero'),
+  description: z.string().nullable().optional(),
+});
+
+export const createTransactionWithSplitsSchema = z
+  .object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
+    description: z.string().min(1, 'Description is required').max(200),
+    category: z.string().optional().default(''),
+    categoryId: z.string().optional().default(''),
+    type: z.enum(['income', 'expense']),
+    amount: z.number().positive('Amount must be positive'),
+    paymentMethod: z.string().min(1, 'Payment method is required'),
+    notes: z.string().max(500).optional().default(''),
+    splits: z.array(transactionSplitInputSchema).min(2).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.splits) {
+      if (!data.category) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['category'],
+          message: 'Category is required',
+        });
+      }
+      if (!data.categoryId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['categoryId'],
+          message: 'Category ID is required',
+        });
+      }
+    }
+  });
+
+export const updateTransactionWithSplitsSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  description: z.string().min(1).max(200).optional(),
+  category: z.string().optional(),
+  categoryId: z.string().optional(),
+  type: z.enum(['income', 'expense']).optional(),
+  amount: z.number().positive().optional(),
+  paymentMethod: z.string().min(1).optional(),
+  notes: z.string().max(500).optional(),
+  splits: z.array(transactionSplitInputSchema).min(2).nullable().optional(),
+});
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
@@ -278,3 +330,6 @@ export type ListRecurringTransactionsQuery = z.infer<typeof listRecurringTransac
 export type CreateBudgetTemplateInput = z.infer<typeof createBudgetTemplateSchema>;
 export type CreateLiabilityInput = z.infer<typeof createLiabilitySchema>;
 export type UpdateLiabilityInput = z.infer<typeof updateLiabilitySchema>;
+export type TransactionSplitInput = z.infer<typeof transactionSplitInputSchema>;
+export type CreateTransactionWithSplitsInput = z.infer<typeof createTransactionWithSplitsSchema>;
+export type UpdateTransactionWithSplitsInput = z.infer<typeof updateTransactionWithSplitsSchema>;
