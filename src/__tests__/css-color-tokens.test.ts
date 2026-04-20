@@ -19,13 +19,13 @@ describe('CSS color tokens', () => {
   });
 
   it('overrides semantic vars in .dark', () => {
-    const darkSection = css.slice(css.indexOf('.dark'));
+    const darkSection = css.slice(css.indexOf('.dark {'));
     expect(darkSection).toContain('--chart-income:');
     expect(darkSection).toContain('--chart-expense:');
   });
 
   it('overrides palette vars in .dark', () => {
-    const darkSection = css.slice(css.indexOf('.dark'));
+    const darkSection = css.slice(css.indexOf('.dark {'));
     expect(darkSection).toContain('--chart-color-1:');
   });
 });
