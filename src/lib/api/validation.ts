@@ -253,6 +253,21 @@ export const createLiabilitySchema = z.object({
 
 export const updateLiabilitySchema = createLiabilitySchema.partial();
 
+// === Monthly budget schemas ===
+
+export const upsertMonthlyBudgetSchema = z.object({
+  categoryId: z.string().min(1),
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().min(2000).max(2100),
+  budgetAmount: z.number().min(0),
+});
+
+export const deleteMonthlyBudgetSchema = z.object({
+  categoryId: z.string().min(1),
+  month: z.number().int().min(0).max(11),
+  year: z.number().int().min(2000).max(2100),
+});
+
 // === Inferred types ===
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;

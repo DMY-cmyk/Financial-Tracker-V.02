@@ -10,6 +10,8 @@ import {
   updateSettingsSchema,
   createUploadSchema,
   createExportJobSchema,
+  upsertMonthlyBudgetSchema,
+  deleteMonthlyBudgetSchema,
 } from '@/lib/api/validation';
 
 describe('createTransactionSchema', () => {
@@ -356,6 +358,64 @@ describe('listTransactionsQuerySchema — advanced filters', () => {
       dateFrom: '2026-03-01',
       dateTo: '2026-01-01',
     });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('upsertMonthlyBudgetSchema', () => {
+  it('accepts valid input', () => {
+    const result = upsertMonthlyBudgetSchema.safeParse({
+      categoryId: 'cat-123',
+      month: 3,
+      year: 2026,
+      budgetAmount: 1500000,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects month out of range', () => {
+    const result = upsertMonthlyBudgetSchema.safeParse({
+      categoryId: 'cat-123',
+      month: 12,
+      year: 2026,
+      budgetAmount: 1500000,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative budgetAmount', () => {
+    const result = upsertMonthlyBudgetSchema.safeParse({
+      categoryId: 'cat-123',
+      month: 3,
+      year: 2026,
+      budgetAmount: -1,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts zero budgetAmount (explicit zero override)', () => {
+    const result = upsertMonthlyBudgetSchema.safeParse({
+      categoryId: 'cat-123',
+      month: 0,
+      year: 2026,
+      budgetAmount: 0,
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('deleteMonthlyBudgetSchema', () => {
+  it('accepts valid input', () => {
+    const result = deleteMonthlyBudgetSchema.safeParse({
+      categoryId: 'cat-123',
+      month: 3,
+      year: 2026,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing categoryId', () => {
+    const result = deleteMonthlyBudgetSchema.safeParse({ month: 3, year: 2026 });
     expect(result.success).toBe(false);
   });
 });

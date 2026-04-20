@@ -7,6 +7,9 @@ import type {
   Liability,
   NetWorthCurrent,
   NetWorthSnapshot,
+  MonthlyBudget,
+  MonthlySpending,
+  AnnualBudgetGridResponse,
 } from '@/lib/types';
 
 // === Request types ===
@@ -543,3 +546,7 @@ export interface SpendingInsightsResponse {
   healthScore: HealthScore;
   period: { month: number; year: number };
 }
+
+// === Monthly budget contracts ===
+
+export type { MonthlyBudget, MonthlySpending, AnnualBudgetGridResponse };
