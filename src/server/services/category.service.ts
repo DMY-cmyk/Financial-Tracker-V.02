@@ -25,8 +25,17 @@ interface ServiceResult<T> {
 
 export async function listCategories(query?: {
   type?: string;
+  month?: number;
+  year?: number;
 }): Promise<ServiceResult<Category[]>> {
   await ensureSeeded();
+  if (
+    query?.month !== undefined &&
+    query?.year !== undefined &&
+    (query.type === 'income' || query.type === 'expense')
+  ) {
+    return { data: await repo.findWithEffectiveBudget(query.type, query.month, query.year) };
+  }
   if (query?.type === 'income' || query?.type === 'expense') {
     return { data: await repo.findByType(query.type) };
   }

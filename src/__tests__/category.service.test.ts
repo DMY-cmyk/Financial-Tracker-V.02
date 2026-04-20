@@ -245,3 +245,44 @@ describe('findWithEffectiveBudget', () => {
     expect(results.every((c) => c.type === 'expense')).toBe(true);
   });
 });
+
+describe('listCategories with month/year', () => {
+  it('returns effective budget (default) when no override', async () => {
+    await createCategory({
+      name: 'Food',
+      type: 'expense',
+      color: '#F59E0B',
+      icon: 'utensils',
+      budget: 1800000,
+    });
+
+    const result = await listCategories({ type: 'expense', month: 3, year: 2026 });
+    expect(result.error).toBeUndefined();
+    expect(result.data![0].budget).toBe(1800000);
+  });
+
+  it('returns override budget when monthly override exists', async () => {
+    const catResult = await createCategory({
+      name: 'Transport',
+      type: 'expense',
+      color: '#3B82F6',
+      icon: 'car',
+      budget: 1800000,
+    });
+    const { createMonthlyBudgetRepository } = await import(
+      '@/server/repositories/monthly-budget.repository'
+    );
+    const mbRepo = createMonthlyBudgetRepository();
+    await mbRepo.upsert({ categoryId: catResult.data!.id, month: 3, year: 2026, budgetAmount: 2500000 });
+
+    const result = await listCategories({ type: 'expense', month: 3, year: 2026 });
+    const found = result.data!.find((c) => c.id === catResult.data!.id);
+    expect(found!.budget).toBe(2500000);
+  });
+
+  it('falls back to findAll when no type provided with month/year', async () => {
+    const result = await listCategories({ month: 3, year: 2026 });
+    expect(result.error).toBeUndefined();
+    expect(Array.isArray(result.data)).toBe(true);
+  });
+});
