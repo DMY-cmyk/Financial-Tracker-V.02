@@ -36,10 +36,18 @@ export async function getMonthlyReportData(
   const totalExpense = expenseTransactions.reduce((s, t) => s + t.amount, 0);
   const totalAssets = paymentMethodBalances.reduce((s, b) => s + b.balance, 0);
 
-  // Group expenses by category
+  // Group expenses by category — split-aware
   const categoryMap = new Map<string, number>();
   for (const tx of expenseTransactions) {
-    categoryMap.set(tx.category, (categoryMap.get(tx.category) ?? 0) + tx.amount);
+    if (tx.isSplit && tx.splits && tx.splits.length > 0) {
+      for (const s of tx.splits) {
+        if (s.category) {
+          categoryMap.set(s.category, (categoryMap.get(s.category) ?? 0) + s.amount);
+        }
+      }
+    } else if (!tx.isSplit && tx.category) {
+      categoryMap.set(tx.category, (categoryMap.get(tx.category) ?? 0) + tx.amount);
+    }
   }
   const expenseSummaryByCategory = Array.from(categoryMap.entries())
     .map(([category, total]) => ({ category, total }))
@@ -47,7 +55,15 @@ export async function getMonthlyReportData(
 
   const incomeCategoryMap = new Map<string, number>();
   for (const tx of incomeTransactions) {
-    incomeCategoryMap.set(tx.category, (incomeCategoryMap.get(tx.category) ?? 0) + tx.amount);
+    if (tx.isSplit && tx.splits && tx.splits.length > 0) {
+      for (const s of tx.splits) {
+        if (s.category) {
+          incomeCategoryMap.set(s.category, (incomeCategoryMap.get(s.category) ?? 0) + s.amount);
+        }
+      }
+    } else if (!tx.isSplit && tx.category) {
+      incomeCategoryMap.set(tx.category, (incomeCategoryMap.get(tx.category) ?? 0) + tx.amount);
+    }
   }
   const incomeCategories = Array.from(incomeCategoryMap.entries())
     .map(([category, total]) => ({ category, total }))
@@ -114,11 +130,18 @@ export async function getAnnualReportData(year: number): Promise<ServiceResult<A
   // Top categories (all types, top 10) — kept for XLSX generator
   const catMap = new Map<string, { total: number; type: 'income' | 'expense' }>();
   for (const tx of allYearResult.rows) {
-    const existing = catMap.get(tx.category);
-    if (existing) {
-      existing.total += tx.amount;
-    } else {
-      catMap.set(tx.category, { total: tx.amount, type: tx.type });
+    if (tx.isSplit && tx.splits && tx.splits.length > 0) {
+      for (const s of tx.splits) {
+        if (s.category) {
+          const existing = catMap.get(s.category);
+          if (existing) existing.total += s.amount;
+          else catMap.set(s.category, { total: s.amount, type: tx.type });
+        }
+      }
+    } else if (!tx.isSplit && tx.category) {
+      const existing = catMap.get(tx.category);
+      if (existing) existing.total += tx.amount;
+      else catMap.set(tx.category, { total: tx.amount, type: tx.type });
     }
   }
   const topCategories = Array.from(catMap.entries())
@@ -130,7 +153,15 @@ export async function getAnnualReportData(year: number): Promise<ServiceResult<A
   const expenseCatMap = new Map<string, number>();
   for (const tx of allYearResult.rows) {
     if (tx.type === 'expense') {
-      expenseCatMap.set(tx.category, (expenseCatMap.get(tx.category) ?? 0) + tx.amount);
+      if (tx.isSplit && tx.splits && tx.splits.length > 0) {
+        for (const s of tx.splits) {
+          if (s.category) {
+            expenseCatMap.set(s.category, (expenseCatMap.get(s.category) ?? 0) + s.amount);
+          }
+        }
+      } else if (!tx.isSplit && tx.category) {
+        expenseCatMap.set(tx.category, (expenseCatMap.get(tx.category) ?? 0) + tx.amount);
+      }
     }
   }
   const topExpenseCategories = Array.from(expenseCatMap.entries())
