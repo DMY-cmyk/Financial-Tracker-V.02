@@ -2,7 +2,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { BiggestTransactionsCard } from '@/features/insights/BiggestTransactionsCard';
-import type { BiggestTransaction } from '@/lib/api/contracts';
+import { OutlierAlerts } from '@/features/insights/OutlierAlerts';
+import type { BiggestTransaction, SpendingOutlier } from '@/lib/api/contracts';
 
 afterEach(() => cleanup());
 
@@ -31,6 +32,27 @@ describe('BiggestTransactionsCard — color indicator accessibility', () => {
     const { container } = render(
       <BiggestTransactionsCard transactions={mockTransactions} locale="en" />
     );
+    const amountEl = container.querySelector('.font-mono');
+    expect(amountEl?.textContent).toMatch(/^-/);
+  });
+});
+
+describe('OutlierAlerts — amount formatting', () => {
+  it('OutlierAlerts amount has minus prefix', () => {
+    const mockOutlier: SpendingOutlier[] = [
+      {
+        id: '1',
+        description: 'Expensive dinner',
+        amount: 750000,
+        date: '2026-04-15',
+        category: 'Food',
+        color: '#F59E0B',
+        categoryAvg: 200000,
+        delta: 550000,
+        multiplier: 3.75,
+      },
+    ];
+    const { container } = render(<OutlierAlerts outliers={mockOutlier} locale="en" />);
     const amountEl = container.querySelector('.font-mono');
     expect(amountEl?.textContent).toMatch(/^-/);
   });
