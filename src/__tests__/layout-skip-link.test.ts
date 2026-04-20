@@ -17,5 +17,6 @@ describe('Skip link classes', () => {
 
   it('uses focus:rounded-md (not focus:rounded-lg)', () => {
     expect(src).toContain('focus:rounded-md');
+    expect(src).not.toContain('focus:rounded-lg');
   });
 });
