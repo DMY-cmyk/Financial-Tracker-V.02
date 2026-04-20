@@ -530,6 +530,19 @@ type TranslationKeys = {
   typicalSpend: string;
   noExpensesThisMonth: string;
   other: string;
+
+  // Annual budget
+  annualBudget: string;
+  monthlyView: string;
+  annualView: string;
+  inheritedBudget: string;
+  plannedZero: string;
+  clearBudgetOverride: string;
+  annualTotal: string;
+  monthlyTotal: string;
+  categoriesOnTrack: string;
+  categoriesAtRisk: string;
+  budgetYear: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -1014,6 +1027,19 @@ const translations: Record<Locale, TranslationKeys> = {
     typicalSpend: 'typical',
     noExpensesThisMonth: 'No expenses this month',
     other: 'Other',
+
+    // Annual budget
+    annualBudget: 'Annual Budget',
+    monthlyView: 'Monthly',
+    annualView: 'Annual',
+    inheritedBudget: 'inherited',
+    plannedZero: 'planned zero',
+    clearBudgetOverride: 'Clear',
+    annualTotal: 'Annual Total',
+    monthlyTotal: 'Monthly Total',
+    categoriesOnTrack: 'On Track',
+    categoriesAtRisk: 'At Risk',
+    budgetYear: 'Year',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1498,6 +1524,19 @@ const translations: Record<Locale, TranslationKeys> = {
     typicalSpend: 'tipikal',
     noExpensesThisMonth: 'Tidak ada pengeluaran bulan ini',
     other: 'Lainnya',
+
+    // Annual budget
+    annualBudget: 'Anggaran Tahunan',
+    monthlyView: 'Bulanan',
+    annualView: 'Tahunan',
+    inheritedBudget: 'bawaan',
+    plannedZero: 'nol direncanakan',
+    clearBudgetOverride: 'Hapus',
+    annualTotal: 'Total Tahunan',
+    monthlyTotal: 'Total Bulanan',
+    categoriesOnTrack: 'Sesuai Rencana',
+    categoriesAtRisk: 'Berisiko',
+    budgetYear: 'Tahun',
   },
 };
 
