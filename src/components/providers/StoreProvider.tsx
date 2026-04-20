@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { useStore } from '@/store';
 import { LocaleContext } from '@/lib/i18n';
 
@@ -33,5 +34,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  return <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>;
+  return (
+    <MotionConfig reducedMotion="user">
+      <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>
+    </MotionConfig>
+  );
 }
