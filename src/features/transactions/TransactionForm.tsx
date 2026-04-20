@@ -293,7 +293,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
       {/* Split toggle / SplitEditor */}
       {!isSplitMode ? (
-        <div className="flex justify-center border-y border-dashed border-border py-2">
+        <div className="border-border flex justify-center border-y border-dashed py-2">
           <button
             type="button"
             onClick={() => {
@@ -301,15 +301,14 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
               setSplits([
                 {
                   categoryId: category || null,
-                  category:
-                    filteredCategories.find((c) => c.id === category)?.name ?? '',
+                  category: filteredCategories.find((c) => c.id === category)?.name ?? '',
                   amount: parseCurrencyInput(amountStr),
                   description: null,
                 },
                 { categoryId: null, category: '', amount: 0, description: null },
               ]);
             }}
-            className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="border-border bg-background text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs"
           >
             <PieChart className="h-3.5 w-3.5" />
             {t(locale, 'splitTransaction')}
@@ -330,9 +329,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>{t(locale, 'removeSplit')}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t(locale, 'removeSplitConfirm')}
-                </AlertDialogDescription>
+                <AlertDialogDescription>{t(locale, 'removeSplitConfirm')}</AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>{t(locale, 'cancel')}</AlertDialogCancel>

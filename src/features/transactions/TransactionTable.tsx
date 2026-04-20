@@ -141,7 +141,10 @@ export function TransactionTable({
                         <span className="text-muted-foreground text-[10px]">
                           {tx.paymentMethod}
                           {tx.isSplit && tx.splits && (
-                            <> &middot; {tx.splits.length} {t(locale, 'categories')}</>
+                            <>
+                              {' '}
+                              &middot; {tx.splits.length} {t(locale, 'categories')}
+                            </>
                           )}
                         </span>
                       </div>
@@ -196,7 +199,7 @@ export function TransactionTable({
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={fadeIn.transition}
-                        className="overflow-hidden rounded-b-xl border border-t-0 border-transparent bg-muted/30 pl-10 pr-4"
+                        className="bg-muted/30 overflow-hidden rounded-b-xl border border-t-0 border-transparent pr-4 pl-10"
                       >
                         <div className="border-l-2 border-blue-200 py-2 pl-4 dark:border-blue-800">
                           {tx.splits.map((split) => (

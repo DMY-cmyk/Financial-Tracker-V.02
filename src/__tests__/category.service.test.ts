@@ -217,9 +217,8 @@ describe('deleteCategory', () => {
       [txId, '2026-01-01', 'Split tx', '', '', 'expense', 500000, 'Cash', '', 1]
     );
 
-    const { createTransactionSplitRepository } = await import(
-      '@/server/repositories/transaction-split.repository'
-    );
+    const { createTransactionSplitRepository } =
+      await import('@/server/repositories/transaction-split.repository');
     const splitRepo = createTransactionSplitRepository();
     await splitRepo.createSplits(txId, [
       { categoryId: cat.data!.id, category: 'Food', amount: 300000 },

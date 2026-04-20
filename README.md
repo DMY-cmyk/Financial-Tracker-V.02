@@ -40,6 +40,20 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Framer Motion entrance animations
 - [x] Load-more pagination (50/page, `useAllTransactions` with `useInfiniteQuery`)
 
+### Transaction Split
+
+- [x] Split a single transaction across multiple categories — one parent row, multiple split lines
+- [x] `SplitEditor` component with running total, color-coded balance indicator (emerald = balanced, amber = under-allocated, red = over-allocated), add/remove lines
+- [x] Split toggle in `TransactionForm` — pre-populates first split line from current category/amount; AlertDialog confirmation before removing splits
+- [x] `TransactionTable` expandable rows — ChevronRight toggle reveals split lines with `CategoryChip`, optional sub-description, and IDR amount
+- [x] `SplitBadge` ("Multiple") shown in category column for split transactions; `· N categories` subtitle on each split row
+- [x] Category deletion guarded against split line usage (returns 409 CONFLICT)
+- [x] Split-aware `categoryTotals()`, dashboard category breakdown, monthly and annual report grouping
+- [x] CSV export `expandSplits` checkbox — emit one row per split line or collapse to parent row
+- [x] Atomic DB writes (BEGIN/COMMIT/ROLLBACK) for all create and update operations
+- [x] 10 new i18n keys (EN/ID): `splitTransaction`, `splitAllocation`, `addSplit`, `removeSplit`, `removeSplitConfirm`, `splitDescription`, `remainingAmount`, `multipleCategoriesSplit`, `totalMustMatch`, `expandSplits`
+- [x] 34 new tests — split service create/update, enrichment, schema validation — 482 total
+
 ### Advanced Transaction Search
 - [x] `TransactionFilterSheet` slide-over panel — amount range, multi-category, date range, notes toggle
 - [x] Filter presets — save/apply/delete up to 5 named presets (localStorage persistence)
@@ -218,7 +232,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] Consistent card styles (rounded-2xl, border, shadow hierarchy)
 - [x] Motion presets library (fadeIn, stagger, spring, panel variants, ease curves)
 - [x] Motion presets (fadeIn, stagger, spring, panel variants, ease curves)
-- [x] i18n dictionary with ~185+ keys (EN/ID bilingual)
+- [x] i18n dictionary with ~195+ keys (EN/ID bilingual)
 - [x] Skeleton loading states (page, card, chart, list, transaction row)
 - [x] Empty/NoResults/InlineError shared state components
 - [x] ConfirmDialog for destructive actions
@@ -243,7 +257,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (448 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights) |
+| **Testing** | Vitest (482 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, transaction split) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion |
 | **OCR** | Tesseract.js |
@@ -275,7 +289,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 448 tests)
+npm run test         # Run tests (Vitest, 482 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint

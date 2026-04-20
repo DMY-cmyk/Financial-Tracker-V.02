@@ -29,9 +29,7 @@ export function exportCSV(
     if (expandSplits && tx.isSplit && tx.splits && tx.splits.length > 0) {
       // Expand: one row per split line, parent row omitted
       for (const s of tx.splits) {
-        const desc = s.description
-          ? `${tx.description} — ${s.description}`
-          : tx.description;
+        const desc = s.description ? `${tx.description} — ${s.description}` : tx.description;
         rows.push(
           `${formatDateID(tx.date)},"${desc.replace(/"/g, '""')}","${s.category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(s.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
         );

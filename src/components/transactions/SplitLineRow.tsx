@@ -47,12 +47,12 @@ export function SplitLineRow({
     <motion.div
       layout
       {...splitRowAnimation}
-      className="grid grid-cols-[2fr_2fr_1.5fr_auto] gap-2 items-center"
+      className="grid grid-cols-[2fr_2fr_1.5fr_auto] items-center gap-2"
     >
       <select
         value={split.categoryId ?? ''}
         onChange={handleCategoryChange}
-        className="rounded-md border border-input bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        className="border-input bg-background focus:ring-ring rounded-md border px-2 py-1.5 text-sm focus:ring-1 focus:outline-none"
       >
         <option value="">{t(locale, 'category')}</option>
         {filtered.map((c) => (
@@ -86,7 +86,7 @@ export function SplitLineRow({
         whileTap={tapScale}
         type="button"
         onClick={() => onRemove(index)}
-        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex h-7 w-7 items-center justify-center rounded-md"
         aria-label={t(locale, 'removeSplit')}
       >
         <X className="h-3.5 w-3.5" />
