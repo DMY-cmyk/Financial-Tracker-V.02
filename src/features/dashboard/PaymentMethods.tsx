@@ -4,12 +4,14 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { motion } from 'framer-motion';
 
-const METHOD_COLORS: Record<string, string> = {
-  'Bank BCA': '#3B82F6',
-  Cash: '#10B981',
-  GoPay: '#06B6D4',
-  OVO: '#8B5CF6',
-};
+const PALETTE = [
+  'var(--chart-color-1)',
+  'var(--chart-color-2)',
+  'var(--chart-color-3)',
+  'var(--chart-color-4)',
+  'var(--chart-color-5)',
+  'var(--chart-color-6)',
+];
 
 interface PaymentMethodsSummaryProps {
   totals: Record<string, number>;
@@ -19,8 +21,12 @@ export function PaymentMethodsSummary({ totals }: PaymentMethodsSummaryProps) {
   const locale = useLocale();
 
   const data = Object.entries(totals)
-    .map(([name, value]) => ({ name, value, color: METHOD_COLORS[name] || '#6B7280' }))
-    .sort((a, b) => b.value - a.value);
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, value], index) => ({
+      name,
+      value,
+      color: PALETTE[index % PALETTE.length],
+    }));
 
   const max = Math.max(...data.map((d) => d.value), 1);
 
