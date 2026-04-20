@@ -1,8 +1,10 @@
-import type { Transaction } from '@/lib/types';
+import type { Transaction, TransactionSplitInput } from '@/lib/types';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
+import { createTransactionSplitRepository } from '@/server/repositories/transaction-split.repository';
 import { ensureSeeded } from '@/server/db/seed';
 import {
   createTransactionSchema,
+  createTransactionWithSplitsSchema,
   updateTransactionSchema,
   listTransactionsQuerySchema,
   bulkCreateTransactionSchema,
@@ -63,7 +65,39 @@ export async function listTransactions(
 export async function createTransaction(body: unknown): Promise<ServiceResult<Transaction>> {
   await ensureSeeded();
 
-  const parsed = createTransactionSchema.safeParse(body);
+  // Extract splits from raw body for early business-rule validation before Zod parse.
+  const rawSplits =
+    body !== null && typeof body === 'object' && 'splits' in body
+      ? (body as Record<string, unknown>).splits
+      : undefined;
+
+  if (Array.isArray(rawSplits)) {
+    // Business-rule: must have at least 2 split lines
+    if (rawSplits.length < 2) {
+      return {
+        error: { message: 'A split requires at least 2 lines', code: 'INVALID_SPLIT_COUNT' },
+      };
+    }
+    // Business-rule: every split amount must be > 0
+    for (const s of rawSplits) {
+      if (
+        s !== null &&
+        typeof s === 'object' &&
+        'amount' in s &&
+        typeof (s as Record<string, unknown>).amount === 'number' &&
+        ((s as Record<string, unknown>).amount as number) <= 0
+      ) {
+        return {
+          error: {
+            message: 'Each split amount must be greater than zero',
+            code: 'INVALID_SPLIT_AMOUNT',
+          },
+        };
+      }
+    }
+  }
+
+  const parsed = createTransactionWithSplitsSchema.safeParse(body);
   if (!parsed.success) {
     return {
       error: {
@@ -74,8 +108,45 @@ export async function createTransaction(body: unknown): Promise<ServiceResult<Tr
     };
   }
 
-  const transaction = await repo.create({ ...parsed.data, isSplit: false });
-  return { data: transaction };
+  const { splits, ...txData } = parsed.data;
+
+  if (!splits) {
+    // No splits — standard single-category path
+    const transaction = await repo.create({ ...txData, isSplit: false });
+    return { data: transaction };
+  }
+
+  // Split path — validate sum after Zod parse (amounts are guaranteed positive here)
+  const splitSum = splits.reduce((sum, s) => sum + s.amount, 0);
+  if (Math.abs(splitSum - txData.amount) > 1) {
+    return {
+      error: {
+        message: `Split amounts (${splitSum}) must equal transaction total (${txData.amount})`,
+        code: 'SPLIT_SUM_MISMATCH',
+      },
+    };
+  }
+
+  const db = await (await import('@/server/db/client')).getDb();
+  const splitRepo = createTransactionSplitRepository();
+
+  await db.exec('BEGIN');
+  try {
+    const transaction = await repo.create({
+      ...txData,
+      category: '',
+      categoryId: '',
+      isSplit: true,
+    });
+    await splitRepo.createSplits(transaction.id, splits as TransactionSplitInput[]);
+    await db.exec('COMMIT');
+    return {
+      data: { ...transaction, splits: await splitRepo.getSplitsByTransactionId(transaction.id) },
+    };
+  } catch (err) {
+    await db.exec('ROLLBACK');
+    throw err;
+  }
 }
 
 export async function updateTransaction(
