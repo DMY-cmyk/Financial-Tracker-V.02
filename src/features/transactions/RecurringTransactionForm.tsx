@@ -125,8 +125,9 @@ export function RecurringTransactionForm({
 
       {/* Description */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'description')}</Label>
+        <Label htmlFor="rtf-description">{t(locale, 'description')}</Label>
         <Input
+          id="rtf-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t(locale, 'description')}
@@ -136,8 +137,9 @@ export function RecurringTransactionForm({
 
       {/* Amount */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'amount')}</Label>
+        <Label htmlFor="rtf-amount">{t(locale, 'amount')}</Label>
         <Input
+          id="rtf-amount"
           value={amountStr}
           onChange={(e) => setAmountStr(e.target.value)}
           placeholder="0"
@@ -149,8 +151,9 @@ export function RecurringTransactionForm({
 
       {/* Category */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'category')}</Label>
+        <Label htmlFor="rtf-category">{t(locale, 'category')}</Label>
         <select
+          id="rtf-category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
@@ -167,8 +170,9 @@ export function RecurringTransactionForm({
 
       {/* Payment Method */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'paymentMethod')}</Label>
+        <Label htmlFor="rtf-paymentMethod">{t(locale, 'paymentMethod')}</Label>
         <select
+          id="rtf-paymentMethod"
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
           className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
@@ -185,8 +189,9 @@ export function RecurringTransactionForm({
 
       {/* Frequency */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'frequency')}</Label>
+        <Label htmlFor="rtf-frequency">{t(locale, 'frequency')}</Label>
         <select
+          id="rtf-frequency"
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as RecurringTransaction['frequency'])}
           className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
@@ -201,8 +206,9 @@ export function RecurringTransactionForm({
       {/* Dates */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label>{t(locale, 'startDate')}</Label>
+          <Label htmlFor="rtf-startDate">{t(locale, 'startDate')}</Label>
           <Input
+            id="rtf-startDate"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
@@ -210,15 +216,21 @@ export function RecurringTransactionForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label>{t(locale, 'endDate')}</Label>
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <Label htmlFor="rtf-endDate">{t(locale, 'endDate')}</Label>
+          <Input
+            id="rtf-endDate"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
         </div>
       </div>
 
       {/* Notes */}
       <div className="space-y-1.5">
-        <Label>{t(locale, 'notes')}</Label>
+        <Label htmlFor="rtf-notes">{t(locale, 'notes')}</Label>
         <Input
+          id="rtf-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder={t(locale, 'notes')}
