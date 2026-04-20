@@ -116,7 +116,7 @@ export default function ExportPage() {
           className="border-border bg-card rounded-2xl border p-4 sm:p-6"
         >
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportOptions')}</h3>
-          <ExportOptions options={options} onChange={setOptions} />
+          <ExportOptions options={options} onChange={setOptions} format={format} />
         </motion.div>
 
         {/* Preview */}
