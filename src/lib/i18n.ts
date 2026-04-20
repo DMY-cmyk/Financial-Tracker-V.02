@@ -542,6 +542,7 @@ type TranslationKeys = {
   monthlyTotal: string;
   categoriesOnTrack: string;
   categoriesAtRisk: string;
+  overBudgetLabel: string;
   budgetYear: string;
 };
 
@@ -1039,6 +1040,7 @@ const translations: Record<Locale, TranslationKeys> = {
     monthlyTotal: 'Monthly Total',
     categoriesOnTrack: 'On Track',
     categoriesAtRisk: 'At Risk',
+    overBudgetLabel: 'Over Budget',
     budgetYear: 'Year',
   },
   id: {
@@ -1536,6 +1538,7 @@ const translations: Record<Locale, TranslationKeys> = {
     monthlyTotal: 'Total Bulanan',
     categoriesOnTrack: 'Sesuai Rencana',
     categoriesAtRisk: 'Berisiko',
+    overBudgetLabel: 'Melebihi Anggaran',
     budgetYear: 'Tahun',
   },
 };
