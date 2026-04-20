@@ -45,15 +45,26 @@ export function DayOfWeekPills({ data, locale }: DayOfWeekPillsProps) {
       <h3 className="mb-4 text-sm font-semibold">{t(locale, 'spendingByDay')}</h3>
 
       {/* Pill row */}
-      <div className="flex justify-between gap-1.5">
+      <div
+        role="list"
+        aria-label={t(locale, 'spendingByDay')}
+        className="flex justify-between gap-1.5"
+      >
         {sorted.map((day) => {
           // Normalize opacity between 0.15 and 0.6
           const ratio = day.totalAmount / maxAmount;
           const opacity = allZero ? 0.15 : 0.15 + ratio * 0.45;
           const isTop2 = !allZero && top2Indices.has(day.dayIndex);
+          const dayName = dayNames[day.dayIndex];
+          const formattedAmount = allZero ? '0' : compactAmount(day.totalAmount);
 
           return (
-            <div key={day.dayIndex} className="flex flex-1 flex-col items-center gap-1.5">
+            <div
+              key={day.dayIndex}
+              role="listitem"
+              aria-label={`${dayName}: ${formattedAmount}`}
+              className="flex flex-1 flex-col items-center gap-1.5"
+            >
               {/* Pill */}
               <div
                 className={cn(
@@ -68,12 +79,10 @@ export function DayOfWeekPills({ data, locale }: DayOfWeekPillsProps) {
                     : `rgba(59, 130, 246, ${opacity})`,
                 }}
               >
-                {dayNames[day.dayIndex]}
+                {dayName}
               </div>
               {/* Amount */}
-              <span className="text-muted-foreground font-mono text-[10px]">
-                {allZero ? '0' : compactAmount(day.totalAmount)}
-              </span>
+              <span className="text-muted-foreground font-mono text-[10px]">{formattedAmount}</span>
             </div>
           );
         })}

@@ -37,7 +37,10 @@ type NavKey =
   | 'upload'
   | 'export'
   | 'settings'
-  | 'categories';
+  | 'categories'
+  | 'groupFinance'
+  | 'groupTools'
+  | 'groupSettings';
 
 const mainItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
   { href: '/home', key: 'home', icon: Home },
@@ -46,17 +49,46 @@ const mainItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] =
   { href: '/budget', key: 'budgetPage', icon: Target },
 ];
 
-const moreItems: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
-  { href: '/bills', key: 'bills', icon: CalendarCheck },
-  { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
-  { href: '/savings', key: 'savingsPage', icon: PiggyBank },
-  { href: '/insights', key: 'insights', icon: TrendingUp },
-  { href: '/reports', key: 'reports', icon: BarChart3 },
-  { href: '/upload', key: 'upload', icon: Upload },
-  { href: '/export', key: 'export', icon: Download },
-  { href: '/settings', key: 'settings', icon: Settings },
-  { href: '/settings/categories', key: 'categories', icon: Tag },
+const moreGroups: {
+  label: string;
+  labelId: string;
+  labelKey: NavKey;
+  items: { href: string; key: NavKey; icon: typeof LayoutDashboard }[];
+}[] = [
+  {
+    label: 'Finance',
+    labelId: 'finance',
+    labelKey: 'groupFinance',
+    items: [
+      { href: '/bills', key: 'bills', icon: CalendarCheck },
+      { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
+      { href: '/savings', key: 'savingsPage', icon: PiggyBank },
+      { href: '/insights', key: 'insights', icon: TrendingUp },
+    ],
+  },
+  {
+    label: 'Tools',
+    labelId: 'tools',
+    labelKey: 'groupTools',
+    items: [
+      { href: '/reports', key: 'reports', icon: BarChart3 },
+      { href: '/upload', key: 'upload', icon: Upload },
+      { href: '/export', key: 'export', icon: Download },
+    ],
+  },
+  {
+    label: 'Settings',
+    labelId: 'settings',
+    labelKey: 'groupSettings',
+    items: [
+      { href: '/settings', key: 'settings', icon: Settings },
+      { href: '/settings/categories', key: 'categories', icon: Tag },
+    ],
+  },
 ];
+
+// Keep moreItems as flat list for isMoreActive calculation
+const moreItems = moreGroups.flatMap((g) => g.items);
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -118,22 +150,32 @@ export function BottomNav() {
           <SheetHeader className="pb-2">
             <SheetTitle>{locale === 'id' ? 'Menu Lainnya' : 'More Options'}</SheetTitle>
           </SheetHeader>
-          <div className="grid grid-cols-4 gap-3">
-            {moreItems.map(({ href, key, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMoreOpen(false)}
-                className={cn(
-                  'flex flex-col items-center gap-2 rounded-xl p-3 text-xs transition-colors',
-                  isActive(href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-center leading-tight">{t(locale, key)}</span>
-              </Link>
+          <div className="space-y-4">
+            {moreGroups.map((group, gi) => (
+              <div key={group.labelId}>
+                {gi > 0 && <div className="border-border border-t" />}
+                <p className="text-muted-foreground mb-2 px-1 pt-2 text-[10px] font-semibold tracking-widest uppercase">
+                  {t(locale, group.labelKey)}
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {group.items.map(({ href, key, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setMoreOpen(false)}
+                      className={cn(
+                        'flex flex-col items-center gap-2 rounded-xl p-3 text-xs transition-colors',
+                        isActive(href)
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="text-center leading-tight">{t(locale, key)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </SheetContent>

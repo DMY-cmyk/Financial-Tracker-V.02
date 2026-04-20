@@ -48,6 +48,7 @@ export function BiggestTransactionsCard({ transactions, locale }: BiggestTransac
             >
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <div
+                  aria-hidden="true"
                   className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
                   style={{ backgroundColor: tx.color }}
                 />
@@ -59,7 +60,7 @@ export function BiggestTransactionsCard({ transactions, locale }: BiggestTransac
                 </div>
               </div>
               <span className="flex-shrink-0 font-mono text-sm font-semibold text-red-500">
-                {idrFormatter.format(tx.amount)}
+                -{idrFormatter.format(tx.amount)}
               </span>
             </motion.li>
           ))}

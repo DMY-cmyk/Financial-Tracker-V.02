@@ -62,7 +62,7 @@ export function OutlierAlerts({ outliers, locale }: OutlierAlertsProps) {
                 {/* Right side: amount + typical */}
                 <div className="flex-shrink-0 text-right">
                   <p className="font-mono text-sm font-semibold text-red-500">
-                    {idrFormatter.format(outlier.amount)}
+                    -{idrFormatter.format(outlier.amount)}
                   </p>
                   <p className="text-muted-foreground text-[10px]">
                     {t(locale, 'typicalSpend')}: {idrFormatter.format(outlier.categoryAvg)}

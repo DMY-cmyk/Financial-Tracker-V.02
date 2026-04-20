@@ -169,6 +169,19 @@
   --chart-3: #d97706;
   --chart-4: #dc2626;
   --chart-5: #8b5cf6;
+  /* Chart semantic tokens */
+  --chart-income: #059669;
+  --chart-expense: #dc2626;
+  --chart-primary: #3b82f6;
+  --chart-muted: #94a3b8;
+  --chart-grid: #e2e8f0;
+  /* Chart palette tokens (index-based, for dynamic series) */
+  --chart-color-1: #3b82f6;
+  --chart-color-2: #10b981;
+  --chart-color-3: #8b5cf6;
+  --chart-color-4: #f59e0b;
+  --chart-color-5: #ec4899;
+  --chart-color-6: #06b6d4;
   --radius: 0.75rem;
   --sidebar: #f8fafc;
   --sidebar-foreground: #0f172a;
@@ -208,6 +221,17 @@
   --chart-3: #f59e0b;
   --chart-4: #ef4444;
   --chart-5: #a78bfa;
+  --chart-income: #34d399;
+  --chart-expense: #f87171;
+  --chart-primary: #60a5fa;
+  --chart-muted: #64748b;
+  --chart-grid: #334155;
+  --chart-color-1: #60a5fa;
+  --chart-color-2: #34d399;
+  --chart-color-3: #a78bfa;
+  --chart-color-4: #fcd34d;
+  --chart-color-5: #f9a8d4;
+  --chart-color-6: #67e8f9;
   --sidebar: #1e293b;
   --sidebar-foreground: #f1f5f9;
   --sidebar-primary: #3b82f6;

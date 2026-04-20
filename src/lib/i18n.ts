@@ -78,6 +78,7 @@ type TranslationKeys = {
   // Filters
   all: string;
   thisMonth: string;
+  lastMonth: string;
 
   // Settings
   language: string;
@@ -396,6 +397,7 @@ type TranslationKeys = {
   // Sidebar group keys
   groupFinance: string;
   groupTools: string;
+  groupSettings: string;
 
   // Beginning Balance
   beginningBalance: string;
@@ -606,6 +608,7 @@ const translations: Record<Locale, TranslationKeys> = {
     of: 'of',
     all: 'All',
     thisMonth: 'This Month',
+    lastMonth: 'Last Month',
     language: 'Language',
     theme: 'Theme',
     light: 'Light',
@@ -916,6 +919,7 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Finance',
     groupTools: 'Tools',
+    groupSettings: 'Settings',
 
     // Beginning Balance
     beginningBalance: 'Beginning Balance',
@@ -1102,6 +1106,7 @@ const translations: Record<Locale, TranslationKeys> = {
     of: 'dari',
     all: 'Semua',
     thisMonth: 'Bulan Ini',
+    lastMonth: 'Bulan Lalu',
     language: 'Bahasa',
     theme: 'Tema',
     light: 'Terang',
@@ -1413,6 +1418,7 @@ const translations: Record<Locale, TranslationKeys> = {
     // Sidebar group keys
     groupFinance: 'Keuangan',
     groupTools: 'Alat',
+    groupSettings: 'Pengaturan',
 
     // Beginning Balance
     beginningBalance: 'Saldo Awal',

@@ -120,8 +120,8 @@ export function NetWorthTrendChart({ history }: NetWorthTrendChartProps) {
         <AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="nwGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+              <stop offset="5%" style={{ stopColor: 'var(--chart-primary)', stopOpacity: 0.3 }} />
+              <stop offset="95%" style={{ stopColor: 'var(--chart-primary)', stopOpacity: 0 }} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -141,7 +141,7 @@ export function NetWorthTrendChart({ history }: NetWorthTrendChartProps) {
           <Area
             type="monotone"
             dataKey="netWorth"
-            stroke="#2563eb"
+            stroke="var(--chart-primary)"
             strokeWidth={2}
             fill="url(#nwGradient)"
             dot={false}

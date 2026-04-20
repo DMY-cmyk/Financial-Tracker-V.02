@@ -184,7 +184,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
       {/* Amount */}
       <div>
-        <Label htmlFor="amount">{t(locale, 'amount')}</Label>
+        <Label htmlFor="amount">
+          {t(locale, 'amount')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <div className="relative mt-1">
           <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 font-mono text-sm">
             Rp
@@ -214,7 +217,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
       {/* Date & Category */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <Label htmlFor="date">{t(locale, 'date')}</Label>
+          <Label htmlFor="date">
+            {t(locale, 'date')}
+            <span className="ml-0.5 text-red-500">*</span>
+          </Label>
           <Input
             id="date"
             type="date"
@@ -226,7 +232,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
           {fieldError('date') && <p className="mt-1 text-xs text-red-500">{fieldError('date')}</p>}
         </div>
         <div>
-          <Label htmlFor="category">{t(locale, 'category')}</Label>
+          <Label htmlFor="category">
+            {t(locale, 'category')}
+            <span className="ml-0.5 text-red-500">*</span>
+          </Label>
           <select
             id="category"
             value={category}
@@ -255,7 +264,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
       {/* Description */}
       <div>
-        <Label htmlFor="description">{t(locale, 'description')}</Label>
+        <Label htmlFor="description">
+          {t(locale, 'description')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <div className="relative">
           <Input
             id="description"
@@ -303,7 +315,10 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
       {/* Payment Method */}
       <div>
-        <Label htmlFor="paymentMethod">{t(locale, 'paymentMethod')}</Label>
+        <Label htmlFor="paymentMethod">
+          {t(locale, 'paymentMethod')}
+          <span className="ml-0.5 text-red-500">*</span>
+        </Label>
         <Select
           value={paymentMethod}
           onValueChange={(val) => {
