@@ -7,6 +7,7 @@ import type {
   Liability,
   NetWorthCurrent,
   NetWorthSnapshot,
+  TransactionSplitInput,
 } from '@/lib/types';
 
 // === Request types ===
@@ -20,6 +21,7 @@ export interface CreateTransactionRequest {
   amount: number;
   paymentMethod: string;
   notes: string;
+  splits?: TransactionSplitInput[];
 }
 
 export interface BulkCreateTransactionRequest {
@@ -46,6 +48,7 @@ export interface UpdateTransactionRequest {
   amount?: number;
   paymentMethod?: string;
   notes?: string;
+  splits?: TransactionSplitInput[] | null;
 }
 
 export interface ListTransactionsParams {
