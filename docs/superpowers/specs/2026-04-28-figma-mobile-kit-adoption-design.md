@@ -2,153 +2,228 @@
 feature: Figma Mobile Kit Visual Adoption
 type: spec
 date: 2026-04-28
-status: draft
+status: approved
 tier: 1
+revision: 2
 related-figma: oQJ6LE7vTOhjKuhpTCEV6X (Finance Management Mobile App UI UX Kit — Community)
+supersedes-internal: 2026-04-28 r1 (initial draft)
 ---
 
-# Figma Mobile Kit Visual Adoption — Design Spec
+# Figma Mobile Kit Visual Adoption — Design Spec (r2)
 
 ## Overview
 
-A two-phase redesign that adopts the visual language of the "Finance Management Mobile App UI UX Kit" (Figma community file) into the existing Next.js web dashboard. The product, routes, data layer, and information architecture are unchanged. The work is layered:
+A redesign that adopts a narrow, high-leverage subset of the "Finance Management Mobile App UI UX Kit" (Figma community file) into the existing Next.js web dashboard. The product, routes, data layer, and information architecture are unchanged.
 
-- **Phase 1 — Visual Language Adoption.** Token swap, chrome refresh, three new shared components, restyle of existing components. No layout changes, no new routes, no new data.
-- **Phase 2 — Mobile Fidelity Pass (Home + Transactions only).** Mobile-breakpoint layout refactors for `/` and `/transactions` to match the kit's mobile screens 1:1 where patterns map cleanly. Desktop layouts untouched.
+The work is split into **three independently mergeable phases**:
 
-Phases ship independently. Phase 1 is mergeable on its own; Phase 2 layers on top.
+- **Phase 1a — Tokens only.** Add brand-mint, tile, and hero token families to `globals.css`. Bump `--radius` from `0.75rem` to `1rem`. No component or page touched.
+- **Phase 1b — Chrome.** Introduce `<HeroHeader>`, `<BottomNavFab>`, exported-but-unused `<CategoryTile>`, and `lib/icon.ts`. Wire hero band into top-level mobile pages. Replace `BottomNav.tsx` with `BottomNavFab.tsx`. Restyle Sidebar / Topbar / MobileNav via tokens only. Add a mint-CTA `<Button variant="mint">`.
+- **Phase 2 — Mobile fidelity (Home + Transactions only).** Introduce `<PeriodTabs>`, `<SavingsRingCard>`, `<TransactionRowMobile>`. Refactor mobile compositions of `/` and `/transactions` to match the kit's Home and Transaction screens. Desktop layouts untouched.
 
 ## Scope
 
-| | Phase 1 | Phase 2 |
-|---|---|---|
-| New files | 4 | 3 |
-| Removed files | 1 (`BottomNav.tsx`) | 0 |
-| Modified files | ~14 | ~4 |
-| New tests | 0 (visual-only) | 2 (component) |
-| New routes | 0 | 0 |
-| API changes | 0 | 0 |
+| | Phase 1a | Phase 1b | Phase 2 |
+|---|---|---|---|
+| New files | 0 | 4 | 3 |
+| Removed files | 0 | 1 (`BottomNav.tsx`) | 0 |
+| Modified files | 1 | ~9 | ~3 |
+| New tests | 0 | 0 | 2 (component) |
+| New routes | 0 | 0 | 0 |
+| API changes | 0 | 0 | 0 |
 
 ## Goals
 
-- Refresh the visual identity to a green-primary, mint-cream-surface system inspired by the kit, while preserving universal finance semantics (red = expense, green = income).
-- Introduce three reusable chrome components (`HeroHeader`, `CategoryTile`, `BottomNavFab`) that are framework-agnostic enough to live alongside existing primitives.
-- Land Phase 1 with zero behavior or data-flow change so it can be merged and tested independently.
-- For Phase 2, bring the mobile breakpoint of `/` and `/transactions` to visual parity with the kit's Home and Transaction screens.
+- Refresh visual identity with a brand-mint accent applied **only to opt-in chrome** (hero band, FAB, bottom-nav active item, primary CTAs). Forms, sidebar focus, calendar selection, links, and charts keep today's blue identity.
+- Preserve universal finance semantics: **red = expense, green = income.**
+- Land Phase 1a on its own as the smallest possible visual nudge.
+- Land Phase 1b without changing any page layout (hero is additive on top-level mobile pages; CategoryTile is exported but unused).
+- For Phase 2, bring `/` and `/transactions` mobile layout to visual parity with the kit's Home and Transaction screens.
 
 ## Non-Goals
 
 - No native mobile app, no PWA shell changes, no Capacitor wrapping. Web-only.
 - No auth flow build-out (Login / Create Account / PIN / Fingerprint / Delete Account screens from the kit are skipped). Existing `/login` and `/register` placeholder routes are not modified.
-- No icon-library swap. `lucide-react` stays; only `strokeWidth` is bumped.
-- No refactor of `/bills`, `/upload`, `/upload/bulk`, `/export`, `/transactions/new`, `/budget`, `/reports`, `/savings`, `/settings`, `/settings/categories`, `/recurring`, `/net-worth`, `/insights`, `/home` layouts. They inherit Phase 1 tokens only.
-- No notifications system. The bell icon in the hero is decorative for now.
-- No dark mode redesign — dark mode token values are derived from the new palette but the dark UX stays as-is otherwise.
+- No icon-library swap. `lucide-react` stays; only `strokeWidth` and line-cap defaults change via opt-in `lucideProps`.
+- No layout refactor of `/bills`, `/upload`, `/upload/bulk`, `/export`, `/transactions/new`, `/budget`, `/reports`, `/savings`, `/settings`, `/settings/categories`, `/recurring`, `/net-worth`, `/insights`, `/home`. They inherit Phase 1a tokens only.
+- No notifications system. The bell icon in the hero is decorative.
+- No dark-mode UX redesign — dark-mode token values are derived from the new palette but the dark UX stays as-is otherwise.
+- No swap of `--primary`, `--ring`, `--accent`, `--secondary`, `--sidebar-*`, `--background`, `--card`, or any `--chart-*`. Surfaces and existing accents stay today's slate-blue identity.
+- No wiring of `<CategoryTile>` into any page. Component ships exported but with zero callsites; page-level wiring is a future-work item.
+- No PageHeader `variant` prop. PageHeader stays exactly as it is today.
 
-## Recorded Decisions (from brainstorming, 2026-04-28)
+## Recorded Decisions
 
 | ID | Decision |
 |---|---|
-| A | Expense color stays **red** (`--destructive`, `--chart-expense`). Kit's blue is used only as accent for dates/secondary text/links. |
-| B | **Hybrid brand swap.** Green primary for CTA, hero band, active nav. Charts and links keep blue tones. |
-| C | Hero band only on **top-level mobile pages** (`/`, `/transactions`, `/reports`, `/budget`, `/settings`). Note: this set is independent from the 5-slot bottom-nav set (`/reports` has a hero but is not in the nav). Detail/edit pages keep current flat header. |
-| D | **Keep `lucide-react`.** Bump `strokeWidth` default from 2 to 2.25; adopt rounded line caps. |
+| A | Expense color stays **red** (`--destructive`, `--chart-expense`). Kit's blue is used only as accent for dates / secondary text / links. |
+| B | **Hybrid brand swap.** Mint applies only to opt-in chrome (hero, FAB, bottom-nav active, primary CTAs). Charts, links, sidebar focus, calendar, form rings stay blue. |
+| C | Hero band only on **top-level mobile pages** (`/`, `/transactions`, `/reports`, `/budget`, `/settings`). The hero set is independent from the 5-slot bottom-nav set (`/reports` has a hero but is not in the nav). Detail/edit pages keep the current flat header. |
+| D | **Keep `lucide-react`.** Add `src/lib/icon.ts` exporting `lucideProps = { strokeWidth: 2.25, strokeLinecap: 'round', strokeLinejoin: 'round' }`. Apply opt-in only at leaf callsites that read poorly today. No blanket icon edits. |
 | E | Bottom-nav 5 slots: **Home / Transactions / Add (FAB) / Budget / Settings.** |
 | F | **Skip all auth screens.** No PIN, fingerprint, account-deletion flows. |
-| G | Phase 2 ships **Home + Transactions only.** Other mobile pages stay in Phase 1 token-only state. |
+| G | Phase 2 ships **Home + Transactions only.** Other mobile pages stay token-only. |
+| H | **Brand-mint as a separate token family.** `--primary` stays blue. Mint shows up only where opt-in. (Chunk-2 alternative II.) |
+| I | `CategoryTile` ships in Phase 1b as exported-but-unused. Wiring into `/settings/categories` and `/savings` is deferred to a future phase. (Q1=a.) |
+| J | Drop the `PageHeader` variant prop. `HeroHeader` is the separate component used on top-level mobile pages; `PageHeader` is unchanged. (Q2.) |
+| K | Hero band renders only at `< 1024px`. At `≥ 1024px`, top-level pages keep `Topbar + PageHeader` exactly as today. (Q3.) |
+| L | Mobile/desktop layout split uses **CSS-only** (`md:hidden` / `hidden md:block`). No `useMediaQuery`, no SSR sniff. (Q4.) |
+| M | `/home`, `/insights`, `/net-worth`, `/recurring` get Phase 1a tokens only. No hero, no other changes. (Q5.) |
 
 ---
 
-## Phase 1 — Visual Language Adoption
+## Phase 1a — Tokens only
 
-### 1.1 Token swap (`src/app/globals.css`)
-
-Replace the values of select existing tokens and add a small set of new ones (`--hero-*`, `--tile-*`). All other tokens keep their current values. Charts keep their current semantic split.
-
-**Light mode (`:root`):**
-
-| Token | Current | New | Reason |
-|---|---|---|---|
-| `--primary` | `#2563eb` | `#22c97e` | Kit's mint green |
-| `--primary-foreground` | `#ffffff` | `#0f172a` | Dark text reads better on mint |
-| `--ring` | `#2563eb` | `#22c97e` | Match primary |
-| `--background` | `#f8fafc` | `#eaf8ec` | Mint cream surface |
-| `--card` | `#ffffff` | `#f4fcf4` | Warmer card |
-| `--accent` | `#dbeafe` | `#d8f3e0` | Mint accent |
-| `--accent-foreground` | `#1e40af` | `#0a4f2c` | Mint accent text |
-| `--secondary` | `#f1f5f9` | `#e7f4ec` | Mint-tinged neutral |
-| `--sidebar` | `#f8fafc` | `#e7f4ec` | Match background tone |
-| `--sidebar-primary` | `#2563eb` | `#22c97e` | Match brand |
-| `--sidebar-accent` | `#dbeafe` | `#d8f3e0` | Match accent |
-
-**Dark mode (`.dark`):**
-
-| Token | Current | New |
-|---|---|---|
-| `--primary` | `#3b82f6` | `#34d399` |
-| `--primary-foreground` | `#ffffff` | `#062b18` |
-| `--ring` | `#3b82f6` | `#34d399` |
-| `--accent` | `#1e3a5f` | `#0e3b27` |
-| `--accent-foreground` | `#93c5fd` | `#86efac` |
-| `--sidebar-primary` | `#3b82f6` | `#34d399` |
-| `--sidebar-accent` | `#1e3a5f` | `#0e3b27` |
-
-**Unchanged on purpose:**
-- `--destructive`, `--chart-expense` — stay red (Decision A).
-- `--success`, `--chart-income` — stay green (no semantic change).
-- `--chart-1` through `--chart-color-6` — chart palettes stay blue/teal-led for readability and a11y (Decision B).
-- Font tokens (`--font-sans`, `--font-mono`) — Plus Jakarta Sans matches the kit closely enough.
-
-**New tokens (added):**
+### 1a.1 New tokens — light mode (`:root`)
 
 ```css
---hero-bg: #22c97e;          /* full-bleed hero band */
---hero-foreground: #0f172a;  /* hero text */
---hero-bg-soft: #98e8b8;     /* faded hero gradient stop */
---tile-bg: #c9defe;          /* category icon tile background */
---tile-bg-active: #1f4fff;   /* selected category tile */
---tile-foreground: #1f4fff;  /* line-art icon color on tile */
+/* Brand mint — used only on opt-in chrome */
+--brand-mint: #22c97e;
+--brand-mint-foreground: #0f172a;
+--brand-mint-soft: #98e8b8;        /* gradient stop, hover hint */
+--brand-mint-strong: #16a368;      /* press state */
+
+/* Hero band */
+--hero-bg: var(--brand-mint);
+--hero-foreground: var(--brand-mint-foreground);
+
+/* Category icon tile */
+--tile-bg: #c9defe;                /* pastel blue (kit) */
+--tile-foreground: #1f4fff;        /* line-art icon color */
+--tile-bg-active: #1f4fff;
 --tile-foreground-active: #ffffff;
---radius: 1rem;              /* bumped from 0.75rem */
+
+/* Radius bump */
+--radius: 1rem;                    /* was 0.75rem */
 ```
 
-Dark-mode equivalents (`.dark`):
+### 1a.2 New tokens — dark mode (`.dark`)
 
 ```css
---hero-bg: #1d8a5e;
---hero-foreground: #f1f5f9;
---hero-bg-soft: #1f6447;
+--brand-mint: #34d399;
+--brand-mint-foreground: #062b18;
+--brand-mint-soft: #1f6447;
+--brand-mint-strong: #0f9b6c;
+
+--hero-bg: var(--brand-mint);
+--hero-foreground: var(--brand-mint-foreground);
+
 --tile-bg: #1e3a5f;
---tile-bg-active: #3b82f6;
 --tile-foreground: #93c5fd;
+--tile-bg-active: #3b82f6;
 --tile-foreground-active: #ffffff;
 ```
 
-Expose them in the `@theme inline` block as `--color-hero`, `--color-hero-foreground`, `--color-tile`, `--color-tile-active`, etc., so they are usable as Tailwind classes (`bg-hero`, `text-hero-foreground`, `bg-tile`).
+### 1a.3 Tailwind exposure (`@theme inline`)
 
-### 1.2 New shared components
+```css
+--color-brand-mint: var(--brand-mint);
+--color-brand-mint-foreground: var(--brand-mint-foreground);
+--color-brand-mint-soft: var(--brand-mint-soft);
+--color-brand-mint-strong: var(--brand-mint-strong);
+--color-hero: var(--hero-bg);
+--color-hero-foreground: var(--hero-foreground);
+--color-tile: var(--tile-bg);
+--color-tile-foreground: var(--tile-foreground);
+--color-tile-active: var(--tile-bg-active);
+--color-tile-active-foreground: var(--tile-foreground-active);
+```
 
-#### `src/components/layout/HeroHeader.tsx` (new)
+Available as utilities: `bg-brand-mint`, `text-brand-mint-foreground`, `bg-hero`, `text-hero-foreground`, `bg-tile`, `text-tile-foreground`, `bg-tile-active`, `text-tile-active-foreground`.
 
-Replaces `PageHeader.tsx` callsites on top-level mobile routes. On desktop, renders as a slimmer band tucked under `Topbar`.
+### 1a.4 Contrast verification (target: WCAG AA)
+
+| Pair | Ratio | Pass? |
+|---|---|---|
+| `#0f172a` on `#22c97e` (mint hero text) | ~10.0 : 1 | ✓ AAA |
+| `#0f172a` on `#16a368` (mint pressed) | ~6.6 : 1 | ✓ AA |
+| `#062b18` on `#34d399` (dark hero text) | ~12.5 : 1 | ✓ AAA |
+| `#1f4fff` on `#c9defe` (tile icon) | ~5.1 : 1 | ✓ AA |
+| `#93c5fd` on `#1e3a5f` (dark tile icon) | ~7.0 : 1 | ✓ AAA |
+
+The implementer must re-verify with axe DevTools or Stark before merge.
+
+### 1a.5 Radius bump cascade
+
+`--radius-sm/md/lg/xl/2xl/3xl/4xl` are already proportional in `globals.css` and inherit the new base:
+
+| Token | Before | After |
+|---|---|---|
+| `--radius-sm` | 0.45rem | 0.6rem |
+| `--radius-md` | 0.6rem | 0.8rem |
+| `--radius-lg` (= `--radius`) | 0.75rem | 1rem |
+| `--radius-xl` | 1.05rem | 1.4rem |
+| `--radius-2xl` | 1.35rem | 1.8rem |
+| `--radius-3xl` | 1.65rem | 2.2rem |
+
+All cards, buttons, inputs, dialogs, sheets, popovers, tooltips become a touch rounder. **No code change beyond `globals.css`.**
+
+### 1a.6 What Phase 1a explicitly does NOT do
+
+- Does not touch `--background`, `--foreground`, `--card`, `--card-foreground`. Surfaces remain slate-blue today.
+- Does not touch `--primary`, `--primary-foreground`, `--ring`, `--secondary`, `--accent`, `--sidebar-*`. Form focus, sidebar accent, calendar selection, link hover all stay blue.
+- Does not modify `--destructive`, `--success`, `--warning`, `--chart-*`, `--chart-color-*`. Income/expense semantics fully preserved.
+
+---
+
+## Phase 1b — Chrome
+
+Layered on top of Phase 1a. Phase 1b can ship in the same PR as 1a if the implementer prefers; the split is for risk-management, not policy.
+
+### 1b.1 `<HeroHeader>` contract
 
 ```tsx
 interface HeroHeaderProps {
   title: string;
-  greeting?: string;          // optional eyebrow ("Hi, Welcome Back")
-  subgreeting?: string;       // optional ("Good Morning")
-  showBack?: boolean;         // default true on detail pages, false on tabs
-  rightAction?: ReactNode;    // bell icon, settings cog, etc.
-  children?: ReactNode;       // metrics row inside the band (Total Balance / Total Expense)
+  greeting?: string;        // top-level Home only
+  subgreeting?: string;     // top-level Home only
+  showBack?: boolean;       // default false
+  rightAction?: ReactNode;  // default: bell icon (decorative)
+  children?: ReactNode;     // metric chips inside the band
 }
 ```
 
-- Background: `bg-hero` (mint), full-bleed top, `rounded-b-3xl` on its own (so the next surface tucks under).
-- Mobile: 25–30% of viewport height when `children` is provided, ~96px when not.
-- Desktop: 80px tall band under the existing `Topbar`. No back arrow.
-- Foreground respects `prefers-reduced-motion` for any subtle animation.
+**Rendering rules:**
+- Renders **nothing at `≥ 1024px`** — desktop keeps `Topbar + PageHeader`. Use `lg:hidden` wrapper.
+- At `< 1024px`:
+  - Background `bg-hero`, `rounded-b-3xl`, soft bottom shadow.
+  - Top row: optional back button (left) + `title` (center) + `rightAction` (right).
+  - Below top row (when provided): `greeting` (12px medium) + `subgreeting` (16px bold) — Home-only.
+  - `children` renders below the title row, inside the mint band (used for metric chips).
+- Height is **content-driven**. Empty hero ≈ 96px. With metric chips ≈ 200–220px.
+- **No animations** specified. Reduced-motion behavior is unchanged from app baseline.
 
-#### `src/components/shared/CategoryTile.tsx` (new)
+**Default `rightAction`:** decorative bell icon with `aria-label={t('hero.bell.aria')}`. No notifications system; the icon is non-interactive in this revision.
+
+### 1b.2 `<BottomNavFab>` contract
+
+Replaces `src/components/layout/BottomNav.tsx` (deleted).
+
+```tsx
+type NavSlot =
+  | { key: string; href: string;   icon: LucideIcon; labelKey: string }
+  | { key: string; fab: true;      icon: LucideIcon; labelKey: string };
+
+const SLOTS: ReadonlyArray<NavSlot> = [
+  { key: 'home',     href: '/',             icon: Home,           labelKey: 'nav.home' },
+  { key: 'tx',       href: '/transactions', icon: ArrowLeftRight, labelKey: 'nav.transactions' },
+  { key: 'add',      fab: true,             icon: Plus,           labelKey: 'nav.add' },
+  { key: 'budget',   href: '/budget',       icon: PiggyBank,      labelKey: 'nav.budget' },
+  { key: 'settings', href: '/settings',     icon: Settings,       labelKey: 'nav.settings' },
+];
+```
+
+**Rules:**
+- Renders only at `< 1024px` (matches existing `BottomNav` breakpoint).
+- FAB pill: 56×56, `bg-brand-mint` + `text-brand-mint-foreground`, `-translate-y-3`, ring shadow. 11px label below the pill.
+- FAB tap opens a shadcn `Sheet` anchored bottom. Sheet contents are **three router-link buttons**:
+  - "Add Income" → `/transactions/new?type=income`
+  - "Add Expense" → `/transactions/new?type=expense`
+  - "Scan Receipt" → `/upload`
+- The sheet is a router-link list, not a form. No state lives in the sheet.
+- "Active" rule: a slot is active when `usePathname()` equals its `href` exactly OR (for `/transactions`) starts with `/transactions/`.
+
+### 1b.3 `<CategoryTile>` contract (exported, unused)
 
 ```tsx
 interface CategoryTileProps {
@@ -160,207 +235,311 @@ interface CategoryTileProps {
 }
 ```
 
-- Square-ish tile, `aspect-[1/1.05]`, `rounded-2xl`, `bg-tile` with `text-tile-foreground` line icon centered, label below in `text-sm font-medium`.
-- `active` state: `bg-tile-active` with `text-tile-foreground-active`.
-- Used in `/settings/categories` (replace current list rows on mobile) and `/savings` (replace current goal cards on mobile). On desktop both pages keep their current grid cards.
+- Square tile, `aspect-[1/1.05]`, `rounded-2xl`, `bg-tile` + `text-tile-foreground`.
+- `active` swaps to `bg-tile-active` + `text-tile-active-foreground`.
+- Renders `<Link>` if `href` provided, otherwise `<button>`.
+- **Zero callsites in Phase 1b.** Resolves the original spec's contradiction (no Phase 1 layout changes).
 
-#### `src/components/layout/BottomNavFab.tsx` (new) — `BottomNav.tsx` is deleted
+### 1b.4 `<Button variant="mint">`
 
-5 slots, center is a raised FAB that opens an "Add" sheet (transaction quick-add). The existing `BottomNav.tsx` file is removed; its sole importer (`AppShell.tsx`) switches to `BottomNavFab`.
+A new button variant added to `src/components/ui/button.tsx`:
 
-```tsx
-const SLOTS = [
-  { key: 'home',    href: '/',             icon: Home,        labelKey: 'nav.home' },
-  { key: 'tx',      href: '/transactions', icon: ArrowLeftRight, labelKey: 'nav.transactions' },
-  { key: 'add',     fab: true,             icon: Plus,        labelKey: 'nav.add' },
-  { key: 'budget',  href: '/budget',       icon: PiggyBank,   labelKey: 'nav.budget' },
-  { key: 'settings',href: '/settings',     icon: Settings,    labelKey: 'nav.settings' },
-] as const;
+- `variant="mint"`: `bg-brand-mint text-brand-mint-foreground hover:bg-brand-mint-strong`.
+- `default`, `ghost`, `outline`, `link`, `destructive`, `secondary` variants are **unchanged**.
+- This is opt-in. Pages that want a mint primary CTA explicitly pass `variant="mint"`.
+
+### 1b.5 `lib/icon.ts`
+
+```ts
+export const lucideProps = {
+  strokeWidth: 2.25,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+} as const;
 ```
 
-- The FAB is a 56×56 mint pill that floats `-translate-y-3` above the bar, with shadow.
-- Pressing FAB opens a `Sheet` with three big buttons: "Add Income", "Add Expense", "Scan Receipt" (links to `/transactions/new?type=income|expense` and `/upload`).
-- The existing `BottomNav.tsx` file is deleted; `BottomNavFab.tsx` is the replacement. All importers updated.
+Used opt-in (`<MyIcon {...lucideProps} />`) at leaf callsites that the implementer judges read poorly today. Not a blanket replacement.
 
-### 1.3 Component restyles (no API change)
+### 1b.6 Top-level page wiring (mobile only)
 
-| File | Change |
-|---|---|
-| `src/components/layout/PageHeader.tsx` | Add `variant="hero" \| "flat"` prop. Default stays `flat` (no hero band) so non-top-level pages are unchanged. Top-level tabs migrate to `<HeroHeader>` directly (PageHeader keeps for detail pages). |
-| `src/components/layout/Topbar.tsx` | Background tinted to `bg-card`, border bottom `border-border/60`. No layout change. |
-| `src/components/layout/Sidebar.tsx` | Active nav item uses `bg-tile/30` with `text-tile-foreground`. Brand mark recolored to mint. |
-| `src/components/layout/MobileNav.tsx` | Drawer header gets the new mint band. |
-| `src/components/ui/button.tsx` | `default` variant: `bg-primary text-primary-foreground` (now mint with dark text). `ghost`, `outline`, `link` unchanged. Add `radius-3xl` to the `lg`/`xl` sizes used in CTAs. |
-| `src/components/ui/card.tsx` | Default radius bumped via `--radius` change. No code edit needed. |
-| `src/components/shared/SummaryCard.tsx` | When `tone="primary"`, use mint background with dark text instead of blue/white. |
-| `src/components/shared/EmptyState.tsx` | Icon recolored via tokens. |
-| Icons used app-wide via `lucide-react` | Adopt strokeWidth via wrapper or via global lucide config (Decision D). Implementation: create `src/lib/icon.ts` exporting `lucideProps = { strokeWidth: 2.25, strokeLinecap: 'round', strokeLinejoin: 'round' }` and apply through `<Icon {...lucideProps} />` only at the leaf callsites that read poorly today (max 10 places). Don't blanket-edit every icon usage. |
+In each of `src/app/page.tsx`, `src/app/transactions/page.tsx`, `src/app/budget/page.tsx`, `src/app/reports/page.tsx`, `src/app/settings/page.tsx`:
 
-### 1.4 Verification (Phase 1)
+- Mount `<HeroHeader>` once, wrapped in a `lg:hidden` container.
+- Hero contents (`/budget`, `/reports`, `/settings`): **title + bell only.** No metric chips, no greeting.
+- Hero contents (`/transactions`): title + bell, plus two metric chips (Total Balance / Total Expense) — see Phase 2 (chips render only when wrapped in the Phase 2 mobile branch; until Phase 2, `/transactions` hero is title + bell only).
+- Hero contents (`/`): title + bell + greeting/subgreeting + chips — only when wrapped in the Phase 2 mobile branch; until Phase 2, `/` hero is title + bell only.
 
-- Visual diff via screenshots is acceptable; no Vitest needed (no behavior change).
-- Run `npm run preflight` (typecheck + lint + format + build).
-- Manual QA pass: each top-level page in light + dark mode, mobile + desktop breakpoints. Acceptance criteria below.
+So in Phase 1b, **all five top-level pages get a minimal title-only hero**. Phase 2 expands hero contents on `/` and `/transactions`.
 
-#### Acceptance criteria (Phase 1)
+### 1b.7 Sidebar / Topbar / MobileNav
 
-- All existing pages render without layout shift > 4px from baseline screenshots.
-- All charts retain their current color semantics (income green, expense red).
-- All forms still pass label `htmlFor` checks (no regression on the 2026-04-20 audit fixes).
-- All buttons meet 4.5:1 contrast against their background in both light and dark mode.
-- `prefers-reduced-motion` is still respected on every animated component.
-- `npm run test` still passes (312 tests).
+Pure recolor via tokens — **no markup or behavior change.**
+
+- `Sidebar.tsx`: brand mark accepts mint via `text-brand-mint`. Active nav item background unchanged (still `--accent` blue).
+- `Topbar.tsx`: background unchanged. (Already `bg-card`/`bg-background`.)
+- `MobileNav.tsx`: drawer header gets a thin mint accent strip (`h-1 bg-brand-mint`) at the top. Optional polish; can be skipped if cost outweighs visual gain.
+
+### 1b.8 Verification (Phase 1b)
+
+- `npm run preflight` passes.
+- `npm run test` still passes (existing 312 tests, no new tests).
+- WCAG AA verified on hero, FAB, tile, mint CTA via axe DevTools or Stark. Implementer captures one screenshot per surface in the PR description.
+- Bottom-nav FAB visible at `< 1024px`. Sheet opens, dismisses on outside click and Esc.
+- HeroHeader renders only at `< 1024px`. At `≥ 1024px`, top-level pages render byte-identically to current `main`.
+- `prefers-reduced-motion` respected app-wide (no regression).
 
 ---
 
-## Phase 2 — Mobile Fidelity Pass (Home + Transactions only)
+## Phase 2 — Mobile fidelity (Home + Transactions only)
 
-Activates only at `< 640px`. Above that, layouts are exactly the Phase 1 result.
+Activates only at `< 768px` (Tailwind `md:`). Above that, layouts are exactly the Phase 1b result.
 
 ### 2.1 `/` (Dashboard) mobile layout
 
-Below 640px, `src/app/page.tsx` returns a different composition. Above 640px, current bento grid is unchanged.
+Top to bottom:
 
-**Mobile composition (top to bottom):**
+1. `<HeroHeader>` with `greeting={t('home.greeting')}`, `subgreeting={t(`home.subgreeting.${timeOfDay()}`)}`, no back arrow, bell icon right (decorative). Inside the hero:
+   - Two metric chips: `home.totalBalance` and `home.totalExpense` (signed; expense uses `text-destructive`, income uses `text-foreground`).
+   - Below chips: a 30%-of-monthly-budget progress bar with caption from `home.budget.caption.*` keyed by current % bucket.
+2. White card overlap (`-mt-6 rounded-t-3xl`) containing `<SavingsRingCard>` (occupies the full row).
+3. `<PeriodTabs variant="three" value={…} onChange={…} />` (Daily / Weekly / Monthly).
+4. Recent-transactions list — 5 most recent items + "See all" → `/transactions`. Rows are `<TransactionRowMobile>`.
+5. Spacer for `BottomNavFab` clearance (`pb-24`).
 
-1. `<HeroHeader>` with `greeting="Hi, Welcome Back"`, `subgreeting={timeOfDayGreeting()}`, no back arrow, bell icon right (decorative). Inside the hero, render two metric chips: `Total Balance` and `Total Expense` (signed, red if negative). Below them, a 30%-of-monthly-budget progress bar + caption like "30% of your expenses, looks good." (caption is conditional on actual % vs. budget.)
-2. White card overlap (`-mt-6 rounded-t-3xl`) containing a savings-on-goals ring summary (`<SavingsRingCard>` — uses existing `useSavingsData`) on the left and 2 stacked stat lines (Revenue Last Week, biggest-expense Last Week) on the right.
-3. `<PeriodTabs value={"Daily"|"Weekly"|"Monthly"} />` (new component, 3 pills).
-4. Recent transactions list (5 items, "See all" → `/transactions`). Row component is `<TransactionRowMobile>` — see 2.3.
-5. Spacer for `BottomNavFab` clearance.
-
-**Sources:**
+**Sources (no new endpoints):**
 - Total balance: `/api/dashboard/summary`
-- Total expense (current month): same endpoint
+- Total expense (current month): `/api/dashboard/summary`
 - Monthly budget %: existing `useBudgetData`
-- Savings ring: existing `useSavingsData`
+- Savings ring: existing `useSavingsData` (Zustand-backed, per current architecture)
 - Recent transactions: `/api/transactions?page=1&pageSize=5`
-
-**No new endpoints. No new fields.** All numbers already exist.
+- Last-week stats: `/api/transactions?from=…&to=…` then aggregate client-side
 
 ### 2.2 `/transactions` mobile layout
 
-Below 640px, `src/app/transactions/page.tsx` adopts:
+Top to bottom:
 
-1. `<HeroHeader>` with `title="Transactions"`, back arrow hidden (it's a tab), bell icon right.
-2. Inside the hero, two metric chips: `Total Balance` and `Total Expense` (same pattern as Home).
-3. `<PeriodTabs />` for Daily / Weekly / Monthly / Yearly (Decision E uses Budget on the bottom nav, but the Period tabs here filter the list — separate concept).
-4. Transactions grouped by month, each group titled (e.g. "April", "March"). Inside each group, `<TransactionRowMobile>` items.
-5. Existing `useAllTransactions` hook is reused — only the rendering changes.
+1. `<HeroHeader>` with `title={t('nav.transactions')}`, no back arrow, bell icon right.
+   - Inside: two metric chips (Total Balance / Total Expense), same shape as Home.
+2. `<PeriodTabs variant="four" value={…} onChange={…} />` (Daily / Weekly / Monthly / Yearly).
+3. Transactions grouped by month. Each group titled (e.g. "April", "March"). Inside each group: `<TransactionRowMobile>` items.
+4. Existing `useAllTransactions` hook is reused — only rendering changes.
 
-### 2.3 `<TransactionRowMobile>` (new)
+### 2.3 `<PeriodTabs>` contract
+
+```tsx
+type Period = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+interface PeriodTabsProps {
+  variant: 'three' | 'four';
+  value: Period;
+  onChange: (next: Period) => void;
+  className?: string;
+}
+```
+
+- Pill row, full-width, `bg-secondary`. Active pill: `bg-brand-mint`, `text-brand-mint-foreground`. Inactive: transparent, muted text.
+- Controlled. No internal state.
+- `variant="three"` exposes `daily | weekly | monthly`; type space stays `Period`.
+
+### 2.4 `<SavingsRingCard>` contract
+
+```tsx
+interface SavingsRingCardProps {} // no props; reads useSavingsData internally
+```
+
+- Card with circular progress ring (recharts PieChart, single ring) showing aggregate savings-goal completion %.
+- Ring color: `--brand-mint` (filled) on `--brand-mint-soft` (track).
+- Right column: two stacked stat lines.
+  1. **Revenue last week** — sum of income transactions in the last 7 days.
+  2. **Top expense category last week** — single category with the highest expense total in the last 7 days. Computed client-side from the same query. Tie resolved by absolute total then locale-aware category-name sort.
+- Empty states: see 2.7.
+
+### 2.5 `<TransactionRowMobile>` contract
 
 ```tsx
 interface TransactionRowMobileProps {
   transaction: Transaction;
   category: Category;
-  onTap?: () => void; // opens edit sheet
+  onTap?: () => void; // existing edit-transaction handler
 }
 ```
 
-Layout (left → right):
-- Pastel mint or blue circular icon tile (52px) with category line-art icon
-- Two-line text: bold transaction name (Salary, Groceries, …) + small italic blue date/time (`18:27 - April 30`)
-- Center: small subdued tag (Monthly, Pantry, Rent, Fuel)
-- Right: amount, signed, monospace, color-tagged (red for expense, dark for income — kit uses dark text for both, but red restores the safety semantic per Decision A)
+- 64px row. Left → right:
+  - 52×52 rounded-2xl tile, `bg-tile`, `text-tile-foreground`, line-art `category.icon` (lucide).
+  - Two-line text: bold name + 12px italic secondary-foreground date (`HH:mm – MMM dd`).
+  - Center: 12px muted tag (category name or "Monthly").
+  - Right: amount, JetBrains Mono. Expense → `text-destructive`. Income → `text-foreground`.
+- `onTap` invokes the existing edit-transaction flow.
 
-### 2.4 New components for Phase 2
+### 2.6 Mobile / desktop branching strategy (Q4 — CSS only)
 
-- `src/components/dashboard/SavingsRingCard.tsx`
-- `src/components/shared/PeriodTabs.tsx` (`Daily | Weekly | Monthly | Yearly` variants; controlled, no internal state)
-- `src/components/transactions/TransactionRowMobile.tsx`
+```tsx
+// src/app/page.tsx (sketch)
+return (
+  <>
+    <div className="md:hidden"><DashboardMobile /></div>
+    <div className="hidden md:block"><DashboardDesktop /></div>
+  </>
+);
+```
 
-### 2.5 Tests added in Phase 2
+- Both subtrees render. `md:hidden` and `hidden md:block` gate visibility via CSS only.
+- No `useMediaQuery`. No SSR sniff. No hydration mismatch.
+- **Acceptance rule:** dual subtree must not duplicate API calls. React Query DevTools must show one inflight request per query key.
 
-- `tests/components/PeriodTabs.test.tsx` — renders 3 or 4 tabs by `variant` prop, calls `onChange` with selected value.
-- `tests/components/TransactionRowMobile.test.tsx` — renders amount with correct sign and color, fires `onTap`.
+### 2.7 Edge-case behavior
 
-### 2.6 Acceptance criteria (Phase 2)
+| Case | Behavior |
+|---|---|
+| No transactions yet | Stat lines show `home.stats.empty`. Recent-tx list shows `tx.empty`. Total balance renders as `0`. |
+| No budget set / budget = 0 | `home.budget.caption.noBudget` shown. Progress bar hidden. |
+| Over budget | Bar fills 100%. Caption uses `home.budget.caption.over` with the over-amount. Bar uses `--destructive`. |
+| No savings goals | Ring at 0% with track only. `home.savings.empty` shown below. |
+| Top category tie | Largest absolute total → tiebreak by locale-aware category-name sort. Deterministic. |
+| No income last week | "Revenue Last Week" shows `0`. No empty state — zero is valid. |
+| `/transactions/new?type=…` query param missing today | FAB still navigates correctly; the page just opens with no preselect. Graceful no-op. Param parsing is a follow-up. |
+| Locale switch mid-session | Existing `t(locale, key)` flow handles it. New keys behave identically. |
+| Reduced motion | No animations specified in any new component. OS preference still drives existing animations elsewhere. |
 
-- At viewport < 640px, `/` and `/transactions` visually match their kit counterparts (Home, Transaction) within 8px on layout positions.
-- At ≥ 640px, both pages render identically to their Phase 1 (post-token-swap) state.
-- Bottom-nav FAB is reachable and the Add sheet opens / dismisses cleanly.
-- No regression in `useAllTransactions` infinite-scroll behavior on mobile.
-- `npm run test` passes (314 tests = 312 + 2 new).
-- Lighthouse Mobile score for `/` does not regress vs. the Phase 1 (post-token-swap) baseline that the implementer captures before starting Phase 2.
+### 2.8 Verification (Phase 2)
+
+- `npm run preflight` passes.
+- `npm run test` passes — 314 tests = 312 + 2 new.
+- At `< 768px`, `/` and `/transactions` adopt the kit composition.
+- At `≥ 768px`, both pages render their pre-Phase-2 (post-1b) layout.
+- React Query DevTools shows one inflight request per query key, even with both subtrees in DOM.
+- `useAllTransactions` infinite-scroll still works on the new mobile list.
+- Lighthouse Mobile on `/` does not regress vs. the Phase 1b baseline the implementer captures before starting Phase 2.
 
 ---
 
-## Implementation order
+## i18n keys (final)
 
-| Order | Phase | Step | Why |
-|---|---|---|---|
-| 1 | 1 | Token swap in `globals.css` | Foundation — every other change reads from these. |
-| 2 | 1 | Build `HeroHeader`, `CategoryTile`, `BottomNavFab` | Reusable chrome. |
-| 3 | 1 | Restyle `Sidebar`, `Topbar`, `MobileNav`, `PageHeader`, `button`, `SummaryCard` | Apply tokens at the chrome layer. |
-| 4 | 1 | Replace `BottomNav` import with `BottomNavFab` in `AppShell` | Wire the new nav. |
-| 5 | 1 | Add `<HeroHeader variant="tab">` to top-level routes (`/`, `/transactions`, `/budget`, `/reports`, `/settings`) | Conditional only on mobile breakpoint. |
-| 6 | 1 | Run `preflight`, manual QA, ship Phase 1. | Ship. |
-| 7 | 2 | `PeriodTabs`, `SavingsRingCard`, `TransactionRowMobile` | Building blocks. |
-| 8 | 2 | Refactor mobile composition of `/` | Home parity. |
-| 9 | 2 | Refactor mobile composition of `/transactions` | Transactions parity. |
-| 10 | 2 | Add Vitest coverage for the 2 new pure components. | Tests. |
-| 11 | 2 | Run `preflight`, manual QA, ship Phase 2. | Ship. |
+All keys need EN + ID pairs in `src/lib/i18n.ts`.
 
-## Open questions (parking)
+### Phase 1b
 
-These are deliberately not resolved in this spec. They become candidate follow-ups after Phase 2 ships:
-
-- Should the rest of the mobile pages (`/budget`, `/reports`, `/settings`, `/settings/categories`, `/savings`) get a fidelity pass too? (Spec recommends deciding from real Phase 2 results.)
-- Do we want a bell-driven notifications system later (the kit has 5.1 Notification)? Out of scope here.
-- Auth flows (Login / PIN / Fingerprint) — the kit has them; the app does not. Tracked separately.
-- Icon-library swap — keeping `lucide-react` for now; revisit if line-art friendliness becomes a complaint.
-
-## Future work / explicitly out of scope
-
-- All auth-flow screens from the kit (Launch / Onboarding / Login / Create Account / PIN / Fingerprint / Delete Account).
-- Notifications screen.
-- 404 / 405 styled pages (light polish — could be added at the end of Phase 1 if cheap, otherwise dropped).
-- Native mobile app or PWA install flow.
-
-## File-by-file change manifest
-
-### Phase 1
-
-**New files (4):**
-- `src/components/layout/HeroHeader.tsx`
-- `src/components/shared/CategoryTile.tsx`
-- `src/components/layout/BottomNavFab.tsx`
-- `src/lib/icon.ts` (shared `lucideProps` constant for strokeWidth + linecap defaults)
-
-**Removed files (1):**
-- `src/components/layout/BottomNav.tsx`
-
-**Modified files (~14):**
-- `src/app/globals.css` (token swap + new hero/tile tokens + radius bump)
-- `src/components/layout/AppShell.tsx` (import BottomNavFab)
-- `src/components/layout/PageHeader.tsx` (add `variant` prop)
-- `src/components/layout/Topbar.tsx`
-- `src/components/layout/Sidebar.tsx`
-- `src/components/layout/MobileNav.tsx`
-- `src/components/ui/button.tsx`
-- `src/components/shared/SummaryCard.tsx`
-- `src/components/shared/EmptyState.tsx`
-- `src/app/page.tsx` (set `variant="hero"`)
-- `src/app/transactions/page.tsx` (set `variant="hero"`)
-- `src/app/budget/page.tsx` (set `variant="hero"`)
-- `src/app/reports/page.tsx` (set `variant="hero"`)
-- `src/app/settings/page.tsx` (set `variant="hero"`)
-- `src/lib/i18n.ts` — add `nav.add`, `nav.budget` (if not present), `home.greeting`, `home.budgetCaption.under30`, `…over30`, `…over70`, `home.totalBalance`, `home.totalExpense` (≈ 8 EN/ID pairs)
+| Key | EN | ID |
+|---|---|---|
+| `nav.add` | Add | Tambah |
+| `nav.budget` | Budget | Anggaran *(no-op if already exists)* |
+| `fab.addIncome` | Add Income | Tambah Pemasukan |
+| `fab.addExpense` | Add Expense | Tambah Pengeluaran |
+| `fab.scanReceipt` | Scan Receipt | Pindai Struk |
+| `hero.bell.aria` | Notifications | Notifikasi |
+| `hero.back.aria` | Go back | Kembali |
 
 ### Phase 2
 
-**New files (3):**
+| Key | EN | ID |
+|---|---|---|
+| `home.greeting` | Hi, Welcome Back | Halo, Selamat Datang Kembali |
+| `home.subgreeting.morning` | Good Morning | Selamat Pagi |
+| `home.subgreeting.afternoon` | Good Afternoon | Selamat Siang |
+| `home.subgreeting.evening` | Good Evening | Selamat Sore |
+| `home.subgreeting.night` | Good Night | Selamat Malam |
+| `home.totalBalance` | Total Balance | Saldo Total |
+| `home.totalExpense` | Total Expense | Pengeluaran Total |
+| `home.budget.caption.under30` | Looking great — well under budget. | Bagus — masih jauh di bawah anggaran. |
+| `home.budget.caption.under70` | On track. Keep it steady. | Sesuai jalur. Pertahankan. |
+| `home.budget.caption.under100` | Close to your limit. | Mendekati batas. |
+| `home.budget.caption.atLimit` | At your monthly limit. | Tepat di batas bulanan. |
+| `home.budget.caption.over` | Over budget by {amount}. | Melebihi anggaran sebesar {amount}. |
+| `home.budget.caption.noBudget` | Set a monthly budget to see progress. | Atur anggaran bulanan untuk melihat progres. |
+| `home.savings.title` | Savings on Goals | Tabungan untuk Tujuan |
+| `home.savings.empty` | No goals yet. Add one to start tracking. | Belum ada tujuan. Tambahkan untuk mulai melacak. |
+| `home.stats.revenueLastWeek` | Revenue Last Week | Pendapatan Minggu Lalu |
+| `home.stats.topCategoryLastWeek` | Top Category Last Week | Kategori Teratas Minggu Lalu |
+| `home.stats.empty` | Not enough data yet. | Data belum cukup. |
+| `period.daily` | Daily | Harian |
+| `period.weekly` | Weekly | Mingguan |
+| `period.monthly` | Monthly | Bulanan |
+| `period.yearly` | Yearly | Tahunan |
+| `tx.seeAll` | See all | Lihat semua |
+| `tx.empty` | No transactions yet. | Belum ada transaksi. |
+
+---
+
+## File-by-file change manifest
+
+### Phase 1a (1 file)
+
+**Modified:**
+- `src/app/globals.css` (add `--brand-mint*`, `--hero-*`, `--tile-*`; bump `--radius`; expose via `@theme inline`)
+
+### Phase 1b (4 new, 1 deleted, ~9 modified)
+
+**New:**
+- `src/components/layout/HeroHeader.tsx`
+- `src/components/layout/BottomNavFab.tsx`
+- `src/components/shared/CategoryTile.tsx` *(exported, unused)*
+- `src/lib/icon.ts`
+
+**Deleted:**
+- `src/components/layout/BottomNav.tsx`
+
+**Modified:**
+- `src/components/layout/AppShell.tsx` (swap import to `BottomNavFab`)
+- `src/components/layout/Topbar.tsx` (token-driven recolor only; behavior unchanged)
+- `src/components/layout/Sidebar.tsx` (token-driven recolor only)
+- `src/components/layout/MobileNav.tsx` (drawer header mint accent strip — optional polish)
+- `src/components/ui/button.tsx` (add `variant="mint"`; default unchanged)
+- `src/app/page.tsx` (mount `<HeroHeader>` at `< 1024px`)
+- `src/app/transactions/page.tsx` (same)
+- `src/app/budget/page.tsx` (mount minimal `<HeroHeader>`, title + bell only)
+- `src/app/reports/page.tsx` (same)
+- `src/app/settings/page.tsx` (same)
+- `src/lib/i18n.ts` (Phase 1b keys)
+
+### Phase 2 (3 new, 2 new tests, ~3 modified)
+
+**New:**
 - `src/components/shared/PeriodTabs.tsx`
 - `src/components/dashboard/SavingsRingCard.tsx`
 - `src/components/transactions/TransactionRowMobile.tsx`
 
-**Modified files (~4):**
-- `src/app/page.tsx` (mobile branch)
-- `src/app/transactions/page.tsx` (mobile branch)
-- `src/features/transactions/AllTransactionsView.tsx` (use `TransactionRowMobile` at `< 640px`)
-- `src/lib/i18n.ts` (period labels: Daily / Weekly / Monthly / Yearly + savings ring caption)
+**New tests** (path matches existing project Vitest convention — implementer verifies via `npm run test -- --reporter verbose` before adding):
+- `…/PeriodTabs.test.tsx`
+- `…/TransactionRowMobile.test.tsx`
 
-**New test files (2):**
-- `tests/components/PeriodTabs.test.tsx`
-- `tests/components/TransactionRowMobile.test.tsx`
+**Modified:**
+- `src/app/page.tsx` (mobile branch: hero + savings ring card + period tabs + recent tx list)
+- `src/app/transactions/page.tsx` (mobile branch: hero + period tabs + month-grouped list)
+- `src/features/transactions/AllTransactionsView.tsx` (use `TransactionRowMobile` at `< 768px`)
+- `src/lib/i18n.ts` (Phase 2 keys)
+
+---
+
+## Implementation order (intra-phase)
+
+| Order | Phase | Step | Why |
+|---|---|---|---|
+| 1 | 1a | Token swap in `globals.css` | Foundation. |
+| 2 | 1a | Run `preflight`, manual visual smoke. Ship 1a (optional independent ship). | Ship. |
+| 3 | 1b | Build `HeroHeader`, `BottomNavFab`, `CategoryTile`, `lib/icon.ts` | Reusable chrome. |
+| 4 | 1b | Delete `BottomNav.tsx`, swap `AppShell.tsx` import. | Wire the new nav. |
+| 5 | 1b | Add minimal `<HeroHeader>` to top-level routes (`/`, `/transactions`, `/budget`, `/reports`, `/settings`). | Conditional only on `< 1024px`. |
+| 6 | 1b | Add `variant="mint"` to `Button`. | Primary CTA option available. |
+| 7 | 1b | Sidebar / Topbar / MobileNav recolors. | Token application at chrome layer. |
+| 8 | 1b | Add Phase 1b i18n keys. | Strings ready. |
+| 9 | 1b | Run `preflight`, manual QA per acceptance criteria. Ship 1b. | Ship. |
+| 10 | 2 | Build `PeriodTabs`, `SavingsRingCard`, `TransactionRowMobile`. | Building blocks. |
+| 11 | 2 | Add Phase 2 i18n keys. | Strings ready. |
+| 12 | 2 | Refactor mobile composition of `/`. | Home parity. |
+| 13 | 2 | Refactor mobile composition of `/transactions`. | Transactions parity. |
+| 14 | 2 | Add Vitest coverage for the 2 new pure components. | Tests. |
+| 15 | 2 | Run `preflight`, manual QA per acceptance criteria. Ship 2. | Ship. |
+
+---
+
+## Open questions / future work
+
+These are deliberately not resolved in this spec. They become candidate follow-ups after Phase 2 ships:
+
+- Wire `<CategoryTile>` into `/settings/categories` and `/savings` (mobile layout).
+- Mobile-fidelity pass for `/budget`, `/reports`, `/settings`.
+- Bell-driven notifications system (the bell becomes functional).
+- `/transactions/new?type=` query-param parsing for FAB shortcuts.
+- Auth flows from the kit (Login / Create Account / PIN / Fingerprint / Delete Account).
+- 404 / 405 styled pages.
+- Icon-library swap or bigger lucide-strokeWidth rollout.
