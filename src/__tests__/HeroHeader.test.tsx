@@ -38,7 +38,7 @@ describe('HeroHeader', () => {
     render(
       <HeroHeader title="x">
         <div data-testid="chips">chips</div>
-      </HeroHeader>,
+      </HeroHeader>
     );
     expect(screen.getByTestId('chips')).toBeTruthy();
   });

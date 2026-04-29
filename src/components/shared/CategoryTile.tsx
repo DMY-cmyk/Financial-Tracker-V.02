@@ -15,7 +15,7 @@ export interface CategoryTileProps {
 export function CategoryTile({ label, icon: Icon, active, href, onClick }: CategoryTileProps) {
   const classes = cn(
     'flex aspect-[1/1.05] flex-col items-center justify-center gap-2 rounded-2xl p-3 text-xs font-medium transition-colors',
-    active ? 'bg-tile-active text-tile-active-foreground' : 'bg-tile text-tile-foreground',
+    active ? 'bg-tile-active text-tile-active-foreground' : 'bg-tile text-tile-foreground'
   );
 
   const content = (

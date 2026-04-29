@@ -13,12 +13,7 @@ import {
   TrendingDown,
   Camera,
 } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 
@@ -63,9 +58,7 @@ export function BottomNavFab() {
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     if (href === '/transactions')
-      return (
-        pathname === '/transactions' || pathname.startsWith('/transactions/')
-      );
+      return pathname === '/transactions' || pathname.startsWith('/transactions/');
     return pathname === href;
   };
 
@@ -105,7 +98,7 @@ export function BottomNavFab() {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex flex-col items-center gap-1 px-2 py-1 text-xs transition-colors',
-                  active ? 'text-brand-mint-strong' : 'text-muted-foreground',
+                  active ? 'text-brand-mint-strong' : 'text-muted-foreground'
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -127,24 +120,21 @@ export function BottomNavFab() {
               onClick={() => setOpen(false)}
               className="bg-secondary hover:bg-muted flex items-center gap-3 rounded-xl px-4 py-3"
             >
-              <TrendingUp className="h-5 w-5" />{' '}
-              <span>{t(locale, 'fabAddIncome')}</span>
+              <TrendingUp className="h-5 w-5" /> <span>{t(locale, 'fabAddIncome')}</span>
             </Link>
             <Link
               href="/transactions/new?type=expense"
               onClick={() => setOpen(false)}
               className="bg-secondary hover:bg-muted flex items-center gap-3 rounded-xl px-4 py-3"
             >
-              <TrendingDown className="h-5 w-5" />{' '}
-              <span>{t(locale, 'fabAddExpense')}</span>
+              <TrendingDown className="h-5 w-5" /> <span>{t(locale, 'fabAddExpense')}</span>
             </Link>
             <Link
               href="/upload"
               onClick={() => setOpen(false)}
               className="bg-secondary hover:bg-muted flex items-center gap-3 rounded-xl px-4 py-3"
             >
-              <Camera className="h-5 w-5" />{' '}
-              <span>{t(locale, 'fabScanReceipt')}</span>
+              <Camera className="h-5 w-5" /> <span>{t(locale, 'fabScanReceipt')}</span>
             </Link>
           </div>
         </SheetContent>
