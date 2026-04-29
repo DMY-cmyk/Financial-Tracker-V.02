@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ComponentType } from 'react';
+import { useEffect, useState, ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -55,6 +55,10 @@ export function BottomNavFab() {
   const pathname = usePathname();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';

@@ -3,7 +3,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import { BottomNavFab } from '@/components/layout/BottomNavFab';
 
-vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
+let mockPath = '/';
+vi.mock('next/navigation', () => ({ usePathname: () => mockPath }));
 
 afterEach(() => cleanup());
 
@@ -27,5 +28,16 @@ describe('BottomNavFab', () => {
     expect(screen.getByText('Add Income')).toBeTruthy();
     expect(screen.getByText('Add Expense')).toBeTruthy();
     expect(screen.getByText('Scan Receipt')).toBeTruthy();
+  });
+
+  it('closes the sheet when pathname changes', () => {
+    mockPath = '/';
+    const { rerender } = render(<BottomNavFab />);
+    fireEvent.click(screen.getByLabelText('Add'));
+    expect(screen.queryByText('Add Income')).toBeTruthy();
+    mockPath = '/budget';
+    rerender(<BottomNavFab />);
+    // After rerender + useEffect flush, sheet should be closed
+    expect(screen.queryByText('Add Income')).toBeNull();
   });
 });
