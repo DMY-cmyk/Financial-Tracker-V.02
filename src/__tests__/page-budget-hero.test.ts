@@ -11,4 +11,7 @@ describe('Budget page hero mount', () => {
   it('renders <HeroHeader title=', () => {
     expect(src).toMatch(/<HeroHeader[^>]*title=/);
   });
+  it('does not wrap the controls motion.div in hidden lg:block', () => {
+    expect(src).not.toContain('<motion.div {...fadeInUp} className="hidden lg:block">');
+  });
 });

@@ -94,13 +94,15 @@ export default function BudgetPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6">
       <HeroHeader title={t(locale, 'budgetPage')} />
-      <motion.div {...fadeInUp} className="hidden lg:block">
+      <motion.div {...fadeInUp}>
         <div className="flex items-center justify-between">
-          <PageHeader
-            title={t(locale, 'budgetPage')}
-            description={`${MONTH_NAMES[month]} ${year}`}
-          />
-          <div className="flex items-center gap-2">
+          <div className="hidden lg:block">
+            <PageHeader
+              title={t(locale, 'budgetPage')}
+              description={`${MONTH_NAMES[month]} ${year}`}
+            />
+          </div>
+          <div className="flex flex-1 items-center justify-end gap-2">
             {view === 'annual' && (
               <div className="flex items-center gap-1">
                 <button
