@@ -12,6 +12,7 @@ import { MONTH_NAMES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
+import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionFilters } from '@/features/transactions/TransactionFilters';
 import { TransactionFilterSheet } from '@/features/transactions/TransactionFilterSheet';
@@ -162,7 +163,10 @@ function TransactionsPageInner() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title={t(locale, 'transactions')} />
+        <HeroHeader title={t(locale, 'transactions')} />
+        <div className="hidden lg:block">
+          <PageHeader title={t(locale, 'transactions')} />
+        </div>
         <ListSkeleton rows={6} />
       </div>
     );
@@ -170,7 +174,8 @@ function TransactionsPageInner() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <motion.div {...fadeInUp}>
+      <HeroHeader title={t(locale, 'transactions')} />
+      <motion.div {...fadeInUp} className="hidden lg:block">
         <PageHeader
           title={t(locale, 'transactions')}
           description={`${total} ${t(locale, 'transactionCount')}`}
