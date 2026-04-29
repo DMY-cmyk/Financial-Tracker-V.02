@@ -27,14 +27,14 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="border-border bg-card h-48 animate-pulse rounded-2xl border" />
+        <div className="border-border bg-card shadow-card h-48 animate-pulse rounded-2xl border" />
       </div>
     );
   }
 
   if (!data || data.transactionCount === 0) {
     return (
-      <div className="border-border bg-card text-muted-foreground flex h-32 items-center justify-center rounded-2xl border text-sm">
+      <div className="border-border bg-card text-muted-foreground shadow-card flex h-32 items-center justify-center rounded-2xl border text-sm">
         {t(locale, 'noData')}
       </div>
     );
@@ -68,7 +68,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
       change: comp ? changeIndicator(comp.incomeChange) : null,
       icon: TrendingUp,
       color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      bg: 'bg-success-soft text-success-soft-foreground',
     },
     {
       label: t(locale, 'totalExpense'),
@@ -76,7 +76,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
       change: comp ? changeIndicator(comp.expenseChange, true) : null,
       icon: TrendingDown,
       color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-50 dark:bg-red-950/30',
+      bg: 'bg-danger-soft text-danger-soft-foreground',
     },
     {
       label: t(locale, 'netBalance'),
@@ -88,7 +88,9 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
           ? 'text-blue-600 dark:text-blue-400'
           : 'text-red-600 dark:text-red-400',
       bg:
-        data.totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
+        data.totalBalance >= 0
+          ? 'bg-info-soft text-info-soft-foreground'
+          : 'bg-danger-soft text-danger-soft-foreground',
     },
     {
       label: t(locale, 'avgSavingsRate'),
@@ -101,8 +103,8 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
           : 'text-amber-600 dark:text-amber-400',
       bg:
         data.savingsRate >= 20
-          ? 'bg-emerald-50 dark:bg-emerald-950/30'
-          : 'bg-amber-50 dark:bg-amber-950/30',
+          ? 'bg-success-soft text-success-soft-foreground'
+          : 'bg-warning-soft text-warning-soft-foreground',
     },
     {
       label: t(locale, 'totalTransactions'),
@@ -110,7 +112,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
       change: null,
       icon: Hash,
       color: 'text-blue-600 dark:text-blue-400',
-      bg: 'bg-blue-50 dark:bg-blue-950/30',
+      bg: 'bg-info-soft text-info-soft-foreground',
     },
   ];
 
@@ -127,13 +129,17 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
           <motion.div
             key={card.label}
             variants={staggerItem}
-            className="border-border bg-card rounded-2xl border p-4"
+            className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5"
           >
             <div className={`inline-flex rounded-lg p-1.5 ${card.bg}`}>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
+              <card.icon className="h-4 w-4" />
             </div>
-            <p className="text-muted-foreground mt-2 text-[11px]">{card.label}</p>
-            <p className="font-mono text-sm font-semibold">{card.value}</p>
+            <p className="text-muted-foreground mt-2 text-[10px] font-medium tracking-wider uppercase">
+              {card.label}
+            </p>
+            <p className={`font-mono text-sm font-semibold tabular-nums ${card.color}`}>
+              {card.value}
+            </p>
             {card.change && <div className="mt-0.5">{card.change}</div>}
           </motion.div>
         ))}
@@ -141,10 +147,13 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
 
       {/* Top Expense Categories */}
       {data.topExpenseCategories.length > 0 && (
-        <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-6">
+        <motion.div
+          {...fadeInUp}
+          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
+        >
           <div className="mb-4 flex items-center gap-2">
             <BarChart3 className="text-muted-foreground h-4 w-4" />
-            <h3 className="text-sm font-semibold">{t(locale, 'topCategories')}</h3>
+            <h3 className="text-sm font-semibold tracking-tight">{t(locale, 'topCategories')}</h3>
           </div>
           <div className="space-y-3">
             {data.topExpenseCategories.map((cat, i) => {
@@ -155,13 +164,13 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
                     <span className="font-medium">
                       {i + 1}. {cat.category}
                     </span>
-                    <span className="font-mono text-red-600 dark:text-red-400">
+                    <span className="font-mono text-red-600 tabular-nums dark:text-red-400">
                       {formatCurrency(cat.amount)} ({Math.round(pct)}%)
                     </span>
                   </div>
-                  <div className="bg-muted h-1.5 overflow-hidden rounded-full">
+                  <div className="bg-surface-inset ring-border-subtle h-1.5 overflow-hidden rounded-full ring-1 ring-inset">
                     <div
-                      className="h-full rounded-full bg-red-500 transition-all duration-500"
+                      className="h-full rounded-full bg-red-500 transition-all duration-700 ease-out"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

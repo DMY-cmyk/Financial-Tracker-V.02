@@ -34,9 +34,11 @@ export function CategoryBreakdown({ categoryTotals, categories }: CategoryBreakd
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.15 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
-      <h3 className="mb-4 text-sm font-semibold">{t(locale, 'categoryBreakdown')}</h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-tight">
+        {t(locale, 'categoryBreakdown')}
+      </h3>
 
       {data.length === 0 ? (
         <div className="text-muted-foreground flex h-40 items-center justify-center text-sm">
@@ -68,6 +70,7 @@ export function CategoryBreakdown({ categoryTotals, categories }: CategoryBreakd
                       border: '1px solid var(--border)',
                       background: 'var(--card)',
                       fontSize: '12px',
+                      boxShadow: 'var(--elevated-shadow)',
                     }}
                   />
                 </PieChart>
@@ -82,7 +85,7 @@ export function CategoryBreakdown({ categoryTotals, categories }: CategoryBreakd
                   <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
                   <span className="text-muted-foreground">{d.name}</span>
                 </div>
-                <span className="font-mono font-medium">
+                <span className="font-mono font-medium tabular-nums">
                   {total > 0 ? Math.round((d.value / total) * 100) : 0}%
                 </span>
               </div>

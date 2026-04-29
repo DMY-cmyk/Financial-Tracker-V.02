@@ -27,7 +27,7 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
       total: totalExpectedIncome,
       icon: TrendingUp,
       color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      bg: 'bg-success-soft text-success-soft-foreground',
     },
     {
       label: t(locale, 'expense'),
@@ -36,15 +36,18 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
       total: totalExpectedExpense,
       icon: TrendingDown,
       color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-50 dark:bg-red-950/30',
+      bg: 'bg-danger-soft text-danger-soft-foreground',
     },
   ];
 
   return (
-    <motion.div {...fadeInUp} className="border-border bg-card rounded-2xl border p-6">
+    <motion.div
+      {...fadeInUp}
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
+    >
       <div className="mb-4 flex items-center gap-2">
         <Wallet className="text-primary h-4 w-4" />
-        <h3 className="text-sm font-semibold">{t(locale, 'expectedThisMonth')}</h3>
+        <h3 className="text-sm font-semibold tracking-tight">{t(locale, 'expectedThisMonth')}</h3>
       </div>
 
       <div className="space-y-4">
@@ -52,22 +55,30 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
           <div key={row.label} className="space-y-1">
             <div className="flex items-center gap-1.5">
               <div className={`rounded-md p-1 ${row.bg}`}>
-                <row.icon className={`h-3 w-3 ${row.color}`} />
+                <row.icon className="h-3 w-3" />
               </div>
               <span className="text-muted-foreground text-xs font-medium">{row.label}</span>
             </div>
             <div className="grid grid-cols-3 gap-2 pl-6 text-xs">
               <div>
-                <p className="text-muted-foreground text-[10px]">{t(locale, 'actualSoFar')}</p>
-                <p className="font-mono font-semibold">{formatCurrency(row.actual)}</p>
+                <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                  {t(locale, 'actualSoFar')}
+                </p>
+                <p className="font-mono font-semibold tabular-nums">{formatCurrency(row.actual)}</p>
               </div>
               <div>
-                <p className="text-muted-foreground text-[10px]">{t(locale, 'projected')}</p>
-                <p className="font-mono font-semibold">{formatCurrency(row.projected)}</p>
+                <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                  {t(locale, 'projected')}
+                </p>
+                <p className="font-mono font-semibold tabular-nums">
+                  {formatCurrency(row.projected)}
+                </p>
               </div>
               <div>
-                <p className="text-muted-foreground text-[10px]">{t(locale, 'total')}</p>
-                <p className={`font-mono font-semibold ${row.color}`}>
+                <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                  {t(locale, 'total')}
+                </p>
+                <p className={`font-mono font-semibold tabular-nums ${row.color}`}>
                   {formatCurrency(row.total)}
                 </p>
               </div>
@@ -76,13 +87,13 @@ export function CurrentMonthForecastCard({ currentMonth }: CurrentMonthForecastC
         ))}
 
         {/* Net row */}
-        <div className="border-border mt-2 border-t pt-3">
+        <div className="border-border-subtle mt-2 border-t pt-3">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-xs font-medium">
+            <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               {t(locale, 'projectedNet')}
             </span>
             <span
-              className={`font-mono text-sm font-bold ${
+              className={`font-mono text-sm font-bold tabular-nums ${
                 projectedNet >= 0
                   ? 'text-emerald-600 dark:text-emerald-400'
                   : 'text-red-600 dark:text-red-400'

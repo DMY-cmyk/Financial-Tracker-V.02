@@ -75,9 +75,9 @@ export default function ExportPage() {
         {/* Format Selection */}
         <motion.div
           variants={staggerItem}
-          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
         >
-          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportFormat')}</h3>
+          <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'exportFormat')}</h3>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {FORMAT_OPTIONS.map(({ value, label, description }) => (
               <FormatCard
@@ -95,9 +95,9 @@ export default function ExportPage() {
         {/* Scope */}
         <motion.div
           variants={staggerItem}
-          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
         >
-          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportScope')}</h3>
+          <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'exportScope')}</h3>
           <ScopeSelector
             scope={scope}
             onScopeChange={setScope}
@@ -113,18 +113,22 @@ export default function ExportPage() {
         {/* Options */}
         <motion.div
           variants={staggerItem}
-          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
         >
-          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportOptions')}</h3>
+          <h3 className="mb-4 text-sm font-semibold tracking-tight">
+            {t(locale, 'exportOptions')}
+          </h3>
           <ExportOptions options={options} onChange={setOptions} />
         </motion.div>
 
         {/* Preview */}
         <motion.div
           variants={staggerItem}
-          className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
         >
-          <h3 className="mb-4 text-sm font-semibold">{t(locale, 'exportPreview')}</h3>
+          <h3 className="mb-4 text-sm font-semibold tracking-tight">
+            {t(locale, 'exportPreview')}
+          </h3>
           {scopedTransactions.length > 0 ? (
             <ExportPreview transactions={scopedTransactions} />
           ) : (

@@ -214,7 +214,10 @@ export default function BillsPage() {
         <PageHeader title={t(locale, 'bills')} />
         <div className="mx-auto max-w-2xl space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border-border bg-card h-20 animate-pulse rounded-2xl border" />
+            <div
+              key={i}
+              className="border-border bg-card shadow-card h-20 animate-pulse rounded-2xl border"
+            />
           ))}
         </div>
       </div>
@@ -275,7 +278,7 @@ export default function BillsPage() {
                     key={bill.id}
                     variants={staggerItem}
                     className={cn(
-                      'border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors',
+                      'group border-border bg-card shadow-card hover:shadow-card-hover flex items-center gap-3 rounded-2xl border p-4 transition-all duration-300',
                       status === 'overdue' && 'border-red-400 dark:border-red-500/60',
                       status === 'dueSoon' && 'border-amber-400 dark:border-amber-500/60'
                     )}
@@ -296,19 +299,19 @@ export default function BillsPage() {
                           {bill.name}
                         </p>
                         {status === 'overdue' && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                          <span className="bg-danger-soft text-danger-soft-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase">
                             <AlertCircle className="h-3 w-3" />
                             {t(locale, 'overdue')}
                           </span>
                         )}
                         {status === 'dueSoon' && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                          <span className="bg-warning-soft text-warning-soft-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase">
                             <Clock className="h-3 w-3" />
                             {t(locale, 'dueSoon')}
                           </span>
                         )}
                         {bill.isRecurring && (
-                          <span className="text-muted-foreground inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
+                          <span className="bg-info-soft text-info-soft-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase">
                             <Repeat className="h-3 w-3" />
                             {t(locale, 'recurringBill')}
                           </span>
@@ -320,7 +323,7 @@ export default function BillsPage() {
                     </div>
                     <span
                       className={cn(
-                        'font-mono text-sm font-medium',
+                        'font-mono text-sm font-medium tabular-nums',
                         bill.isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
                       )}
                     >

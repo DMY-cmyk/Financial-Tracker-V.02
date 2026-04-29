@@ -282,7 +282,7 @@ export default function CategoriesPage() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Expense Categories */}
-        <div className="border-border bg-card rounded-2xl border p-6">
+        <div className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300">
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'expenseCategories')}</h3>
           <Reorder.Group
             axis="y"
@@ -296,7 +296,7 @@ export default function CategoriesPage() {
                 <Reorder.Item
                   value={c}
                   key={c.id}
-                  className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2"
+                  className="hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors"
                 >
                   <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
                   <Icon className="h-4 w-4" style={{ color: c.color }} />
@@ -329,7 +329,7 @@ export default function CategoriesPage() {
         </div>
 
         {/* Income Categories */}
-        <div className="border-border bg-card rounded-2xl border p-6">
+        <div className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300">
           <h3 className="mb-4 text-sm font-semibold">{t(locale, 'incomeSources')}</h3>
           <Reorder.Group
             axis="y"
@@ -343,7 +343,7 @@ export default function CategoriesPage() {
                 <Reorder.Item
                   value={c}
                   key={c.id}
-                  className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2"
+                  className="hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors"
                 >
                   <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
                   <Icon className="h-4 w-4" style={{ color: c.color }} />
@@ -365,7 +365,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Add Category */}
-      <div className="border-border bg-card rounded-2xl border p-6">
+      <div className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300">
         <h3 className="mb-4 text-sm font-semibold">{t(locale, 'addCategory')}</h3>
         <div className="flex flex-wrap items-end gap-3">
           <div>
@@ -413,7 +413,7 @@ export default function CategoriesPage() {
                       'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
                       newCatIcon === opt.name
                         ? 'bg-primary/10 text-primary ring-primary ring-1'
-                        : 'text-muted-foreground hover:bg-muted'
+                        : 'text-muted-foreground hover:bg-surface-inset'
                     )}
                   >
                     <OptIcon className="h-3.5 w-3.5" />
@@ -447,13 +447,16 @@ export default function CategoriesPage() {
       </div>
 
       {/* Payment Methods */}
-      <div className="border-border bg-card rounded-2xl border p-6">
+      <div className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300">
         <h3 className="mb-4 text-sm font-semibold">{t(locale, 'paymentMethods')}</h3>
         <div className="mb-4 space-y-2">
           {paymentMethods.map((m) => (
-            <div key={m.id} className="hover:bg-muted/50 flex items-center gap-2 rounded-lg p-2">
+            <div
+              key={m.id}
+              className="hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors"
+            >
               <span className="flex-1 text-sm">{m.name}</span>
-              <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px]">
+              <span className="bg-surface-inset text-muted-foreground ring-border-subtle rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase ring-1 ring-inset">
                 {m.type}
               </span>
               <Button

@@ -26,7 +26,10 @@ export default function SavingsPage() {
         <PageHeader title={t(locale, 'savingsPage')} />
         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border-border bg-card h-40 animate-pulse rounded-2xl border" />
+            <div
+              key={i}
+              className="border-border bg-card shadow-card h-40 animate-pulse rounded-2xl border"
+            />
           ))}
         </div>
       </div>
@@ -93,11 +96,11 @@ export default function SavingsPage() {
                   <motion.div
                     key={goal.id}
                     variants={staggerGridItem}
-                    className="border-border bg-card group hover:bg-muted/50 rounded-2xl border p-5 transition-colors"
+                    className="group border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <div className="flex items-start gap-4">
                       <ProgressRing percentage={pct} size={56} strokeWidth={6} color={goal.color}>
-                        <span className="text-[10px] font-bold">{pct}%</span>
+                        <span className="text-[10px] font-bold tabular-nums">{pct}%</span>
                       </ProgressRing>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">

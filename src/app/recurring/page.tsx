@@ -19,10 +19,10 @@ import { Plus, Pencil, Trash2, Repeat, Play, Pause } from 'lucide-react';
 import { toast } from 'sonner';
 
 const FREQUENCY_COLORS: Record<string, string> = {
-  daily: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-  weekly: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
-  monthly: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
-  yearly: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+  daily: 'bg-info-soft text-info-soft-foreground',
+  weekly: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  monthly: 'bg-success-soft text-success-soft-foreground',
+  yearly: 'bg-warning-soft text-warning-soft-foreground',
 };
 
 export default function RecurringTransactionsPage() {
@@ -92,7 +92,10 @@ export default function RecurringTransactionsPage() {
         <PageHeader title={t(locale, 'recurringTransactions')} />
         <div className="mx-auto max-w-2xl space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border-border bg-card h-20 animate-pulse rounded-2xl border" />
+            <div
+              key={i}
+              className="border-border bg-card shadow-card h-20 animate-pulse rounded-2xl border"
+            />
           ))}
         </div>
       </div>
@@ -155,8 +158,8 @@ export default function RecurringTransactionsPage() {
                   key={rt.id}
                   variants={staggerItem}
                   className={cn(
-                    'border-border bg-card group hover:bg-muted/50 flex items-center gap-3 rounded-2xl border p-4 transition-colors',
-                    !rt.isActive && 'opacity-50'
+                    'group border-border bg-card shadow-card hover:shadow-card-hover flex items-center gap-3 rounded-2xl border p-4 transition-all duration-300',
+                    !rt.isActive && 'opacity-60'
                   )}
                 >
                   <div className="min-w-0 flex-1">
@@ -164,7 +167,7 @@ export default function RecurringTransactionsPage() {
                       <p className="truncate text-sm font-medium">{rt.description}</p>
                       <span
                         className={cn(
-                          'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                          'rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase',
                           FREQUENCY_COLORS[rt.frequency]
                         )}
                       >
@@ -185,7 +188,7 @@ export default function RecurringTransactionsPage() {
                   </div>
                   <span
                     className={cn(
-                      'font-mono text-sm font-medium',
+                      'font-mono text-sm font-medium tabular-nums',
                       rt.type === 'income'
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-red-600 dark:text-red-400'

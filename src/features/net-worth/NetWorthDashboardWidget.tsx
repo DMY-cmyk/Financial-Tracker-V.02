@@ -35,31 +35,46 @@ export function NetWorthDashboardWidget({
 
   return (
     <motion.div {...fadeInUp}>
-      <Link href="/net-worth" className="block">
-        <div className="rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#2563eb] p-5 text-white transition-opacity hover:opacity-90">
-          <p className="mb-1 text-[10px] font-semibold tracking-wide uppercase opacity-70">
-            {t(locale, 'netWorth')}
-          </p>
-          <p className="font-mono text-2xl font-extrabold">
-            {formatCurrency(current?.netWorth ?? 0)}
-          </p>
-          {delta !== null && (
-            <p className={cn('mt-2 text-xs', positive ? 'text-emerald-300' : 'text-red-300')}>
-              {positive ? '▲' : '▼'} {formatCurrency(Math.abs(delta))} {t(locale, 'vsLastMonth')}
+      <Link href="/net-worth" className="group block">
+        <div className="shadow-card hover:shadow-elevated relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e3a8a] via-[#1d4ed8] to-[#2563eb] p-5 text-white transition-all duration-300 hover:-translate-y-0.5">
+          {/* Soft white glow in upper-right */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-16 -right-12 h-44 w-44 rounded-full opacity-30 blur-3xl"
+            style={{ background: 'rgb(255 255 255 / 0.4)' }}
+          />
+          <div className="relative">
+            <p className="mb-1 text-[10px] font-semibold tracking-[0.16em] uppercase opacity-75">
+              {t(locale, 'netWorth')}
             </p>
-          )}
-          <div className="mt-3 flex gap-4 border-t border-white/20 pt-3 text-[10px]">
-            <div>
-              <span className="opacity-60">{t(locale, 'assets')}: </span>
-              <span className="font-mono font-semibold">
-                {formatCurrency(current?.totalAssets ?? 0)}
-              </span>
-            </div>
-            <div>
-              <span className="opacity-60">{t(locale, 'liabilities')}: </span>
-              <span className="font-mono font-semibold">
-                {formatCurrency(current?.totalLiabilities ?? 0)}
-              </span>
+            <p className="font-mono text-2xl leading-tight font-extrabold tabular-nums">
+              {formatCurrency(current?.netWorth ?? 0)}
+            </p>
+            {delta !== null && (
+              <p
+                className={cn(
+                  'mt-2 text-xs font-medium tabular-nums',
+                  positive ? 'text-emerald-300' : 'text-red-300'
+                )}
+              >
+                {positive ? '▲' : '▼'} {formatCurrency(Math.abs(delta))} {t(locale, 'vsLastMonth')}
+              </p>
+            )}
+            <div className="mt-3 flex gap-4 border-t border-white/15 pt-3 text-[10px]">
+              <div>
+                <span className="tracking-wider uppercase opacity-65">{t(locale, 'assets')}: </span>
+                <span className="font-mono font-semibold tabular-nums">
+                  {formatCurrency(current?.totalAssets ?? 0)}
+                </span>
+              </div>
+              <div>
+                <span className="tracking-wider uppercase opacity-65">
+                  {t(locale, 'liabilities')}:{' '}
+                </span>
+                <span className="font-mono font-semibold tabular-nums">
+                  {formatCurrency(current?.totalLiabilities ?? 0)}
+                </span>
+              </div>
             </div>
           </div>
         </div>

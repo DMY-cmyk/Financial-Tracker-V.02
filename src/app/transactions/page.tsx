@@ -181,13 +181,19 @@ function TransactionsPageInner() {
     <div className="space-y-4 sm:space-y-6">
       <HeroHeader title={t(locale, 'transactions')}>
         <div className="grid grid-cols-2 gap-3 md:hidden">
-          <div className="bg-hero-foreground/10 rounded-2xl p-3">
-            <p className="text-[11px] opacity-80">{t(locale, 'homeTotalBalance')}</p>
-            <p className="font-mono text-base font-bold">{formatCurrency(balance)}</p>
+          <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+            <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+              {t(locale, 'homeTotalBalance')}
+            </p>
+            <p className="mt-0.5 font-mono text-base font-bold tabular-nums">
+              {formatCurrency(balance)}
+            </p>
           </div>
-          <div className="bg-hero-foreground/10 rounded-2xl p-3">
-            <p className="text-[11px] opacity-80">{t(locale, 'homeTotalExpense')}</p>
-            <p className="text-destructive font-mono text-base font-bold">
+          <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+            <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+              {t(locale, 'homeTotalExpense')}
+            </p>
+            <p className="text-destructive mt-0.5 font-mono text-base font-bold tabular-nums">
               -{formatCurrency(dashExpense)}
             </p>
           </div>

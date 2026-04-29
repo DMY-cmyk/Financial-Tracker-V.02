@@ -79,10 +79,10 @@ export default function SettingsPage() {
                   aria-checked={theme === value}
                   onClick={() => setTheme(value)}
                   className={cn(
-                    'flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-colors sm:p-4',
+                    'flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-200 sm:p-4',
                     theme === value
-                      ? 'border-primary bg-primary/5'
-                      : 'bg-muted/50 hover:bg-muted border-transparent'
+                      ? 'border-primary bg-primary/5 shadow-card'
+                      : 'bg-surface-inset hover:border-border-subtle hover:bg-card hover:shadow-card border-transparent'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -104,10 +104,10 @@ export default function SettingsPage() {
                   aria-checked={locale === opt.code}
                   onClick={() => setLocale(opt.code)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-colors sm:p-4',
+                    'flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all duration-200 sm:p-4',
                     locale === opt.code
-                      ? 'border-primary bg-primary/5'
-                      : 'bg-muted/50 hover:bg-muted border-transparent'
+                      ? 'border-primary bg-primary/5 shadow-card'
+                      : 'bg-surface-inset hover:border-border-subtle hover:bg-card hover:shadow-card border-transparent'
                   )}
                 >
                   <Globe className="h-4 w-4 shrink-0" />
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 </Button>
               </div>
 
-              <div className="border-border border-t pt-3">
+              <div className="border-border-subtle border-t pt-3">
                 <Button
                   variant="destructive"
                   className="w-full gap-2"

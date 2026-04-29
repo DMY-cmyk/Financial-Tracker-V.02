@@ -37,9 +37,9 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
-      <h3 className="mb-4 text-sm font-semibold">{t(locale, 'cashFlow')}</h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'cashFlow')}</h3>
       <div className="h-56">
         {filtered.length === 0 ? (
           <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
@@ -98,8 +98,9 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                       border: '1px solid var(--border)',
                       background: 'var(--card)',
                       fontSize: '12px',
+                      boxShadow: 'var(--elevated-shadow)',
                     }}
-                    itemStyle={{ fontFamily: 'monospace' }}
+                    itemStyle={{ fontFamily: 'var(--font-mono)' }}
                     formatter={(value, name) => [
                       formatCurrencyShort(Number(value)),
                       t(locale, String(name) === 'income' ? 'income' : 'expense'),

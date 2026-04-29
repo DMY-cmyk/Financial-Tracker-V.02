@@ -54,14 +54,14 @@ export function BudgetOverview({ totalBudget, totalSpent }: BudgetOverviewProps)
       </motion.div>
 
       {totalBudget > 0 && (
-        <div className="border-border bg-card rounded-2xl border p-4">
+        <div className="border-border bg-card shadow-card rounded-2xl border p-4">
           <div className="mb-2 flex items-center justify-between text-xs">
             <span className="text-muted-foreground font-medium">{t(locale, 'budgetOverview')}</span>
-            <span className="font-mono font-medium">
+            <span className="font-mono font-medium tabular-nums">
               {percentage.toFixed(0)}% {t(locale, 'percentUsed')}
             </span>
           </div>
-          <div className="bg-muted h-3 overflow-hidden rounded-full">
+          <div className="bg-surface-inset ring-border-subtle h-2 overflow-hidden rounded-full ring-1 ring-inset">
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-700 ease-out',

@@ -50,12 +50,12 @@ export default function ReportsPage() {
           <PageHeader title={t(locale, 'reports')} />
         </div>
         <div className="mx-auto max-w-5xl space-y-4">
-          <div className="border-border bg-card h-80 animate-pulse rounded-2xl border" />
+          <div className="border-border bg-card shadow-card h-80 animate-pulse rounded-2xl border" />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="border-border bg-card h-24 animate-pulse rounded-2xl border"
+                className="border-border bg-card shadow-card h-24 animate-pulse rounded-2xl border"
               />
             ))}
           </div>
@@ -70,14 +70,14 @@ export default function ReportsPage() {
       value: formatCurrency(totalIncome),
       icon: TrendingUp,
       color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      bg: 'bg-success-soft text-success-soft-foreground',
     },
     {
       label: t(locale, 'totalExpense'),
       value: formatCurrency(totalExpense),
       icon: TrendingDown,
       color: 'text-red-600 dark:text-red-400',
-      bg: 'bg-red-50 dark:bg-red-950/30',
+      bg: 'bg-danger-soft text-danger-soft-foreground',
     },
     {
       label: t(locale, 'netBalance'),
@@ -85,7 +85,10 @@ export default function ReportsPage() {
       icon: Wallet,
       color:
         totalBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400',
-      bg: totalBalance >= 0 ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-red-50 dark:bg-red-950/30',
+      bg:
+        totalBalance >= 0
+          ? 'bg-info-soft text-info-soft-foreground'
+          : 'bg-danger-soft text-danger-soft-foreground',
     },
     {
       label: t(locale, 'avgSavingsRate'),
@@ -97,8 +100,8 @@ export default function ReportsPage() {
           : 'text-amber-600 dark:text-amber-400',
       bg:
         avgSavingsRate >= 20
-          ? 'bg-emerald-50 dark:bg-emerald-950/30'
-          : 'bg-amber-50 dark:bg-amber-950/30',
+          ? 'bg-success-soft text-success-soft-foreground'
+          : 'bg-warning-soft text-warning-soft-foreground',
     },
   ];
 
@@ -128,7 +131,7 @@ export default function ReportsPage() {
                   className={`px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
                     monthCount === n
                       ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted'
+                      : 'text-muted-foreground hover:bg-surface-inset'
                   }`}
                 >
                   {n === 6 ? t(locale, 'last6Months') : t(locale, 'last12Months')}
@@ -148,15 +151,19 @@ export default function ReportsPage() {
               <motion.div
                 key={card.label}
                 variants={staggerItem}
-                className="border-border bg-card rounded-2xl border p-4"
+                className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5"
               >
                 <div className="flex items-center gap-2">
                   <div className={`rounded-lg p-1.5 ${card.bg}`}>
-                    <card.icon className={`h-4 w-4 ${card.color}`} />
+                    <card.icon className="h-4 w-4" />
                   </div>
                 </div>
-                <p className="text-muted-foreground mt-2 text-[11px]">{card.label}</p>
-                <p className="font-mono text-sm font-semibold">{card.value}</p>
+                <p className="text-muted-foreground mt-2 text-[10px] font-medium tracking-wider uppercase">
+                  {card.label}
+                </p>
+                <p className={`font-mono text-sm font-semibold tabular-nums ${card.color}`}>
+                  {card.value}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -166,7 +173,7 @@ export default function ReportsPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="border-border bg-card rounded-2xl border p-6"
+            className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
           >
             <h3 className="mb-4 text-sm font-semibold">{t(locale, 'incomeVsExpense')}</h3>
             <TrendChart data={trends} />
@@ -178,7 +185,7 @@ export default function ReportsPage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="border-border bg-card rounded-2xl border p-6"
+              className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
             >
               <h3 className="mb-4 text-sm font-semibold">{t(locale, 'monthlyBreakdown')}</h3>
               <div className="overflow-x-auto">
@@ -194,20 +201,25 @@ export default function ReportsPage() {
                   </thead>
                   <tbody>
                     {trends.map((row) => (
-                      <tr key={row.monthKey} className="border-border border-b last:border-0">
+                      <tr
+                        key={row.monthKey}
+                        className="border-border-subtle hover:bg-surface-inset border-b transition-colors last:border-0"
+                      >
                         <td className="py-2 font-medium">{row.monthKey}</td>
-                        <td className="py-2 text-right font-mono text-emerald-600 dark:text-emerald-400">
+                        <td className="py-2 text-right font-mono text-emerald-600 tabular-nums dark:text-emerald-400">
                           {formatCurrency(row.income)}
                         </td>
-                        <td className="py-2 text-right font-mono text-red-600 dark:text-red-400">
+                        <td className="py-2 text-right font-mono text-red-600 tabular-nums dark:text-red-400">
                           {formatCurrency(row.expense)}
                         </td>
                         <td
-                          className={`py-2 text-right font-mono ${row.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
+                          className={`py-2 text-right font-mono tabular-nums ${row.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}
                         >
                           {formatCurrency(row.balance)}
                         </td>
-                        <td className="py-2 text-right font-mono">{row.savingsRate}%</td>
+                        <td className="py-2 text-right font-mono tabular-nums">
+                          {row.savingsRate}%
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -262,8 +274,8 @@ export default function ReportsPage() {
         <TabsContent value="forecast" className="space-y-4 sm:space-y-6">
           {forecastLoading ? (
             <div className="space-y-4">
-              <div className="border-border bg-card h-48 animate-pulse rounded-2xl border" />
-              <div className="border-border bg-card h-72 animate-pulse rounded-2xl border" />
+              <div className="border-border bg-card shadow-card h-48 animate-pulse rounded-2xl border" />
+              <div className="border-border bg-card shadow-card h-72 animate-pulse rounded-2xl border" />
             </div>
           ) : forecastData ? (
             <>
@@ -272,7 +284,7 @@ export default function ReportsPage() {
               <motion.div
                 {...fadeInUp}
                 transition={{ delay: 0.1 }}
-                className="border-border bg-card rounded-2xl border p-6"
+                className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
               >
                 <h3 className="mb-4 text-sm font-semibold">{t(locale, 'cashFlowForecast')}</h3>
                 <ForecastChart trends={trends} forecast={forecastData} />
@@ -281,7 +293,7 @@ export default function ReportsPage() {
               <motion.div
                 {...fadeInUp}
                 transition={{ delay: 0.2 }}
-                className="border-border bg-card rounded-2xl border p-6"
+                className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
               >
                 <h3 className="mb-4 text-sm font-semibold">
                   {t(locale, 'forecastMonths').replace('{n}', '6')}

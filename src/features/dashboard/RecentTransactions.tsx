@@ -22,16 +22,16 @@ export function RecentTransactions({ transactions, categories }: RecentTransacti
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.4 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{t(locale, 'recentTransactions')}</h3>
+        <h3 className="text-sm font-semibold tracking-tight">{t(locale, 'recentTransactions')}</h3>
         <Link
           href="/transactions"
-          className="text-primary flex items-center gap-1 text-xs font-medium hover:underline"
+          className="group/viewall text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-medium transition-colors"
         >
           {t(locale, 'viewAll')}
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-3 w-3 transition-transform group-hover/viewall:translate-x-0.5" />
         </Link>
       </div>
 
@@ -48,11 +48,11 @@ export function RecentTransactions({ transactions, categories }: RecentTransacti
             return (
               <div
                 key={tx.id}
-                className="hover:bg-muted/50 flex items-center gap-3 rounded-lg p-2 transition-colors"
+                className="hover:bg-surface-inset flex items-center gap-3 rounded-lg p-2 transition-colors"
               >
                 <div
-                  className="h-8 w-8 flex-shrink-0 rounded-lg"
-                  style={{ backgroundColor: `${color}15` }}
+                  className="ring-border-subtle h-8 w-8 flex-shrink-0 rounded-lg ring-1 ring-inset"
+                  style={{ backgroundColor: `${color}18` }}
                 >
                   <div className="flex h-full w-full items-center justify-center">
                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
@@ -66,7 +66,7 @@ export function RecentTransactions({ transactions, categories }: RecentTransacti
                 </div>
                 <span
                   className={cn(
-                    'font-mono text-sm font-semibold',
+                    'font-mono text-sm font-semibold tabular-nums',
                     tx.type === 'income'
                       ? 'text-emerald-600 dark:text-emerald-400'
                       : 'text-red-600 dark:text-red-400'

@@ -49,8 +49,8 @@ export function UnbudgetedCategories({ categories, onSetBudget }: UnbudgetedCate
   };
 
   return (
-    <div className="border-border bg-card rounded-2xl border p-4">
-      <h3 className="mb-3 text-sm font-semibold">{t(locale, 'unbudgeted')}</h3>
+    <div className="border-border bg-card shadow-card rounded-2xl border p-4">
+      <h3 className="mb-3 text-sm font-semibold tracking-tight">{t(locale, 'unbudgeted')}</h3>
       <motion.div variants={staggerList} initial="hidden" animate="show" className="space-y-2">
         {categories.map((cat) => (
           <motion.div
@@ -58,7 +58,7 @@ export function UnbudgetedCategories({ categories, onSetBudget }: UnbudgetedCate
             variants={staggerListItem}
             className={cn(
               'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors',
-              'hover:bg-muted/50'
+              'hover:bg-surface-inset'
             )}
           >
             <div

@@ -50,28 +50,28 @@ export function BudgetCategoryCard({ category, alert, onUpdateBudget }: BudgetCa
   };
 
   return (
-    <div className="border-border bg-card rounded-2xl border p-4 transition-shadow hover:shadow-sm">
+    <div className="border-border bg-card shadow-card hover:border-border-strong hover:shadow-card-hover rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5">
       {/* Header */}
       <div className="mb-3 flex items-center gap-2">
         <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: color }} />
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{name}</span>
         {alert?.level === 'exceeded' ? (
-          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
+          <span className="bg-danger-soft text-danger-soft-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase">
             {t(locale, 'overBudget')}
           </span>
         ) : alert?.level === 'warning' ? (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+          <span className="bg-warning-soft text-warning-soft-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums">
             {Math.round(alert.spentPct * 100)}%
           </span>
         ) : (
           <span
             className={cn(
-              'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              'rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums',
               isOver
-                ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
+                ? 'bg-danger-soft text-danger-soft-foreground'
                 : isWarning
-                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
-                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+                  ? 'bg-warning-soft text-warning-soft-foreground'
+                  : 'bg-success-soft text-success-soft-foreground'
             )}
           >
             {percentage.toFixed(0)}%
@@ -91,7 +91,7 @@ export function BudgetCategoryCard({ category, alert, onUpdateBudget }: BudgetCa
       </div>
 
       {/* Progress bar */}
-      <div className="bg-muted mb-3 h-2 overflow-hidden rounded-full">
+      <div className="bg-surface-inset ring-border-subtle mb-3 h-1.5 overflow-hidden rounded-full ring-1 ring-inset">
         <div
           className={cn(
             'h-full rounded-full transition-all duration-700 ease-out',
@@ -125,18 +125,24 @@ export function BudgetCategoryCard({ category, alert, onUpdateBudget }: BudgetCa
       ) : (
         <div className="grid grid-cols-3 gap-1 text-[11px]">
           <div>
-            <p className="text-muted-foreground">{t(locale, 'spent')}</p>
-            <p className="font-mono font-medium">{formatCurrency(spent)}</p>
+            <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+              {t(locale, 'spent')}
+            </p>
+            <p className="font-mono font-medium tabular-nums">{formatCurrency(spent)}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">{t(locale, 'budget')}</p>
-            <p className="font-mono font-medium">{formatCurrency(budget)}</p>
+            <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+              {t(locale, 'budget')}
+            </p>
+            <p className="font-mono font-medium tabular-nums">{formatCurrency(budget)}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">{t(locale, 'remaining')}</p>
+            <p className="text-muted-foreground text-[10px] tracking-wider uppercase">
+              {t(locale, 'remaining')}
+            </p>
             <p
               className={cn(
-                'font-mono font-medium',
+                'font-mono font-medium tabular-nums',
                 remaining < 0 ? 'text-red-600 dark:text-red-400' : ''
               )}
             >

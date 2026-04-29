@@ -35,9 +35,9 @@ export function PaymentMethodsSummary({ totals }: PaymentMethodsSummaryProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.25 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
-      <h3 className="mb-4 text-sm font-semibold">{t(locale, 'paymentMethods')}</h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'paymentMethods')}</h3>
 
       {data.length === 0 ? (
         <div className="text-muted-foreground flex h-20 items-center justify-center text-sm">
@@ -49,11 +49,13 @@ export function PaymentMethodsSummary({ totals }: PaymentMethodsSummaryProps) {
             <div key={d.name}>
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="font-medium">{d.name}</span>
-                <span className="text-muted-foreground font-mono">{formatCurrency(d.value)}</span>
+                <span className="text-muted-foreground font-mono tabular-nums">
+                  {formatCurrency(d.value)}
+                </span>
               </div>
-              <div className="bg-muted h-2 overflow-hidden rounded-full">
+              <div className="bg-surface-inset ring-border-subtle h-1.5 overflow-hidden rounded-full ring-1 ring-inset">
                 <div
-                  className="h-full rounded-full transition-all duration-500"
+                  className="h-full rounded-full transition-all duration-700 ease-out"
                   style={{
                     width: `${(d.value / max) * 100}%`,
                     backgroundColor: d.color,

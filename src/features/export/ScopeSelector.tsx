@@ -29,8 +29,10 @@ export function ScopeSelector({
 
   const btnClass = (s: ExportScope) =>
     cn(
-      'rounded-xl border-2 p-4 text-left transition-colors',
-      scope === s ? 'border-primary bg-primary/5' : 'bg-muted/50 hover:bg-muted border-transparent'
+      'rounded-xl border-2 p-4 text-left transition-all duration-200',
+      scope === s
+        ? 'border-primary bg-primary/5 shadow-card'
+        : 'border-transparent bg-surface-inset hover:border-border-subtle hover:bg-card hover:shadow-card'
     );
 
   return (

@@ -23,15 +23,22 @@ export function ExportActionBar({
   const formatLabel = format.toUpperCase();
 
   return (
-    <div className={cn('border-border bg-card rounded-2xl border p-6', className)}>
+    <div
+      className={cn(
+        'border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300',
+        className
+      )}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium">
-            {t(locale, 'downloadReady')}: <span className="font-semibold">{transactionCount}</span>{' '}
+            {t(locale, 'downloadReady')}:{' '}
+            <span className="font-mono font-semibold tabular-nums">{transactionCount}</span>{' '}
             {t(locale, 'transactions').toLowerCase()}
           </p>
           <p className="text-muted-foreground text-xs">
-            {t(locale, 'exportFormat')}: {formatLabel}
+            {t(locale, 'exportFormat')}:{' '}
+            <span className="text-foreground font-mono font-medium">{formatLabel}</span>
           </p>
         </div>
         <Button

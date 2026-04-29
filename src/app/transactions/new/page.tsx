@@ -33,7 +33,7 @@ export default function NewTransactionPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.1 }}
-        className="border-border bg-card rounded-2xl border p-4 sm:p-6"
+        className="border-border bg-card shadow-card rounded-2xl border p-4 sm:p-6"
       >
         <TransactionForm onClose={() => router.push('/transactions')} />
       </motion.div>

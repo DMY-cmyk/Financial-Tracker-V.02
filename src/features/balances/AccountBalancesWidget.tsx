@@ -20,10 +20,10 @@ export function AccountBalancesWidget() {
   };
 
   return (
-    <div className="bg-card border-border rounded-2xl border p-5 shadow-sm">
+    <div className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-5 transition-shadow duration-300">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold">{t(locale, 'accountBalances')}</h3>
-        <span className="text-muted-foreground font-mono text-sm font-medium">
+        <h3 className="font-semibold tracking-tight">{t(locale, 'accountBalances')}</h3>
+        <span className="text-muted-foreground font-mono text-sm font-medium tabular-nums">
           {formatCurrency(totalBalance)}
         </span>
       </div>

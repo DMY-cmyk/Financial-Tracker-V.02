@@ -62,9 +62,9 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
-      <h3 className="mb-4 text-sm font-semibold">{t(locale, 'budgetProgress')}</h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'budgetProgress')}</h3>
 
       {budgets.length === 0 ? (
         <div className="text-muted-foreground flex h-20 items-center justify-center text-sm">
@@ -90,14 +90,14 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
                       const alert = alertMap.get(b.id);
                       if (alert?.level === 'exceeded') {
                         return (
-                          <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
+                          <span className="bg-danger-soft text-danger-soft-foreground rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
                             OVER
                           </span>
                         );
                       }
                       if (alert?.level === 'warning') {
                         return (
-                          <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                          <span className="bg-warning-soft text-warning-soft-foreground rounded-full px-1.5 py-0.5 text-[9px] font-semibold tabular-nums">
                             {Math.round(alert.spentPct * 100)}%
                           </span>
                         );
@@ -123,9 +123,9 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
                       type="button"
                       onClick={() => startEdit(b)}
                       className={cn(
-                        'text-muted-foreground font-mono',
+                        'text-muted-foreground font-mono tabular-nums',
                         onUpdateBudget &&
-                          'hover:text-foreground group/budget hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 transition-colors'
+                          'group/budget hover:bg-surface-inset hover:text-foreground inline-flex cursor-pointer items-center gap-1 rounded px-1 transition-colors'
                       )}
                       disabled={!onUpdateBudget}
                       title={onUpdateBudget ? t(locale, 'editBudget') : undefined}
@@ -137,7 +137,7 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
                     </button>
                   )}
                 </div>
-                <div className="bg-muted h-2 overflow-hidden rounded-full">
+                <div className="bg-surface-inset ring-border-subtle h-1.5 overflow-hidden rounded-full ring-1 ring-inset">
                   <div
                     className={cn(
                       'h-full rounded-full transition-all duration-700 ease-out',
@@ -147,7 +147,7 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
                   />
                 </div>
                 {isOver && (
-                  <p className="mt-1 text-[10px] font-medium text-red-500">
+                  <p className="mt-1 text-[10px] font-medium text-red-500 tabular-nums">
                     {t(locale, 'overBudget')} ({formatCurrency(Math.abs(b.remaining))})
                   </p>
                 )}

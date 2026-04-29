@@ -90,13 +90,25 @@ export function DashboardContent() {
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
+        className="flex flex-wrap items-end justify-between gap-3"
       >
-        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{t(locale, 'dashboard')}</h1>
-        <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-          {locale === 'id'
-            ? `Ringkasan keuangan untuk ${MONTH_NAMES[month]} ${year}`
-            : `Your financial overview for ${MONTH_NAMES[month]} ${year}`}
-        </p>
+        <div>
+          <p className="text-muted-foreground/70 text-[10px] font-semibold tracking-[0.18em] uppercase">
+            {locale === 'id' ? 'Ringkasan' : 'Overview'}
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-[28px]">
+            {t(locale, 'dashboard')}
+          </h1>
+          <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
+            {locale === 'id'
+              ? `Ringkasan keuangan untuk ${MONTH_NAMES[month]} ${year}`
+              : `Your financial overview for ${MONTH_NAMES[month]} ${year}`}
+          </p>
+        </div>
+        <div className="border-border-subtle bg-surface-inset text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[11px] font-medium tabular-nums">
+          <span className="bg-primary h-1.5 w-1.5 rounded-full" />
+          {MONTH_NAMES[month]} · {year}
+        </div>
       </motion.div>
 
       {/* Summary Cards */}
@@ -106,9 +118,18 @@ export function DashboardContent() {
         initial="hidden"
         animate="show"
       >
-        <div className="pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/2 left-1/3 h-24 w-24 -translate-y-1/2 rounded-full bg-violet-500/8 blur-2xl" />
+        <div
+          className="pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full blur-3xl"
+          style={{ background: 'rgb(var(--glow-primary) / 0.12)' }}
+        />
+        <div
+          className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-3xl"
+          style={{ background: 'rgb(var(--glow-success) / 0.12)' }}
+        />
+        <div
+          className="pointer-events-none absolute top-1/2 left-1/3 h-24 w-24 -translate-y-1/2 rounded-full blur-2xl"
+          style={{ background: 'rgb(var(--glow-accent) / 0.10)' }}
+        />
         <motion.div variants={staggerGridItem}>
           <SummaryCard
             label={t(locale, 'netBalance')}

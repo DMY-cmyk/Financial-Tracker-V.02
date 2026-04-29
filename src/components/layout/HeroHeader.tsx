@@ -35,8 +35,15 @@ export function HeroHeader({
 
   return (
     <div className={cn('lg:hidden', className)}>
-      <div className="bg-hero text-hero-foreground rounded-b-3xl px-5 pt-6 pb-6 shadow-sm">
-        <div className="flex items-center justify-between">
+      <div className="bg-hero text-hero-foreground shadow-card relative overflow-hidden rounded-b-3xl px-5 pt-6 pb-7">
+        {/* Subtle radial highlight in the upper-right for depth */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full opacity-50 blur-3xl"
+          style={{ background: 'rgb(255 255 255 / 0.18)' }}
+        />
+
+        <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-2">
             {showBack && (
               <button
@@ -48,19 +55,25 @@ export function HeroHeader({
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
-            <h1 className="text-base font-semibold">{title}</h1>
+            <h1 className="text-[13px] font-semibold tracking-[0.16em] uppercase">{title}</h1>
           </div>
           <div className="flex items-center">{rightAction ?? fallbackRight}</div>
         </div>
 
         {(greeting || subgreeting) && (
-          <div className="mt-4 space-y-0.5">
-            {greeting && <p className="text-xs font-medium opacity-90">{greeting}</p>}
-            {subgreeting && <p className="text-base font-bold">{subgreeting}</p>}
+          <div className="relative mt-5 space-y-1">
+            {greeting && (
+              <p className="text-[11px] font-medium tracking-wider uppercase opacity-75">
+                {greeting}
+              </p>
+            )}
+            {subgreeting && (
+              <p className="text-xl leading-tight font-bold tracking-tight">{subgreeting}</p>
+            )}
           </div>
         )}
 
-        {children && <div className="mt-4">{children}</div>}
+        {children && <div className="relative mt-5">{children}</div>}
       </div>
     </div>
   );

@@ -150,6 +150,36 @@
   --color-tile-foreground: var(--tile-foreground);
   --color-tile-active: var(--tile-bg-active);
   --color-tile-active-foreground: var(--tile-foreground-active);
+
+  /* Surface elevation scale */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-inset: var(--surface-inset);
+
+  /* Border scale */
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  /* Soft semantic surfaces — for icon tiles, banners, chips */
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-foreground: var(--danger-soft-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-foreground: var(--info-soft-foreground);
+
+  /* Ambient glows — for hero/dashboard background atmosphere */
+  --color-glow-primary: var(--glow-primary);
+  --color-glow-success: var(--glow-success);
+  --color-glow-accent: var(--glow-accent);
+
+  /* Shadow scale */
+  --shadow-card: var(--card-shadow);
+  --shadow-card-hover: var(--card-shadow-hover);
+  --shadow-elevated: var(--elevated-shadow);
 }
 
 :root {
@@ -219,6 +249,36 @@
   --sidebar-accent-foreground: #1e40af;
   --sidebar-border: #e2e8f0;
   --sidebar-ring: #2563eb;
+
+  /* Surface elevation — page → card → raised → inset well */
+  --surface-1: #f8fafc;
+  --surface-2: #ffffff;
+  --surface-3: #ffffff;
+  --surface-inset: #f1f5f9;
+
+  /* Border scale — subtle (dividers in dense UIs) → default → strong (active state) */
+  --border-subtle: #eef2f7;
+  --border-strong: #cbd5e1;
+
+  /* Soft semantic surfaces */
+  --success-soft: #d1fae5;
+  --success-soft-foreground: #047857;
+  --danger-soft: #fee2e2;
+  --danger-soft-foreground: #b91c1c;
+  --warning-soft: #fef3c7;
+  --warning-soft-foreground: #b45309;
+  --info-soft: #dbeafe;
+  --info-soft-foreground: #1d4ed8;
+
+  /* Ambient glows (RGB triplets used with rgb(... / alpha)) */
+  --glow-primary: 59 130 246; /* blue-500 */
+  --glow-success: 16 185 129; /* emerald-500 */
+  --glow-accent: 139 92 246; /* violet-500 */
+
+  /* Card shadows — restrained, layered */
+  --card-shadow: 0 1px 2px -1px rgb(15 23 42 / 0.04), 0 1px 3px -1px rgb(15 23 42 / 0.03);
+  --card-shadow-hover: 0 4px 16px -4px rgb(15 23 42 / 0.08), 0 2px 6px -2px rgb(15 23 42 / 0.04);
+  --elevated-shadow: 0 12px 32px -8px rgb(15 23 42 / 0.1), 0 4px 12px -4px rgb(15 23 42 / 0.06);
 }
 
 .dark {
@@ -281,6 +341,36 @@
   --tile-foreground: #93c5fd;
   --tile-bg-active: #3b82f6;
   --tile-foreground-active: #ffffff;
+
+  /* Surface elevation — deeper layers in dark, subtle separation */
+  --surface-1: #0f172a;
+  --surface-2: #1e293b;
+  --surface-3: #243349;
+  --surface-inset: #172033;
+
+  /* Border scale */
+  --border-subtle: #1f2a3d;
+  --border-strong: #475569;
+
+  /* Soft semantic surfaces — tinted shadows of the semantic colors */
+  --success-soft: #052e1f;
+  --success-soft-foreground: #6ee7b7;
+  --danger-soft: #3a1212;
+  --danger-soft-foreground: #fca5a5;
+  --warning-soft: #3b260a;
+  --warning-soft-foreground: #fcd34d;
+  --info-soft: #112444;
+  --info-soft-foreground: #93c5fd;
+
+  /* Ambient glows — slightly brighter triplets for dark mode bloom */
+  --glow-primary: 96 165 250; /* blue-400 */
+  --glow-success: 52 211 153; /* emerald-400 */
+  --glow-accent: 167 139 250; /* violet-400 */
+
+  /* Card shadows — deeper alpha, more dramatic depth in dark */
+  --card-shadow: 0 1px 2px -1px rgb(0 0 0 / 0.4), 0 1px 3px -1px rgb(0 0 0 / 0.3);
+  --card-shadow-hover: 0 4px 16px -4px rgb(0 0 0 / 0.5), 0 2px 6px -2px rgb(0 0 0 / 0.35);
+  --elevated-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.6), 0 4px 12px -4px rgb(0 0 0 / 0.4);
 }
 
 @layer base {

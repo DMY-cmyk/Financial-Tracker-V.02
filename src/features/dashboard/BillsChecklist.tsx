@@ -20,9 +20,9 @@ export function BillsChecklist({ bills, onToggle }: BillsChecklistProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.3 }}
-      className="border-border bg-card rounded-2xl border p-6"
+      className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-6 transition-shadow duration-300"
     >
-      <h3 className="mb-4 text-sm font-semibold">{t(locale, 'billsChecklist')}</h3>
+      <h3 className="mb-4 text-sm font-semibold tracking-tight">{t(locale, 'billsChecklist')}</h3>
 
       {bills.length === 0 ? (
         <div className="text-muted-foreground flex h-20 items-center justify-center text-sm">
@@ -33,7 +33,7 @@ export function BillsChecklist({ bills, onToggle }: BillsChecklistProps) {
           {bills.map((bill) => (
             <div
               key={bill.id}
-              className="hover:bg-muted/50 flex items-center gap-3 rounded-lg p-2 transition-colors"
+              className="hover:bg-surface-inset flex items-center gap-3 rounded-lg p-2 transition-colors"
             >
               <Checkbox
                 checked={bill.isPaid}
@@ -55,7 +55,7 @@ export function BillsChecklist({ bills, onToggle }: BillsChecklistProps) {
               </div>
               <span
                 className={cn(
-                  'font-mono text-xs font-medium',
+                  'font-mono text-xs font-medium tabular-nums',
                   bill.isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
                 )}
               >

@@ -91,7 +91,7 @@ export function TransactionTable({
                   animate="animate"
                   exit="exit"
                   className={cn(
-                    'group bg-card hover:border-border hover:bg-muted/30 flex items-center gap-3 rounded-xl border border-transparent p-3 transition-colors',
+                    'group bg-card hover:border-border-subtle hover:bg-surface-inset hover:shadow-card flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all',
                     hasSelection && selectedIds.has(tx.id) && 'border-primary/30 bg-primary/5'
                   )}
                 >
@@ -110,7 +110,7 @@ export function TransactionTable({
                   </div>
                   <span
                     className={cn(
-                      'font-mono text-sm font-semibold whitespace-nowrap',
+                      'font-mono text-sm font-semibold whitespace-nowrap tabular-nums',
                       tx.type === 'income'
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-red-600 dark:text-red-400'
@@ -159,8 +159,8 @@ export function TransactionTable({
 
       {/* Pagination */}
       {totalPages > 1 && onPageChange && (
-        <div className="border-border flex items-center justify-between rounded-2xl border px-4 py-3">
-          <span className="text-muted-foreground text-xs">
+        <div className="border-border bg-card shadow-card flex items-center justify-between rounded-2xl border px-4 py-3">
+          <span className="text-muted-foreground text-xs tabular-nums">
             {locale === 'id'
               ? `Halaman ${page} dari ${totalPages}`
               : `Page ${page} of ${totalPages}`}

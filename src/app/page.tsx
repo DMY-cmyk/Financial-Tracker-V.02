@@ -109,23 +109,29 @@ export default function DashboardPage() {
           subgreeting={t(locale, subgreetingKey)}
         >
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-hero-foreground/10 rounded-2xl p-3">
-              <p className="text-[11px] opacity-80">{t(locale, 'homeTotalBalance')}</p>
-              <p className="font-mono text-base font-bold">{formatCurrency(balance)}</p>
+            <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+              <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+                {t(locale, 'homeTotalBalance')}
+              </p>
+              <p className="mt-0.5 font-mono text-base font-bold tabular-nums">
+                {formatCurrency(balance)}
+              </p>
             </div>
-            <div className="bg-hero-foreground/10 rounded-2xl p-3">
-              <p className="text-[11px] opacity-80">{t(locale, 'homeTotalExpense')}</p>
-              <p className="text-destructive font-mono text-base font-bold">
+            <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+              <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+                {t(locale, 'homeTotalExpense')}
+              </p>
+              <p className="text-destructive mt-0.5 font-mono text-base font-bold tabular-nums">
                 -{formatCurrency(expense)}
               </p>
             </div>
           </div>
           {hasBudget && (
-            <div className="mt-3">
-              <div className="bg-hero-foreground/10 h-2 w-full overflow-hidden rounded-full">
+            <div className="mt-3.5">
+              <div className="bg-hero-foreground/15 ring-hero-foreground/10 h-1.5 w-full overflow-hidden rounded-full ring-1 ring-inset">
                 <div
                   className={cn(
-                    'h-full rounded-full transition-all',
+                    'h-full rounded-full transition-all duration-500 ease-out',
                     pct > 100 ? 'bg-destructive' : 'bg-hero-foreground'
                   )}
                   style={{ width: `${Math.min(pct, 100)}%` }}
@@ -133,7 +139,7 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-          <p className="mt-2 text-[11px] opacity-90">{caption}</p>
+          <p className="mt-2 text-[11px] font-medium opacity-85">{caption}</p>
         </HeroHeader>
 
         <div className="bg-background -mt-6 rounded-t-3xl px-4 pt-6 pb-24">

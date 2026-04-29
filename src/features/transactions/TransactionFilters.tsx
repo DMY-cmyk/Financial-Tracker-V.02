@@ -68,7 +68,7 @@ export function TransactionFilters({
             className={`px-3 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg ${
               typeFilter === type
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-muted'
+                : 'text-muted-foreground hover:bg-surface-inset'
             }`}
           >
             {type === 'all' ? t(locale, 'all') : t(locale, type)}
@@ -102,7 +102,7 @@ export function TransactionFilters({
           className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
             allMonths
               ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border text-muted-foreground hover:bg-muted'
+              : 'border-border text-muted-foreground hover:bg-surface-inset'
           }`}
         >
           {t(locale, 'allMonths')}
@@ -116,7 +116,7 @@ export function TransactionFilters({
           className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
             yearOnly
               ? 'bg-primary text-primary-foreground border-primary'
-              : 'border-border text-muted-foreground hover:bg-muted'
+              : 'border-border text-muted-foreground hover:bg-surface-inset'
           }`}
         >
           {t(locale, 'viewEntireYear')}
