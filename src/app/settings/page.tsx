@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
+import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -49,7 +50,8 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 sm:space-y-6">
-      <motion.div {...fadeInUp}>
+      <HeroHeader title={t(locale, 'settings')} />
+      <motion.div {...fadeInUp} className="hidden lg:block">
         <PageHeader title={t(locale, 'settings')} />
       </motion.div>
 
