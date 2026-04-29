@@ -546,6 +546,40 @@ type TranslationKeys = {
   categoriesAtRisk: string;
   overBudgetLabel: string;
   budgetYear: string;
+
+  // Mobile-kit chrome (Phase 1b)
+  navAdd: string;
+  fabAddIncome: string;
+  fabAddExpense: string;
+  fabScanReceipt: string;
+  heroBellAria: string;
+  heroBackAria: string;
+
+  // Mobile-kit Phase 2 (Home + Transactions mobile)
+  homeGreeting: string;
+  homeSubgreetingMorning: string;
+  homeSubgreetingAfternoon: string;
+  homeSubgreetingEvening: string;
+  homeSubgreetingNight: string;
+  homeTotalBalance: string;
+  homeTotalExpense: string;
+  homeBudgetCaptionUnder30: string;
+  homeBudgetCaptionUnder70: string;
+  homeBudgetCaptionUnder100: string;
+  homeBudgetCaptionAtLimit: string;
+  homeBudgetCaptionOver: string;
+  homeBudgetCaptionNoBudget: string;
+  homeSavingsTitle: string;
+  homeSavingsEmpty: string;
+  homeStatsRevenueLastWeek: string;
+  homeStatsTopCategoryLastWeek: string;
+  homeStatsEmpty: string;
+  periodDaily: string;
+  periodWeekly: string;
+  periodMonthly: string;
+  periodYearly: string;
+  txSeeAll: string;
+  txEmpty: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -1046,6 +1080,40 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesAtRisk: 'At Risk',
     overBudgetLabel: 'Over Budget',
     budgetYear: 'Year',
+
+    // Mobile-kit chrome (Phase 1b)
+    navAdd: 'Add',
+    fabAddIncome: 'Add Income',
+    fabAddExpense: 'Add Expense',
+    fabScanReceipt: 'Scan Receipt',
+    heroBellAria: 'Notifications',
+    heroBackAria: 'Go back',
+
+    // Mobile-kit Phase 2 (Home + Transactions mobile)
+    homeGreeting: 'Hi, Welcome Back',
+    homeSubgreetingMorning: 'Good Morning',
+    homeSubgreetingAfternoon: 'Good Afternoon',
+    homeSubgreetingEvening: 'Good Evening',
+    homeSubgreetingNight: 'Good Night',
+    homeTotalBalance: 'Total Balance',
+    homeTotalExpense: 'Total Expense',
+    homeBudgetCaptionUnder30: 'Looking great — well under budget.',
+    homeBudgetCaptionUnder70: 'On track. Keep it steady.',
+    homeBudgetCaptionUnder100: 'Close to your limit.',
+    homeBudgetCaptionAtLimit: 'At your monthly limit.',
+    homeBudgetCaptionOver: 'Over budget by {amount}.',
+    homeBudgetCaptionNoBudget: 'Set a monthly budget to see progress.',
+    homeSavingsTitle: 'Savings on Goals',
+    homeSavingsEmpty: 'No goals yet. Add one to start tracking.',
+    homeStatsRevenueLastWeek: 'Revenue Last Week',
+    homeStatsTopCategoryLastWeek: 'Top Category Last Week',
+    homeStatsEmpty: 'Not enough data yet.',
+    periodDaily: 'Daily',
+    periodWeekly: 'Weekly',
+    periodMonthly: 'Monthly',
+    periodYearly: 'Yearly',
+    txSeeAll: 'See all',
+    txEmpty: 'No transactions yet.',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1546,6 +1614,40 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesAtRisk: 'Berisiko',
     overBudgetLabel: 'Melebihi Anggaran',
     budgetYear: 'Tahun',
+
+    // Mobile-kit chrome (Phase 1b)
+    navAdd: 'Tambah',
+    fabAddIncome: 'Tambah Pemasukan',
+    fabAddExpense: 'Tambah Pengeluaran',
+    fabScanReceipt: 'Pindai Struk',
+    heroBellAria: 'Notifikasi',
+    heroBackAria: 'Kembali',
+
+    // Mobile-kit Phase 2 (Home + Transactions mobile)
+    homeGreeting: 'Halo, Selamat Datang Kembali',
+    homeSubgreetingMorning: 'Selamat Pagi',
+    homeSubgreetingAfternoon: 'Selamat Siang',
+    homeSubgreetingEvening: 'Selamat Sore',
+    homeSubgreetingNight: 'Selamat Malam',
+    homeTotalBalance: 'Saldo Total',
+    homeTotalExpense: 'Pengeluaran Total',
+    homeBudgetCaptionUnder30: 'Bagus — masih jauh di bawah anggaran.',
+    homeBudgetCaptionUnder70: 'Sesuai jalur. Pertahankan.',
+    homeBudgetCaptionUnder100: 'Mendekati batas.',
+    homeBudgetCaptionAtLimit: 'Tepat di batas bulanan.',
+    homeBudgetCaptionOver: 'Melebihi anggaran sebesar {amount}.',
+    homeBudgetCaptionNoBudget: 'Atur anggaran bulanan untuk melihat progres.',
+    homeSavingsTitle: 'Tabungan untuk Tujuan',
+    homeSavingsEmpty: 'Belum ada tujuan. Tambahkan untuk mulai melacak.',
+    homeStatsRevenueLastWeek: 'Pendapatan Minggu Lalu',
+    homeStatsTopCategoryLastWeek: 'Kategori Teratas Minggu Lalu',
+    homeStatsEmpty: 'Data belum cukup.',
+    periodDaily: 'Harian',
+    periodWeekly: 'Mingguan',
+    periodMonthly: 'Bulanan',
+    periodYearly: 'Tahunan',
+    txSeeAll: 'Lihat semua',
+    txEmpty: 'Belum ada transaksi.',
   },
 };
 

@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { HealthScoreCard } from '@/features/insights/HealthScoreCard';
@@ -28,10 +30,7 @@ describe('HealthScoreCard accessibility', () => {
   });
 
   it('foreground ring circle uses duration-500 (not duration-700)', () => {
-    const src = require('fs').readFileSync(
-      require('path').resolve('src/features/insights/HealthScoreCard.tsx'),
-      'utf-8'
-    );
+    const src = readFileSync(resolve('src/features/insights/HealthScoreCard.tsx'), 'utf-8');
     expect(src).toContain('duration-500');
     expect(src).not.toContain('duration-700');
   });

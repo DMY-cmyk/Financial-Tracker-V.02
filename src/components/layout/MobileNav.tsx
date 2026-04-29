@@ -77,6 +77,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[280px] p-0">
+        <div className="bg-brand-mint h-1 w-full" />
         <SheetHeader className="border-border border-b px-5 py-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm">

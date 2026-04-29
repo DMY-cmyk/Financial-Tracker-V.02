@@ -139,6 +139,17 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-mint-foreground: var(--brand-mint-foreground);
+  --color-brand-mint-soft: var(--brand-mint-soft);
+  --color-brand-mint-strong: var(--brand-mint-strong);
+  --color-hero: var(--hero-bg);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-tile: var(--tile-bg);
+  --color-tile-foreground: var(--tile-foreground);
+  --color-tile-active: var(--tile-bg-active);
+  --color-tile-active-foreground: var(--tile-foreground-active);
 }
 
 :root {
@@ -182,7 +193,24 @@
   --chart-color-4: #f59e0b;
   --chart-color-5: #ec4899;
   --chart-color-6: #06b6d4;
-  --radius: 0.75rem;
+  --radius: 1rem;
+
+  /* Brand mint — used only on opt-in chrome */
+  --brand-mint: #22c97e;
+  --brand-mint-foreground: #0f172a;
+  --brand-mint-soft: #98e8b8;
+  --brand-mint-strong: #16a368;
+
+  /* Hero band */
+  --hero-bg: var(--brand-mint);
+  --hero-foreground: var(--brand-mint-foreground);
+
+  /* Category icon tile */
+  --tile-bg: #c9defe;
+  --tile-foreground: #1f4fff;
+  --tile-bg-active: #1f4fff;
+  --tile-foreground-active: #ffffff;
+
   --sidebar: #f8fafc;
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #2563eb;
@@ -240,6 +268,19 @@
   --sidebar-accent-foreground: #93c5fd;
   --sidebar-border: #334155;
   --sidebar-ring: #3b82f6;
+
+  --brand-mint: #34d399;
+  --brand-mint-foreground: #062b18;
+  --brand-mint-soft: #1f6447;
+  --brand-mint-strong: #0f9b6c;
+
+  --hero-bg: var(--brand-mint);
+  --hero-foreground: var(--brand-mint-foreground);
+
+  --tile-bg: #1e3a5f;
+  --tile-foreground: #93c5fd;
+  --tile-bg-active: #3b82f6;
+  --tile-foreground-active: #ffffff;
 }
 
 @layer base {

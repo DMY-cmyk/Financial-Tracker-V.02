@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useBudgetData } from '@/hooks/useBudgetData';
 import { useBudgetTemplates } from '@/hooks/useBudgetTemplates';
 import { useAnnualBudget } from '@/hooks/useAnnualBudget';
+import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { BudgetOverview } from '@/components/budget/BudgetOverview';
@@ -70,7 +71,10 @@ export default function BudgetPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-4xl space-y-4">
-        <PageHeader title={t(locale, 'budgetPage')} />
+        <HeroHeader title={t(locale, 'budgetPage')} />
+        <div className="hidden lg:block">
+          <PageHeader title={t(locale, 'budgetPage')} />
+        </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="border-border bg-card h-24 animate-pulse rounded-2xl border" />
@@ -89,13 +93,16 @@ export default function BudgetPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6">
+      <HeroHeader title={t(locale, 'budgetPage')} />
       <motion.div {...fadeInUp}>
         <div className="flex items-center justify-between">
-          <PageHeader
-            title={t(locale, 'budgetPage')}
-            description={`${MONTH_NAMES[month]} ${year}`}
-          />
-          <div className="flex items-center gap-2">
+          <div className="hidden lg:block">
+            <PageHeader
+              title={t(locale, 'budgetPage')}
+              description={`${MONTH_NAMES[month]} ${year}`}
+            />
+          </div>
+          <div className="flex flex-1 items-center justify-end gap-2">
             {view === 'annual' && (
               <div className="flex items-center gap-1">
                 <button

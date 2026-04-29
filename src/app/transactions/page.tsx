@@ -12,7 +12,11 @@ import { MONTH_NAMES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
+import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PeriodTabs, type Period } from '@/components/shared/PeriodTabs';
+import { useDashboardData } from '@/features/dashboard/useDashboardData';
+import { formatCurrency } from '@/lib/formatters';
 import { TransactionFilters } from '@/features/transactions/TransactionFilters';
 import { TransactionFilterSheet } from '@/features/transactions/TransactionFilterSheet';
 import { TransactionForm } from '@/features/transactions/TransactionForm';
@@ -111,6 +115,8 @@ function TransactionsPageInner() {
 
   const { presets, savePreset, deletePreset } = useFilterPresets();
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [period, setPeriod] = useState<Period>('daily');
+  const { balance, expense: dashExpense, categories: dashCategories } = useDashboardData();
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
@@ -162,7 +168,10 @@ function TransactionsPageInner() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title={t(locale, 'transactions')} />
+        <HeroHeader title={t(locale, 'transactions')} />
+        <div className="hidden lg:block">
+          <PageHeader title={t(locale, 'transactions')} />
+        </div>
         <ListSkeleton rows={6} />
       </div>
     );
@@ -170,7 +179,24 @@ function TransactionsPageInner() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <motion.div {...fadeInUp}>
+      <HeroHeader title={t(locale, 'transactions')}>
+        <div className="grid grid-cols-2 gap-3 md:hidden">
+          <div className="bg-hero-foreground/10 rounded-2xl p-3">
+            <p className="text-[11px] opacity-80">{t(locale, 'homeTotalBalance')}</p>
+            <p className="font-mono text-base font-bold">{formatCurrency(balance)}</p>
+          </div>
+          <div className="bg-hero-foreground/10 rounded-2xl p-3">
+            <p className="text-[11px] opacity-80">{t(locale, 'homeTotalExpense')}</p>
+            <p className="text-destructive font-mono text-base font-bold">
+              -{formatCurrency(dashExpense)}
+            </p>
+          </div>
+        </div>
+      </HeroHeader>
+      <div className="md:hidden">
+        <PeriodTabs variant="four" value={period} onChange={setPeriod} />
+      </div>
+      <motion.div {...fadeInUp} className="hidden lg:block">
         <PageHeader
           title={t(locale, 'transactions')}
           description={`${total} ${t(locale, 'transactionCount')}`}
@@ -340,6 +366,7 @@ function TransactionsPageInner() {
               onEdit={openEdit}
               onDuplicate={openDuplicate}
               onDelete={handleDelete}
+              categories={dashCategories}
             />
           </motion.div>
         )}
