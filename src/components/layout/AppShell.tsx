@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useStore } from '@/store';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
-import { BottomNav } from './BottomNav';
+import { BottomNavFab } from './BottomNavFab';
 import { MobileNav } from './MobileNav';
 
 const AUTH_PATHS = ['/login', '/register'];
@@ -46,7 +46,7 @@ export function AppShell({ children }: AppShellProps) {
       <MobileNav open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
 
       {/* Mobile bottom nav */}
-      <BottomNav />
+      <BottomNavFab />
     </div>
   );
 }
