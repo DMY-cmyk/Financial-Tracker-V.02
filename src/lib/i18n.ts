@@ -546,6 +546,14 @@ type TranslationKeys = {
   categoriesAtRisk: string;
   overBudgetLabel: string;
   budgetYear: string;
+
+  // Mobile-kit chrome (Phase 1b)
+  navAdd: string;
+  fabAddIncome: string;
+  fabAddExpense: string;
+  fabScanReceipt: string;
+  heroBellAria: string;
+  heroBackAria: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -1046,6 +1054,14 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesAtRisk: 'At Risk',
     overBudgetLabel: 'Over Budget',
     budgetYear: 'Year',
+
+    // Mobile-kit chrome (Phase 1b)
+    navAdd: 'Add',
+    fabAddIncome: 'Add Income',
+    fabAddExpense: 'Add Expense',
+    fabScanReceipt: 'Scan Receipt',
+    heroBellAria: 'Notifications',
+    heroBackAria: 'Go back',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1546,6 +1562,14 @@ const translations: Record<Locale, TranslationKeys> = {
     categoriesAtRisk: 'Berisiko',
     overBudgetLabel: 'Melebihi Anggaran',
     budgetYear: 'Tahun',
+
+    // Mobile-kit chrome (Phase 1b)
+    navAdd: 'Tambah',
+    fabAddIncome: 'Tambah Pemasukan',
+    fabAddExpense: 'Tambah Pengeluaran',
+    fabScanReceipt: 'Pindai Struk',
+    heroBellAria: 'Notifikasi',
+    heroBackAria: 'Kembali',
   },
 };
 
