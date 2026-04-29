@@ -7,6 +7,8 @@ import { useStore } from '@/store';
 import { FolderNavigator } from '@/components/folders/FolderNavigator';
 import { useDueRecurring } from '@/features/dashboard/useDueRecurring';
 import { RecurringDueBanner } from '@/features/dashboard/RecurringDueBanner';
+import { HeroHeader } from '@/components/layout/HeroHeader';
+import { t } from '@/lib/i18n';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -28,6 +30,7 @@ export default function DashboardPage() {
 
   return (
     <>
+      <HeroHeader title={t(locale, 'dashboard')} />
       <div className="mx-auto max-w-7xl">
         <AnimatePresence>
           {hasDueItems && (
