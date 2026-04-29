@@ -211,6 +211,26 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] Delete confirmation dialog (replaces browser confirm)
 - [x] Toast feedback for data clear
 
+### Mobile Kit Visual Adoption (Figma Mobile UI Kit)
+- [x] **Brand-mint accent token family** — `--brand-mint`, `--brand-mint-soft`, `--brand-mint-strong`, `--brand-mint-foreground` (light + dark) applied opt-in to chrome (hero band, FAB, primary CTAs); `--primary` blue identity preserved
+- [x] **Hero band token family** — `--hero-bg` / `--hero-foreground` mapped to brand-mint
+- [x] **Category-tile token family** — `--tile-bg` / `--tile-foreground` / `--tile-bg-active` / `--tile-foreground-active` (pastel-blue tile) for icon-led category surfaces
+- [x] **Radius bump** — `--radius` 0.75rem → 1rem; cascades to all `--radius-*` derivatives (cards, buttons, inputs, dialogs, sheets, popovers)
+- [x] **`<HeroHeader>`** mobile-only mint band (renders < 1024px) — title + optional greeting/subgreeting + decorative bell + children slot for metric chips
+- [x] **`<BottomNavFab>`** — 5-slot bottom nav (Home / Transactions / Add FAB / Budget / Settings) replacing legacy `BottomNav`. Center FAB pill (`bg-brand-mint`, `-translate-y-3`) opens an Add Sheet with three router-link shortcuts (Add Income / Add Expense / Scan Receipt). Sheet auto-closes on route change.
+- [x] **`<CategoryTile>`** — square pastel-blue icon tile with active-state swap to mint-blue and `aria-current="page"` on the Link branch (exported, wiring deferred)
+- [x] **`<PeriodTabs>`** — controlled pill-row tabs (3-variant Daily/Weekly/Monthly or 4-variant adding Yearly), active pill in mint
+- [x] **`<TransactionRowMobile>`** — 64px row with 52×52 mint-blue icon tile, name + italic timestamp, category tag, signed amount (red expense / foreground income)
+- [x] **`<SavingsRingCard>`** — recharts donut ring (mint on mint-soft track) showing aggregate goal completion %, plus revenue-last-week and top-expense-category-last-week stats with empty states
+- [x] **`Button variant="mint"`** — opt-in primary CTA variant; existing variants unchanged
+- [x] **`lib/icon.ts`** — opt-in lucide stroke defaults (`strokeWidth: 2.25`, rounded line caps/joins) for leaf callsites
+- [x] **Hero band wired to top-level mobile pages** — `/`, `/transactions`, `/budget`, `/reports`, `/settings`. Each page's existing `PageHeader` is hidden at mobile to prevent `<h1>` collision; `/budget` controls (year stepper, monthly/annual toggle) remain visible at all viewports.
+- [x] **`/` and `/transactions` mobile composition** — CSS-only mobile/desktop branching (`md:hidden` / `hidden md:block`), no `useMediaQuery`. Mobile dashboard composes hero (greeting + chips + budget bar with 6-bucket caption) → savings ring overlap card → period tabs → recent-tx list (5 items + "See all"). Mobile transactions composes hero + chips → period tabs → month-grouped TransactionRowMobile list (with infinite-scroll load-more preserved).
+- [x] **Sidebar brand mark** picks up mint via `bg-brand-mint` + `text-brand-mint-foreground`
+- [x] **MobileNav drawer** sports a 4px mint accent strip at the top
+- [x] **30 new i18n keys** (EN + ID) covering hero / FAB / period / home greeting + subgreeting / total balance + expense / 6 budget caption buckets / savings + stats / transactions empty + see-all
+- [x] **115 new tests** (Vitest) — token presence, component renders, conditional branches, page mount source-grep guards, controls visibility regression guards
+
 ### Design System
 - [x] Custom color palette (Blue primary, Emerald income, Red expense, Amber warning)
 - [x] Plus Jakarta Sans (UI) + JetBrains Mono (currency)
