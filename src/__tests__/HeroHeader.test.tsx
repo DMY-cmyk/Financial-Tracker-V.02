@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, afterEach } from 'vitest';
-import { render, cleanup, screen } from '@testing-library/react';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import { HeroHeader } from '@/components/layout/HeroHeader';
 
 afterEach(() => cleanup());
@@ -41,5 +41,12 @@ describe('HeroHeader', () => {
       </HeroHeader>,
     );
     expect(screen.getByTestId('chips')).toBeTruthy();
+  });
+
+  it('calls onBack when back button is clicked', () => {
+    const onBack = vi.fn();
+    render(<HeroHeader title="x" showBack onBack={onBack} />);
+    fireEvent.click(screen.getByLabelText('Go back'));
+    expect(onBack).toHaveBeenCalledOnce();
   });
 });

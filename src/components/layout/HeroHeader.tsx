@@ -10,6 +10,7 @@ export interface HeroHeaderProps {
   greeting?: string;
   subgreeting?: string;
   showBack?: boolean;
+  onBack?: () => void;
   rightAction?: ReactNode;
   children?: ReactNode;
   className?: string;
@@ -20,6 +21,7 @@ export function HeroHeader({
   greeting,
   subgreeting,
   showBack = false,
+  onBack,
   rightAction,
   children,
   className,
@@ -37,7 +39,12 @@ export function HeroHeader({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {showBack && (
-              <button type="button" aria-label={t(locale, 'heroBackAria')} className="-ml-1 p-1">
+              <button
+                type="button"
+                onClick={onBack}
+                aria-label={t(locale, 'heroBackAria')}
+                className="-ml-1 p-1"
+              >
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
