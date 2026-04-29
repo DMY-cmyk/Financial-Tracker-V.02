@@ -34,9 +34,7 @@ describe('TransactionRowMobile', () => {
   });
 
   it('uses text-destructive for expense', () => {
-    const { container } = render(
-      <TransactionRowMobile transaction={baseTx} category={baseCat} />,
-    );
+    const { container } = render(<TransactionRowMobile transaction={baseTx} category={baseCat} />);
     expect(container.querySelector('[data-amount]')!.className).toContain('text-destructive');
   });
 
@@ -44,7 +42,7 @@ describe('TransactionRowMobile', () => {
     const income: Transaction = { ...baseTx, type: 'income' };
     const incomeCat: Category = { ...baseCat, type: 'income' };
     const { container } = render(
-      <TransactionRowMobile transaction={income} category={incomeCat} />,
+      <TransactionRowMobile transaction={income} category={incomeCat} />
     );
     expect(container.querySelector('[data-amount]')!.className).toContain('text-foreground');
   });
@@ -52,7 +50,7 @@ describe('TransactionRowMobile', () => {
   it('invokes onTap when clicked', () => {
     const onTap = vi.fn();
     const { container } = render(
-      <TransactionRowMobile transaction={baseTx} category={baseCat} onTap={onTap} />,
+      <TransactionRowMobile transaction={baseTx} category={baseCat} onTap={onTap} />
     );
     fireEvent.click(container.firstElementChild as Element);
     expect(onTap).toHaveBeenCalledOnce();

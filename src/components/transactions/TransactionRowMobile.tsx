@@ -12,11 +12,7 @@ export interface TransactionRowMobileProps {
   onTap?: () => void;
 }
 
-export function TransactionRowMobile({
-  transaction,
-  category,
-  onTap,
-}: TransactionRowMobileProps) {
+export function TransactionRowMobile({ transaction, category, onTap }: TransactionRowMobileProps) {
   const isExpense = transaction.type === 'expense';
   const when = format(new Date(transaction.date), 'HH:mm – MMM dd');
 
@@ -24,7 +20,7 @@ export function TransactionRowMobile({
     <button
       type="button"
       onClick={onTap}
-      className="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left transition-colors hover:bg-muted/40"
+      className="hover:bg-muted/40 flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-left transition-colors"
     >
       <div className="bg-tile text-tile-foreground flex h-13 w-13 items-center justify-center rounded-2xl">
         <Tag className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
@@ -38,7 +34,7 @@ export function TransactionRowMobile({
         data-amount
         className={cn(
           'font-mono text-sm tabular-nums',
-          isExpense ? 'text-destructive' : 'text-foreground',
+          isExpense ? 'text-destructive' : 'text-foreground'
         )}
       >
         {isExpense ? '-' : '+'}

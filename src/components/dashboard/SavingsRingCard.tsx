@@ -77,7 +77,7 @@ export function SavingsRingCard() {
             <p
               className={cn(
                 'font-mono',
-                revenueLastWeek > 0 ? 'text-foreground' : 'text-muted-foreground',
+                revenueLastWeek > 0 ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
               {revenueLastWeek > 0 ? formatCurrency(revenueLastWeek) : t(locale, 'homeStatsEmpty')}

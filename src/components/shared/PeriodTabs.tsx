@@ -26,7 +26,10 @@ export function PeriodTabs({ variant, value, onChange, className }: PeriodTabsPr
   const locale = useLocale();
   const items = variant === 'four' ? FOUR : THREE;
   return (
-    <div role="tablist" className={cn('bg-secondary inline-flex w-full rounded-2xl p-1', className)}>
+    <div
+      role="tablist"
+      className={cn('bg-secondary inline-flex w-full rounded-2xl p-1', className)}
+    >
       {items.map((p) => {
         const active = p === value;
         return (
@@ -40,7 +43,7 @@ export function PeriodTabs({ variant, value, onChange, className }: PeriodTabsPr
               'flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
               active
                 ? 'bg-brand-mint text-brand-mint-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
+                : 'text-muted-foreground hover:text-foreground'
             )}
           >
             {t(locale, KEY_MAP[p])}

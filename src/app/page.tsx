@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 <div
                   className={cn(
                     'h-full rounded-full transition-all',
-                    pct > 100 ? 'bg-destructive' : 'bg-hero-foreground',
+                    pct > 100 ? 'bg-destructive' : 'bg-hero-foreground'
                   )}
                   style={{ width: `${Math.min(pct, 100)}%` }}
                 />

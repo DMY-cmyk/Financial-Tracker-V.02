@@ -116,11 +116,7 @@ function TransactionsPageInner() {
   const { presets, savePreset, deletePreset } = useFilterPresets();
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [period, setPeriod] = useState<Period>('daily');
-  const {
-    balance,
-    expense: dashExpense,
-    categories: dashCategories,
-  } = useDashboardData();
+  const { balance, expense: dashExpense, categories: dashCategories } = useDashboardData();
 
   useKeyboardShortcuts({
     onNewTransaction: openAdd,
