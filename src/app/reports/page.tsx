@@ -9,6 +9,7 @@ import { useReportsData } from '@/features/reports/useReportsData';
 import { useForecastData } from '@/features/reports/useForecastData';
 import { BalanceGrid } from '@/features/balances/BalanceGrid';
 import { useBalances } from '@/features/balances/useBalances';
+import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TrendChart } from '@/features/reports/TrendChart';
 import { AnnualSummary } from '@/features/reports/AnnualSummary';
@@ -44,7 +45,10 @@ export default function ReportsPage() {
   if (trendsLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title={t(locale, 'reports')} />
+        <HeroHeader title={t(locale, 'reports')} />
+        <div className="hidden lg:block">
+          <PageHeader title={t(locale, 'reports')} />
+        </div>
         <div className="mx-auto max-w-5xl space-y-4">
           <div className="border-border bg-card h-80 animate-pulse rounded-2xl border" />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -100,7 +104,8 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <motion.div {...fadeInUp}>
+      <HeroHeader title={t(locale, 'reports')} />
+      <motion.div {...fadeInUp} className="hidden lg:block">
         <PageHeader title={t(locale, 'reports')} description={t(locale, 'financialTrends')} />
       </motion.div>
 
