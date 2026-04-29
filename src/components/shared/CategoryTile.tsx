@@ -27,7 +27,12 @@ export function CategoryTile({ label, icon: Icon, active, href, onClick }: Categ
 
   if (href) {
     return (
-      <Link href={href} className={classes} onClick={onClick}>
+      <Link
+        href={href}
+        className={classes}
+        onClick={onClick}
+        aria-current={active ? 'page' : undefined}
+      >
         {content}
       </Link>
     );

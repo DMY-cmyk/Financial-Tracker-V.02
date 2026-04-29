@@ -27,4 +27,9 @@ describe('CategoryTile', () => {
     const { container } = render(<CategoryTile label="x" icon={Tag} active />);
     expect(container.firstElementChild?.className).toContain('bg-tile-active');
   });
+
+  it('sets aria-current="page" on the Link branch when active', () => {
+    const { container } = render(<CategoryTile label="x" icon={Tag} active href="/c/x" />);
+    expect(container.querySelector('a')?.getAttribute('aria-current')).toBe('page');
+  });
 });
