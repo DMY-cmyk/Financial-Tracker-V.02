@@ -59,7 +59,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
           collapsed ? 'justify-center px-2' : 'px-5'
         )}
       >
-        <div className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm">
+        <div className="bg-primary text-brand-mint flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm">
           <span className="text-primary-foreground text-xs font-bold">FT</span>
         </div>
         <AnimatePresence>
