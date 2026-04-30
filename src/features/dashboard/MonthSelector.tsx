@@ -26,7 +26,7 @@ export function MonthSelector() {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-sm font-semibold">{year}</span>
+        <span className="font-mono text-sm font-semibold">{year}</span>
         <Button
           variant="ghost"
           size="icon"
