@@ -96,6 +96,7 @@
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
+  /* Font names below are CSS variables set by next/font in src/app/layout.tsx body className. */
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -186,22 +187,22 @@
 :root {
   /* Editorial palette */
   --paper: #ffffff;
-  --paper-2: #f4f4f2;
+  --paper-2: #f4f4f2;        /* page background secondary — sectioning band */
   --ink: #0a0a0a;
-  --ink-2: #1a1a1a;
-  --ink-3: #6b6b6b;
-  --rule: #0a0a0a;
-  --rule-soft: #e6e6e3;
+  --ink-2: #1a1a1a;          /* ink secondary — captions, sub-labels */
+  --ink-3: #6b6b6b;          /* ink tertiary — muted / help text */
+  --rule: #0a0a0a;           /* hard rule — editorial dividers */
+  --rule-soft: #e6e6e3;      /* default border / hairline */
   --card: #ffffff;
-  --card-2: #fafaf8;
+  --card-2: #fafaf8;         /* card alt fill — nested / inset surfaces */
   --accent: #ff5b1f;
-  --accent-2: #0a0a0a;
+  --accent-2: #0a0a0a;       /* secondary accent (light: ink, dark: warm orange) */
   --pos: #1f5b3e;
-  --pos-soft: #e3f0e6;
+  --pos-soft: #e3f0e6;       /* income tint */
   --neg: #a8341f;
-  --neg-soft: #fbe1da;
+  --neg-soft: #fbe1da;       /* expense tint */
   --warn: #a76b1c;
-  --warn-soft: #f3deb6;
+  --warn-soft: #f3deb6;      /* warning tint */
 
   /* Backwards-compatible semantic tokens — point at editorial */
   --background: var(--paper);
