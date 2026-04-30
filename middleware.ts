@@ -5,7 +5,15 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'financial-tracker-secret-key-change-in-production'
 );
 
-const PUBLIC_PATHS = ['/login', '/register', '/api/auth', '/api/health', '/api/cron'];
+const PUBLIC_PATHS = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/api/auth',
+  '/api/health',
+  '/api/cron',
+];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
