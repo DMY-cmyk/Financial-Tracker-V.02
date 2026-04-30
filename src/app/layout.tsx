@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Fraunces } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/components/providers/StoreProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
@@ -7,15 +7,22 @@ import { AppShell } from '@/components/layout/AppShell';
 import { Toaster } from '@/components/ui/sonner';
 import { EndOfMonthReminder } from '@/components/shared/EndOfMonthReminder';
 
-const jakarta = Plus_Jakarta_Sans({
+const geistSans = Geist({
   variable: '--font-sans',
   subsets: ['latin'],
   display: 'swap',
 });
 
-const jetbrains = JetBrains_Mono({
-  variable: '--font-geist-mono',
+const geistMono = Geist_Mono({
+  variable: '--font-mono',
   subsets: ['latin'],
+  display: 'swap',
+});
+
+const fraunces = Fraunces({
+  variable: '--font-display',
+  subsets: ['latin'],
+  axes: ['opsz'],
   display: 'swap',
 });
 
@@ -42,7 +49,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakarta.variable} ${jetbrains.variable} font-sans antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} font-sans antialiased`}
+      >
         <a
           href="#main-content"
           className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg"
