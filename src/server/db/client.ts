@@ -152,8 +152,19 @@ async function initializeSchema(client: DbClient): Promise<void> {
       id TEXT PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
-      password_hash TEXT NOT NULL,
+      password_hash TEXT,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
+    `CREATE TABLE IF NOT EXISTS oauth_accounts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      provider_subject TEXT NOT NULL,
+      email TEXT NOT NULL,
+      display_name TEXT,
+      avatar_url TEXT,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+      UNIQUE(provider, provider_subject)
     )`,
     `CREATE TABLE IF NOT EXISTS password_reset_tokens (
       id TEXT PRIMARY KEY,
@@ -237,6 +248,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_monthly_budgets_year ON monthly_budgets(year)',
     'CREATE INDEX IF NOT EXISTS idx_prt_user ON password_reset_tokens(user_id)',
     'CREATE INDEX IF NOT EXISTS idx_prt_hash ON password_reset_tokens(token_hash)',
+    'CREATE INDEX IF NOT EXISTS idx_oauth_user ON oauth_accounts(user_id)',
   ];
 
   for (const idx of indexes) {
