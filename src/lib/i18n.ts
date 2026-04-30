@@ -447,6 +447,39 @@ type TranslationKeys = {
   sessionExpired: string;
   loginRequired: string;
 
+  // Editorial auth surface
+  authHeroDek: string;
+  authHeroLive30: string;
+  authHeroNetWorth: string;
+  authHeroThisMonth: string;
+  authHeroCategories: string;
+  authWelcomeBack: string;
+  authSignInSubtitle: string;
+  authPasswordLabel: string;
+  authKeepSignedIn: string;
+  authOr: string;
+  authContinueGoogle: string;
+  authForgotPassword: string;
+  authCreateAccount: string;
+  authTLSEncrypted: string;
+  authSessionEnded: string;
+  authOpeningBooks: string;
+  authIssue: string;
+  authSecureLedger: string;
+  forgotTitle: string;
+  forgotSubtitle: string;
+  forgotSubmit: string;
+  forgotSent: string;
+  forgotResendIn: string;
+  resetTitle: string;
+  resetSubtitle: string;
+  resetSubmit: string;
+  resetStrength: string;
+  resetMismatch: string;
+  oauthErrorGeneric: string;
+  oauthErrorEmailUnverified: string;
+  oauthErrorStateMismatch: string;
+
   // Budget templates
   saveAsTemplate: string;
   applyTemplate: string;
@@ -1114,6 +1147,39 @@ const translations: Record<Locale, TranslationKeys> = {
     periodYearly: 'Yearly',
     txSeeAll: 'See all',
     txEmpty: 'No transactions yet.',
+
+    // Editorial auth surface
+    authHeroDek: 'A reading of your money — kept like a journal, told like a newspaper.',
+    authHeroLive30: 'LIVE · LAST 30 DAYS',
+    authHeroNetWorth: 'Net worth',
+    authHeroThisMonth: 'This month',
+    authHeroCategories: 'Categories',
+    authWelcomeBack: 'Welcome back.',
+    authSignInSubtitle: 'Sign in to review the ledger.',
+    authPasswordLabel: 'Password',
+    authKeepSignedIn: 'Keep me signed in for 30 days',
+    authOr: 'OR',
+    authContinueGoogle: 'Continue with Google',
+    authForgotPassword: 'Forgot password?',
+    authCreateAccount: 'Create account',
+    authTLSEncrypted: 'TLS · END-TO-END ENCRYPTED',
+    authSessionEnded: 'SESSION ENDED',
+    authOpeningBooks: 'Opening the books…',
+    authIssue: 'ISSUE',
+    authSecureLedger: 'SECURE LEDGER',
+    forgotTitle: 'Forgot password',
+    forgotSubtitle: "We'll email a link valid for 1 hour.",
+    forgotSubmit: 'Send reset link →',
+    forgotSent: 'CHECK YOUR EMAIL',
+    forgotResendIn: 'Resend in {n}s',
+    resetTitle: 'Set a new password',
+    resetSubtitle: 'Choose something memorable.',
+    resetSubmit: 'Reset and sign in →',
+    resetStrength: 'Password strength',
+    resetMismatch: "Passwords don't match",
+    oauthErrorGeneric: "We couldn't sign you in — try again.",
+    oauthErrorEmailUnverified: 'Verify your Google email first.',
+    oauthErrorStateMismatch: 'Your sign-in attempt expired. Please try again.',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1648,6 +1714,39 @@ const translations: Record<Locale, TranslationKeys> = {
     periodYearly: 'Tahunan',
     txSeeAll: 'Lihat semua',
     txEmpty: 'Belum ada transaksi.',
+
+    // Editorial auth surface
+    authHeroDek: 'Pembacaan keuangan Anda — disimpan seperti jurnal, diceritakan seperti koran.',
+    authHeroLive30: 'LANGSUNG · 30 HARI TERAKHIR',
+    authHeroNetWorth: 'Kekayaan bersih',
+    authHeroThisMonth: 'Bulan ini',
+    authHeroCategories: 'Kategori',
+    authWelcomeBack: 'Selamat datang.',
+    authSignInSubtitle: 'Masuk untuk meninjau buku besar.',
+    authPasswordLabel: 'Kata sandi',
+    authKeepSignedIn: 'Tetap masuk selama 30 hari',
+    authOr: 'ATAU',
+    authContinueGoogle: 'Lanjutkan dengan Google',
+    authForgotPassword: 'Lupa kata sandi?',
+    authCreateAccount: 'Buat akun',
+    authTLSEncrypted: 'TLS · TERENKRIPSI UJUNG-KE-UJUNG',
+    authSessionEnded: 'SESI BERAKHIR',
+    authOpeningBooks: 'Membuka buku…',
+    authIssue: 'EDISI',
+    authSecureLedger: 'BUKU BESAR AMAN',
+    forgotTitle: 'Lupa kata sandi',
+    forgotSubtitle: 'Kami akan mengirim tautan yang berlaku 1 jam.',
+    forgotSubmit: 'Kirim tautan reset →',
+    forgotSent: 'PERIKSA EMAIL ANDA',
+    forgotResendIn: 'Kirim ulang dalam {n}d',
+    resetTitle: 'Atur kata sandi baru',
+    resetSubtitle: 'Pilih yang mudah diingat.',
+    resetSubmit: 'Reset dan masuk →',
+    resetStrength: 'Kekuatan kata sandi',
+    resetMismatch: 'Kata sandi tidak cocok',
+    oauthErrorGeneric: 'Kami tidak dapat memasukkan Anda — coba lagi.',
+    oauthErrorEmailUnverified: 'Verifikasi email Google Anda terlebih dahulu.',
+    oauthErrorStateMismatch: 'Upaya masuk Anda kedaluwarsa. Silakan coba lagi.',
   },
 };
 
