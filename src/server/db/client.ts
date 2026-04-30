@@ -155,6 +155,14 @@ async function initializeSchema(client: DbClient): Promise<void> {
       password_hash TEXT NOT NULL,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
+    `CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      token_hash TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      used_at TEXT DEFAULT NULL,
+      created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    )`,
     `CREATE TABLE IF NOT EXISTS budget_templates (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -227,6 +235,8 @@ async function initializeSchema(client: DbClient): Promise<void> {
     'CREATE INDEX IF NOT EXISTS idx_recurring_tx_active ON recurring_transactions(is_active)',
     'CREATE INDEX IF NOT EXISTS idx_transactions_source ON transactions(source_recurring_id, source_due_date) WHERE source_recurring_id IS NOT NULL',
     'CREATE INDEX IF NOT EXISTS idx_monthly_budgets_year ON monthly_budgets(year)',
+    'CREATE INDEX IF NOT EXISTS idx_prt_user ON password_reset_tokens(user_id)',
+    'CREATE INDEX IF NOT EXISTS idx_prt_hash ON password_reset_tokens(token_hash)',
   ];
 
   for (const idx of indexes) {
