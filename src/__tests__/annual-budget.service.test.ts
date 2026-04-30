@@ -111,7 +111,7 @@ describe('getAnnualBudgetGrid', () => {
     const cat = await catRepo.create({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });
@@ -167,7 +167,7 @@ const mockCat: Category = {
   id: 'cat-1',
   name: 'Food',
   type: 'expense',
-  color: '#F59E0B',
+  color: '#D97706',
   icon: 'utensils',
   budget: 1800000,
 };

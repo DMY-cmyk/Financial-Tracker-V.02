@@ -13,7 +13,7 @@ const mockRow: AnnualBudgetRow = {
     id: 'cat-1',
     name: 'Food',
     type: 'expense',
-    color: '#F59E0B',
+    color: '#D97706',
     icon: 'utensils',
     budget: 1800000,
   },

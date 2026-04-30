@@ -191,7 +191,7 @@ describe('createCategorySchema', () => {
     const result = createCategorySchema.safeParse({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
     });
     expect(result.success).toBe(true);
     if (result.success) {

@@ -24,7 +24,7 @@ export async function ensureSeeded() {
     // Ensure "Saldo Awal" income category always exists (even on pre-existing databases)
     await db.query(
       'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      ['cat-saldo-awal', 'Saldo Awal', 'income', '#10B981', 'wallet', 0]
+      ['cat-saldo-awal', 'Saldo Awal', 'income', '#059669', 'wallet', 0]
     );
     seeded = true;
     return;
@@ -43,7 +43,7 @@ export async function ensureSeeded() {
   // Ensure "Saldo Awal" income category always exists
   await db.query(
     'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-    ['cat-saldo-awal', 'Saldo Awal', 'income', '#10B981', 'wallet', 0]
+    ['cat-saldo-awal', 'Saldo Awal', 'income', '#059669', 'wallet', 0]
   );
 
   // Build name→id map for category resolution

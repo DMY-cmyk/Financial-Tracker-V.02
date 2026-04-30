@@ -10,7 +10,7 @@ const makeCategory = (overrides: {
 }) => ({
   id: overrides.id ?? 'cat-1',
   name: overrides.name ?? 'Dining',
-  color: overrides.color ?? '#EF4444',
+  color: overrides.color ?? '#DC2626',
   budget: overrides.budget,
   spent: overrides.spent,
 });

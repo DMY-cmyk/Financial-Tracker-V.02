@@ -8,10 +8,10 @@ import { useLocale, t } from '@/lib/i18n';
 import type { SavingsGoal } from '@/lib/types';
 
 export const COLOR_OPTIONS = [
-  '#2563EB',
-  '#10B981',
-  '#F59E0B',
-  '#EF4444',
+  '#1D4ED8',
+  '#059669',
+  '#D97706',
+  '#DC2626',
   '#8B5CF6',
   '#EC4899',
   '#06B6D4',

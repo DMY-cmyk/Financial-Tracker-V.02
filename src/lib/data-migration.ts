@@ -114,7 +114,7 @@ function parseBills(sheet: WorkbookSheet, month: number, year: number): Bill[] {
 function parseSavingsGoals(sheet: WorkbookSheet): SavingsGoal[] {
   const goals: SavingsGoal[] = [];
   const cells = sheet.cells;
-  const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EC4899'];
+  const colors = ['#3B82F6', '#059669', '#D97706', '#EC4899'];
 
   for (let row = 49; row <= 55; row++) {
     const name = getCell(cells, row, 0);

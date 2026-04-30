@@ -21,7 +21,7 @@ describe('createCategory', () => {
   const validInput = {
     name: 'Food',
     type: 'expense' as const,
-    color: '#F59E0B',
+    color: '#D97706',
     icon: 'utensils',
     budget: 500000,
   };
@@ -72,7 +72,7 @@ describe('listCategories', () => {
     await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
@@ -86,7 +86,7 @@ describe('listCategories', () => {
     await createCategory({
       name: 'Salary',
       type: 'income',
-      color: '#10B981',
+      color: '#059669',
       icon: 'circle',
       budget: 0,
     });
@@ -116,7 +116,7 @@ describe('updateCategory', () => {
     const created = await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
@@ -125,7 +125,7 @@ describe('updateCategory', () => {
     expect(result.error).toBeUndefined();
     expect(result.data!.name).toBe('Food & Drink');
     expect(result.data!.budget).toBe(700000);
-    expect(result.data!.color).toBe('#F59E0B'); // unchanged
+    expect(result.data!.color).toBe('#D97706'); // unchanged
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
@@ -140,7 +140,7 @@ describe('deleteCategory', () => {
     const created = await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
@@ -161,7 +161,7 @@ describe('deleteCategory', () => {
     const cat = await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
@@ -189,7 +189,7 @@ describe('deleteCategory', () => {
     const cat = await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
@@ -208,7 +208,7 @@ describe('findWithEffectiveBudget', () => {
     const cat = await catRepo.create({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });
@@ -225,7 +225,7 @@ describe('findWithEffectiveBudget', () => {
     const cat = await catRepo.create({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });
@@ -248,7 +248,7 @@ describe('findWithEffectiveBudget', () => {
     await catRepo.create({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'utensils',
       budget: 1000000,
     });
@@ -263,7 +263,7 @@ describe('listCategories with month/year', () => {
     await createCategory({
       name: 'Food',
       type: 'expense',
-      color: '#F59E0B',
+      color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });

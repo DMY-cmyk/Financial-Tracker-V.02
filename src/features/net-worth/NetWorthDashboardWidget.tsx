@@ -36,7 +36,7 @@ export function NetWorthDashboardWidget({
   return (
     <motion.div {...fadeInUp}>
       <Link href="/net-worth" className="group block">
-        <div className="shadow-card hover:shadow-elevated relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e3a8a] via-[#1d4ed8] to-[#2563eb] p-5 text-white transition-all duration-300 hover:-translate-y-0.5">
+        <div className="shadow-card hover:shadow-elevated relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1e3a8a] via-[#1d4ed8] to-[#3b82f6] p-5 text-white transition-all duration-300 hover:-translate-y-0.5">
           {/* Soft white glow in upper-right */}
           <div
             aria-hidden="true"

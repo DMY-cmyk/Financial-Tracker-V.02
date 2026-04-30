@@ -57,7 +57,7 @@ describe('useSavingsGoals — data loading', () => {
       name: 'Emergency Fund',
       targetAmount: 10_000_000,
       savedAmount: 5_000_000,
-      color: '#2563EB',
+      color: '#1D4ED8',
     };
     vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
 
@@ -100,7 +100,7 @@ describe('useSavingsGoals — data loading', () => {
       name: 'Vacation',
       targetAmount: 5_000_000,
       savedAmount: 1_000_000,
-      color: '#10B981',
+      color: '#059669',
     };
     vi.mocked(api.savings.list)
       .mockResolvedValueOnce({ data: { goals: [] } })
@@ -131,7 +131,7 @@ describe('useSavingsGoals — form.openAdd', () => {
     expect(result.current.form.name).toBe('');
     expect(result.current.form.target).toBe('');
     expect(result.current.form.saved).toBe('');
-    expect(result.current.form.color).toBe('#2563EB');
+    expect(result.current.form.color).toBe('#1D4ED8');
     expect(result.current.form.errors).toEqual({});
   });
 
@@ -147,7 +147,7 @@ describe('useSavingsGoals — form.openAdd', () => {
     expect(result.current.form.open).toBe(false);
     expect(result.current.form.name).toBe('');
     expect(result.current.form.editingGoal).toBeNull();
-    expect(result.current.form.color).toBe('#2563EB');
+    expect(result.current.form.color).toBe('#1D4ED8');
   });
 });
 
@@ -158,7 +158,7 @@ describe('useSavingsGoals — form.openEdit', () => {
       name: 'Emergency Fund',
       targetAmount: 10_000_000,
       savedAmount: 5_000_000,
-      color: '#EF4444',
+      color: '#DC2626',
     };
     vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
     const { result } = renderHook(() => useSavingsGoals());
@@ -171,7 +171,7 @@ describe('useSavingsGoals — form.openEdit', () => {
     expect(result.current.form.name).toBe('Emergency Fund');
     expect(result.current.form.target).toBe('10000000');
     expect(result.current.form.saved).toBe('5000000');
-    expect(result.current.form.color).toBe('#EF4444');
+    expect(result.current.form.color).toBe('#DC2626');
   });
 });
 
@@ -217,7 +217,7 @@ describe('useSavingsGoals — form.submit create', () => {
         name: 'New Goal',
         targetAmount: 5_000_000,
         savedAmount: 0,
-        color: '#2563EB',
+        color: '#1D4ED8',
       },
     });
 
@@ -236,7 +236,7 @@ describe('useSavingsGoals — form.submit create', () => {
       name: 'New Goal',
       targetAmount: 5_000_000,
       savedAmount: 0,
-      color: '#2563EB',
+      color: '#1D4ED8',
     });
     expect(result.current.form.open).toBe(false);
     expect(toast.success).toHaveBeenCalledWith('goalSaved');
@@ -271,7 +271,7 @@ describe('useSavingsGoals — form.submit update', () => {
       name: 'Old Name',
       targetAmount: 5_000_000,
       savedAmount: 1_000_000,
-      color: '#10B981',
+      color: '#059669',
     };
     vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
     vi.mocked(api.savings.update).mockResolvedValue({
@@ -292,7 +292,7 @@ describe('useSavingsGoals — form.submit update', () => {
       name: 'New Name',
       targetAmount: 5_000_000,
       savedAmount: 1_000_000,
-      color: '#10B981',
+      color: '#059669',
     });
     expect(result.current.form.open).toBe(false);
     expect(api.savings.create).not.toHaveBeenCalled();
@@ -307,7 +307,7 @@ describe('useSavingsGoals — deleteConfirm', () => {
       name: 'Goal To Delete',
       targetAmount: 1_000_000,
       savedAmount: 0,
-      color: '#EF4444',
+      color: '#DC2626',
     };
     vi.mocked(api.savings.list).mockResolvedValue({ data: { goals: [goal] } });
     vi.mocked(api.savings.delete).mockResolvedValue({ data: { success: true } });

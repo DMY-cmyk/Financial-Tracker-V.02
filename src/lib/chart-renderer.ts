@@ -2,11 +2,13 @@
 // CLIENT-ONLY — never import from Server Components or API routes.
 // All chart.js imports are dynamic so this module is safe to import in hooks.
 
+// Chart-export palette. Values mirror the editorial chart-color tokens in globals.css.
+// Canvas renderers cannot resolve CSS variables, so we keep literal hex shades here.
 const PIE_COLORS = [
-  '#2563eb',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
+  '#1d4ed8',
+  '#059669',
+  '#d97706',
+  '#dc2626',
   '#8b5cf6',
   '#06b6d4',
   '#f97316',
@@ -43,7 +45,7 @@ export async function renderDonutChart(income: number, expense: number): Promise
       datasets: [
         {
           data: [income, expense],
-          backgroundColor: ['#10b981', '#ef4444'],
+          backgroundColor: ['#059669', '#dc2626'],
           borderWidth: 2,
           borderColor: '#ffffff',
         },
@@ -70,7 +72,7 @@ export async function renderDonutChart(income: number, expense: number): Promise
           c.textAlign = 'center';
           c.textBaseline = 'middle';
           c.font = 'bold 13px sans-serif';
-          c.fillStyle = net >= 0 ? '#10b981' : '#ef4444';
+          c.fillStyle = net >= 0 ? '#059669' : '#dc2626';
           c.fillText('Saldo', cx, cy - 9);
           c.font = 'bold 12px sans-serif';
           c.fillText(formatAmountShort(net), cx, cy + 9);
@@ -108,7 +110,7 @@ export async function renderCashflowChart(
       datasets: [
         {
           data: [income, expense, Math.abs(net)],
-          backgroundColor: ['#10b981', '#ef4444', net >= 0 ? '#2563eb' : '#f59e0b'],
+          backgroundColor: ['#059669', '#dc2626', net >= 0 ? '#1d4ed8' : '#d97706'],
           borderWidth: 0,
           borderRadius: 4,
         },

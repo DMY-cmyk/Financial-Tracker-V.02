@@ -14,7 +14,7 @@ const mockTransactions: BiggestTransaction[] = [
     category: 'Food',
     date: '2026-04-10',
     amount: 350000,
-    color: '#F59E0B',
+    color: '#D97706',
     paymentMethod: 'Cash',
   },
 ];
@@ -46,7 +46,7 @@ describe('OutlierAlerts — amount formatting', () => {
         amount: 750000,
         date: '2026-04-15',
         category: 'Food',
-        color: '#F59E0B',
+        color: '#D97706',
         categoryAvg: 200000,
         delta: 550000,
         multiplier: 3.75,

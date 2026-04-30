@@ -10,7 +10,7 @@ export function ProgressRing({
   percentage,
   size = 80,
   strokeWidth = 8,
-  color = '#2563EB',
+  color = 'var(--accent)',
   children,
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;

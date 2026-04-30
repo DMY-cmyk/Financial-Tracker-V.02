@@ -31,7 +31,7 @@ describe('getCurrentNetWorth', () => {
     const id = nanoid();
     await db.query(
       'INSERT INTO savings_goals (id, name, target_amount, saved_amount, color) VALUES (?, ?, ?, ?, ?)',
-      [id, 'Test', 1_000_000, 600_000, '#2563EB']
+      [id, 'Test', 1_000_000, 600_000, '#1D4ED8']
     );
     const result = await getCurrentNetWorth();
     expect(result.data?.breakdown.savingsGoals).toBe(600_000);
@@ -43,7 +43,7 @@ describe('getCurrentNetWorth', () => {
     const id = nanoid();
     await db.query(
       'INSERT INTO savings_goals (id, name, target_amount, saved_amount, color) VALUES (?, ?, ?, ?, ?)',
-      [id, 'Fund', 5_000_000, 1_000_000, '#10B981']
+      [id, 'Fund', 5_000_000, 1_000_000, '#059669']
     );
     await createLiability({ name: 'Loan', amount: 300_000, category: 'loan' });
 

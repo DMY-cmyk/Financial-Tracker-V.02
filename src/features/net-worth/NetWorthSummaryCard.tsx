@@ -23,7 +23,7 @@ export function NetWorthSummaryCard({ current, isLoading }: NetWorthSummaryCardP
   return (
     <motion.div
       {...fadeInUp}
-      className="rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#2563eb] p-6 text-white"
+      className="rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] p-6 text-white"
     >
       <p className="mb-1 text-xs font-semibold tracking-wide uppercase opacity-70">
         {t(locale, 'netWorth')}
