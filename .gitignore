@@ -1,4 +1,8 @@
 *.xlsx
+*.fig
+assets/figma/
+assets/templates/
+.design-bundle/
 .worktrees/
 .superpowers/
 __pycache__/

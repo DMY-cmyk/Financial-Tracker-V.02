@@ -175,16 +175,33 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 ### Authentication
 
 - [x] JWT-based auth enforced by Next.js Edge Middleware on every request
-- [x] Login page (`/login`) with session-expired banner (`?reason=expired`) and SKIP_AUTH first-run redirect
-- [x] Register page (`/register`) — creates the single-user account
-- [x] `POST /api/auth/logout` — clears `auth-token` httpOnly cookie
-- [x] `GET /api/auth/me` — returns current user from validated JWT
-- [x] `GET /api/auth/setup-check` (dev-only) — detects empty DB for first-run auto-redirect
-- [x] `GET /api/health` — public health check endpoint (bypasses auth)
+- [x] Editorial split-panel `/login` page — animated cashflow ribbon, counting net-worth stats, market ticker, mono ledger field styling
+- [x] **Keep-me-signed-in** checkbox (30-day cookie) vs default 7-day session
+- [x] Editorial split-panel `/register` — same hero pattern as login
+- [x] **Google OAuth** (hand-rolled, OAuth 2.0 + PKCE) — `/api/auth/google` → Google consent → `/api/auth/google/callback` (state + verifier cookies, deletes on callback)
+- [x] OAuth linking rules — sign in by `(provider, subject)`, link by verified email, otherwise create new user (no password required)
+- [x] OAuth error banner on `/login?error=...` — translated codes (`oauth_email_unverified`, `oauth_state_mismatch`, generic)
+- [x] **Forgot password flow** — `/forgot-password` (request email) + `/reset-password?token=` (4-segment strength meter, confirm-match validation)
+- [x] **Resend email integration** — single-use SHA-256-hashed tokens, 1-hour expiry, EN+ID HTML+plaintext templates with editorial styling; dev-mode console fallback when `RESEND_API_KEY` missing
+- [x] Session-expired banner on `/login?reason=expired` and SKIP_AUTH first-run redirect retained
+- [x] `POST /api/auth/logout` clears `auth-token` httpOnly cookie
+- [x] `GET /api/auth/me` returns current user from validated JWT
+- [x] `GET /api/auth/setup-check` (dev-only) detects empty DB for first-run auto-redirect
+- [x] `GET /api/health` public health check endpoint (bypasses auth)
 - [x] `x-user-id` header forwarded to all API route handlers by middleware
-- [x] 7-day JWT expiry; cookie cleared automatically on expiry redirect
 - [x] `bcryptjs` password hashing (cost 12 in production, 4 in tests)
-- [x] Bilingual auth strings (EN/ID) via i18n system
+- [x] Bilingual auth strings (EN/ID) via i18n — 30+ new keys for the editorial auth surface
+
+### Editorial Theme System
+
+- [x] **Paper / Ink palette** — replaced previous blue-tinted theme tokens with editorial paper (`#ffffff`) / ink (`#0a0a0a`) / electric orange accent (`#ff5b1f`) for light mode; midnight dark (`#14110d`) / bone (`#f6f1e8`) / gold (`#d3b266`) for dark mode
+- [x] **Geist Sans + Geist Mono + Fraunces** fonts via `next/font/google` (replaces Plus Jakarta Sans + JetBrains Mono); Fraunces italic display for editorial accents only (login hero, headlines)
+- [x] **Editorial utility classes** in `globals.css` — `.ft-display` / `.ft-display-up` (Fraunces), `.ft-mono` (tabular numerals), `.ft-eyebrow` (10px mono uppercase, 0.18em tracking), `.ft-rule` / `.ft-rule-soft` hairlines, `.ft-live-dot` (pulsing accent)
+- [x] **Animation vocabulary** — `ftRise` stagger (`.ft-rise-1..6`, 80ms increments), `ftFlow` (cashflow ribbon dashed-stroke), `ftPulseSoft` (live dot), `ftMarq` (market ticker marquee), `ftBarGrow` (budget bars), `ftShimmerBg` (skeleton loader). All respect `prefers-reduced-motion: reduce`.
+- [x] **First-paint theme bootstrap** — inline `<head>` script reads `localStorage.theme` and applies `.dark` class before React hydration to prevent flash
+- [x] **Hex compatibility sweep** — replaced hardcoded `#2563EB` / `#10b981` / `#ef4444` / `#f59e0b` across 19 files with editorial tokens or canvas-safe neighbours
+- [x] **Numeral upgrade** — `font-mono` / `ft-mono` applied to amount displays (CashFlowChart, BalanceCard, SummaryCard, TransactionRowMobile, MonthSelector)
+- [x] **Reusable login primitives** in `src/components/login/` — `EditorialField` (square input with focus glow), `CountStat` (rAF-driven counter), `LiveRibbon` (animated SVG cashflow), `MarketTicker` (marquee with edge fade-mask), `EditorialHero` (split-panel composition), `LoginForm`
 
 ### Payment Method Icons
 
@@ -262,15 +279,16 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **State** | Zustand (UI only: theme, locale, month/year) — all data via REST API |
 | **Database** | Neon Postgres (`@neondatabase/serverless`) in production, better-sqlite3 in dev/tests |
 | **Validation** | Zod (API request/response schemas) |
-| **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) |
-| **Testing** | Vitest (448 tests: validation, all services, balance, reports, auth, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights) |
+| **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) · hand-rolled Google OAuth 2.0 + PKCE |
+| **Email** | Resend (password-reset flow, dev-mode console fallback) |
+| **Testing** | Vitest (**802 tests**: validation, all services, balance, reports, auth, OAuth linking rules, password-reset flow, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, editorial tokens + utilities + animations + hero primitives) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
-| **Animations** | Framer Motion |
+| **Animations** | Framer Motion + editorial CSS keyframes (ftRise / ftFlow / ftMarq / ftPulseSoft / ftBarGrow / ftShimmerBg) |
 | **OCR** | Tesseract.js |
 | **Export** | ExcelJS (XLSX write) · JSZip (OpenXML chart injection) · Chart.js (PDF chart rendering) · xlsx (bulk-import read) · jsPDF (PDF) · native CSV/JSON |
 | **Deploy** | Vercel (auto-deploys from GitHub) |
 | **Toasts** | Sonner |
-| **Fonts** | Plus Jakarta Sans + JetBrains Mono |
+| **Fonts** | Geist Sans + Geist Mono + Fraunces (editorial italic display) — all via `next/font/google` |
 
 ## Getting Started
 
@@ -288,6 +306,12 @@ npm run build                # Production build
 | `DATABASE_URL` | Production | Neon Postgres connection string. Leave empty to use SQLite (dev/tests). |
 | `JWT_SECRET` | Production | Random 32+ character string for signing JWT tokens. Required for auth to work. |
 | `CRON_SECRET` | Production | Random 32-char string for Vercel Cron auth. Generate with `openssl rand -hex 16`. |
+| `RESEND_API_KEY` | Password reset | Resend API key for sending password-reset emails. If unset in dev, links are logged to `console.log`. |
+| `EMAIL_FROM` | Password reset | From-address for outgoing email, e.g. `Financial Tracker <noreply@your-domain.com>`. |
+| `APP_URL` | Production | Public app URL (used to build reset links + OAuth redirect URI). |
+| `GOOGLE_CLIENT_ID` | OAuth | Google OAuth 2.0 client ID. Leave unset to disable Google sign-in. |
+| `GOOGLE_CLIENT_SECRET` | OAuth | Google OAuth client secret. |
+| `GOOGLE_REDIRECT_URI` | OAuth | Authorized redirect URI, e.g. `https://your-domain.com/api/auth/google/callback`. Must be registered in Google Cloud Console. |
 | `NEXT_PUBLIC_SKIP_AUTH` | Dev only | Set to `true` to auto-redirect to `/register` when no users exist in DB. |
 | `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
 | `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
@@ -295,7 +319,7 @@ npm run build                # Production build
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 448 tests)
+npm run test         # Run tests (Vitest, 802 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
