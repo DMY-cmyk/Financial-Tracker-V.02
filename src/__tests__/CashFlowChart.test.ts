@@ -25,6 +25,6 @@ describe('CashFlowChart — CSS vars and accessibility', () => {
 
   it('tooltip uses itemStyle with monospace font', () => {
     expect(src).toContain('itemStyle');
-    expect(src).toContain('monospace');
+    expect(src).toContain('var(--font-mono)');
   });
 });
