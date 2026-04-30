@@ -23,9 +23,7 @@ describe('EditorialField', () => {
   });
 
   it('renders type=password and hides text', () => {
-    render(
-      <EditorialField label="Password" value="secret" onChange={() => {}} type="password" />,
-    );
+    render(<EditorialField label="Password" value="secret" onChange={() => {}} type="password" />);
     const input = screen.getByLabelText('Password') as HTMLInputElement;
     expect(input.type).toBe('password');
   });

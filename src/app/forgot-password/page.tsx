@@ -35,9 +35,7 @@ export default function ForgotPasswordPage() {
         {sent ? (
           <div className="ft-rise flex max-w-md flex-col gap-3">
             <div className="ft-eyebrow">{t(locale, 'forgotSent')}</div>
-            <h2 className="ft-display-up text-4xl">
-              {locale === 'en' ? 'Sent.' : 'Terkirim.'}
-            </h2>
+            <h2 className="ft-display-up text-4xl">{locale === 'en' ? 'Sent.' : 'Terkirim.'}</h2>
             <p className="ft-display text-[15px] text-[var(--ink-3)]">
               {locale === 'en'
                 ? 'Check your inbox for a link to reset your password.'
@@ -46,9 +44,7 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <form onSubmit={submit} className="flex max-w-md flex-col gap-3">
-            <div className="ft-eyebrow">
-              {locale === 'en' ? 'RESET' : 'SETEL ULANG'}
-            </div>
+            <div className="ft-eyebrow">{locale === 'en' ? 'RESET' : 'SETEL ULANG'}</div>
             <h2 className="ft-display-up text-4xl">{t(locale, 'forgotTitle')}</h2>
             <p className="ft-display text-[15px] text-[var(--ink-3)]">
               {t(locale, 'forgotSubtitle')}
@@ -64,7 +60,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={busy || !email}
-              className="mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-[var(--paper)] disabled:opacity-50"
+              className="mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase disabled:opacity-50"
             >
               {t(locale, 'forgotSubmit')}
             </button>

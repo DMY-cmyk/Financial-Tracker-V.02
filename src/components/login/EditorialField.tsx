@@ -34,7 +34,7 @@ export function EditorialField({
         autoComplete={autoComplete}
         required={required}
         autoFocus={autoFocus}
-        className="w-full border border-[var(--rule-soft)] bg-[var(--card-2)] px-3.5 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--accent)] focus:bg-[var(--card)]"
+        className="w-full border border-[var(--rule-soft)] bg-[var(--card-2)] px-3.5 py-3 text-sm text-[var(--ink)] transition-colors outline-none focus:border-[var(--accent)] focus:bg-[var(--card)]"
         style={{ borderRadius: 0, fontFamily: 'var(--font-sans), system-ui, sans-serif' }}
       />
     </label>

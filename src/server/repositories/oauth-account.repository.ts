@@ -20,9 +20,7 @@ export interface InsertOAuthAccountInput {
   avatarUrl?: string | null;
 }
 
-export async function insertOAuthAccount(
-  input: InsertOAuthAccountInput
-): Promise<OAuthAccountRow> {
+export async function insertOAuthAccount(input: InsertOAuthAccountInput): Promise<OAuthAccountRow> {
   const id = crypto.randomUUID();
   const db = await getDb();
   await db.query(
@@ -38,10 +36,7 @@ export async function insertOAuthAccount(
       input.avatarUrl ?? null,
     ]
   );
-  const result = await db.query<OAuthAccountRow>(
-    'SELECT * FROM oauth_accounts WHERE id = ?',
-    [id]
-  );
+  const result = await db.query<OAuthAccountRow>('SELECT * FROM oauth_accounts WHERE id = ?', [id]);
   return result.rows[0];
 }
 

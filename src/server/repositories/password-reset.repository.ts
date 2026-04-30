@@ -27,9 +27,7 @@ export async function createResetToken(input: {
   return result.rows[0];
 }
 
-export async function findResetTokenByHash(
-  hash: string
-): Promise<PasswordResetTokenRow | null> {
+export async function findResetTokenByHash(hash: string): Promise<PasswordResetTokenRow | null> {
   const db = await getDb();
   const result = await db.query<PasswordResetTokenRow>(
     'SELECT * FROM password_reset_tokens WHERE token_hash = ?',
@@ -40,8 +38,5 @@ export async function findResetTokenByHash(
 
 export async function consumeResetToken(id: string): Promise<void> {
   const db = await getDb();
-  await db.query(
-    "UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?",
-    [id]
-  );
+  await db.query('UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
 }

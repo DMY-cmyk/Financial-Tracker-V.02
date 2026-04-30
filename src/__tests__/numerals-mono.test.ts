@@ -27,9 +27,7 @@ describe('amount/date/numeral displays use the mono font token', () => {
     it(`${path} references font-mono / var(--font-mono) / ft-mono`, () => {
       const src = readFileSync(resolve(path), 'utf-8');
       const usesMono =
-        src.includes('font-mono') ||
-        src.includes('var(--font-mono)') ||
-        src.includes('ft-mono');
+        src.includes('font-mono') || src.includes('var(--font-mono)') || src.includes('ft-mono');
       expect(usesMono).toBe(true);
     });
   }

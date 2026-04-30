@@ -14,12 +14,7 @@ export interface LoginFormProps {
 }
 
 export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: LoginFormProps) {
-  let router: ReturnType<typeof useRouter> | null = null;
-  try {
-    router = useRouter();
-  } catch {
-    // No router context (e.g., test env) — fall back to no-op redirect.
-  }
+  const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,8 +49,8 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
         setError(data?.error?.message ?? 'Login failed');
       } else {
         onSuccess?.();
-        router?.push?.('/home');
-        router?.refresh?.();
+        router.push('/home');
+        router.refresh();
       }
     } catch {
       setError('Something went wrong. Please try again.');
@@ -133,13 +128,9 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
       <button
         type="submit"
         disabled={busy}
-        className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-[var(--paper)] transition-transform active:scale-[0.99] disabled:cursor-default"
+        className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase transition-transform active:scale-[0.99] disabled:cursor-default"
       >
-        {busy
-          ? t(locale, 'authOpeningBooks')
-          : locale === 'en'
-            ? 'Sign in →'
-            : 'Masuk →'}
+        {busy ? t(locale, 'authOpeningBooks') : locale === 'en' ? 'Sign in →' : 'Masuk →'}
       </button>
 
       <div className="my-3 flex items-center gap-3">

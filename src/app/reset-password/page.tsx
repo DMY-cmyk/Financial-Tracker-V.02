@@ -16,12 +16,7 @@ function strengthScore(pwd: string): number {
 }
 
 function ResetPasswordInner() {
-  let router: ReturnType<typeof useRouter> | null = null;
-  try {
-    router = useRouter();
-  } catch {
-    // No router context (e.g., test env) — fall back to no-op redirect.
-  }
+  const router = useRouter();
   const locale = useLocale();
   const params = useSearchParams();
   const token = params?.get('token') ?? '';
@@ -48,7 +43,7 @@ function ResetPasswordInner() {
         const body = await res.json();
         setError(body.error?.message ?? 'Reset failed');
       } else {
-        router?.push?.('/login');
+        router.push('/login');
       }
     } finally {
       setBusy(false);
@@ -64,13 +59,9 @@ function ResetPasswordInner() {
         onSubmit={submit}
         className="flex flex-col items-stretch justify-center gap-3 px-14 py-14"
       >
-        <div className="ft-eyebrow">
-          {locale === 'en' ? 'RESET' : 'SETEL ULANG'}
-        </div>
+        <div className="ft-eyebrow">{locale === 'en' ? 'RESET' : 'SETEL ULANG'}</div>
         <h2 className="ft-display-up text-4xl">{t(locale, 'resetTitle')}</h2>
-        <p className="ft-display text-[15px] text-[var(--ink-3)]">
-          {t(locale, 'resetSubtitle')}
-        </p>
+        <p className="ft-display text-[15px] text-[var(--ink-3)]">{t(locale, 'resetSubtitle')}</p>
 
         <EditorialField
           label={t(locale, 'authPasswordLabel')}
@@ -105,9 +96,7 @@ function ResetPasswordInner() {
           required
         />
         {confirm && !matches && (
-          <div className="text-xs text-[var(--neg)]">
-            {t(locale, 'resetMismatch')}
-          </div>
+          <div className="text-xs text-[var(--neg)]">{t(locale, 'resetMismatch')}</div>
         )}
 
         {error && (
@@ -122,7 +111,7 @@ function ResetPasswordInner() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-[var(--paper)] disabled:opacity-50"
+          className="mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase disabled:opacity-50"
         >
           {t(locale, 'resetSubmit')}
         </button>

@@ -28,9 +28,7 @@ describe('POST /api/auth/login — keepSignedIn flag', () => {
   });
 
   it('sets a 30-day cookie when keepSignedIn=true', async () => {
-    const res = await POST(
-      makeReq({ email: 'a@b.co', password: 'pw1234', keepSignedIn: true })
-    );
+    const res = await POST(makeReq({ email: 'a@b.co', password: 'pw1234', keepSignedIn: true }));
     expect(res.status).toBe(200);
     const setCookie = res.headers.get('set-cookie') ?? '';
     expect(setCookie).toContain('Max-Age=2592000'); // 30 days

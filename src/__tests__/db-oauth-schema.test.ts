@@ -10,7 +10,7 @@ describe('db schema — oauth_accounts', () => {
   it('has the expected columns', async () => {
     const db = await getDb();
     const result = await db.query<{ name: string }>(
-      `SELECT name FROM pragma_table_info('oauth_accounts')`,
+      `SELECT name FROM pragma_table_info('oauth_accounts')`
     );
     const cols = result.rows.map((r) => r.name).sort();
     expect(cols).toEqual([
@@ -28,7 +28,7 @@ describe('db schema — oauth_accounts', () => {
   it('users.password_hash is nullable', async () => {
     const db = await getDb();
     const result = await db.query<{ name: string; notnull: number }>(
-      `SELECT name, "notnull" FROM pragma_table_info('users')`,
+      `SELECT name, "notnull" FROM pragma_table_info('users')`
     );
     const ph = result.rows.find((c) => c.name === 'password_hash');
     expect(ph).toBeDefined();

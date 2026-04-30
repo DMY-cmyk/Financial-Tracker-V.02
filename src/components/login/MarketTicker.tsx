@@ -8,7 +8,9 @@ export function MarketTicker() {
   return (
     <div
       className="overflow-hidden"
-      style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}
+      style={{
+        maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+      }}
     >
       <div
         className="flex gap-7 whitespace-nowrap"
@@ -16,7 +18,7 @@ export function MarketTicker() {
       >
         {tripled.map((r, i) => (
           <div key={i} className="ft-mono flex items-baseline gap-2 text-[11px]">
-            <span className="text-[var(--ink-3)] tracking-wider">{r.symbol}</span>
+            <span className="tracking-wider text-[var(--ink-3)]">{r.symbol}</span>
             <span className="font-semibold text-[var(--ink)]">{r.value}</span>
             <span style={{ color: r.positive ? 'var(--pos)' : 'var(--neg)' }}>{r.delta}</span>
           </div>

@@ -44,8 +44,7 @@ export default function RegisterPage() {
           setFieldErrors(data.error.details);
         } else {
           setError(
-            data.error?.message ||
-              (locale === 'en' ? 'Registration failed' : 'Pendaftaran gagal'),
+            data.error?.message || (locale === 'en' ? 'Registration failed' : 'Pendaftaran gagal')
           );
         }
         return;
@@ -57,7 +56,7 @@ export default function RegisterPage() {
       setError(
         locale === 'en'
           ? 'Something went wrong. Please try again.'
-          : 'Terjadi kesalahan. Silakan coba lagi.',
+          : 'Terjadi kesalahan. Silakan coba lagi.'
       );
     } finally {
       setLoading(false);
@@ -146,7 +145,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-[var(--paper)] transition-transform active:scale-[0.99] disabled:cursor-default"
+          className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase transition-transform active:scale-[0.99] disabled:cursor-default"
         >
           {loading
             ? locale === 'en'

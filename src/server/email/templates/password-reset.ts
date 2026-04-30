@@ -28,7 +28,10 @@ const COPY = {
   },
 } as const;
 
-export function renderPasswordResetEmail({ locale, resetUrl }: PasswordResetTemplateInput): RenderedEmail {
+export function renderPasswordResetEmail({
+  locale,
+  resetUrl,
+}: PasswordResetTemplateInput): RenderedEmail {
   const c = COPY[locale];
   const html = `<!doctype html>
 <html><body style="margin:0;padding:32px;background:#f4f4f2;font-family:Geist,system-ui,sans-serif;color:#0a0a0a;">

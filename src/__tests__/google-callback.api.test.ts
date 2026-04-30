@@ -31,7 +31,9 @@ beforeEach(async () => {
 
 describe('GET /api/auth/google/callback', () => {
   it('redirects to /home on success and sets auth-token cookie', async () => {
-    const res = await GET(reqWithCookies('?code=c&state=s', { oauth_state: 's', oauth_verifier: 'v' }));
+    const res = await GET(
+      reqWithCookies('?code=c&state=s', { oauth_state: 's', oauth_verifier: 'v' })
+    );
     expect([302, 307]).toContain(res.status);
     expect(res.headers.get('location')).toMatch(/\/home$/);
     const cookies = res.headers.get('set-cookie') || '';

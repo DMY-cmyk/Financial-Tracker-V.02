@@ -1,6 +1,19 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+
+// Stub next/navigation so useRouter() doesn't throw outside an App Router context.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+}));
+
 import { LoginForm } from '@/components/login/LoginForm';
 
 const fetchSpy = vi.fn();
@@ -38,7 +51,10 @@ describe('LoginForm', () => {
 
   it('navigates to /api/auth/google when Google button clicked', () => {
     const assignSpy = vi.fn();
-    Object.defineProperty(window, 'location', { value: { ...window.location, assign: assignSpy }, writable: true });
+    Object.defineProperty(window, 'location', {
+      value: { ...window.location, assign: assignSpy },
+      writable: true,
+    });
     render(<LoginForm locale="en" />);
     fireEvent.click(screen.getByRole('button', { name: /continue with google/i }));
     expect(assignSpy).toHaveBeenCalledWith('/api/auth/google');

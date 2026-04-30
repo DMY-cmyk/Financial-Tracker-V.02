@@ -1,13 +1,16 @@
 'use client';
 
-const POINTS: number[] = Array.from({ length: 30 }, (_, i) =>
-  50 + Math.sin(i * 0.4) * 18 + Math.cos(i * 0.2) * 8
+const POINTS: number[] = Array.from(
+  { length: 30 },
+  (_, i) => 50 + Math.sin(i * 0.4) * 18 + Math.cos(i * 0.2) * 8
 );
 
 export function LiveRibbon() {
   const w = 460;
   const h = 70;
-  const path = POINTS.map((p, i) => `${i === 0 ? 'M' : 'L'}${(i / (POINTS.length - 1)) * w},${p}`).join(' ');
+  const path = POINTS.map(
+    (p, i) => `${i === 0 ? 'M' : 'L'}${(i / (POINTS.length - 1)) * w},${p}`
+  ).join(' ');
   const area = `${path} L${w},${h} L0,${h} Z`;
 
   return (

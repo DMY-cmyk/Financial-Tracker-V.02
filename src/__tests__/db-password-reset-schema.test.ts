@@ -12,13 +12,6 @@ describe('db schema — password_reset_tokens', () => {
       `SELECT name FROM pragma_table_info('password_reset_tokens')`
     );
     const cols = result.rows.map((r) => r.name).sort();
-    expect(cols).toEqual([
-      'created_at',
-      'expires_at',
-      'id',
-      'token_hash',
-      'used_at',
-      'user_id',
-    ]);
+    expect(cols).toEqual(['created_at', 'expires_at', 'id', 'token_hash', 'used_at', 'user_id']);
   });
 });
