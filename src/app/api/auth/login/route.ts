@@ -5,6 +5,7 @@ import { loginUser } from '@/server/services/auth.service';
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
+  keepSignedIn: z.boolean().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = parsed.data;
+    const { email, password, keepSignedIn } = parsed.data;
     const result = await loginUser(email, password);
 
     if ('error' in result) {
@@ -27,11 +28,12 @@ export async function POST(request: NextRequest) {
     }
 
     const response = NextResponse.json({ data: { user: result.user } });
+    const maxAge = keepSignedIn ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7;
     response.cookies.set('auth-token', result.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge,
       path: '/',
     });
 
