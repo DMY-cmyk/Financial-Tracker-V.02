@@ -46,3 +46,24 @@ describe('globals.css — editorial utility classes', () => {
     expect(css).toMatch(/animation:\s*ftPulseSoft/);
   });
 });
+
+describe('globals.css — animations', () => {
+  it('defines ftRise, ftFlow, ftPulseSoft, ftMarq, ftBarGrow, ftShimmerBg keyframes', () => {
+    expect(css).toContain('@keyframes ftRise');
+    expect(css).toContain('@keyframes ftFlow');
+    expect(css).toContain('@keyframes ftPulseSoft');
+    expect(css).toContain('@keyframes ftMarq');
+    expect(css).toContain('@keyframes ftBarGrow');
+    expect(css).toContain('@keyframes ftShimmerBg');
+  });
+
+  it('defines staggered .ft-rise-1..6 utilities', () => {
+    for (const n of [1, 2, 3, 4, 5, 6]) {
+      expect(css).toContain(`.ft-rise-${n} `);
+    }
+  });
+
+  it('honors prefers-reduced-motion', () => {
+    expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  });
+});
