@@ -27,3 +27,22 @@ describe('globals.css — editorial tokens', () => {
     expect(css).toContain('--color-border: var(--rule-soft)');
   });
 });
+
+describe('globals.css — editorial utility classes', () => {
+  it('defines .ft-display, .ft-display-up, .ft-mono, .ft-eyebrow', () => {
+    expect(css).toContain('.ft-display ');
+    expect(css).toContain('.ft-display-up ');
+    expect(css).toContain('.ft-mono ');
+    expect(css).toContain('.ft-eyebrow ');
+  });
+
+  it('defines .ft-rule and .ft-rule-soft hairlines', () => {
+    expect(css).toContain('.ft-rule ');
+    expect(css).toContain('.ft-rule-soft ');
+  });
+
+  it('defines .ft-live-dot with pulse animation', () => {
+    expect(css).toContain('.ft-live-dot');
+    expect(css).toMatch(/animation:\s*ftPulseSoft/);
+  });
+});

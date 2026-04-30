@@ -447,3 +447,39 @@
 html {
   overflow-y: scroll;
 }
+
+/* Editorial utility classes ------------------------------- */
+.ft-display {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+}
+.ft-display-up {
+  font-family: var(--font-display), serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+.ft-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: 'tnum', 'ss01';
+}
+.ft-eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.ft-rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+.ft-rule-soft { border: 0; border-top: 1px solid var(--rule-soft); margin: 0; }
+.ft-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  animation: ftPulseSoft 1.4s ease-in-out infinite;
+}
