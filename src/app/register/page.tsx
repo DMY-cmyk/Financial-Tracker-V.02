@@ -3,19 +3,17 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { fadeInUp } from '@/lib/motion';
-import { Eye, EyeOff, Loader2, UserPlus } from 'lucide-react';
+import { EditorialHero } from '@/components/login/EditorialHero';
+import { EditorialField } from '@/components/login/EditorialField';
+import { useLocale } from '@/lib/i18n';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const locale = useLocale();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
@@ -26,7 +24,7 @@ export default function RegisterPage() {
     setFieldErrors({});
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(locale === 'en' ? 'Passwords do not match' : 'Kata sandi tidak cocok');
       return;
     }
 
@@ -45,7 +43,10 @@ export default function RegisterPage() {
         if (data.error?.details) {
           setFieldErrors(data.error.details);
         } else {
-          setError(data.error?.message || 'Registration failed');
+          setError(
+            data.error?.message ||
+              (locale === 'en' ? 'Registration failed' : 'Pendaftaran gagal'),
+          );
         }
         return;
       }
@@ -53,132 +54,115 @@ export default function RegisterPage() {
       router.push('/home');
       router.refresh();
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError(
+        locale === 'en'
+          ? 'Something went wrong. Please try again.'
+          : 'Terjadi kesalahan. Silakan coba lagi.',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-emerald-50 px-4 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <motion.div
-        {...fadeInUp}
-        className="border-border bg-card w-full max-w-md rounded-2xl border p-8 shadow-xl"
+    <div className="grid min-h-screen grid-cols-1 bg-[var(--paper)] lg:grid-cols-2">
+      <div className="hidden lg:block">
+        <EditorialHero locale={locale} />
+      </div>
+      <form
+        onSubmit={handleSubmit}
+        className="relative flex max-w-xl flex-col justify-center gap-3.5 px-14 py-14"
       >
-        <div className="mb-8 text-center">
-          <div className="bg-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl shadow-lg">
-            <span className="text-primary-foreground text-lg font-bold">FT</span>
-          </div>
-          <h1 className="text-2xl font-bold">Create Account</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Start tracking your finances</p>
+        <div className="ft-eyebrow ft-rise-1">
+          {locale === 'en' ? 'CREATE ACCOUNT' : 'BUAT AKUN'}
         </div>
+        <h2 className="ft-display-up ft-rise-2 text-[44px] leading-none tracking-tight">
+          {locale === 'en' ? 'Welcome.' : 'Selamat datang.'}
+        </h2>
+        <p className="ft-display ft-rise-3 text-[15px] text-[var(--ink-3)]">
+          {locale === 'en' ? 'Create your ledger.' : 'Buat buku besar Anda.'}
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
+        <div className="ft-rise-4 mt-3 flex flex-col gap-3">
+          <div>
+            <EditorialField
+              label={locale === 'en' ? 'Name' : 'Nama'}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={setName}
+              type="text"
               required
-              autoComplete="name"
               autoFocus
+              autoComplete="name"
             />
-            {fieldErrors.name && <p className="text-xs text-red-500">{fieldErrors.name[0]}</p>}
+            {fieldErrors.name && (
+              <p className="mt-1 text-xs text-[var(--neg)]">{fieldErrors.name[0]}</p>
+            )}
           </div>
-
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
+          <div>
+            <EditorialField
+              label="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={setEmail}
+              type="email"
               required
               autoComplete="email"
             />
-            {fieldErrors.email && <p className="text-xs text-red-500">{fieldErrors.email[0]}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Min. 8 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                autoComplete="new-password"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {fieldErrors.password && (
-              <p className="text-xs text-red-500">{fieldErrors.password[0]}</p>
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-[var(--neg)]">{fieldErrors.email[0]}</p>
             )}
           </div>
-
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm Password
-            </label>
-            <Input
-              id="confirmPassword"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Repeat your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+          <div>
+            <EditorialField
+              label={locale === 'en' ? 'Password' : 'Kata Sandi'}
+              value={password}
+              onChange={setPassword}
+              type="password"
               required
               autoComplete="new-password"
             />
-          </div>
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          <Button type="submit" className="w-full gap-2" disabled={loading}>
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <UserPlus className="h-4 w-4" />
+            {fieldErrors.password && (
+              <p className="mt-1 text-xs text-[var(--neg)]">{fieldErrors.password[0]}</p>
             )}
-            Create Account
-          </Button>
-        </form>
+          </div>
+          <EditorialField
+            label={locale === 'en' ? 'Confirm Password' : 'Konfirmasi Kata Sandi'}
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            type="password"
+            required
+            autoComplete="new-password"
+          />
+        </div>
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
-          Already have an account?{' '}
-          <Link href="/login" className="text-primary font-medium hover:underline">
-            Sign in
+        {error && (
+          <div
+            role="alert"
+            className="ft-rise-4 border border-[var(--neg)] bg-[var(--neg-soft)] px-3 py-2 text-xs text-[var(--neg)]"
+          >
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold uppercase tracking-widest text-[var(--paper)] transition-transform active:scale-[0.99] disabled:cursor-default"
+        >
+          {loading
+            ? locale === 'en'
+              ? 'Creating…'
+              : 'Membuat…'
+            : locale === 'en'
+              ? 'Create account →'
+              : 'Buat akun →'}
+        </button>
+
+        <div className="mt-6 flex justify-between border-t border-[var(--rule-soft)] pt-4 text-xs text-[var(--ink-3)]">
+          <Link href="/login" className="underline">
+            {locale === 'en' ? 'Already have an account? Sign in' : 'Sudah punya akun? Masuk'}
           </Link>
-        </p>
-      </motion.div>
+        </div>
+      </form>
     </div>
   );
 }
