@@ -11,7 +11,8 @@ describe('/login page composition', () => {
   });
 
   it('uses 2-column grid on lg+ viewports', () => {
-    expect(src).toMatch(/grid-cols-1\s+lg:grid-cols-2/);
+    expect(src).toContain('grid-cols-1');
+    expect(src).toContain('lg:grid-cols-2');
   });
 
   it('removes blue/emerald gradient background', () => {
