@@ -129,3 +129,26 @@ async function createToken(user: AuthUser): Promise<string> {
     .setExpirationTime(JWT_EXPIRY)
     .sign(JWT_SECRET);
 }
+
+/**
+ * Issue a session JWT for a known user id (used by OAuth callbacks where the
+ * user has already been resolved/linked by the oauth service).
+ */
+export async function issueSessionForUser(userId: string): Promise<string> {
+  const db = await getDb();
+  const result = await db.query<UserRow>(
+    'SELECT id, email, name, password_hash, created_at FROM users WHERE id = ?',
+    [userId]
+  );
+  if (result.rows.length === 0) {
+    throw new Error(`User not found: ${userId}`);
+  }
+  const row = result.rows[0];
+  const user: AuthUser = {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    createdAt: row.created_at,
+  };
+  return createToken(user);
+}
