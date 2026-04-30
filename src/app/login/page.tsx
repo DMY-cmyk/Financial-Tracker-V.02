@@ -11,6 +11,7 @@ function LoginPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const sessionExpired = params.get('reason') === 'expired';
+  const oauthError = params.get('error') ?? undefined;
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SKIP_AUTH !== 'true') return;
@@ -32,7 +33,7 @@ function LoginPageInner() {
         <EditorialHero locale={locale} />
       </div>
       <div className="flex items-center justify-center">
-        <LoginForm locale={locale} sessionExpired={sessionExpired} />
+        <LoginForm locale={locale} sessionExpired={sessionExpired} oauthError={oauthError} />
       </div>
     </div>
   );

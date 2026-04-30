@@ -10,9 +10,10 @@ export interface LoginFormProps {
   locale: Locale;
   onSuccess?: () => void;
   sessionExpired?: boolean;
+  oauthError?: string;
 }
 
-export function LoginForm({ locale, onSuccess, sessionExpired }: LoginFormProps) {
+export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: LoginFormProps) {
   let router: ReturnType<typeof useRouter> | null = null;
   try {
     router = useRouter();
@@ -25,6 +26,18 @@ export function LoginForm({ locale, onSuccess, sessionExpired }: LoginFormProps)
   const [keep, setKeep] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const oauthMessage = (() => {
+    if (!oauthError) return null;
+    switch (oauthError) {
+      case 'oauth_email_unverified':
+        return t(locale, 'oauthErrorEmailUnverified');
+      case 'oauth_state_mismatch':
+        return t(locale, 'oauthErrorStateMismatch');
+      default:
+        return t(locale, 'oauthErrorGeneric');
+    }
+  })();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,6 +80,15 @@ export function LoginForm({ locale, onSuccess, sessionExpired }: LoginFormProps)
       {sessionExpired && (
         <div className="ft-rise-3 border border-[var(--warn)] bg-[var(--warn-soft)] px-3 py-2 text-xs text-[var(--warn)]">
           <span className="ft-eyebrow mr-2">{t(locale, 'authSessionEnded')}</span>
+        </div>
+      )}
+
+      {oauthMessage && (
+        <div
+          role="alert"
+          className="ft-rise-4 border border-[var(--neg)] bg-[var(--neg-soft)] px-3 py-2 text-xs text-[var(--neg)]"
+        >
+          {oauthMessage}
         </div>
       )}
 

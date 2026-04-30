@@ -43,4 +43,9 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /continue with google/i }));
     expect(assignSpy).toHaveBeenCalledWith('/api/auth/google');
   });
+
+  it('renders an editorial error banner mapped from oauthError prop', () => {
+    render(<LoginForm locale="en" oauthError="oauth_email_unverified" />);
+    expect(screen.getByRole('alert').textContent).toMatch(/Verify your Google email/i);
+  });
 });
