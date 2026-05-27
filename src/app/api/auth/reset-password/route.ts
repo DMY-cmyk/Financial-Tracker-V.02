@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { readJsonBody } from '@/lib/api/read-json';
 import { consumePasswordReset } from '@/server/services/password-reset.service';
 
 const schema = z.object({
@@ -9,7 +10,9 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const parsedBody = await readJsonBody(request);
+    if (parsedBody.error) return parsedBody.error;
+    const body = parsedBody.data;
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

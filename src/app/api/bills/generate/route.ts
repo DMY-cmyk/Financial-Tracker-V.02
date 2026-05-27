@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/api/read-json';
 import { generateRecurringBills } from '@/server/services/bill.service';
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const month = Number(body.month);
-  const year = Number(body.year);
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
+  const month = Number((body as { month?: unknown }).month);
+  const year = Number((body as { year?: unknown }).year);
 
   if (isNaN(month) || isNaN(year)) {
     return NextResponse.json(

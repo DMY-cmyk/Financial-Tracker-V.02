@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/api/read-json';
 import { listCategories, createCategory } from '@/server/services/category.service';
 
 export async function GET(request: NextRequest) {
@@ -22,7 +23,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await createCategory(body);
 
   if (result.error) {

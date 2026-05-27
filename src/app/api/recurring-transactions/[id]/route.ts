@@ -3,10 +3,13 @@ import {
   updateRecurringTransaction,
   deleteRecurringTransaction,
 } from '@/server/services/recurring-transaction.service';
+import { readJsonBody } from '@/lib/api/read-json';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await updateRecurringTransaction(id, body);
 
   if (result.error) {

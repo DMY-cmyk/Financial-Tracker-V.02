@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/api/read-json';
 import { listLiabilities, createLiability } from '@/server/services/liability.service';
 
 export async function GET() {
@@ -10,7 +11,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await createLiability(body);
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

@@ -4,6 +4,7 @@ import {
   upsertMonthlyBudget,
   deleteMonthlyBudget,
 } from '@/server/services/annual-budget.service';
+import { readJsonBody } from '@/lib/api/read-json';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -29,7 +30,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await upsertMonthlyBudget(body);
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;
@@ -39,7 +42,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await deleteMonthlyBudget(body);
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

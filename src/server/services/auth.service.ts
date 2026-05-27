@@ -1,12 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { getDb } from '@/server/db/client';
+import { getJwtSecret, JWT_ISSUER } from '@/lib/auth/jwt-secret';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'financial-tracker-secret-key-change-in-production'
-);
-const JWT_ISSUER = 'financial-tracker';
 const JWT_EXPIRY = '7d';
+
+// A real (12-round) bcrypt hash used only to equalize response time when an
+// account does not exist, so login timing cannot be used to enumerate emails.
+const DUMMY_PASSWORD_HASH = '$2b$12$xadYSACVZF/KV6Psm.yrVexsbGIO4wk17l3ly.QWIkyqkWtYvuXd.';
 
 export interface AuthUser {
   id: string;
@@ -81,6 +82,9 @@ export async function loginUser(
   ]);
 
   if (result.rows.length === 0) {
+    // Compare against a dummy hash so a missing account takes the same time as
+    // a wrong password — prevents email enumeration via timing side-channel.
+    await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
     return { error: 'Invalid email or password' };
   }
 
@@ -104,7 +108,7 @@ export async function loginUser(
 
 export async function getUserFromToken(token: string): Promise<AuthUser | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, { issuer: JWT_ISSUER });
+    const { payload } = await jwtVerify(token, getJwtSecret(), { issuer: JWT_ISSUER });
     return {
       id: payload.sub as string,
       email: payload.email as string,
@@ -127,7 +131,7 @@ async function createToken(user: AuthUser): Promise<string> {
     .setIssuer(JWT_ISSUER)
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRY)
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 /**
