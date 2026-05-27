@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'financial-tracker-secret-key-change-in-production'
-);
+import { getJwtSecret } from '@/lib/auth/jwt-secret';
 
 const PUBLIC_PATHS = [
   '/login',
@@ -42,7 +39,7 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, { issuer: 'financial-tracker' });
+    const { payload } = await jwtVerify(token, getJwtSecret(), { issuer: 'financial-tracker' });
     if (!payload.sub) {
       // Token missing subject claim — treat as unauthorized
       if (pathname.startsWith('/api/')) {

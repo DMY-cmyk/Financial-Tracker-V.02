@@ -3,6 +3,7 @@ import {
   listRecurringTransactions,
   createRecurringTransaction,
 } from '@/server/services/recurring-transaction.service';
+import { readJsonBody } from '@/lib/api/read-json';
 
 export async function GET() {
   const result = await listRecurringTransactions();
@@ -14,7 +15,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await createRecurringTransaction(body);
 
   if (result.error) {

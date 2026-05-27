@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJsonBody } from '@/lib/api/read-json';
 import { getSettings, updateSettings } from '@/server/services/settings.service';
 
 export async function GET() {
@@ -11,7 +12,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await updateSettings(body);
 
   if (result.error) {

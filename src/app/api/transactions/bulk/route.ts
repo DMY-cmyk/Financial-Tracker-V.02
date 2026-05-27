@@ -3,9 +3,12 @@ import {
   bulkCreateTransactions,
   bulkDeleteTransactions,
 } from '@/server/services/transaction.service';
+import { readJsonBody } from '@/lib/api/read-json';
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await bulkCreateTransactions(body);
 
   if (result.error) {
@@ -17,7 +20,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const body = await request.json();
+  const parsed = await readJsonBody(request);
+  if (parsed.error) return parsed.error;
+  const body = parsed.data;
   const result = await bulkDeleteTransactions(body);
 
   if (result.error) {

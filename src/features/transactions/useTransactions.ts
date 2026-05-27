@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { useStore } from '@/store';
+import { useLocale, t } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
 import { type Transaction, type PaymentMethod } from '@/lib/types';
 
@@ -68,6 +70,7 @@ export function useTransactions(): UseTransactionsReturn {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const initialized = useStore((s) => s.initialized);
+  const locale = useLocale();
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -217,12 +220,18 @@ export function useTransactions(): UseTransactionsReturn {
 
   const deleteTransaction = useCallback(
     (id: string) => {
-      api.transactions.delete(id).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      });
+      api.transactions
+        .delete(id)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        })
+        .catch(() => {
+          // Surface the failure instead of silently leaving the row in place.
+          toast.error(t(locale, 'failedDelete'));
+        });
     },
-    [queryClient]
+    [queryClient, locale]
   );
 
   const toggleSelect = useCallback((id: string) => {

@@ -228,6 +228,7 @@ type TranslationKeys = {
   transactionUpdated: string;
   transactionAdded: string;
   failedSave: string;
+  failedDelete: string;
   exportFailed: string;
   fixExtractedErrors: string;
   savedFromReceipt: string;
@@ -810,6 +811,7 @@ const translations: Record<Locale, TranslationKeys> = {
     transactionUpdated: 'Transaction updated',
     transactionAdded: 'Transaction added',
     failedSave: 'Failed to save',
+    failedDelete: 'Failed to delete',
     exportFailed: 'Export failed',
     fixExtractedErrors: 'Please fix extracted data errors',
     savedFromReceipt: 'Transaction saved from receipt',
@@ -1375,6 +1377,7 @@ const translations: Record<Locale, TranslationKeys> = {
     transactionUpdated: 'Transaksi diperbarui',
     transactionAdded: 'Transaksi ditambahkan',
     failedSave: 'Gagal menyimpan',
+    failedDelete: 'Gagal menghapus',
     exportFailed: 'Ekspor gagal',
     fixExtractedErrors: 'Periksa data yang diekstrak',
     savedFromReceipt: 'Transaksi disimpan dari struk',

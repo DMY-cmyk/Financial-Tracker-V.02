@@ -7,6 +7,21 @@ import { injectCharts } from './chart-xml-injector';
 
 // --- CSV ---
 
+/**
+ * Render a value as a safe CSV cell.
+ * Neutralizes formula/CSV injection: a leading =, +, -, @, tab or CR is
+ * prefixed with a single quote so spreadsheet apps treat the cell as text and
+ * never evaluate it as a formula. Embedded quotes are doubled and the cell is
+ * always wrapped in quotes.
+ */
+export function csvCell(value: string): string {
+  let v = value;
+  if (/^[=+\-@\t\r]/.test(v)) {
+    v = "'" + v;
+  }
+  return '"' + v.replace(/"/g, '""') + '"';
+}
+
 export function exportCSV(
   transactions: Transaction[],
   filename: string,
@@ -21,9 +36,16 @@ export function exportCSV(
   const commentTotals = `"// Total Pemasukan: ${fmtAmount(totalIncome)} | Total Pengeluaran: ${fmtAmount(totalExpense)} | Saldo: ${fmtAmount(totalAssets)}"`;
 
   const headers = 'Tanggal,Deskripsi,Kategori,Tipe,Jumlah,Metode Pembayaran,Catatan';
-  const rows = transactions.map(
-    (tx) =>
-      `${formatDateID(tx.date)},"${tx.description.replace(/"/g, '""')}","${tx.category}",${tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran'},"${fmtAmount(tx.amount)}","${tx.paymentMethod}","${(tx.notes || '').replace(/"/g, '""')}"`
+  const rows = transactions.map((tx) =>
+    [
+      formatDateID(tx.date),
+      csvCell(tx.description),
+      csvCell(tx.category),
+      tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
+      csvCell(fmtAmount(tx.amount)),
+      csvCell(tx.paymentMethod),
+      csvCell(tx.notes || ''),
+    ].join(',')
   );
   // \uFEFF = UTF-8 BOM — required for correct Indonesian character rendering in Excel on Windows
   const content = '\uFEFF' + [commentScope, commentTotals, headers, ...rows].join('\n');
@@ -228,7 +250,11 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
       tableWidth: halfW,
     });
   }
-  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 6;
+  // If a period has neither income nor expense categories (e.g. an empty
+  // month), no autoTable ran above and `lastAutoTable` is undefined — guard
+  // it like the later sections do, otherwise reading `.finalY` crashes.
+  y =
+    ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 6;
 
   // ── Saldo per Metode Pembayaran (full width) ──────────────────────────────
   if (paymentMethodBalances.length > 0) {

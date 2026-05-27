@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { readJsonBody } from '@/lib/api/read-json';
 import { loginUser } from '@/server/services/auth.service';
 
 const loginSchema = z.object({
@@ -10,7 +11,9 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const parsedBody = await readJsonBody(request);
+    if (parsedBody.error) return parsedBody.error;
+    const body = parsedBody.data;
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
