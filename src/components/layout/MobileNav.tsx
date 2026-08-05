@@ -7,50 +7,14 @@ import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import {
-  Home,
-  LayoutDashboard,
-  Receipt,
-  Upload,
-  Download,
-  Settings,
-  Plus,
-  Tag,
-  CalendarCheck,
-  PiggyBank,
-  Target,
-  Repeat,
-  BarChart3,
-  Languages,
-} from 'lucide-react';
+import { Settings, Plus, Tag, Languages } from 'lucide-react';
+import { NAV_GROUPS, type NavItem } from '@/features/navigation/nav-config';
 
-type NavKey =
-  | 'home'
-  | 'dashboard'
-  | 'transactions'
-  | 'budgetPage'
-  | 'bills'
-  | 'recurringTransactions'
-  | 'savingsPage'
-  | 'reports'
-  | 'upload'
-  | 'export'
-  | 'settings'
-  | 'categories';
-
-const NAV_ITEMS: { href: string; key: NavKey; icon: typeof LayoutDashboard }[] = [
-  { href: '/home', key: 'home', icon: Home },
-  { href: '/', key: 'dashboard', icon: LayoutDashboard },
-  { href: '/transactions', key: 'transactions', icon: Receipt },
-  { href: '/recurring', key: 'recurringTransactions', icon: Repeat },
-  { href: '/budget', key: 'budgetPage', icon: Target },
-  { href: '/bills', key: 'bills', icon: CalendarCheck },
-  { href: '/savings', key: 'savingsPage', icon: PiggyBank },
-  { href: '/reports', key: 'reports', icon: BarChart3 },
-  { href: '/upload', key: 'upload', icon: Upload },
-  { href: '/export', key: 'export', icon: Download },
-  { href: '/settings', key: 'settings', icon: Settings },
-  { href: '/settings/categories', key: 'categories', icon: Tag },
+// Single source of truth: same groups as the desktop sidebar, plus system entries
+const NAV_ITEMS: NavItem[] = [
+  ...NAV_GROUPS.flatMap((g) => g.items),
+  { href: '/settings', labelKey: 'settings', icon: Settings },
+  { href: '/settings/categories', labelKey: 'categories', icon: Tag },
 ];
 
 interface MobileNavProps {
@@ -103,12 +67,12 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
           <p className="text-muted-foreground/60 mb-2 px-3 text-[10px] font-semibold tracking-wider uppercase">
             {t(locale, 'menu')}
           </p>
-          {NAV_ITEMS.map(({ href, key, icon: Icon }) => (
+          {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                'flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive(href)
                   ? 'bg-primary/10 text-primary shadow-sm'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -116,7 +80,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
               aria-current={isActive(href) ? 'page' : undefined}
             >
               <Icon className="h-[18px] w-[18px] shrink-0" />
-              <span>{t(locale, key)}</span>
+              <span>{t(locale, labelKey as Parameters<typeof t>[1])}</span>
             </Link>
           ))}
         </nav>
@@ -135,7 +99,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
                 aria-checked={locale === 'en'}
                 onClick={() => setLocale('en')}
                 className={cn(
-                  'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
+                  'flex-1 rounded-md px-3 py-2.5 text-xs font-medium transition-all',
                   locale === 'en'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
@@ -148,7 +112,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
                 aria-checked={locale === 'id'}
                 onClick={() => setLocale('id')}
                 className={cn(
-                  'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
+                  'flex-1 rounded-md px-3 py-2.5 text-xs font-medium transition-all',
                   locale === 'id'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'

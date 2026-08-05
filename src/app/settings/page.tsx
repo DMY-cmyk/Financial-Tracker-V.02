@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const clearAllData = useStore((s) => s.clearAllData);
 
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const themes = [
@@ -34,18 +35,21 @@ export default function SettingsPage() {
   ];
 
   const handleClearData = async () => {
+    setClearing(true);
     try {
       const res = await fetch('/api/data', { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to clear database');
     } catch {
-      toast.error(t(locale, 'exportFailed'));
+      toast.error(t(locale, 'error'));
+      setClearing(false);
       setClearDialogOpen(false);
       return;
     }
     clearAllData();
     toast.success(t(locale, 'dataClearedToast'));
     setClearDialogOpen(false);
-    window.location.reload();
+    // Give the toast a beat to be seen before the hard reload wipes it
+    setTimeout(() => window.location.reload(), 1200);
   };
 
   return (
@@ -187,6 +191,7 @@ export default function SettingsPage() {
         confirmLabel={t(locale, 'clear')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={handleClearData}
+        loading={clearing}
       />
     </div>
   );

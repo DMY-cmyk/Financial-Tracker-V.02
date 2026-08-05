@@ -28,6 +28,7 @@ export function useReportsData(): UseReportsDataReturn {
     queryFn: async () => {
       const params = new URLSearchParams({ months: String(monthCount) });
       const res = await fetch(`/api/reports/trends?${params}`);
+      if (!res.ok) throw new Error(`Trends request failed (${res.status})`);
       const json = await res.json();
       return json.data?.months ?? [];
     },

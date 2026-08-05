@@ -5,11 +5,12 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { useBalances } from './useBalances';
 import { BalanceGrid } from './BalanceGrid';
+import { InlineError } from '@/components/shared/EmptyState';
 
 export function AccountBalancesWidget() {
   const locale = useLocale();
   const router = useRouter();
-  const { balances, totalBalance, isLoading } = useBalances();
+  const { balances, totalBalance, isLoading, isError, refetch } = useBalances();
 
   const handleCardClick = (paymentMethodName: string) => {
     const params = new URLSearchParams({
@@ -27,12 +28,20 @@ export function AccountBalancesWidget() {
           {formatCurrency(totalBalance)}
         </span>
       </div>
-      <BalanceGrid
-        balances={balances}
-        locale={locale}
-        isLoading={isLoading}
-        onCardClick={handleCardClick}
-      />
+      {isError ? (
+        <InlineError
+          message={t(locale, 'error')}
+          onRetry={() => refetch()}
+          retryLabel={t(locale, 'tryAgain')}
+        />
+      ) : (
+        <BalanceGrid
+          balances={balances}
+          locale={locale}
+          isLoading={isLoading}
+          onCardClick={handleCardClick}
+        />
+      )}
     </div>
   );
 }

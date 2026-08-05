@@ -99,6 +99,7 @@ export function useAnnualBudget() {
   const [gridData, setGridData] = useState<AnnualBudgetGridResponse | null>(null);
   const [fetchKey, setFetchKey] = useState(0);
   const [loadedYear, setLoadedYear] = useState<number | null>(null);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (!initialized) return;
@@ -108,8 +109,11 @@ export function useAnnualBudget() {
       if (cancelled) return;
       if (result.data) {
         setGridData(result.data);
-        setLoadedYear(year);
+        setIsError(false);
+      } else {
+        setIsError(true);
       }
+      setLoadedYear(year);
     });
 
     return () => {
@@ -157,10 +161,20 @@ export function useAnnualBudget() {
     [year, refetch]
   );
 
-  const isLoading = !initialized || gridData === null;
+  const isLoading = !initialized || (gridData === null && !isError);
 
   // suppress unused variable warning — loadedYear is available for consumers if needed
   void loadedYear;
 
-  return { year, rows, summary, monthlyTotals, upsertCell, deleteCell, refetch, isLoading };
+  return {
+    year,
+    rows,
+    summary,
+    monthlyTotals,
+    upsertCell,
+    deleteCell,
+    refetch,
+    isLoading,
+    isError,
+  };
 }

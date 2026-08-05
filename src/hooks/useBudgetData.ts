@@ -28,6 +28,7 @@ export function useBudgetData() {
   const [fetchKey, setFetchKey] = useState(0);
 
   const [loadedKey, setLoadedKey] = useState('');
+  const [isError, setIsError] = useState(false);
   const targetKey = `${month}-${year}-${fetchKey}`;
   const isApiLoading = loadedKey !== targetKey;
 
@@ -43,6 +44,7 @@ export function useBudgetData() {
       if (cancelled) return;
       if (summaryResult.data) setSummary(summaryResult.data);
       if (catResult.data) setCategories(catResult.data.categories);
+      setIsError(Boolean(summaryResult.error || catResult.error));
       setLoadedKey(`${month}-${year}-${fetchKey}`);
     });
 
@@ -122,6 +124,7 @@ export function useBudgetData() {
   const isLoading = !initialized || isApiLoading;
 
   return {
+    isError,
     month,
     year,
     budgetedCategories,

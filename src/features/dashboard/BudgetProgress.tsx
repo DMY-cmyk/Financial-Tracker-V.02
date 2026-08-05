@@ -91,7 +91,7 @@ export function BudgetProgress({ budgets, alerts = [], onUpdateBudget }: BudgetP
                       if (alert?.level === 'exceeded') {
                         return (
                           <span className="bg-danger-soft text-danger-soft-foreground rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
-                            OVER
+                            {t(locale, 'overBudgetLabel')}
                           </span>
                         );
                       }

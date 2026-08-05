@@ -8,7 +8,7 @@ import { Topbar } from './Topbar';
 import { BottomNavFab } from './BottomNavFab';
 import { MobileNav } from './MobileNav';
 
-const AUTH_PATHS = ['/login', '/register'];
+const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="bg-background flex h-screen overflow-hidden">
+    <div className="bg-background flex h-dvh overflow-hidden">
       {/* Desktop sidebar */}
       <Sidebar
         collapsed={collapsed}
@@ -36,8 +36,8 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onMenuClick={() => setMobileNavOpen(true)} />
-        <main id="main-content" className="flex-1 overflow-y-auto">
+        <Topbar onMenuClick={() => setMobileNavOpen(true)} menuOpen={mobileNavOpen} />
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto outline-none">
           <div className="p-4 pb-20 sm:p-6 lg:pb-6">{children}</div>
         </main>
       </div>

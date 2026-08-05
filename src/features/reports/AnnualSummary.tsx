@@ -19,6 +19,7 @@ export function AnnualSummary({ year }: AnnualSummaryProps) {
     queryKey: ['reports-annual', year],
     queryFn: async () => {
       const res = await fetch(`/api/reports/annual?year=${year}`);
+      if (!res.ok) throw new Error(`Annual report request failed (${res.status})`);
       const json = await res.json();
       return json.data ?? null;
     },

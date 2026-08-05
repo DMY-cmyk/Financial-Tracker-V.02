@@ -9,14 +9,23 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { api } from '@/lib/api/client';
 import { useStore } from '@/store';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { EmptyState, InlineError } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Pencil, Trash2, CalendarCheck, AlertCircle, Clock, Repeat } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  CalendarCheck,
+  AlertCircle,
+  Clock,
+  Repeat,
+  Loader2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import type { Bill } from '@/lib/types';
 
@@ -33,6 +42,8 @@ export default function BillsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [loadedKey, setLoadedKey] = useState('');
+  const [loadError, setLoadError] = useState(false);
+  const [saving, setSaving] = useState(false);
   const targetKey = `${month}-${year}-${fetchKey}`;
   const isLoading = loadedKey !== targetKey;
 
@@ -52,6 +63,9 @@ export default function BillsPage() {
       if (cancelled) return;
       if (result.data) {
         setBills(result.data.bills);
+        setLoadError(false);
+      } else {
+        setLoadError(true);
       }
       setLoadedKey(`${month}-${year}-${fetchKey}`);
     });
@@ -103,7 +117,8 @@ export default function BillsPage() {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (saving || !validateForm()) return;
+    setSaving(true);
 
     if (editingBill) {
       const result = await api.bills.update(editingBill.id, {
@@ -136,12 +151,15 @@ export default function BillsPage() {
         toast.error(t(locale, 'failedSave'));
       }
     }
+    setSaving(false);
   };
 
   const handleTogglePaid = async (bill: Bill) => {
     const result = await api.bills.update(bill.id, { isPaid: !bill.isPaid });
     if (result.data) {
       setBills((prev) => prev.map((b) => (b.id === bill.id ? { ...b, isPaid: !bill.isPaid } : b)));
+    } else {
+      toast.error(t(locale, 'failedSave'));
     }
   };
 
@@ -245,7 +263,15 @@ export default function BillsPage() {
 
       <div className="mx-auto max-w-2xl">
         <AnimatePresence mode="wait">
-          {bills.length === 0 ? (
+          {loadError ? (
+            <motion.div key="error" {...fadeInUp}>
+              <InlineError
+                message={t(locale, 'error')}
+                onRetry={refetch}
+                retryLabel={t(locale, 'tryAgain')}
+              />
+            </motion.div>
+          ) : bills.length === 0 ? (
             <motion.div key="empty" {...fadeInUp}>
               <EmptyState
                 title={t(locale, 'noBills')}
@@ -329,7 +355,7 @@ export default function BillsPage() {
                     >
                       {formatCurrency(bill.amount)}
                     </span>
-                    <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="flex gap-1 transition-opacity pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -412,7 +438,8 @@ export default function BillsPage() {
               </Label>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSubmit} className="flex-1">
+              <Button onClick={handleSubmit} disabled={saving} className="flex-1">
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {t(locale, 'save')}
               </Button>
               <Button variant="outline" onClick={closeForm}>

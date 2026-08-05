@@ -11,6 +11,7 @@ interface UseUploadReturn {
   // File state
   file: File | null;
   preview: string;
+  isSaving: boolean;
   handleFileSelect: (f: File) => void;
   handleClear: () => void;
 
@@ -46,6 +47,7 @@ export function useUpload(): UseUploadReturn {
   const [progress, setProgress] = useState(0);
   const [ocrResult, setOcrResult] = useState<OcrData | null>(null);
   const [errors, setErrors] = useState<FieldError[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -145,48 +147,53 @@ export function useUpload(): UseUploadReturn {
   };
 
   const handleSave = async (): Promise<boolean> => {
-    if (!ocrResult) return false;
+    if (!ocrResult || isSaving) return false;
+    setIsSaving(true);
+    try {
+      const validationErrors = validateOcrFields(ocrResult);
+      if (validationErrors.length > 0) {
+        setErrors(validationErrors);
+        return false;
+      }
 
-    const validationErrors = validateOcrFields(ocrResult);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return false;
+      const amount = parseCurrencyInput(ocrResult.amount);
+      const matchedCategory = categories.find(
+        (c) => c.name.toLowerCase() === ocrResult.category.toLowerCase()
+      );
+      const categoryId = matchedCategory?.id || '';
+      if (!categoryId) {
+        setErrors([{ field: 'category', message: 'Category not found' }]);
+        return false;
+      }
+      const result = await api.transactions.create({
+        date: ocrResult.date,
+        description: ocrResult.description,
+        category: ocrResult.category,
+        categoryId,
+        type: 'expense',
+        amount,
+        paymentMethod: paymentMethods[0]?.name || 'Cash',
+        notes: 'Added via OCR',
+      });
+
+      if (result.error) {
+        setErrors([{ field: 'root', message: result.error.message }]);
+        return false;
+      }
+
+      if (uploadId) await api.uploads.update(uploadId, { status: 'saved' });
+      setStatus('saved');
+      setErrors([]);
+      return true;
+    } finally {
+      setIsSaving(false);
     }
-
-    const amount = parseCurrencyInput(ocrResult.amount);
-    const matchedCategory = categories.find(
-      (c) => c.name.toLowerCase() === ocrResult.category.toLowerCase()
-    );
-    const categoryId = matchedCategory?.id || '';
-    if (!categoryId) {
-      setErrors([{ field: 'category', message: 'Category not found' }]);
-      return false;
-    }
-    const result = await api.transactions.create({
-      date: ocrResult.date,
-      description: ocrResult.description,
-      category: ocrResult.category,
-      categoryId,
-      type: 'expense',
-      amount,
-      paymentMethod: paymentMethods[0]?.name || 'Cash',
-      notes: 'Added via OCR',
-    });
-
-    if (result.error) {
-      setErrors([{ field: 'root', message: result.error.message }]);
-      return false;
-    }
-
-    if (uploadId) await api.uploads.update(uploadId, { status: 'saved' });
-    setStatus('saved');
-    setErrors([]);
-    return true;
   };
 
   return {
     file,
     preview,
+    isSaving,
     handleFileSelect,
     handleClear,
     status,

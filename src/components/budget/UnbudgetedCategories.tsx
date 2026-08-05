@@ -85,10 +85,17 @@ export function UnbudgetedCategories({ categories, onSetBudget }: UnbudgetedCate
                   size="icon"
                   className="h-7 w-7"
                   onClick={() => saveEdit(cat.id)}
+                  aria-label={t(locale, 'save')}
                 >
                   <Check className="h-3.5 w-3.5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={cancelEdit}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={cancelEdit}
+                  aria-label={t(locale, 'cancel')}
+                >
                   <X className="h-3.5 w-3.5" />
                 </Button>
               </div>

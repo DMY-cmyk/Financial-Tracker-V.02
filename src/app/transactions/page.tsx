@@ -22,7 +22,7 @@ import { TransactionFilterSheet } from '@/features/transactions/TransactionFilte
 import { TransactionForm } from '@/features/transactions/TransactionForm';
 import { AllTransactionsView } from '@/features/transactions/AllTransactionsView';
 import { TransactionSummary } from '@/features/transactions/TransactionSummary';
-import { EmptyState, NoResults } from '@/components/shared/EmptyState';
+import { EmptyState, NoResults, InlineError } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ListSkeleton } from '@/components/shared/Skeletons';
 import { Button } from '@/components/ui/button';
@@ -60,6 +60,8 @@ function TransactionsPageInner() {
     hasMore,
     loadMore,
     isLoading,
+    isError,
+    refetch,
     isLoadingMore,
     search,
     setSearch,
@@ -129,10 +131,16 @@ function TransactionsPageInner() {
 
   const handleDelete = (id: string) => setDeleteId(id);
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteId) {
-      const deletedTx = transactions.find((tx) => tx.id === deleteId);
-      deleteTransaction(deleteId);
+      const id = deleteId;
+      setDeleteId(null);
+      const deletedTx = transactions.find((tx) => tx.id === id);
+      const ok = await deleteTransaction(id);
+      if (!ok) {
+        toast.error(t(locale, 'error'));
+        return;
+      }
       toast.success(t(locale, 'transactionDeleted'), {
         action: deletedTx
           ? {
@@ -155,14 +163,21 @@ function TransactionsPageInner() {
             }
           : undefined,
       });
-      setDeleteId(null);
     }
   };
 
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const confirmBulkDelete = async () => {
-    const deleted = await bulkDeleteTransactions();
-    toast.success(`${deleted} ${t(locale, 'bulkDeleteSuccess')}`);
-    setBulkDeleteOpen(false);
+    setBulkDeleting(true);
+    try {
+      const deleted = await bulkDeleteTransactions();
+      toast.success(`${deleted} ${t(locale, 'bulkDeleteSuccess')}`);
+      setBulkDeleteOpen(false);
+    } catch {
+      toast.error(t(locale, 'error'));
+    } finally {
+      setBulkDeleting(false);
+    }
   };
 
   if (isLoading) {
@@ -336,7 +351,15 @@ function TransactionsPageInner() {
       </motion.div>
 
       <AnimatePresence mode="wait">
-        {isEmpty ? (
+        {isError ? (
+          <motion.div key="error" {...fadeInUp}>
+            <InlineError
+              message={t(locale, 'error')}
+              onRetry={() => refetch()}
+              retryLabel={t(locale, 'tryAgain')}
+            />
+          </motion.div>
+        ) : isEmpty ? (
           <motion.div key="empty" {...fadeInUp}>
             <EmptyState
               title={t(locale, 'noData')}
@@ -463,6 +486,7 @@ function TransactionsPageInner() {
         confirmLabel={t(locale, 'delete')}
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmBulkDelete}
+        loading={bulkDeleting}
       />
 
       {/* Bulk action bar */}

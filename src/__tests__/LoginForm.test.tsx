@@ -31,7 +31,7 @@ describe('LoginForm', () => {
   it('renders email + password fields, sign-in submit, Google button', () => {
     render(<LoginForm locale="en" />);
     expect(screen.getByLabelText(/email/i)).toBeTruthy();
-    expect(screen.getByLabelText(/password/i)).toBeTruthy();
+    expect(screen.getByLabelText(/^password$/i)).toBeTruthy();
     expect(screen.getByRole('button', { name: /sign in/i })).toBeTruthy();
     expect(screen.getByRole('button', { name: /continue with google/i })).toBeTruthy();
   });
@@ -40,7 +40,7 @@ describe('LoginForm', () => {
     fetchSpy.mockResolvedValue({ ok: true, json: async () => ({ data: { user: {} } }) });
     render(<LoginForm locale="en" />);
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.co' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'pw1234' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'pw1234' } });
     fireEvent.click(screen.getByLabelText(/keep me signed in/i));
     const form = screen.getByRole('button', { name: /sign in/i }).closest('form')!;
     fireEvent.submit(form);

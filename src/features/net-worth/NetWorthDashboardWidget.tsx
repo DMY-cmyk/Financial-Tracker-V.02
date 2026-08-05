@@ -4,6 +4,7 @@ import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { fadeInUp } from '@/lib/motion';
 import Link from 'next/link';
 import type { NetWorthCurrent, NetWorthSnapshot } from '@/lib/types';
@@ -22,9 +23,7 @@ export function NetWorthDashboardWidget({
   const locale = useLocale();
 
   if (isLoading) {
-    return (
-      <div className="h-28 animate-pulse rounded-2xl bg-gradient-to-br from-blue-900 to-blue-600" />
-    );
+    return <div className="bg-muted h-28 animate-pulse rounded-2xl" />;
   }
 
   const lastTwo = history.slice(-2);
@@ -57,7 +56,12 @@ export function NetWorthDashboardWidget({
                   positive ? 'text-emerald-300' : 'text-red-300'
                 )}
               >
-                {positive ? '▲' : '▼'} {formatCurrency(Math.abs(delta))} {t(locale, 'vsLastMonth')}
+                {positive ? (
+                  <TrendingUp className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
+                ) : (
+                  <TrendingDown className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />
+                )}
+                {formatCurrency(Math.abs(delta))} {t(locale, 'vsLastMonth')}
               </p>
             )}
             <div className="mt-3 flex gap-4 border-t border-white/15 pt-3 text-[10px]">

@@ -7,7 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { t } from '@/lib/i18n';
 import { useStore } from '@/store';
-import { staggerList, staggerListItem } from '@/lib/motion';
+import { staggerList, staggerListItem, DURATION, EASE } from '@/lib/motion';
 import type { NavGroup } from './nav-config';
 
 interface SidebarGroupProps {
@@ -52,10 +52,15 @@ export function SidebarGroup({
       {isCollapsible && (
         <button
           onClick={onToggle}
+          aria-expanded={!isCollapsed}
+          aria-controls={`nav-group-${group.id}`}
           className="text-muted-foreground/60 hover:text-muted-foreground mb-1 flex w-full items-center justify-between px-3 py-1 text-[10px] font-semibold tracking-wider uppercase transition-colors"
         >
           <span>{t(locale, group.labelKey as Parameters<typeof t>[1])}</span>
-          <motion.span animate={{ rotate: isCollapsed ? 0 : 90 }} transition={{ duration: 0.2 }}>
+          <motion.span
+            animate={{ rotate: isCollapsed ? 0 : 90 }}
+            transition={{ duration: DURATION.fast }}
+          >
             <ChevronRight className="h-3 w-3" />
           </motion.span>
         </button>
@@ -66,10 +71,11 @@ export function SidebarGroup({
         {(!isCollapsible || !isCollapsed) && (
           <motion.div
             key={group.id}
+            id={`nav-group-${group.id}`}
             initial={isCollapsible ? { height: 0, opacity: 0 } : false}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.25, ease: EASE.smooth }}
             style={{ overflow: 'hidden' }}
           >
             <motion.div
@@ -84,6 +90,9 @@ export function SidebarGroup({
                     href={href}
                     className={navLinkClass(href)}
                     title={railMode ? t(locale, labelKey as Parameters<typeof t>[1]) : undefined}
+                    aria-label={
+                      railMode ? t(locale, labelKey as Parameters<typeof t>[1]) : undefined
+                    }
                     aria-current={isItemActive(href) ? 'page' : undefined}
                     onClick={(e) => {
                       if (href === '/' && pathname === '/') {
@@ -100,7 +109,7 @@ export function SidebarGroup({
                           initial={{ opacity: 0, width: 0 }}
                           animate={{ opacity: 1, width: 'auto' }}
                           exit={{ opacity: 0, width: 0 }}
-                          transition={{ duration: 0.15 }}
+                          transition={{ duration: DURATION.fast }}
                           className="whitespace-nowrap"
                         >
                           {t(locale, labelKey as Parameters<typeof t>[1])}

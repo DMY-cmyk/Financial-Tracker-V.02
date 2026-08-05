@@ -98,7 +98,7 @@ export function BudgetCell({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded bg-emerald-900 px-1.5 py-0.5 text-[10px] text-emerald-400 hover:bg-emerald-800 disabled:opacity-50"
+            className="bg-success-soft text-success-soft-foreground hover:bg-success-soft/80 rounded px-1.5 py-0.5 text-[10px] disabled:opacity-50"
           >
             {t(locale, 'save')}
           </button>

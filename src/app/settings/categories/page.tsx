@@ -49,6 +49,7 @@ import { formatCurrencyInput, parseCurrencyInput } from '@/lib/formatters';
 import { toast } from 'sonner';
 import type { Category, PaymentMethod } from '@/lib/types';
 import { IconPicker } from '@/components/shared/IconPicker';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 const ICON_OPTIONS: { name: string; icon: typeof Circle }[] = [
   { name: 'circle', icon: Circle },
@@ -107,6 +108,12 @@ export default function CategoriesPage() {
   const [editBeginningBalance, setEditBeginningBalance] = useState('');
   const [editIcon, setEditIcon] = useState('initials');
   const [savingEdit, setSavingEdit] = useState(false);
+
+  const [pendingDelete, setPendingDelete] = useState<{
+    kind: 'category' | 'method';
+    id: string;
+  } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const refetch = useCallback(() => setFetchCount((c) => c + 1), []);
 
@@ -198,11 +205,13 @@ export default function CategoriesPage() {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
     const result = await api.categories.delete(id);
     if (result.error) {
       toast.error(result.error.message);
       refetch();
+    } else {
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      toast.success(t(locale, 'deleted'));
     }
   };
 
@@ -228,12 +237,26 @@ export default function CategoriesPage() {
   };
 
   const handleDeleteMethod = async (id: string) => {
-    setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
     const result = await api.paymentMethods.delete(id);
     if (result.error) {
       toast.error(result.error.message);
       refetch();
+    } else {
+      setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
+      toast.success(t(locale, 'deleted'));
     }
+  };
+
+  const confirmPendingDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    if (pendingDelete.kind === 'category') {
+      await handleDeleteCategory(pendingDelete.id);
+    } else {
+      await handleDeleteMethod(pendingDelete.id);
+    }
+    setDeleting(false);
+    setPendingDelete(null);
   };
 
   const handleOpenEdit = (method: PaymentMethod) => {
@@ -317,7 +340,7 @@ export default function CategoriesPage() {
                     variant="ghost"
                     size="icon"
                     className="text-destructive h-7 w-7"
-                    onClick={() => handleDeleteCategory(c.id)}
+                    onClick={() => setPendingDelete({ kind: 'category', id: c.id })}
                     aria-label={t(locale, 'delete')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -352,7 +375,7 @@ export default function CategoriesPage() {
                     variant="ghost"
                     size="icon"
                     className="text-destructive h-7 w-7"
-                    onClick={() => handleDeleteCategory(c.id)}
+                    onClick={() => setPendingDelete({ kind: 'category', id: c.id })}
                     aria-label={t(locale, 'delete')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -472,7 +495,7 @@ export default function CategoriesPage() {
                 variant="ghost"
                 size="icon"
                 className="text-destructive h-7 w-7"
-                onClick={() => handleDeleteMethod(m.id)}
+                onClick={() => setPendingDelete({ kind: 'method', id: m.id })}
                 aria-label={t(locale, 'delete')}
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -610,6 +633,25 @@ export default function CategoriesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        title={t(
+          locale,
+          pendingDelete?.kind === 'method' ? 'deletePaymentMethodTitle' : 'deleteCategoryTitle'
+        )}
+        description={t(
+          locale,
+          pendingDelete?.kind === 'method' ? 'deletePaymentMethodConfirm' : 'deleteCategoryConfirm'
+        )}
+        confirmLabel={t(locale, 'delete')}
+        cancelLabel={t(locale, 'cancel')}
+        onConfirm={confirmPendingDelete}
+        loading={deleting}
+      />
     </PageTransition>
   );
 }

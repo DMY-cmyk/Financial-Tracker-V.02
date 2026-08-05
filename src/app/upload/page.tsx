@@ -43,6 +43,7 @@ export default function UploadPage() {
     setOcrResult,
     processOcr,
     handleSave,
+    isSaving,
     isProcessing,
     errors,
     categories,
@@ -165,6 +166,7 @@ export default function UploadPage() {
                   data={ocrResult}
                   onChange={setOcrResult}
                   onSave={onSave}
+                  isSaving={isSaving}
                   categories={categories}
                 />
               </div>

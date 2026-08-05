@@ -7,20 +7,10 @@ import { formatCurrency } from '@/lib/formatters';
 import { BudgetCell } from './BudgetCell';
 import type { AnnualBudgetRow } from '@/hooks/useAnnualBudget';
 
-const MONTH_ABBR = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+const MONTH_ABBR: Record<'en' | 'id', string[]> = {
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  id: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+};
 
 interface AnnualBudgetGridProps {
   rows: AnnualBudgetRow[];
@@ -74,7 +64,7 @@ export function AnnualBudgetGrid({
             <th className="bg-muted/50 text-muted-foreground sticky left-0 z-10 px-4 py-3 text-left font-medium">
               {t(locale, 'category')}
             </th>
-            {MONTH_ABBR.map((abbr, m) => (
+            {MONTH_ABBR[locale].map((abbr, m) => (
               <th
                 key={m}
                 className={cn(

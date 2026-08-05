@@ -77,17 +77,15 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                       />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11 }}
-                    className="fill-muted-foreground"
+                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 11 }}
-                    className="fill-muted-foreground"
+                    tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                     tickFormatter={(v) => formatCurrencyShort(v)}
                     tickLine={false}
                     axisLine={false}
@@ -118,6 +116,7 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                     dataKey="expense"
                     stroke="var(--chart-expense)"
                     strokeWidth={2}
+                    strokeDasharray="6 3"
                     fill="url(#expenseGrad)"
                   />
                   <Legend

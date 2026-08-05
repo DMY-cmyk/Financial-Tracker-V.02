@@ -22,9 +22,9 @@ describe('HeroHeader', () => {
     expect(screen.getByText('Good Morning')).toBeTruthy();
   });
 
-  it('renders a decorative bell with aria-label by default', () => {
-    render(<HeroHeader title="x" />);
-    expect(screen.getByLabelText('Notifications')).toBeTruthy();
+  it('renders a decorative aria-hidden bell by default', () => {
+    const { container } = render(<HeroHeader title="x" />);
+    expect(container.querySelector('span[aria-hidden="true"] svg')).toBeTruthy();
   });
 
   it('renders back button only when showBack is true', () => {

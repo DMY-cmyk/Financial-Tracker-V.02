@@ -422,6 +422,22 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+  /* Tailwind v4 preflight sets buttons to cursor: default */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  /* Keyboard focus must stay visible on blurred/translucent surfaces */
+  a:focus-visible,
+  button:focus-visible,
+  [role='button']:focus-visible,
+  [tabindex]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 /* Reduce motion for users who prefer it */

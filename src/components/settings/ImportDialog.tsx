@@ -13,7 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
-import { Upload, FileText, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ImportDialogProps {
@@ -27,6 +27,8 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
+  const [importing, setImporting] = useState(false);
+
   const handleFile = (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext !== 'json' && ext !== 'csv') {
@@ -37,11 +39,19 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   };
 
   const handleConfirm = async () => {
-    const count = await confirmImport();
-    if (count > 0) {
-      toast.success(`${count} ${t(locale, 'transactionsFound')}`);
-      reset();
-      onOpenChange(false);
+    if (importing) return;
+    setImporting(true);
+    try {
+      const count = await confirmImport();
+      if (count > 0) {
+        toast.success(`${count} ${t(locale, 'transactionsFound')}`);
+        reset();
+        onOpenChange(false);
+      } else {
+        toast.error(t(locale, 'error'));
+      }
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -165,7 +175,10 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleClose}>{t(locale, 'cancel')}</AlertDialogCancel>
           {status === 'complete' && (
-            <Button onClick={handleConfirm}>{t(locale, 'importNow')}</Button>
+            <Button onClick={handleConfirm} disabled={importing}>
+              {importing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t(locale, 'importNow')}
+            </Button>
           )}
         </AlertDialogFooter>
       </AlertDialogContent>

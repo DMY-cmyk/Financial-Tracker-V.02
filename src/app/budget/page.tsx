@@ -6,7 +6,7 @@ import { Target, BookmarkPlus, Library, Lightbulb, CalendarDays, LayoutGrid } fr
 import { Button } from '@/components/ui/button';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
-import { MONTH_NAMES } from '@/lib/constants';
+import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
 import { fadeInUp, staggerGrid, staggerGridItem } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { useBudgetData } from '@/hooks/useBudgetData';
@@ -14,7 +14,7 @@ import { useBudgetTemplates } from '@/hooks/useBudgetTemplates';
 import { useAnnualBudget } from '@/hooks/useAnnualBudget';
 import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { EmptyState, InlineError } from '@/components/shared/EmptyState';
 import { BudgetOverview } from '@/components/budget/BudgetOverview';
 import { BudgetCategoryCard } from '@/components/budget/BudgetCategoryCard';
 import { UnbudgetedCategories } from '@/components/budget/UnbudgetedCategories';
@@ -37,6 +37,7 @@ export default function BudgetPage() {
     updateBudget,
     refetch,
     isLoading,
+    isError,
     budgetAlerts,
   } = useBudgetData();
 
@@ -65,7 +66,9 @@ export default function BudgetPage() {
     monthlyTotals,
     upsertCell,
     deleteCell,
+    refetch: annualRefetch,
     isLoading: isAnnualLoading,
+    isError: isAnnualError,
   } = useAnnualBudget();
 
   if (isLoading) {
@@ -99,7 +102,7 @@ export default function BudgetPage() {
           <div className="hidden lg:block">
             <PageHeader
               title={t(locale, 'budgetPage')}
-              description={`${MONTH_NAMES[month]} ${year}`}
+              description={`${(locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES)[month]} ${year}`}
             />
           </div>
           <div className="flex flex-1 items-center justify-end gap-2">
@@ -107,14 +110,16 @@ export default function BudgetPage() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setYear(year - 1)}
-                  className="text-muted-foreground hover:bg-muted rounded-lg border px-2 py-1 text-sm"
+                  aria-label={t(locale, 'prevYearAria')}
+                  className="text-muted-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg border text-sm"
                 >
                   ‹
                 </button>
                 <span className="min-w-[3rem] text-center text-sm font-medium">{year}</span>
                 <button
                   onClick={() => setYear(year + 1)}
-                  className="text-muted-foreground hover:bg-muted rounded-lg border px-2 py-1 text-sm"
+                  aria-label={t(locale, 'nextYearAria')}
+                  className="text-muted-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-lg border text-sm"
                 >
                   ›
                 </button>
@@ -123,6 +128,7 @@ export default function BudgetPage() {
             <div className="bg-muted/50 flex rounded-lg border p-0.5">
               <button
                 onClick={() => setView('monthly')}
+                aria-pressed={view === 'monthly'}
                 className={cn(
                   'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-all',
                   view === 'monthly'
@@ -135,6 +141,7 @@ export default function BudgetPage() {
               </button>
               <button
                 onClick={() => setView('annual')}
+                aria-pressed={view === 'annual'}
                 className={cn(
                   'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-all',
                   view === 'annual'
@@ -168,7 +175,15 @@ export default function BudgetPage() {
             </Button>
           </motion.div>
 
-          {isEmpty ? (
+          {isError ? (
+            <motion.div {...fadeInUp}>
+              <InlineError
+                message={t(locale, 'error')}
+                onRetry={refetch}
+                retryLabel={t(locale, 'tryAgain')}
+              />
+            </motion.div>
+          ) : isEmpty ? (
             <motion.div {...fadeInUp}>
               <EmptyState
                 title={t(locale, 'noBudgetCategories')}
@@ -212,7 +227,17 @@ export default function BudgetPage() {
         </>
       )}
 
-      {view === 'annual' && (
+      {view === 'annual' && isAnnualError && (
+        <motion.div {...fadeInUp}>
+          <InlineError
+            message={t(locale, 'error')}
+            onRetry={annualRefetch}
+            retryLabel={t(locale, 'tryAgain')}
+          />
+        </motion.div>
+      )}
+
+      {view === 'annual' && !isAnnualError && (
         <motion.div {...fadeInUp} className="space-y-6">
           <AnnualBudgetSummary summary={summary} locale={locale} isLoading={isAnnualLoading} />
           <AnnualBudgetGrid

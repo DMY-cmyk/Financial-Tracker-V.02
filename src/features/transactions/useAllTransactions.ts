@@ -25,6 +25,8 @@ interface UseAllTransactionsReturn {
   loadMore: () => void;
   isLoading: boolean;
   isLoadingMore: boolean;
+  isError: boolean;
+  refetch: () => void;
 
   // Basic filters
   search: string;
@@ -71,7 +73,7 @@ interface UseAllTransactionsReturn {
   openEdit: (tx: Transaction) => void;
   openDuplicate: (tx: Transaction) => void;
   closeForm: () => void;
-  deleteTransaction: (id: string) => void;
+  deleteTransaction: (id: string) => Promise<boolean>;
 
   // Selection (bulk)
   selectedIds: Set<string>;
@@ -265,6 +267,8 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
+    isError,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ['all-transactions', filterKey],
     queryFn: async ({ pageParam }) => {
@@ -296,6 +300,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
       const result = await api.transactions.list(
         params as Parameters<typeof api.transactions.list>[0]
       );
+      if (result.error) throw new Error(result.error.message);
       return result.data ?? null;
     },
     getNextPageParam: (lastPage) => {
@@ -341,12 +346,12 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   }, [queryClient]);
 
   const deleteTransaction = useCallback(
-    (id: string) => {
-      api.transactions.delete(id).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        queryClient.invalidateQueries({ queryKey: ['payment-method-balances'] });
-      });
+    async (id: string) => {
+      const result = await api.transactions.delete(id);
+      queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-method-balances'] });
+      return !result.error;
     },
     [queryClient]
   );
@@ -373,6 +378,7 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
   const bulkDeleteTransactions = useCallback(async () => {
     const ids = Array.from(selectedIds);
     const result = await api.transactions.bulkDelete(ids);
+    if (result.error) throw new Error(result.error.message);
     const deleted = result.data?.deleted ?? 0;
     setSelectedIds(new Set());
     queryClient.invalidateQueries({ queryKey: ['all-transactions'] });
@@ -390,6 +396,8 @@ export function useAllTransactions(initialFilters?: InitialFilters): UseAllTrans
     loadMore: fetchNextPage,
     isLoading,
     isLoadingMore: isFetchingNextPage,
+    isError,
+    refetch,
     search,
     setSearch,
     typeFilter,

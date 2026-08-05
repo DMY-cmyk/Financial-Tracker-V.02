@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
+import { gentleSpring, DURATION } from '@/lib/motion';
 import { Settings, Plus, PanelLeftClose, PanelLeft, Tag, Languages } from 'lucide-react';
 import { SidebarGroup } from '@/features/navigation/SidebarGroup';
 import { useNavGroups } from '@/features/navigation/useNavGroups';
@@ -44,9 +45,9 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
 
   return (
     <motion.aside
-      aria-label={locale === 'id' ? 'Navigasi utama' : 'Main navigation'}
+      aria-label={t(locale, 'mainNavigation')}
       animate={{ width: collapsed ? 72 : 260 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      transition={gentleSpring}
       className={cn(
         'border-border bg-card/50 flex flex-col overflow-hidden border-r backdrop-blur-sm',
         className
@@ -68,7 +69,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: DURATION.fast }}
               className="truncate text-sm font-semibold"
             >
               Financial Tracker
@@ -93,7 +94,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: 'auto' }}
                 exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: DURATION.fast }}
               >
                 {t(locale, 'newTransaction')}
               </motion.span>
@@ -120,7 +121,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
       <div className="border-border space-y-1 border-t p-3">
         {!collapsed && (
           <p className="text-muted-foreground/60 mb-2 px-3 text-[10px] font-semibold tracking-wider uppercase">
-            {locale === 'id' ? 'Sistem' : 'System'}
+            {t(locale, 'systemSection')}
           </p>
         )}
         {NAV_BOTTOM.map(({ href, key, icon: Icon }) => (
@@ -129,6 +130,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
             href={href}
             className={navLinkClass(href)}
             title={collapsed ? t(locale, key) : undefined}
+            aria-label={collapsed ? t(locale, key) : undefined}
             aria-current={isActive(href) ? 'page' : undefined}
           >
             <Icon className="h-[18px] w-[18px] shrink-0" />
@@ -138,7 +140,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: 'auto' }}
                   exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.15 }}
+                  transition={{ duration: DURATION.fast }}
                   className="whitespace-nowrap"
                 >
                   {t(locale, key)}
@@ -200,7 +202,8 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
 
         <button
           onClick={onToggleCollapse}
-          aria-label={t(locale, 'collapse')}
+          aria-label={collapsed ? t(locale, 'expand') : t(locale, 'collapse')}
+          aria-expanded={!collapsed}
           className={cn(
             'text-muted-foreground/60 hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors',
             collapsed && 'justify-center px-0'
@@ -214,7 +217,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: DURATION.fast }}
               >
                 {t(locale, 'collapse')}
               </motion.span>

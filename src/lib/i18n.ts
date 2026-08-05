@@ -94,6 +94,15 @@ type TranslationKeys = {
   importData: string;
   clearData: string;
   confirmDelete: string;
+  deleteCategoryTitle: string;
+  deleteCategoryConfirm: string;
+  deletePaymentMethodTitle: string;
+  deletePaymentMethodConfirm: string;
+  deleted: string;
+  showPassword: string;
+  hidePassword: string;
+  prevYearAria: string;
+  nextYearAria: string;
   exportFormat: string;
   exportScope: string;
   exportOptions: string;
@@ -144,6 +153,14 @@ type TranslationKeys = {
   menu: string;
   newTransaction: string;
   collapse: string;
+  expand: string;
+  openMenu: string;
+  monthNavigation: string;
+  prevMonth: string;
+  nextMonth: string;
+  mainNavigation: string;
+  bottomNavigation: string;
+  systemSection: string;
 
   // Toasts
   transactionSaved: string;
@@ -480,6 +497,9 @@ type TranslationKeys = {
   oauthErrorGeneric: string;
   oauthErrorEmailUnverified: string;
   oauthErrorStateMismatch: string;
+  oauthErrorAccountExistsPassword: string;
+  authLoginFailed: string;
+  authGenericError: string;
 
   // Budget templates
   saveAsTemplate: string;
@@ -688,6 +708,17 @@ const translations: Record<Locale, TranslationKeys> = {
     importData: 'Import Data',
     clearData: 'Clear All Data',
     confirmDelete: 'Are you sure? This will permanently delete all your data.',
+    deleteCategoryTitle: 'Delete category',
+    deleteCategoryConfirm:
+      'This category will be permanently deleted. Categories still used by transactions cannot be deleted.',
+    deletePaymentMethodTitle: 'Delete payment method',
+    deletePaymentMethodConfirm:
+      'This payment method will be permanently deleted. Methods still used by transactions cannot be deleted.',
+    deleted: 'Deleted',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    prevYearAria: 'Previous year',
+    nextYearAria: 'Next year',
     exportFormat: 'Format',
     exportScope: 'Scope',
     exportOptions: 'Options',
@@ -730,6 +761,14 @@ const translations: Record<Locale, TranslationKeys> = {
     menu: 'Menu',
     newTransaction: 'New Transaction',
     collapse: 'Collapse',
+    expand: 'Expand',
+    openMenu: 'Open menu',
+    monthNavigation: 'Month navigation',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    mainNavigation: 'Main navigation',
+    bottomNavigation: 'Bottom navigation',
+    systemSection: 'System',
 
     transactionSaved: 'Transaction saved',
     transactionDeleted: 'Transaction deleted',
@@ -1182,6 +1221,10 @@ const translations: Record<Locale, TranslationKeys> = {
     oauthErrorGeneric: "We couldn't sign you in — try again.",
     oauthErrorEmailUnverified: 'Verify your Google email first.',
     oauthErrorStateMismatch: 'Your sign-in attempt expired. Please try again.',
+    oauthErrorAccountExistsPassword:
+      'An account with this email already has a password. Sign in with your password first.',
+    authLoginFailed: 'Login failed',
+    authGenericError: 'Something went wrong. Please try again.',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1254,6 +1297,17 @@ const translations: Record<Locale, TranslationKeys> = {
     importData: 'Impor Data',
     clearData: 'Hapus Semua Data',
     confirmDelete: 'Yakin? Semua data akan dihapus secara permanen.',
+    deleteCategoryTitle: 'Hapus kategori',
+    deleteCategoryConfirm:
+      'Kategori ini akan dihapus permanen. Kategori yang masih dipakai transaksi tidak dapat dihapus.',
+    deletePaymentMethodTitle: 'Hapus metode pembayaran',
+    deletePaymentMethodConfirm:
+      'Metode pembayaran ini akan dihapus permanen. Metode yang masih dipakai transaksi tidak dapat dihapus.',
+    deleted: 'Dihapus',
+    showPassword: 'Tampilkan kata sandi',
+    hidePassword: 'Sembunyikan kata sandi',
+    prevYearAria: 'Tahun sebelumnya',
+    nextYearAria: 'Tahun berikutnya',
     exportFormat: 'Format',
     exportScope: 'Cakupan',
     exportOptions: 'Opsi',
@@ -1296,6 +1350,14 @@ const translations: Record<Locale, TranslationKeys> = {
     menu: 'Menu',
     newTransaction: 'Transaksi Baru',
     collapse: 'Perkecil',
+    expand: 'Perbesar',
+    openMenu: 'Buka menu',
+    monthNavigation: 'Navigasi bulan',
+    prevMonth: 'Bulan sebelumnya',
+    nextMonth: 'Bulan berikutnya',
+    mainNavigation: 'Navigasi utama',
+    bottomNavigation: 'Navigasi bawah',
+    systemSection: 'Sistem',
 
     transactionSaved: 'Transaksi disimpan',
     transactionDeleted: 'Transaksi dihapus',
@@ -1750,6 +1812,10 @@ const translations: Record<Locale, TranslationKeys> = {
     oauthErrorGeneric: 'Kami tidak dapat memasukkan Anda — coba lagi.',
     oauthErrorEmailUnverified: 'Verifikasi email Google Anda terlebih dahulu.',
     oauthErrorStateMismatch: 'Upaya masuk Anda kedaluwarsa. Silakan coba lagi.',
+    oauthErrorAccountExistsPassword:
+      'Akun dengan email ini sudah memiliki kata sandi. Masuk dengan kata sandi terlebih dahulu.',
+    authLoginFailed: 'Gagal masuk',
+    authGenericError: 'Terjadi kesalahan. Silakan coba lagi.',
   },
 };
 

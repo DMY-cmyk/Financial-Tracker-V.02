@@ -244,6 +244,7 @@ export default function ReportsPage() {
                   size="icon"
                   className="h-8 w-8"
                   onClick={() => setAnnualYear((y) => y - 1)}
+                  aria-label={t(locale, 'prevYearAria')}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -256,6 +257,7 @@ export default function ReportsPage() {
                   className="h-8 w-8"
                   onClick={() => setAnnualYear((y) => y + 1)}
                   disabled={annualYear >= new Date().getFullYear()}
+                  aria-label={t(locale, 'nextYearAria')}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

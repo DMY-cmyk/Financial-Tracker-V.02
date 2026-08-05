@@ -115,10 +115,22 @@ export function BudgetCategoryCard({ category, alert, onUpdateBudget }: BudgetCa
               if (e.key === 'Escape') cancelEdit();
             }}
           />
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={saveEdit}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={saveEdit}
+            aria-label={t(locale, 'save')}
+          >
             <Check className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={cancelEdit}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={cancelEdit}
+            aria-label={t(locale, 'cancel')}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>

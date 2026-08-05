@@ -16,7 +16,7 @@ import { AccountBalancesWidget } from '@/features/balances/AccountBalancesWidget
 import { NetWorthDashboardWidget } from '@/features/net-worth/NetWorthDashboardWidget';
 import { SummaryCard } from '@/components/shared/SummaryCard';
 import { QuickActionButton } from '@/components/shared/QuickActionButton';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { EmptyState, InlineError } from '@/components/shared/EmptyState';
 import { PageSkeleton, ChartCardSkeleton } from '@/components/shared/Skeletons';
 import {
   Wallet,
@@ -71,7 +71,10 @@ export function DashboardContent() {
     categories,
     netWorthCurrent,
     netWorthHistory,
+    onToggleBill,
     isLoading,
+    isError,
+    refetch,
     isEmpty,
     updateBudget,
     budgetAlerts,
@@ -81,6 +84,17 @@ export function DashboardContent() {
 
   if (isLoading) {
     return <PageSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <InlineError
+        message={t(locale, 'error')}
+        onRetry={() => refetch()}
+        retryLabel={t(locale, 'tryAgain')}
+        className="mt-8"
+      />
+    );
   }
 
   return (
@@ -235,7 +249,7 @@ export function DashboardContent() {
             animate="show"
           >
             <motion.div variants={staggerItem}>
-              <BillsChecklist bills={bills} />
+              <BillsChecklist bills={bills} onToggle={onToggleBill} />
             </motion.div>
             <motion.div variants={staggerItem}>
               <SavingsGoals goals={savingsGoals} />

@@ -200,6 +200,8 @@ export function useExport(): UseExportReturn {
       }
     } catch (err) {
       setExportError(err instanceof Error ? err.message : 'Export failed');
+      // Rethrow so callers can distinguish failure from success (toast handling)
+      throw err;
     } finally {
       setIsExporting(false);
     }

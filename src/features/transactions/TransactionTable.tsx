@@ -119,7 +119,7 @@ export function TransactionTable({
                     {tx.type === 'income' ? '+' : '-'}
                     {formatCurrency(tx.amount)}
                   </span>
-                  <div className="flex gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+                  <div className="flex gap-1 transition-opacity pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
                     <Button
                       variant="ghost"
                       size="icon"

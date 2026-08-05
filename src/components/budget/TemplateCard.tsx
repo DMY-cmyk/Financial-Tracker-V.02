@@ -68,6 +68,7 @@ export function TemplateCard({ template, onApply, onDelete }: TemplateCardProps)
             className="text-destructive hover:text-destructive"
             onClick={() => setDeleteConfirmOpen(true)}
             disabled={isDeleting}
+            aria-label={t(locale, 'delete')}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

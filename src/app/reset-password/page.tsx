@@ -40,11 +40,13 @@ function ResetPasswordInner() {
         body: JSON.stringify({ token, password: pwd }),
       });
       if (!res.ok) {
-        const body = await res.json();
-        setError(body.error?.message ?? 'Reset failed');
+        const body = await res.json().catch(() => null);
+        setError(body?.error?.message ?? t(locale, 'authGenericError'));
       } else {
         router.push('/login');
       }
+    } catch {
+      setError(t(locale, 'authGenericError'));
     } finally {
       setBusy(false);
     }
@@ -68,6 +70,7 @@ function ResetPasswordInner() {
           value={pwd}
           onChange={setPwd}
           type="password"
+          autoComplete="new-password"
           required
           autoFocus
         />
@@ -93,11 +96,10 @@ function ResetPasswordInner() {
           value={confirm}
           onChange={setConfirm}
           type="password"
+          autoComplete="new-password"
           required
+          error={confirm && !matches ? t(locale, 'resetMismatch') : undefined}
         />
-        {confirm && !matches && (
-          <div className="text-xs text-[var(--neg)]">{t(locale, 'resetMismatch')}</div>
-        )}
 
         {error && (
           <div

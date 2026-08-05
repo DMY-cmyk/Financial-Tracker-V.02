@@ -28,8 +28,8 @@ export function HeroHeader({
 }: HeroHeaderProps) {
   const locale = useLocale();
   const fallbackRight = (
-    <span aria-label={t(locale, 'heroBellAria')} className="text-hero-foreground inline-flex">
-      <Bell className="h-5 w-5" aria-hidden="true" />
+    <span aria-hidden="true" className="text-hero-foreground inline-flex">
+      <Bell className="h-5 w-5" />
     </span>
   );
 
@@ -39,8 +39,7 @@ export function HeroHeader({
         {/* Subtle radial highlight in the upper-right for depth */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full opacity-50 blur-3xl"
-          style={{ background: 'rgb(255 255 255 / 0.18)' }}
+          className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full bg-white/20 opacity-50 blur-3xl"
         />
 
         <div className="relative flex items-center justify-between">
@@ -50,7 +49,7 @@ export function HeroHeader({
                 type="button"
                 onClick={onBack}
                 aria-label={t(locale, 'heroBackAria')}
-                className="-ml-1 p-1"
+                className="-ml-3 flex h-11 w-11 items-center justify-center"
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>

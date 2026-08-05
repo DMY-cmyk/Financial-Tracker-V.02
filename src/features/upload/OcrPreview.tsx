@@ -3,6 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Category } from '@/lib/types';
 import { t, useLocale } from '@/lib/i18n';
 
@@ -17,10 +18,17 @@ interface OcrPreviewProps {
   data: OcrData;
   onChange: (data: OcrData) => void;
   onSave: () => void;
+  isSaving?: boolean;
   categories: Category[];
 }
 
-export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewProps) {
+export function OcrPreview({
+  data,
+  onChange,
+  onSave,
+  categories,
+  isSaving = false,
+}: OcrPreviewProps) {
   const locale = useLocale();
   const expenseCategories = categories.filter((c) => c.type === 'expense');
 
@@ -71,7 +79,8 @@ export function OcrPreview({ data, onChange, onSave, categories }: OcrPreviewPro
           ))}
         </select>
       </div>
-      <Button onClick={onSave} className="w-full">
+      <Button onClick={onSave} disabled={isSaving} className="w-full">
+        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {t(locale, 'saveTransaction')}
       </Button>
     </div>

@@ -6,19 +6,19 @@ import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { fadeInUp, staggerGrid, staggerGridItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { EmptyState, InlineError } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ProgressRing } from '@/components/shared/ProgressRing';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Plus, Pencil, Trash2, PiggyBank } from 'lucide-react';
+import { Plus, Pencil, Trash2, PiggyBank, Loader2 } from 'lucide-react';
 import { useSavingsGoals, COLOR_OPTIONS } from '@/features/savings/useSavingsGoals';
 
 export default function SavingsPage() {
   const locale = useLocale();
-  const { goals, isLoading, error, form, deleteConfirm, quickEdit } = useSavingsGoals();
+  const { goals, isLoading, error, reload, form, deleteConfirm, quickEdit } = useSavingsGoals();
 
   if (isLoading) {
     return (
@@ -41,7 +41,11 @@ export default function SavingsPage() {
       <div className="space-y-6">
         <PageHeader title={t(locale, 'savingsPage')} />
         <div className="mx-auto max-w-2xl">
-          <p className="text-destructive py-8 text-center text-sm">{t(locale, 'error')}</p>
+          <InlineError
+            message={t(locale, 'error')}
+            onRetry={reload}
+            retryLabel={t(locale, 'tryAgain')}
+          />
         </div>
       </div>
     );
@@ -105,7 +109,7 @@ export default function SavingsPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
                           <p className="truncate text-sm font-medium">{goal.name}</p>
-                          <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                          <div className="flex gap-1 transition-opacity pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -237,7 +241,8 @@ export default function SavingsPage() {
               </div>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button onClick={form.submit} className="flex-1">
+              <Button onClick={form.submit} disabled={form.isSubmitting} className="flex-1">
+                {form.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {t(locale, 'save')}
               </Button>
               <Button variant="outline" onClick={form.close}>

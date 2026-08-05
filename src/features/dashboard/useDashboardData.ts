@@ -23,7 +23,12 @@ export function useDashboardData() {
   const initialized = useStore((s) => s.initialized);
   const queryClient = useQueryClient();
 
-  const { data, isLoading: isQueryLoading } = useQuery<DashboardData>({
+  const {
+    data,
+    isLoading: isQueryLoading,
+    isError,
+    refetch,
+  } = useQuery<DashboardData>({
     queryKey: ['dashboard', month, year],
     queryFn: async () => {
       const [summaryResult, catResult, billsResult, savingsResult, netWorthResult] =
@@ -34,6 +39,11 @@ export function useDashboardData() {
           api.savings.list(),
           api.netWorth.get(),
         ]);
+      // Surface the primary failure so react-query retries and exposes isError,
+      // instead of rendering an all-zeroes dashboard.
+      if (summaryResult.error) {
+        throw new Error(summaryResult.error.message);
+      }
       return {
         summary: summaryResult.data ?? null,
         categories: catResult.data?.categories ?? [],
@@ -152,6 +162,8 @@ export function useDashboardData() {
     onToggleBill,
     updateBudget,
     isLoading,
+    isError,
+    refetch,
     isEmpty: !isLoading && summary?.transactionCount === 0,
   };
 }

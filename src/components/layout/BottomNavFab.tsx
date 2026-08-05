@@ -4,7 +4,7 @@ import { useState, ComponentType } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home,
+  LayoutDashboard,
   ArrowLeftRight,
   Plus,
   PiggyBank,
@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
 
-type LabelKey = 'home' | 'transactions' | 'navAdd' | 'budgetPage' | 'settings';
+type LabelKey = 'dashboard' | 'transactions' | 'navAdd' | 'budgetPage' | 'settings';
 
 type Slot =
   | {
@@ -34,7 +34,7 @@ type Slot =
     };
 
 const SLOTS: ReadonlyArray<Slot> = [
-  { key: 'home', href: '/', icon: Home, labelKey: 'home' },
+  { key: 'dashboard', href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
   {
     key: 'tx',
     href: '/transactions',
@@ -67,8 +67,8 @@ export function BottomNavFab() {
   return (
     <>
       <nav
-        aria-label={locale === 'id' ? 'Navigasi bawah' : 'Bottom navigation'}
-        className="border-border bg-card/95 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-md lg:hidden"
+        aria-label={t(locale, 'bottomNavigation')}
+        className="border-border bg-card/95 fixed right-0 bottom-0 left-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
       >
         <div className="grid grid-cols-5 items-end px-2 pt-1 pb-2">
           {SLOTS.map((slot) => {
@@ -80,8 +80,10 @@ export function BottomNavFab() {
                     type="button"
                     data-slot="fab"
                     aria-label={t(locale, slot.labelKey)}
+                    aria-expanded={open}
+                    aria-haspopup="dialog"
                     onClick={() => setOpen(true)}
-                    className="bg-brand-mint text-brand-mint-foreground ring-card inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full shadow-lg ring-4"
+                    className="bg-brand-mint text-brand-mint-foreground ring-card inline-flex h-14 w-14 -translate-y-3 items-center justify-center rounded-full shadow-lg ring-4 transition-transform active:scale-95"
                   >
                     <FabIcon className="h-6 w-6" />
                   </button>
@@ -100,10 +102,10 @@ export function BottomNavFab() {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex flex-col items-center gap-1 px-2 py-1 text-xs transition-colors',
-                  active ? 'text-brand-mint-strong' : 'text-muted-foreground'
+                  active ? 'text-brand-mint-strong font-semibold' : 'text-muted-foreground'
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={cn('h-5 w-5', active && 'stroke-[2.5]')} />
                 <span>{t(locale, slot.labelKey)}</span>
               </Link>
             );

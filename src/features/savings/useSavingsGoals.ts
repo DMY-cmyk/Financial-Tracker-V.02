@@ -31,6 +31,7 @@ export function useSavingsGoals() {
 
   // Form state
   const [formOpen, setFormOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
   const [formName, setFormName] = useState('');
   const [formTarget, setFormTarget] = useState('');
@@ -106,7 +107,8 @@ export function useSavingsGoals() {
   };
 
   const submit = async () => {
-    if (!validateForm()) return;
+    if (isSubmitting || !validateForm()) return;
+    setIsSubmitting(true);
 
     const payload = {
       name: formName.trim(),
@@ -126,6 +128,7 @@ export function useSavingsGoals() {
     } else {
       toast.error(t(locale, 'failedSave'));
     }
+    setIsSubmitting(false);
   };
 
   const openQuickEdit = (goal: SavingsGoal) => {
@@ -196,6 +199,7 @@ export function useSavingsGoals() {
       setSaved: setFormSaved,
       color: formColor,
       setColor: setFormColor,
+      isSubmitting,
       errors: formErrors,
       openAdd,
       openEdit,

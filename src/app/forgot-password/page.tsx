@@ -10,17 +10,26 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    setError(null);
     try {
-      await fetch('/api/auth/forgot-password', {
+      const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, locale }),
       });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error?.message ?? t(locale, 'authGenericError'));
+        return;
+      }
       setSent(true);
+    } catch {
+      setError(t(locale, 'authGenericError'));
     } finally {
       setBusy(false);
     }
@@ -54,9 +63,18 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={setEmail}
               type="email"
+              autoComplete="email"
               required
               autoFocus
             />
+            {error && (
+              <div
+                role="alert"
+                className="border border-[var(--neg)] bg-[var(--neg-soft)] px-3 py-2 text-xs text-[var(--neg)]"
+              >
+                {error}
+              </div>
+            )}
             <button
               type="submit"
               disabled={busy || !email}
