@@ -103,7 +103,9 @@ export const createCategorySchema = z.object({
     .default(0),
 });
 
-export const updateCategorySchema = createCategorySchema.partial();
+export const updateCategorySchema = createCategorySchema.partial().extend({
+  archived: z.boolean().optional(),
+});
 
 // === Payment method schemas ===
 

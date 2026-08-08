@@ -9,6 +9,7 @@ interface CatRow {
   color: string;
   icon: string;
   budget: number;
+  archived: number | boolean;
 }
 
 function rowToCategory(row: CatRow): Category {
@@ -19,6 +20,7 @@ function rowToCategory(row: CatRow): Category {
     color: row.color,
     icon: row.icon,
     budget: Number(row.budget),
+    archived: Number(row.archived) === 1,
   };
 }
 
@@ -68,7 +70,7 @@ export function createCategoryRepository() {
     ): Promise<Category[]> {
       const db = await getDb();
       const result = await db.query<CatRow>(
-        `SELECT c.id, c.name, c.type, c.color, c.icon,
+        `SELECT c.id, c.name, c.type, c.color, c.icon, c.archived,
            COALESCE(mb.budget_amount, c.budget) AS budget
          FROM categories c
          LEFT JOIN monthly_budgets mb
@@ -103,8 +105,17 @@ export function createCategoryRepository() {
       if (!existing.rows[0]) return undefined;
       const updated = { ...rowToCategory(existing.rows[0]), ...data };
       await db.query(
-        'UPDATE categories SET name=?, type=?, color=?, icon=?, budget=? WHERE user_id=? AND id=?',
-        [updated.name, updated.type, updated.color, updated.icon, updated.budget, userId, id]
+        'UPDATE categories SET name=?, type=?, color=?, icon=?, budget=?, archived=? WHERE user_id=? AND id=?',
+        [
+          updated.name,
+          updated.type,
+          updated.color,
+          updated.icon,
+          updated.budget,
+          updated.archived ? 1 : 0,
+          userId,
+          id,
+        ]
       );
       return updated;
     },

@@ -94,6 +94,10 @@ type TranslationKeys = {
   importData: string;
   clearData: string;
   confirmDelete: string;
+  archive: string;
+  unarchive: string;
+  categoryArchived: string;
+  categoryUnarchived: string;
   deleteCategoryTitle: string;
   deleteCategoryConfirm: string;
   deletePaymentMethodTitle: string;
@@ -709,6 +713,10 @@ const translations: Record<Locale, TranslationKeys> = {
     importData: 'Import Data',
     clearData: 'Clear All Data',
     confirmDelete: 'Are you sure? This will permanently delete all your data.',
+    archive: 'Archive',
+    unarchive: 'Unarchive',
+    categoryArchived: 'Category archived — hidden from new transactions',
+    categoryUnarchived: 'Category restored',
     deleteCategoryTitle: 'Delete category',
     deleteCategoryConfirm:
       'This category will be permanently deleted. Categories still used by transactions cannot be deleted.',
@@ -1299,6 +1307,10 @@ const translations: Record<Locale, TranslationKeys> = {
     importData: 'Impor Data',
     clearData: 'Hapus Semua Data',
     confirmDelete: 'Yakin? Semua data akan dihapus secara permanen.',
+    archive: 'Arsipkan',
+    unarchive: 'Aktifkan lagi',
+    categoryArchived: 'Kategori diarsipkan — disembunyikan dari transaksi baru',
+    categoryUnarchived: 'Kategori diaktifkan kembali',
     deleteCategoryTitle: 'Hapus kategori',
     deleteCategoryConfirm:
       'Kategori ini akan dihapus permanen. Kategori yang masih dipakai transaksi tidak dapat dihapus.',

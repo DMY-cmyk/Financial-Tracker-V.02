@@ -28,7 +28,7 @@ export function RecurringTransactionForm({
 
   useEffect(() => {
     api.categories.list().then((r) => {
-      if (r.data) setCategories(r.data.categories);
+      if (r.data) setCategories(r.data.categories.filter((c) => !c.archived));
     });
     api.paymentMethods.list().then((r) => {
       if (r.data) setPaymentMethods(r.data.paymentMethods);
