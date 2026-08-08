@@ -22,7 +22,6 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Net Worth KPI widget — current net worth + month-over-month delta (green/red)
 - [x] Clickable balance cards — show monthly flow overlay on click
 - [x] Quick Actions section (add transaction, upload receipt, export data)
-- [x] Animated counter with Framer Motion spring
 - [x] Responsive sectioned layout with visual hierarchy
 - [x] Stagger entrance animations
 
@@ -56,6 +55,7 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] Review and correct extracted fields before saving
 - [x] Status-driven flow (idle -> processing -> extracted -> saved)
 - [x] Confidence indicator bar (High/Medium/Low)
+- [x] Upload history list with per-row delete (`DELETE /api/uploads/[id]`, ConfirmDialog + toast)
 - [x] Modular components (DropZone, UploadedFileCard, ExtractionStatusBadge, ConfidenceBar, OcrPreview)
 
 ### Export
@@ -192,6 +192,15 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] `bcryptjs` password hashing (cost 12 in production, 4 in tests)
 - [x] Bilingual auth strings (EN/ID) via i18n — 30+ new keys for the editorial auth surface
 
+### Security Hardening
+
+- [x] **Rate limiting** on all auth POST endpoints (register, login, forgot/reset password) — in-memory sliding window (`src/lib/rate-limit.ts`)
+- [x] **Security headers + CSP** on every response (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, Content-Security-Policy allowing only self + Google OAuth endpoints)
+- [x] **User-scoped clear data** — `DELETE /api/data` deletes only the requesting user's rows across all 13 data tables; auth tables (users, oauth_accounts, password_reset_tokens) preserved
+- [x] **Production guards** — `JWT_SECRET` required at runtime; `getAppUrl()` refuses request-origin fallback in production
+- [x] **Money integer validation** — all amount fields validated as integers (IDR has no cents)
+- [x] **WIB (UTC+7) date utilities** for recurring/due calculations (`src/lib/wib-date.ts`)
+
 ### Editorial Theme System
 
 - [x] **Paper / Ink palette** — replaced previous blue-tinted theme tokens with editorial paper (`#ffffff`) / ink (`#0a0a0a`) / electric orange accent (`#ff5b1f`) for light mode; midnight dark (`#14110d`) / bone (`#f6f1e8`) / gold (`#d3b266`) for dark mode
@@ -200,7 +209,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] **Animation vocabulary** — `ftRise` stagger (`.ft-rise-1..6`, 80ms increments), `ftFlow` (cashflow ribbon dashed-stroke), `ftPulseSoft` (live dot), `ftMarq` (market ticker marquee), `ftBarGrow` (budget bars), `ftShimmerBg` (skeleton loader). All respect `prefers-reduced-motion: reduce`.
 - [x] **First-paint theme bootstrap** — inline `<head>` script reads `localStorage.theme` and applies `.dark` class before React hydration to prevent flash
 - [x] **Hex compatibility sweep** — replaced hardcoded `#2563EB` / `#10b981` / `#ef4444` / `#f59e0b` across 19 files with editorial tokens or canvas-safe neighbours
-- [x] **Numeral upgrade** — `font-mono` / `ft-mono` applied to amount displays (CashFlowChart, BalanceCard, SummaryCard, TransactionRowMobile, MonthSelector)
+- [x] **Numeral upgrade** — `font-mono` / `ft-mono` applied to amount displays (CashFlowChart, BalanceCard, SummaryCard, TransactionRowMobile)
 - [x] **Reusable login primitives** in `src/components/login/` — `EditorialField` (square input with focus glow), `CountStat` (rAF-driven counter), `LiveRibbon` (animated SVG cashflow), `MarketTicker` (marquee with edge fade-mask), `EditorialHero` (split-panel composition), `LoginForm`
 
 ### Payment Method Icons
@@ -217,8 +226,8 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] 36 new tests (25 utility + 8 component + 3 regression)
 
 ### Settings
-- [x] Theme: Light / Dark / System
-- [x] Language: English / Bahasa Indonesia
+- [x] Theme: Light / Dark / System — synced to the server (`GET/PATCH /api/settings`) so preferences follow the user across devices; localStorage keeps them working offline
+- [x] Language: English / Bahasa Indonesia — synced the same way
 - [x] Category & payment method management (CRUD, color picker, budget)
 - [x] Beginning Balance (Saldo Awal) per payment method — real-world account starting balance
 - [x] Edit dialog for payment methods (name, type, beginning balance, icon)
@@ -240,7 +249,6 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] **`<TransactionRowMobile>`** — 64px row with 52×52 mint-blue icon tile, name + italic timestamp, category tag, signed amount (red expense / foreground income)
 - [x] **`<SavingsRingCard>`** — recharts donut ring (mint on mint-soft track) showing aggregate goal completion %, plus revenue-last-week and top-expense-category-last-week stats with empty states
 - [x] **`Button variant="mint"`** — opt-in primary CTA variant; existing variants unchanged
-- [x] **`lib/icon.ts`** — opt-in lucide stroke defaults (`strokeWidth: 2.25`, rounded line caps/joins) for leaf callsites
 - [x] **Hero band wired to top-level mobile pages** — `/`, `/transactions`, `/budget`, `/reports`, `/settings`. Each page's existing `PageHeader` is hidden at mobile to prevent `<h1>` collision; `/budget` controls (year stepper, monthly/annual toggle) remain visible at all viewports.
 - [x] **`/` and `/transactions` mobile composition** — CSS-only mobile/desktop branching (`md:hidden` / `hidden md:block`), no `useMediaQuery`. Mobile dashboard composes hero (greeting + chips + budget bar with 6-bucket caption) → savings ring overlap card → period tabs → recent-tx list (5 items + "See all"). Mobile transactions composes hero + chips → period tabs → month-grouped TransactionRowMobile list (with infinite-scroll load-more preserved).
 - [x] **Sidebar brand mark** picks up mint via `bg-brand-mint` + `text-brand-mint-foreground`
@@ -281,7 +289,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) · hand-rolled Google OAuth 2.0 + PKCE |
 | **Email** | Resend (password-reset flow, dev-mode console fallback) |
-| **Testing** | Vitest (**802 tests**: validation, all services, balance, reports, auth, OAuth linking rules, password-reset flow, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, editorial tokens + utilities + animations + hero primitives) |
+| **Testing** | Vitest (**839 tests**: validation, all services, balance, reports, auth, OAuth linking rules, password-reset flow, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, rate limiting, user-scoped clear data, upload deletion, editorial tokens + utilities + animations + hero primitives) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion + editorial CSS keyframes (ftRise / ftFlow / ftMarq / ftPulseSoft / ftBarGrow / ftShimmerBg) |
 | **OCR** | Tesseract.js |
@@ -311,15 +319,14 @@ npm run build                # Production build
 | `APP_URL` | Production | Public app URL (used to build reset links + OAuth redirect URI). |
 | `GOOGLE_CLIENT_ID` | OAuth | Google OAuth 2.0 client ID. Leave unset to disable Google sign-in. |
 | `GOOGLE_CLIENT_SECRET` | OAuth | Google OAuth client secret. |
-| `GOOGLE_REDIRECT_URI` | OAuth | Authorized redirect URI, e.g. `https://your-domain.com/api/auth/google/callback`. Must be registered in Google Cloud Console. |
 | `NEXT_PUBLIC_SKIP_AUTH` | Dev only | Set to `true` to auto-redirect to `/register` when no users exist in DB. |
-| `NEXT_PUBLIC_BASE_PATH` | No | Base path for deployment |
-| `NEXT_PUBLIC_APP_TITLE` | No | Override app display title |
+
+The OAuth redirect URI is derived from `APP_URL` as `${APP_URL}/api/auth/google/callback` — register that exact URL in Google Cloud Console.
 
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 802 tests)
+npm run test         # Run tests (Vitest, 839 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -346,8 +353,8 @@ src/
       cron/generate-recurring/ # POST (Vercel Cron, dual auth)
       recurring-transactions/  # GET/POST + [id] PATCH/DELETE + generate/ POST + due/ GET
       settings/               # GET + PATCH
-      uploads/                # GET (list) + POST, [id] PATCH
-      export-jobs/            # GET (list) + POST
+      uploads/                # GET (list) + POST, [id] PATCH/DELETE
+      export-jobs/            # GET (list) + POST (audit records of client-side exports)
       dashboard/summary/      # GET (aggregated summary)
     transactions/page.tsx     # Transaction list + filters
     transactions/new/page.tsx # Add transaction form
@@ -377,7 +384,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (448 tests: validation, transaction, dashboard, category, payment-method, settings, export-job, auth, advanced filters, liability, net-worth, payment-method-icons, recurring-auto-generate, spending-insights)
+  __tests__/                  # Vitest tests (839 tests across 109 files)
 ```
 
 ## Documentation
