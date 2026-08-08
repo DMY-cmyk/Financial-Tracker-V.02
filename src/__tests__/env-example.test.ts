@@ -15,6 +15,13 @@ describe('.env.example', () => {
   it('declares Google OAuth vars', () => {
     expect(env).toMatch(/^GOOGLE_CLIENT_ID=/m);
     expect(env).toMatch(/^GOOGLE_CLIENT_SECRET=/m);
-    expect(env).toMatch(/^GOOGLE_REDIRECT_URI=/m);
+  });
+  it('declares production-required secrets', () => {
+    expect(env).toMatch(/^JWT_SECRET=/m);
+    expect(env).toMatch(/^CRON_SECRET=/m);
+  });
+  it('omits vars the code never reads', () => {
+    expect(env).not.toMatch(/^GOOGLE_REDIRECT_URI=/m);
+    expect(env).not.toMatch(/NEXT_PUBLIC_/);
   });
 });
