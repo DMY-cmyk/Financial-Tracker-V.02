@@ -11,7 +11,6 @@ import {
 } from '@/lib/types';
 import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
-import type { ExportJobResponse } from '@/lib/api/contracts';
 
 interface UseExportReturn {
   // Config
@@ -31,10 +30,6 @@ interface UseExportReturn {
   scopeLabel: string;
   totalCount: number;
   allTransactionCount: number;
-
-  // Export jobs history
-  exportJobs: ExportJobResponse[];
-  jobsLoading: boolean;
 
   // Export action
   handleExport: () => Promise<void>;
@@ -57,22 +52,10 @@ export function useExport(): UseExportReturn {
   });
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const [exportJobs, setExportJobs] = useState<ExportJobResponse[]>([]);
-  const [jobsLoading, setJobsLoading] = useState(true);
-
   useEffect(() => {
     if (!initialized) return;
     api.transactions.list().then((result) => {
       if (result.data) setAllTransactions(result.data.transactions);
-    });
-  }, [initialized]);
-
-  useEffect(() => {
-    if (!initialized) return;
-    setJobsLoading(true);
-    api.exportJobs.list().then((result) => {
-      if (result.data) setExportJobs(result.data.jobs);
-      setJobsLoading(false);
     });
   }, [initialized]);
 
@@ -185,19 +168,14 @@ export function useExport(): UseExportReturn {
         }
       }
 
-      // Persist export job record
-      const jobResult = await api.exportJobs.create({
+      // Record the export server-side as an audit entry. Files are generated
+      // client-side and downloaded directly — no artifact is stored.
+      await api.exportJobs.create({
         format,
         scope,
         filters: scope === 'range' ? JSON.stringify({ startDate, endDate }) : undefined,
         recordCount: scopedTransactions.length,
       });
-      if (jobResult.data) {
-        setExportJobs((prev) => [
-          { ...jobResult.data!, status: 'completed', completedAt: new Date().toISOString() },
-          ...prev,
-        ]);
-      }
     } catch (err) {
       setExportError(err instanceof Error ? err.message : 'Export failed');
       // Rethrow so callers can distinguish failure from success (toast handling)
@@ -232,8 +210,6 @@ export function useExport(): UseExportReturn {
     scopeLabel,
     totalCount: scopedTransactions.length,
     allTransactionCount: allTransactions.length,
-    exportJobs,
-    jobsLoading,
     handleExport,
     isExporting,
     exportError,

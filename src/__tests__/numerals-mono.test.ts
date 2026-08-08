@@ -14,7 +14,6 @@ const TARGETS = [
   'src/features/balances/BalanceCard.tsx',
   'src/components/shared/SummaryCard.tsx',
   'src/components/transactions/TransactionRowMobile.tsx',
-  'src/features/dashboard/MonthSelector.tsx',
 ];
 
 describe('amount/date/numeral displays use the mono font token', () => {

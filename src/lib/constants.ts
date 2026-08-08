@@ -1,4 +1,9 @@
-import { Category, PaymentMethod } from './types';
+import { Category, LanguageOption, PaymentMethod } from './types';
+
+export const LANGUAGE_OPTIONS: LanguageOption[] = [
+  { code: 'en', label: 'English', nativeLabel: 'English', flag: 'EN' },
+  { code: 'id', label: 'Bahasa Indonesia', nativeLabel: 'Bahasa Indonesia', flag: 'ID' },
+];
 
 export const CATEGORY_COLORS: Record<string, string> = {
   Food: '#D97706',
