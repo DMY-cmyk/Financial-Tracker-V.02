@@ -1,30 +1,23 @@
-import { NextResponse } from 'next/server';
-import { getDb } from '@/server/db/client';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireUserId } from '@/server/auth/current-user';
+import { clearUserData } from '@/server/services/data.service';
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
-    const db = await getDb();
-    await db.exec(`
-      DELETE FROM transactions;
-      DELETE FROM categories;
-      DELETE FROM payment_methods;
-      DELETE FROM bills;
-      DELETE FROM savings_goals;
-      DELETE FROM settings;
-      DELETE FROM uploads;
-      DELETE FROM export_jobs;
-    `);
-
-    return NextResponse.json({ data: { success: true } });
+    const userId = requireUserId(request);
+    const result = await clearUserData(userId);
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+    return NextResponse.json({ data: result.data });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: {
-          message: error instanceof Error ? error.message : 'Failed to clear data',
-          code: 'CLEAR_FAILED',
-        },
-      },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to clear data';
+    if (message.startsWith('UNAUTHENTICATED')) {
+      return NextResponse.json(
+        { error: { message: 'Unauthorized', code: 'UNAUTHORIZED' } },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json({ error: { message, code: 'CLEAR_FAILED' } }, { status: 500 });
   }
 }

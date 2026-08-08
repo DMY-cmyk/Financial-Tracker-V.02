@@ -42,7 +42,7 @@ describe('IDR money fields must be whole rupiah', () => {
     const result = createSavingsGoalSchema.safeParse({
       name: 'Trip',
       targetAmount: 5000000.5,
-      color: '#10B981',
+      color: '#0EA5E9',
     });
     expect(result.success).toBe(false);
   });
@@ -51,7 +51,7 @@ describe('IDR money fields must be whole rupiah', () => {
     const result = createCategorySchema.safeParse({
       name: 'Food',
       type: 'expense',
-      color: '#10B981',
+      color: '#0EA5E9',
       budget: 1500000.25,
     });
     expect(result.success).toBe(false);
