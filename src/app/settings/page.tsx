@@ -14,14 +14,13 @@ import Link from 'next/link';
 import { ImportDialog } from '@/components/settings/ImportDialog';
 import { Moon, Sun, Monitor, Globe, Trash2, FolderOpen, Download, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LANGUAGE_OPTIONS } from '@/lib/mock-data';
+import { useSettings } from '@/hooks/useSettings';
+import { LANGUAGE_OPTIONS } from '@/lib/constants';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
-  const theme = useStore((s) => s.ui.theme);
-  const setTheme = useStore((s) => s.setTheme);
+  const { theme, updateTheme, updateLocale } = useSettings();
   const locale = useLocale();
-  const setLocale = useStore((s) => s.setLocale);
   const clearAllData = useStore((s) => s.clearAllData);
 
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
@@ -81,7 +80,7 @@ export default function SettingsPage() {
                   key={value}
                   role="radio"
                   aria-checked={theme === value}
-                  onClick={() => setTheme(value)}
+                  onClick={() => updateTheme(value)}
                   className={cn(
                     'flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all duration-200 sm:p-4',
                     theme === value
@@ -106,7 +105,7 @@ export default function SettingsPage() {
                   key={opt.code}
                   role="radio"
                   aria-checked={locale === opt.code}
-                  onClick={() => setLocale(opt.code)}
+                  onClick={() => updateLocale(opt.code)}
                   className={cn(
                     'flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all duration-200 sm:p-4',
                     locale === opt.code

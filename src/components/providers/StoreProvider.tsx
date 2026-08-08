@@ -4,12 +4,15 @@ import { useEffect } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { useStore } from '@/store';
 import { LocaleContext } from '@/lib/i18n';
+import { useSettingsSync } from '@/hooks/useSettings';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const initialized = useStore((s) => s.initialized);
   const initialize = useStore((s) => s.initialize);
   const theme = useStore((s) => s.ui.theme);
   const locale = useStore((s) => s.ui.locale);
+
+  useSettingsSync();
 
   useEffect(() => {
     if (!initialized) {
