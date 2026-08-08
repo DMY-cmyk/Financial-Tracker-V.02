@@ -3,6 +3,7 @@ import {
   findOAuthAccount,
   insertOAuthAccount,
 } from '@/server/repositories/oauth-account.repository';
+import { provisionDefaultsForUser } from '@/server/services/user-provisioning.service';
 import type { GoogleUserInfo } from '@/server/auth/google';
 
 type ServiceResult<T> = { data?: T; error?: { message: string; code: string } };
@@ -81,5 +82,10 @@ export async function handleGoogleCallbackUser(
     displayName: profile.name ?? null,
     avatarUrl: profile.picture ?? null,
   });
+  try {
+    await provisionDefaultsForUser(userId);
+  } catch (err) {
+    console.error('[oauth] default provisioning failed (account still created):', err);
+  }
   return { data: { user: { id: userId, email: emailLower, name }, isNew: true } };
 }

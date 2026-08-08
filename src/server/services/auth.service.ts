@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { getDb } from '@/server/db/client';
 import { getJwtSecret, JWT_ISSUER } from '@/lib/auth/jwt-secret';
+import { provisionDefaultsForUser } from '@/server/services/user-provisioning.service';
 
 const JWT_EXPIRY = '7d';
 
@@ -58,6 +59,12 @@ export async function registerUser(
       return { error: 'Email already registered' };
     }
     throw err;
+  }
+
+  try {
+    await provisionDefaultsForUser(id);
+  } catch (err) {
+    console.error('[register] default provisioning failed (account still created):', err);
   }
 
   const user: AuthUser = {
