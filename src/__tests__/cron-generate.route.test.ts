@@ -34,27 +34,27 @@ describe('POST /api/cron/generate-recurring', () => {
     expect(response.status).toBe(401);
   });
 
+  it('returns 401 with only x-vercel-cron-signature (header is client-settable)', async () => {
+    const response = await POST(makeRequest({ 'x-vercel-cron-signature': 'spoofed' }));
+    expect(response.status).toBe(401);
+  });
+
+  it('returns 401 when CRON_SECRET env is missing (fail-closed)', async () => {
+    vi.stubEnv('CRON_SECRET', '');
+    const response = await POST(makeRequest({ authorization: 'Bearer ' }));
+    expect(response.status).toBe(401);
+  });
+
   it('returns 200 with correct Bearer token', async () => {
     const response = await POST(makeRequest({ authorization: 'Bearer test-secret-12345' }));
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.data.generated).toBe(3);
     expect(body.data.skipped).toBe(0);
+    expect(body.data.failed).toBe(0);
   });
 
-  it('returns 200 with x-vercel-cron-signature header', async () => {
-    const response = await POST(makeRequest({ 'x-vercel-cron-signature': 'some-vercel-value' }));
-    expect(response.status).toBe(200);
-  });
-
-  it('returns generated and skipped counts in response', async () => {
-    const response = await POST(makeRequest({ authorization: 'Bearer test-secret-12345' }));
-    const body = await response.json();
-    expect(body.data).toHaveProperty('generated');
-    expect(body.data).toHaveProperty('skipped');
-  });
-
-  it('returns 500 when service returns an error', async () => {
+  it('continues past a failing user and reports it in failed count', async () => {
     const { generateRecurringTransactions } =
       await import('@/server/services/recurring-transaction.service');
     vi.mocked(generateRecurringTransactions).mockResolvedValueOnce({
@@ -62,8 +62,8 @@ describe('POST /api/cron/generate-recurring', () => {
     });
 
     const response = await POST(makeRequest({ authorization: 'Bearer test-secret-12345' }));
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(200);
     const body = await response.json();
-    expect(body.error).toBe('Database error');
+    expect(body.data.failed).toBeGreaterThanOrEqual(1);
   });
 });
