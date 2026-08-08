@@ -273,6 +273,12 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE liabilities ADD COLUMN IF NOT EXISTS user_id TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE net_worth_snapshots ADD COLUMN IF NOT EXISTS user_id TEXT NOT NULL DEFAULT ''`,
     `ALTER TABLE monthly_budgets ADD COLUMN IF NOT EXISTS user_id TEXT NOT NULL DEFAULT ''`,
+    `ALTER TABLE settings ADD COLUMN IF NOT EXISTS user_id TEXT NOT NULL DEFAULT ''`,
+    // Legacy settings PK was (key); the repository upserts with
+    // ON CONFLICT (key, user_id), which needs the composite PK. DROP + ADD
+    // is idempotent per cold start (Postgres-only; SQLite errors absorbed).
+    `ALTER TABLE settings DROP CONSTRAINT IF EXISTS settings_pkey`,
+    `ALTER TABLE settings ADD CONSTRAINT settings_pkey PRIMARY KEY (key, user_id)`,
     // Money columns: convert legacy DOUBLE PRECISION → BIGINT (Postgres-only).
     // IDR has no sub-rupiah denominations in practice, so rounding any
     // fractional drift to the nearest integer is the desired semantic.
@@ -326,7 +332,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       // Anything else is a real schema-migration failure and must be surfaced.
       const msg = err instanceof Error ? err.message : String(err);
       const expected =
-        /duplicate column|already exists|near "EXISTS": syntax error|near "ALTER": syntax error|near "TYPE": syntax error|near "ADD": syntax error|near "NOT": syntax error|near "CONSTRAINT": syntax error|already a constraint/i.test(
+        /duplicate column|already exists|near "EXISTS": syntax error|near "ALTER": syntax error|near "TYPE": syntax error|near "ADD": syntax error|near "NOT": syntax error|near "CONSTRAINT": syntax error|near "DROP": syntax error|already a constraint|multiple primary keys/i.test(
           msg
         );
       if (!expected) {
