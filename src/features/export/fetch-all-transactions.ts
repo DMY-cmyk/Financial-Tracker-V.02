@@ -28,5 +28,13 @@ export async function fetchAllTransactions(
     page += 1;
   }
 
+  // Fail closed if account exceeds pagination cap — no silent partial exports.
+  if (totalPages > MAX_PAGES) {
+    return {
+      transactions: [],
+      error: `Too many transactions to export (over ${MAX_PAGES * PAGE_SIZE})`,
+    };
+  }
+
   return { transactions: all };
 }

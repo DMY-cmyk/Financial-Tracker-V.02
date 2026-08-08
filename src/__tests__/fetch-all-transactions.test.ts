@@ -55,4 +55,15 @@ describe('fetchAllTransactions', () => {
     expect(result.error).toBeUndefined();
     expect(result.transactions).toHaveLength(0);
   });
+
+  it('fails closed instead of silently truncating past MAX_PAGES', async () => {
+    const result = await fetchAllTransactions(async ({ pageSize }) => ({
+      data: {
+        transactions: Array.from({ length: pageSize }, (_, i) => makeTx(i)),
+        totalPages: 201,
+      },
+    }));
+    expect(result.error).toBeDefined();
+    expect(result.transactions).toHaveLength(0);
+  });
 });
