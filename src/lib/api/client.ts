@@ -238,6 +238,12 @@ export const api = {
         body: JSON.stringify(data),
       });
     },
+
+    delete(id: string) {
+      return fetchApi<{ success: true }>(`/uploads/${id}`, {
+        method: 'DELETE',
+      });
+    },
   },
 
   exportJobs: {

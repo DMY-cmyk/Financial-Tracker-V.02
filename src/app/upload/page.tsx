@@ -17,8 +17,9 @@ import { ExtractionStatusBadge } from '@/features/upload/ExtractionStatusBadge';
 import { ConfidenceBar } from '@/features/upload/ConfidenceBar';
 import { OcrPreview } from '@/features/upload/OcrPreview';
 import { InlineError } from '@/components/shared/EmptyState';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
-import { ScanLine, CheckCircle2, RotateCcw, History } from 'lucide-react';
+import { ScanLine, CheckCircle2, RotateCcw, History, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const uploadStatusMap: Record<UploadResponse['status'], ExtractionStatus> = {
@@ -50,6 +51,8 @@ export default function UploadPage() {
   } = useUpload();
 
   const [uploads, setUploads] = useState<UploadResponse[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<UploadResponse | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchUploads() {
@@ -60,6 +63,20 @@ export default function UploadPage() {
     }
     fetchUploads();
   }, [status]);
+
+  const handleDeleteUpload = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    const result = await api.uploads.delete(deleteTarget.id);
+    setIsDeleting(false);
+    if (result.error) {
+      toast.error(t(locale, 'failedDelete'));
+    } else {
+      setUploads((prev) => prev.filter((u) => u.id !== deleteTarget.id));
+      toast.success(t(locale, 'deleted'));
+    }
+    setDeleteTarget(null);
+  };
 
   const onSave = async () => {
     const success = await handleSave();
@@ -212,6 +229,15 @@ export default function UploadPage() {
                     <span className="text-muted-foreground text-xs whitespace-nowrap">
                       {formatDate(upload.createdAt, locale)}
                     </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive h-8 w-8"
+                      aria-label={t(locale, 'delete')}
+                      onClick={() => setDeleteTarget(upload)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </li>
               ))}
@@ -219,6 +245,19 @@ export default function UploadPage() {
           )}
         </div>
       </motion.div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        title={t(locale, 'delete')}
+        description={t(locale, 'deleteUploadDesc')}
+        confirmLabel={t(locale, 'delete')}
+        cancelLabel={t(locale, 'cancel')}
+        onConfirm={handleDeleteUpload}
+        loading={isDeleting}
+      />
     </div>
   );
 }

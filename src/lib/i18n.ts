@@ -345,6 +345,7 @@ type TranslationKeys = {
   // Upload history
   uploadHistory: string;
   noUploadHistory: string;
+  deleteUploadDesc: string;
   uploadDate: string;
   extracted: string;
 
@@ -962,6 +963,7 @@ const translations: Record<Locale, TranslationKeys> = {
     switchLanguage: 'Switch Language',
     uploadHistory: 'Upload History',
     noUploadHistory: 'No uploads yet',
+    deleteUploadDesc: 'This upload record will be removed from your history.',
     uploadDate: 'Upload Date',
     extracted: 'Extracted',
     selectIcon: 'Select Icon',
@@ -1551,6 +1553,7 @@ const translations: Record<Locale, TranslationKeys> = {
     switchLanguage: 'Ganti Bahasa',
     uploadHistory: 'Riwayat Unggahan',
     noUploadHistory: 'Belum ada unggahan',
+    deleteUploadDesc: 'Catatan unggahan ini akan dihapus dari riwayat Anda.',
     uploadDate: 'Tanggal Unggah',
     extracted: 'Diekstrak',
     selectIcon: 'Pilih Ikon',

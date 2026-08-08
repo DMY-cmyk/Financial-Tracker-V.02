@@ -62,3 +62,13 @@ export async function updateUpload(
   if (!result) return { error: { message: 'Upload not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
+
+export async function deleteUpload(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: true }>> {
+  await ensureSeeded();
+  const removed = await repo.remove(userId, id);
+  if (!removed) return { error: { message: 'Upload not found', code: 'NOT_FOUND' } };
+  return { data: { success: true } };
+}

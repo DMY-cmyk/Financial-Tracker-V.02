@@ -92,5 +92,14 @@ export function createUploadRepository() {
       }
       return this.findById(userId, id).then((r) => r!);
     },
+
+    async remove(userId: string, id: string): Promise<boolean> {
+      const db = await getDb();
+      const result = await db.query('DELETE FROM uploads WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
+      return result.rowCount > 0;
+    },
   };
 }
