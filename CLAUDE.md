@@ -1,5 +1,21 @@
 # Financial Tracker V.02 — Project Instructions
 
+## ⚠️ MANDATORY: Deployment Playbook Analysis Before Any Update
+
+**STRICT RULE — no exceptions.** Before planning or executing ANY update, upgrade,
+refinement, polish, bugfix, or feature request on this codebase:
+
+1. **Read `docs/DEPLOYMENT-PLAYBOOK.md` FIRST** and run the change through its
+   Tahap 1 impact analysis (database structure? API shape? legacy-data reads?).
+2. State the impact-analysis result to the user before writing code.
+3. Follow the playbook's full sequence: additive-only migrations (every new column
+   needs BOTH the CREATE TABLE definition AND an ALTER TABLE entry in
+   `src/server/db/client.ts` columnMigrations), guard tests, TDD, `npm run preflight`,
+   post-deploy verification via `/api/health` + `vercel logs`.
+4. The app is live with multiple real user accounts on Neon Postgres. Dev SQLite is
+   always fresh; production is never fresh. Schema drift between them has caused real
+   production outages (2026-08-08) — the playbook exists to prevent recurrence.
+
 ## Product Goals
 
 This is a modern personal finance tracking dashboard designed for Indonesian Rupiah (IDR) budgeting. The primary user interaction is an at-a-glance bento grid dashboard with widget cards, NOT a spreadsheet.
