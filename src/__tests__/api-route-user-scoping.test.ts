@@ -31,7 +31,7 @@ describe('every data API route resolves the current user', () => {
   for (const file of routes) {
     it(`${file.split(`${sep}api${sep}`)[1]} calls requireUserId`, () => {
       const source = readFileSync(file, 'utf-8');
-      expect(source).toContain('requireUserId');
+      expect(source).toMatch(/requireUserId\(\s*request\s*\)/);
     });
   }
 });
