@@ -252,6 +252,11 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS beginning_balance BIGINT NOT NULL DEFAULT 0`,
     `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_recurring_id TEXT DEFAULT NULL`,
     `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_due_date TEXT DEFAULT NULL`,
+    // OAuth-only accounts have no password. Postgres databases created before
+    // Google OAuth declared password_hash NOT NULL — drop it so Rule-3 signups
+    // can insert NULL. SQLite rejects ALTER COLUMN (absorbed by the
+    // expected-error filter); its CREATE TABLE is already nullable.
+    `ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL`,
     // user_id backfill for pre-existing single-tenant deployments.
     // New schema declares NOT NULL DEFAULT '' so freshly-created tables already
     // have the column. These statements only matter for Postgres databases that
