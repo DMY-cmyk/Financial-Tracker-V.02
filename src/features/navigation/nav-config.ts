@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   PiggyBank,
   TrendingUp,
+  Lightbulb,
   BarChart3,
   Upload,
   Download,
@@ -53,7 +54,7 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: 'groupTools',
     defaultCollapsed: false,
     items: [
-      { href: '/insights', labelKey: 'insights', icon: TrendingUp },
+      { href: '/insights', labelKey: 'insights', icon: Lightbulb },
       { href: '/reports', labelKey: 'reports', icon: BarChart3 },
       { href: '/upload', labelKey: 'upload', icon: Upload },
       { href: '/export', labelKey: 'downloadReport', icon: Download },
