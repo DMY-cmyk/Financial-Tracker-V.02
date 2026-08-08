@@ -16,47 +16,52 @@ function rowToMonthlyBudget(row: MBRow): MonthlyBudget {
     categoryId: row.category_id,
     month: row.month,
     year: row.year,
-    budgetAmount: row.budget_amount,
+    budgetAmount: Number(row.budget_amount),
   };
 }
 
 export function createMonthlyBudgetRepository() {
   return {
-    async findByYear(year: number): Promise<MonthlyBudget[]> {
+    async findByYear(userId: string, year: number): Promise<MonthlyBudget[]> {
       const db = await getDb();
       const result = await db.query<MBRow>(
-        'SELECT * FROM monthly_budgets WHERE year = ? ORDER BY month, category_id',
-        [year]
+        'SELECT * FROM monthly_budgets WHERE user_id = ? AND year = ? ORDER BY month, category_id',
+        [userId, year]
       );
       return result.rows.map(rowToMonthlyBudget);
     },
 
-    async upsert(data: Omit<MonthlyBudget, 'id'>): Promise<MonthlyBudget> {
+    async upsert(userId: string, data: Omit<MonthlyBudget, 'id'>): Promise<MonthlyBudget> {
       const db = await getDb();
       const existing = await db.query<MBRow>(
-        'SELECT * FROM monthly_budgets WHERE category_id = ? AND month = ? AND year = ?',
-        [data.categoryId, data.month, data.year]
+        'SELECT * FROM monthly_budgets WHERE user_id = ? AND category_id = ? AND month = ? AND year = ?',
+        [userId, data.categoryId, data.month, data.year]
       );
       if (existing.rows[0]) {
         await db.query(
-          'UPDATE monthly_budgets SET budget_amount = ? WHERE category_id = ? AND month = ? AND year = ?',
-          [data.budgetAmount, data.categoryId, data.month, data.year]
+          'UPDATE monthly_budgets SET budget_amount = ? WHERE user_id = ? AND category_id = ? AND month = ? AND year = ?',
+          [data.budgetAmount, userId, data.categoryId, data.month, data.year]
         );
         return rowToMonthlyBudget({ ...existing.rows[0], budget_amount: data.budgetAmount });
       }
       const id = nanoid();
       await db.query(
-        'INSERT INTO monthly_budgets (id, category_id, month, year, budget_amount) VALUES (?, ?, ?, ?, ?)',
-        [id, data.categoryId, data.month, data.year, data.budgetAmount]
+        'INSERT INTO monthly_budgets (id, user_id, category_id, month, year, budget_amount) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, userId, data.categoryId, data.month, data.year, data.budgetAmount]
       );
       return { id, ...data };
     },
 
-    async delete(categoryId: string, month: number, year: number): Promise<boolean> {
+    async delete(
+      userId: string,
+      categoryId: string,
+      month: number,
+      year: number
+    ): Promise<boolean> {
       const db = await getDb();
       const result = await db.query(
-        'DELETE FROM monthly_budgets WHERE category_id = ? AND month = ? AND year = ?',
-        [categoryId, month, year]
+        'DELETE FROM monthly_budgets WHERE user_id = ? AND category_id = ? AND month = ? AND year = ?',
+        [userId, categoryId, month, year]
       );
       return result.rowCount > 0;
     },

@@ -22,43 +22,76 @@ function rowToPm(row: PmRow): PaymentMethod {
 
 export function createPaymentMethodRepository() {
   return {
-    async findAll(): Promise<PaymentMethod[]> {
+    async findAll(userId: string): Promise<PaymentMethod[]> {
       const db = await getDb();
-      const result = await db.query<PmRow>('SELECT * FROM payment_methods ORDER BY name');
+      const result = await db.query<PmRow>(
+        'SELECT * FROM payment_methods WHERE user_id = ? ORDER BY name',
+        [userId]
+      );
       return result.rows.map(rowToPm);
     },
 
-    async findById(id: string): Promise<PaymentMethod | undefined> {
+    async findById(userId: string, id: string): Promise<PaymentMethod | undefined> {
       const db = await getDb();
-      const result = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
+      const result = await db.query<PmRow>(
+        'SELECT * FROM payment_methods WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       return result.rows[0] ? rowToPm(result.rows[0]) : undefined;
     },
 
-    async create(data: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
+    async create(userId: string, data: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO payment_methods (id, name, icon, type, beginning_balance) VALUES (?, ?, ?, ?, ?)',
-        [id, data.name, data.icon, data.type, data.beginningBalance ?? 0]
+        'INSERT INTO payment_methods (id, user_id, name, icon, type, beginning_balance) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, userId, data.name, data.icon, data.type, data.beginningBalance ?? 0]
       );
       return { ...data, id, beginningBalance: data.beginningBalance ?? 0 };
     },
 
-    async update(id: string, data: Partial<PaymentMethod>): Promise<PaymentMethod | undefined> {
+    async update(
+      userId: string,
+      id: string,
+      data: Partial<PaymentMethod>
+    ): Promise<PaymentMethod | undefined> {
       const db = await getDb();
-      const existing = await db.query<PmRow>('SELECT * FROM payment_methods WHERE id = ?', [id]);
+      const existing = await db.query<PmRow>(
+        'SELECT * FROM payment_methods WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       if (!existing.rows[0]) return undefined;
       const updated = { ...rowToPm(existing.rows[0]), ...data };
       await db.query(
-        'UPDATE payment_methods SET name=?, icon=?, type=?, beginning_balance=? WHERE id=?',
-        [updated.name, updated.icon, updated.type, updated.beginningBalance ?? 0, id]
+        'UPDATE payment_methods SET name=?, icon=?, type=?, beginning_balance=? WHERE user_id=? AND id=?',
+        [updated.name, updated.icon, updated.type, updated.beginningBalance ?? 0, userId, id]
       );
       return updated;
     },
 
-    async delete(id: string): Promise<boolean> {
+    async delete(userId: string, id: string): Promise<boolean> {
       const db = await getDb();
-      const result = await db.query('DELETE FROM payment_methods WHERE id = ?', [id]);
+      const result = await db.query('DELETE FROM payment_methods WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
+      return result.rowCount > 0;
+    },
+
+    // Atomic delete: removes the payment method only if no transactions of the
+    // same user reference it. Closes the check-then-delete race in
+    // deletePaymentMethod().
+    async deleteIfUnused(userId: string, id: string, name: string): Promise<boolean> {
+      const db = await getDb();
+      const result = await db.query(
+        `DELETE FROM payment_methods
+         WHERE user_id = ? AND id = ?
+           AND NOT EXISTS (
+             SELECT 1 FROM transactions
+             WHERE transactions.user_id = ? AND transactions.payment_method = ?
+           )`,
+        [userId, id, userId, name]
+      );
       return result.rowCount > 0;
     },
   };

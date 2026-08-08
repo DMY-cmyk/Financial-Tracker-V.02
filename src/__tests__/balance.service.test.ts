@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { listPaymentMethodBalances } from '@/server/services/balance.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 import { createPaymentMethod } from '@/server/services/payment-method.service';
 import { createTransaction } from '@/server/services/transaction.service';
 
@@ -12,7 +13,7 @@ beforeEach(async () => {
 });
 
 const mkTx = (date: string, type: 'income' | 'expense', amount: number, pm = 'BCA') =>
-  createTransaction({
+  createTransaction(DEMO_USER_ID, {
     date,
     description: 'd',
     category: 'c',
@@ -25,48 +26,48 @@ const mkTx = (date: string, type: 'income' | 'expense', amount: number, pm = 'BC
 
 describe('listPaymentMethodBalances (monthly chain)', () => {
   it('returns empty array when no payment methods exist', async () => {
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     expect(r.error).toBeUndefined();
     expect(r.data).toEqual([]);
   });
 
   it('beginningBalance is 0 when no prior transactions exist', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
-    const r = await listPaymentMethodBalances(2, 2026); // March 2026
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026); // March 2026
     expect(r.data![0].beginningBalance).toBe(0);
   });
 
   it('beginningBalance = sum of transactions before the month', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
     await mkTx('2026-01-10', 'income', 5000000); // January — before March
     await mkTx('2026-02-15', 'expense', 1000000); // February — before March
-    const r = await listPaymentMethodBalances(2, 2026); // month=2 → March
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026); // month=2 → March
     // beginningBalance = 5,000,000 - 1,000,000 = 4,000,000
     expect(r.data![0].beginningBalance).toBe(4000000);
   });
 
   it('income = only income in the queried month', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
     await mkTx('2026-01-10', 'income', 5000000); // prior month
     await mkTx('2026-03-05', 'income', 3000000); // this month
-    const r = await listPaymentMethodBalances(2, 2026); // March
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026); // March
     expect(r.data![0].income).toBe(3000000);
   });
 
   it('expense = only expense in the queried month', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
     await mkTx('2026-01-10', 'expense', 200000); // prior
     await mkTx('2026-03-20', 'expense', 500000); // this month
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     expect(r.data![0].expense).toBe(500000);
   });
 
   it('balance (closing) = beginningBalance + income − expense', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
     await mkTx('2026-01-10', 'income', 6000000); // prior — beginningBalance
     await mkTx('2026-03-05', 'income', 3000000); // income this month
     await mkTx('2026-03-20', 'expense', 2000000); // expense this month
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     const b = r.data![0];
     expect(b.beginningBalance).toBe(6000000);
     expect(b.income).toBe(3000000);
@@ -75,10 +76,10 @@ describe('listPaymentMethodBalances (monthly chain)', () => {
   });
 
   it('without params (all-time path): beginningBalance=0, income/expense all-time', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
     await mkTx('2026-01-10', 'income', 5000000);
     await mkTx('2026-03-20', 'expense', 1000000);
-    const r = await listPaymentMethodBalances(); // no params
+    const r = await listPaymentMethodBalances(DEMO_USER_ID); // no params
     const b = r.data![0];
     expect(b.beginningBalance).toBe(0);
     expect(b.income).toBe(5000000);
@@ -87,22 +88,22 @@ describe('listPaymentMethodBalances (monthly chain)', () => {
   });
 
   it('orders results by balance descending', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
-    await createPaymentMethod({ name: 'GoPay', icon: 'smartphone', type: 'ewallet' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'GoPay', icon: 'smartphone', type: 'ewallet' });
     await mkTx('2026-03-05', 'income', 1000000, 'BCA');
     await mkTx('2026-03-05', 'income', 5000000, 'GoPay');
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     expect(r.data![0].name).toBe('GoPay');
     expect(r.data![1].name).toBe('BCA');
   });
 
   it('multiple payment methods computed independently', async () => {
-    await createPaymentMethod({ name: 'BCA', icon: 'building', type: 'bank' });
-    await createPaymentMethod({ name: 'GoPay', icon: 'smartphone', type: 'ewallet' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', icon: 'building', type: 'bank' });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'GoPay', icon: 'smartphone', type: 'ewallet' });
     await mkTx('2026-01-10', 'income', 4000000, 'BCA');
     await mkTx('2026-01-15', 'income', 1000000, 'GoPay');
     await mkTx('2026-03-05', 'expense', 500000, 'BCA');
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     const bca = r.data!.find((b) => b.name === 'BCA')!;
     const gopay = r.data!.find((b) => b.name === 'GoPay')!;
     expect(bca.beginningBalance).toBe(4000000);
@@ -116,16 +117,24 @@ describe('listPaymentMethodBalances (monthly chain)', () => {
 
 describe('listPaymentMethodBalances (all-time path)', () => {
   it('balance includes beginning_balance when no transactions exist', async () => {
-    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 500000 });
-    const r = await listPaymentMethodBalances();
+    await createPaymentMethod(DEMO_USER_ID, {
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 500000,
+    });
+    const r = await listPaymentMethodBalances(DEMO_USER_ID);
     expect(r.data).toHaveLength(1);
     expect(r.data![0].balance).toBe(500000);
     expect(r.data![0].beginningBalance).toBe(500000);
   });
 
   it('balance = beginning_balance + income − expense', async () => {
-    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 1000000 });
-    await createTransaction({
+    await createPaymentMethod(DEMO_USER_ID, {
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 1000000,
+    });
+    await createTransaction(DEMO_USER_ID, {
       description: 'Salary',
       amount: 3000000,
       type: 'income',
@@ -134,7 +143,7 @@ describe('listPaymentMethodBalances (all-time path)', () => {
       categoryId: 'gaji1',
       paymentMethod: 'BCA',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       description: 'Food',
       amount: 500000,
       type: 'expense',
@@ -143,7 +152,7 @@ describe('listPaymentMethodBalances (all-time path)', () => {
       categoryId: 'makanan1',
       paymentMethod: 'BCA',
     });
-    const r = await listPaymentMethodBalances();
+    const r = await listPaymentMethodBalances(DEMO_USER_ID);
     const row = r.data![0];
     expect(row.income).toBe(3000000);
     expect(row.expense).toBe(500000);
@@ -151,14 +160,18 @@ describe('listPaymentMethodBalances (all-time path)', () => {
   });
 
   it('negative beginning_balance reduces balance', async () => {
-    await createPaymentMethod({ name: 'CC', type: 'ewallet', beginningBalance: -200000 });
-    const r = await listPaymentMethodBalances();
+    await createPaymentMethod(DEMO_USER_ID, {
+      name: 'CC',
+      type: 'ewallet',
+      beginningBalance: -200000,
+    });
+    const r = await listPaymentMethodBalances(DEMO_USER_ID);
     expect(r.data![0].balance).toBe(-200000);
   });
 
   it('zero beginning_balance preserves income−expense behavior (regression)', async () => {
-    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 0 });
-    await createTransaction({
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', type: 'bank', beginningBalance: 0 });
+    await createTransaction(DEMO_USER_ID, {
       description: 'Income',
       amount: 2000000,
       type: 'income',
@@ -167,7 +180,7 @@ describe('listPaymentMethodBalances (all-time path)', () => {
       categoryId: 'gaji1',
       paymentMethod: 'BCA',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       description: 'Expense',
       amount: 500000,
       type: 'expense',
@@ -176,7 +189,7 @@ describe('listPaymentMethodBalances (all-time path)', () => {
       categoryId: 'makanan1',
       paymentMethod: 'BCA',
     });
-    const r = await listPaymentMethodBalances();
+    const r = await listPaymentMethodBalances(DEMO_USER_ID);
     expect(r.data![0].beginningBalance).toBe(0);
     expect(r.data![0].balance).toBe(1500000);
   });
@@ -185,13 +198,17 @@ describe('listPaymentMethodBalances (all-time path)', () => {
 describe('listPaymentMethodBalances (monthly path — beginning_balance)', () => {
   it('beginning_balance is added to chain calculation', async () => {
     // PM with beginning_balance of 1,000,000
-    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 1000000 });
+    await createPaymentMethod(DEMO_USER_ID, {
+      name: 'BCA',
+      type: 'bank',
+      beginningBalance: 1000000,
+    });
     // Prior month income: 500,000 (February 2026)
     await mkTx('2026-02-10', 'income', 500000);
     // Current month expense: 200,000 (March 2026)
     await mkTx('2026-03-05', 'expense', 200000);
     // Query March 2026 (month=2, year=2026)
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     const row = r.data![0];
     // beginningBalance for March = pm.beginning_balance + prior transactions = 1000000 + 500000 = 1500000
     expect(row.beginningBalance).toBe(1500000);
@@ -200,10 +217,10 @@ describe('listPaymentMethodBalances (monthly path — beginning_balance)', () =>
   });
 
   it('zero beginning_balance leaves monthly chain unchanged (regression)', async () => {
-    await createPaymentMethod({ name: 'BCA', type: 'bank', beginningBalance: 0 });
+    await createPaymentMethod(DEMO_USER_ID, { name: 'BCA', type: 'bank', beginningBalance: 0 });
     await mkTx('2026-02-10', 'income', 500000);
     await mkTx('2026-03-05', 'expense', 200000);
-    const r = await listPaymentMethodBalances(2, 2026);
+    const r = await listPaymentMethodBalances(DEMO_USER_ID, 2, 2026);
     const row = r.data![0];
     expect(row.beginningBalance).toBe(500000); // 0 + 500000
     expect(row.balance).toBe(300000); // 500000 - 200000

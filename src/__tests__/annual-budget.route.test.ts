@@ -2,6 +2,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
+
+const AUTH_HEADER = { 'x-user-id': DEMO_USER_ID };
 
 beforeEach(async () => {
   await resetDb();
@@ -22,14 +25,16 @@ vi.mock('@/server/services/annual-budget.service', () => ({
 describe('GET /api/budget/annual', () => {
   it('returns 400 when year is missing', async () => {
     const { GET } = await import('@/app/api/budget/annual/route');
-    const req = new Request('http://localhost/api/budget/annual');
+    const req = new Request('http://localhost/api/budget/annual', { headers: AUTH_HEADER });
     const res = await GET(req as never);
     expect(res.status).toBe(400);
   });
 
   it('returns 200 with grid data', async () => {
     const { GET } = await import('@/app/api/budget/annual/route');
-    const req = new Request('http://localhost/api/budget/annual?year=2026');
+    const req = new Request('http://localhost/api/budget/annual?year=2026', {
+      headers: AUTH_HEADER,
+    });
     const res = await GET(req as never);
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -42,7 +47,7 @@ describe('POST /api/budget/annual', () => {
     const { POST } = await import('@/app/api/budget/annual/route');
     const req = new Request('http://localhost/api/budget/annual', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...AUTH_HEADER },
       body: JSON.stringify({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 1500000 }),
     });
     const res = await POST(req as never);
@@ -57,7 +62,7 @@ describe('DELETE /api/budget/annual', () => {
     const { DELETE } = await import('@/app/api/budget/annual/route');
     const req = new Request('http://localhost/api/budget/annual', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...AUTH_HEADER },
       body: JSON.stringify({ categoryId: 'cat-1', month: 3, year: 2026 }),
     });
     const res = await DELETE(req as never);

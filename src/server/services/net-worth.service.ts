@@ -9,22 +9,24 @@ interface ServiceResult<T> {
   error?: { message: string; code: string };
 }
 
-export async function getCurrentNetWorth(): Promise<ServiceResult<NetWorthCurrent>> {
+export async function getCurrentNetWorth(userId: string): Promise<ServiceResult<NetWorthCurrent>> {
   await ensureSeeded();
 
-  const balancesResult = await listPaymentMethodBalances();
+  const balancesResult = await listPaymentMethodBalances(userId);
   if (balancesResult.error) return { error: balancesResult.error };
   const paymentMethodTotal = (balancesResult.data ?? []).reduce((sum, b) => sum + b.balance, 0);
 
   const db = await getDb();
 
   const savingsRow = await db.query<{ total: number }>(
-    'SELECT COALESCE(SUM(saved_amount), 0) AS total FROM savings_goals'
+    'SELECT COALESCE(SUM(saved_amount), 0) AS total FROM savings_goals WHERE user_id = ?',
+    [userId]
   );
   const savingsTotal = Number(savingsRow.rows[0]?.total ?? 0);
 
   const liabRow = await db.query<{ total: number }>(
-    'SELECT COALESCE(SUM(amount), 0) AS total FROM liabilities'
+    'SELECT COALESCE(SUM(amount), 0) AS total FROM liabilities WHERE user_id = ?',
+    [userId]
   );
   const liabTotal = Number(liabRow.rows[0]?.total ?? 0);
 
@@ -43,16 +45,16 @@ export async function getCurrentNetWorth(): Promise<ServiceResult<NetWorthCurren
   };
 }
 
-export async function recordSnapshot(): Promise<ServiceResult<NetWorthSnapshot>> {
+export async function recordSnapshot(userId: string): Promise<ServiceResult<NetWorthSnapshot>> {
   await ensureSeeded();
-  const currentResult = await getCurrentNetWorth();
+  const currentResult = await getCurrentNetWorth(userId);
   if (currentResult.error) return { error: currentResult.error };
   const current = currentResult.data!;
 
   const now = new Date();
   const repo = createNetWorthRepository();
 
-  const snapshot = await repo.upsert({
+  const snapshot = await repo.upsert(userId, {
     month: now.getMonth(),
     year: now.getFullYear(),
     totalAssets: current.totalAssets,
@@ -68,8 +70,10 @@ export async function recordSnapshot(): Promise<ServiceResult<NetWorthSnapshot>>
   return { data: snapshot };
 }
 
-export async function getNetWorthHistory(): Promise<ServiceResult<NetWorthSnapshot[]>> {
+export async function getNetWorthHistory(
+  userId: string
+): Promise<ServiceResult<NetWorthSnapshot[]>> {
   await ensureSeeded();
   const repo = createNetWorthRepository();
-  return { data: await repo.getHistory(12) };
+  return { data: await repo.getHistory(userId, 12) };
 }

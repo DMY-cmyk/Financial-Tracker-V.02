@@ -8,6 +8,7 @@ import {
   deleteMonthlyBudget,
 } from '@/server/services/annual-budget.service';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 import { computeAnnualBudgetSummary, buildAnnualBudgetRows } from '@/hooks/useAnnualBudget';
 import type { Category, MonthlyBudget, MonthlySpending } from '@/lib/types';
 
@@ -44,7 +45,7 @@ describe('monthly_budgets table', () => {
 describe('createMonthlyBudgetRepository', () => {
   it('upserts a new monthly budget override', async () => {
     const repo = createMonthlyBudgetRepository();
-    const result = await repo.upsert({
+    const result = await repo.upsert(DEMO_USER_ID, {
       categoryId: 'cat-1',
       month: 3,
       year: 2026,
@@ -59,8 +60,13 @@ describe('createMonthlyBudgetRepository', () => {
 
   it('updates an existing override on upsert', async () => {
     const repo = createMonthlyBudgetRepository();
-    await repo.upsert({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 1000000 });
-    const updated = await repo.upsert({
+    await repo.upsert(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2026,
+      budgetAmount: 1000000,
+    });
+    const updated = await repo.upsert(DEMO_USER_ID, {
       categoryId: 'cat-1',
       month: 3,
       year: 2026,
@@ -71,34 +77,54 @@ describe('createMonthlyBudgetRepository', () => {
 
   it('finds all overrides for a year', async () => {
     const repo = createMonthlyBudgetRepository();
-    await repo.upsert({ categoryId: 'cat-1', month: 0, year: 2026, budgetAmount: 1000000 });
-    await repo.upsert({ categoryId: 'cat-2', month: 5, year: 2026, budgetAmount: 500000 });
-    await repo.upsert({ categoryId: 'cat-1', month: 3, year: 2025, budgetAmount: 999999 });
+    await repo.upsert(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 0,
+      year: 2026,
+      budgetAmount: 1000000,
+    });
+    await repo.upsert(DEMO_USER_ID, {
+      categoryId: 'cat-2',
+      month: 5,
+      year: 2026,
+      budgetAmount: 500000,
+    });
+    await repo.upsert(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2025,
+      budgetAmount: 999999,
+    });
 
-    const results = await repo.findByYear(2026);
+    const results = await repo.findByYear(DEMO_USER_ID, 2026);
     expect(results).toHaveLength(2);
     expect(results.every((r) => r.year === 2026)).toBe(true);
   });
 
   it('deletes a specific override', async () => {
     const repo = createMonthlyBudgetRepository();
-    await repo.upsert({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 1000000 });
-    const deleted = await repo.delete('cat-1', 3, 2026);
+    await repo.upsert(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2026,
+      budgetAmount: 1000000,
+    });
+    const deleted = await repo.delete(DEMO_USER_ID, 'cat-1', 3, 2026);
     expect(deleted).toBe(true);
-    const remaining = await repo.findByYear(2026);
+    const remaining = await repo.findByYear(DEMO_USER_ID, 2026);
     expect(remaining).toHaveLength(0);
   });
 
   it('returns false when deleting a non-existent override', async () => {
     const repo = createMonthlyBudgetRepository();
-    const deleted = await repo.delete('cat-99', 3, 2026);
+    const deleted = await repo.delete(DEMO_USER_ID, 'cat-99', 3, 2026);
     expect(deleted).toBe(false);
   });
 });
 
 describe('getAnnualBudgetGrid', () => {
   it('returns empty grid when no expense categories exist', async () => {
-    const result = await getAnnualBudgetGrid(2026);
+    const result = await getAnnualBudgetGrid(DEMO_USER_ID, 2026);
     expect(result.error).toBeUndefined();
     expect(result.data!.categories).toHaveLength(0);
     expect(result.data!.overrides).toHaveLength(0);
@@ -108,16 +134,21 @@ describe('getAnnualBudgetGrid', () => {
 
   it('returns categories with overrides', async () => {
     const catRepo = createCategoryRepository();
-    const cat = await catRepo.create({
+    const cat = await catRepo.create(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });
-    await upsertMonthlyBudget({ categoryId: cat.id, month: 3, year: 2026, budgetAmount: 2500000 });
+    await upsertMonthlyBudget(DEMO_USER_ID, {
+      categoryId: cat.id,
+      month: 3,
+      year: 2026,
+      budgetAmount: 2500000,
+    });
 
-    const result = await getAnnualBudgetGrid(2026);
+    const result = await getAnnualBudgetGrid(DEMO_USER_ID, 2026);
     expect(result.data!.categories).toHaveLength(1);
     expect(result.data!.overrides).toHaveLength(1);
     expect(result.data!.overrides[0].budgetAmount).toBe(2500000);
@@ -126,7 +157,7 @@ describe('getAnnualBudgetGrid', () => {
 
 describe('upsertMonthlyBudget', () => {
   it('creates a new monthly budget override', async () => {
-    const result = await upsertMonthlyBudget({
+    const result = await upsertMonthlyBudget(DEMO_USER_ID, {
       categoryId: 'cat-1',
       month: 3,
       year: 2026,
@@ -137,7 +168,7 @@ describe('upsertMonthlyBudget', () => {
   });
 
   it('returns validation error for invalid month', async () => {
-    const result = await upsertMonthlyBudget({
+    const result = await upsertMonthlyBudget(DEMO_USER_ID, {
       categoryId: 'cat-1',
       month: 13,
       year: 2026,
@@ -150,14 +181,27 @@ describe('upsertMonthlyBudget', () => {
 
 describe('deleteMonthlyBudget', () => {
   it('deletes an existing override', async () => {
-    await upsertMonthlyBudget({ categoryId: 'cat-1', month: 3, year: 2026, budgetAmount: 1000000 });
-    const result = await deleteMonthlyBudget({ categoryId: 'cat-1', month: 3, year: 2026 });
+    await upsertMonthlyBudget(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2026,
+      budgetAmount: 1000000,
+    });
+    const result = await deleteMonthlyBudget(DEMO_USER_ID, {
+      categoryId: 'cat-1',
+      month: 3,
+      year: 2026,
+    });
     expect(result.error).toBeUndefined();
     expect(result.data!.success).toBe(true);
   });
 
   it('returns false.success when override does not exist', async () => {
-    const result = await deleteMonthlyBudget({ categoryId: 'cat-99', month: 3, year: 2026 });
+    const result = await deleteMonthlyBudget(DEMO_USER_ID, {
+      categoryId: 'cat-99',
+      month: 3,
+      year: 2026,
+    });
     expect(result.error).toBeUndefined();
     expect(result.data!.success).toBe(false);
   });

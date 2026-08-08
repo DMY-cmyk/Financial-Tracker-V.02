@@ -30,6 +30,7 @@ interface ServiceResult<T> {
 }
 
 export async function getDashboardSummary(
+  userId: string,
   rawQuery: Record<string, unknown>
 ): Promise<ServiceResult<DashboardSummaryResponse>> {
   await ensureSeeded();
@@ -46,7 +47,7 @@ export async function getDashboardSummary(
   }
 
   const { month, year } = parsed.data;
-  const transactions = await repo.findByMonth(month, year);
+  const transactions = await repo.findByMonth(userId, month, year);
 
   const income = totalIncome(transactions);
   const expense = totalExpense(transactions);

@@ -24,7 +24,7 @@ function rowToTransaction(row: TxRow): Transaction {
     category: row.category,
     categoryId: row.category_id || '',
     type: row.type as 'income' | 'expense',
-    amount: row.amount,
+    amount: Number(row.amount),
     paymentMethod: row.payment_method,
     notes: row.notes || '',
     sourceRecurringId: row.source_recurring_id ?? undefined,
@@ -34,47 +34,55 @@ function rowToTransaction(row: TxRow): Transaction {
 
 export function createTransactionRepository() {
   return {
-    async findAll(): Promise<Transaction[]> {
+    async findAll(userId: string): Promise<Transaction[]> {
       const db = await getDb();
-      const result = await db.query<TxRow>('SELECT * FROM transactions ORDER BY date DESC');
+      const result = await db.query<TxRow>(
+        'SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC',
+        [userId]
+      );
       return result.rows.map(rowToTransaction);
     },
 
-    async findById(id: string): Promise<Transaction | undefined> {
+    async findById(userId: string, id: string): Promise<Transaction | undefined> {
       const db = await getDb();
-      const result = await db.query<TxRow>('SELECT * FROM transactions WHERE id = ?', [id]);
+      const result = await db.query<TxRow>(
+        'SELECT * FROM transactions WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       return result.rows[0] ? rowToTransaction(result.rows[0]) : undefined;
     },
 
     async findBySource(
+      userId: string,
       sourceRecurringId: string,
       sourceDueDate: string
     ): Promise<Transaction | null> {
       const db = await getDb();
       const result = await db.query<TxRow>(
-        'SELECT * FROM transactions WHERE source_recurring_id = ? AND source_due_date = ? LIMIT 1',
-        [sourceRecurringId, sourceDueDate]
+        'SELECT * FROM transactions WHERE user_id = ? AND source_recurring_id = ? AND source_due_date = ? LIMIT 1',
+        [userId, sourceRecurringId, sourceDueDate]
       );
       return result.rows.length > 0 ? rowToTransaction(result.rows[0]) : null;
     },
 
-    async findByMonth(month: number, year: number): Promise<Transaction[]> {
+    async findByMonth(userId: string, month: number, year: number): Promise<Transaction[]> {
       const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
       const db = await getDb();
       const result = await db.query<TxRow>(
-        "SELECT * FROM transactions WHERE date LIKE ? || '%' ORDER BY date DESC",
-        [prefix]
+        "SELECT * FROM transactions WHERE user_id = ? AND date LIKE ? || '%' ORDER BY date DESC",
+        [userId, prefix]
       );
       return result.rows.map(rowToTransaction);
     },
 
-    async create(data: Omit<Transaction, 'id'>): Promise<Transaction> {
+    async create(userId: string, data: Omit<Transaction, 'id'>): Promise<Transaction> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes, source_recurring_id, source_due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO transactions (id, user_id, date, description, category, category_id, type, amount, payment_method, notes, source_recurring_id, source_due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           id,
+          userId,
           data.date,
           data.description,
           data.category,
@@ -90,14 +98,21 @@ export function createTransactionRepository() {
       return { ...data, id };
     },
 
-    async update(id: string, data: Partial<Transaction>): Promise<Transaction | undefined> {
+    async update(
+      userId: string,
+      id: string,
+      data: Partial<Transaction>
+    ): Promise<Transaction | undefined> {
       const db = await getDb();
-      const existing = await db.query<TxRow>('SELECT * FROM transactions WHERE id = ?', [id]);
+      const existing = await db.query<TxRow>(
+        'SELECT * FROM transactions WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       if (!existing.rows[0]) return undefined;
 
       const updated = { ...rowToTransaction(existing.rows[0]), ...data };
       await db.query(
-        'UPDATE transactions SET date=?, description=?, category=?, category_id=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
+        'UPDATE transactions SET date=?, description=?, category=?, category_id=?, type=?, amount=?, payment_method=?, notes=?, updated_at=CURRENT_TIMESTAMP WHERE user_id=? AND id=?',
         [
           updated.date,
           updated.description,
@@ -107,13 +122,17 @@ export function createTransactionRepository() {
           updated.amount,
           updated.paymentMethod,
           updated.notes,
+          userId,
           id,
         ]
       );
       return updated;
     },
 
-    async createMany(data: Omit<Transaction, 'id'>[]): Promise<{
+    async createMany(
+      userId: string,
+      data: Omit<Transaction, 'id'>[]
+    ): Promise<{
       created: Transaction[];
       duplicates: number;
       errors: { index: number; message: string }[];
@@ -126,10 +145,10 @@ export function createTransactionRepository() {
       for (let i = 0; i < data.length; i++) {
         try {
           const row = data[i];
-          // Check for existing transaction with same date, description, amount, and type
+          // Per-user duplicate check
           const existing = await db.query(
-            'SELECT id FROM transactions WHERE date = ? AND description = ? AND amount = ? AND type = ? LIMIT 1',
-            [row.date, row.description, row.amount, row.type]
+            'SELECT id FROM transactions WHERE user_id = ? AND date = ? AND description = ? AND amount = ? AND type = ? LIMIT 1',
+            [userId, row.date, row.description, row.amount, row.type]
           );
           if (existing.rows.length > 0) {
             duplicates++;
@@ -138,9 +157,10 @@ export function createTransactionRepository() {
 
           const id = nanoid();
           await db.query(
-            'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO transactions (id, user_id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
               id,
+              userId,
               row.date,
               row.description,
               row.category,
@@ -163,51 +183,56 @@ export function createTransactionRepository() {
       return { created, duplicates, errors };
     },
 
-    async delete(id: string): Promise<boolean> {
+    async delete(userId: string, id: string): Promise<boolean> {
       const db = await getDb();
-      const result = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
+      const result = await db.query('DELETE FROM transactions WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
       return result.rowCount > 0;
     },
 
-    async deleteMany(ids: string[]): Promise<number> {
+    async deleteMany(userId: string, ids: string[]): Promise<number> {
+      if (ids.length === 0) return 0;
       const db = await getDb();
-      let deleted = 0;
-      for (const id of ids) {
-        const result = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
-        deleted += result.rowCount;
-      }
-      return deleted;
+      const placeholders = ids.map(() => '?').join(', ');
+      const result = await db.query(
+        `DELETE FROM transactions WHERE user_id = ? AND id IN (${placeholders})`,
+        [userId, ...ids]
+      );
+      return result.rowCount;
     },
 
-    async countByCategory(categoryId: string): Promise<number> {
+    async countByCategory(userId: string, categoryId: string): Promise<number> {
       const db = await getDb();
       const result = await db.query<{ cnt: number }>(
-        'SELECT COUNT(*) as cnt FROM transactions WHERE category_id = ?',
-        [categoryId]
+        'SELECT COUNT(*) as cnt FROM transactions WHERE user_id = ? AND category_id = ?',
+        [userId, categoryId]
       );
       return result.rows[0]?.cnt ?? 0;
     },
 
-    async countByPaymentMethod(paymentMethodName: string): Promise<number> {
+    async countByPaymentMethod(userId: string, paymentMethodName: string): Promise<number> {
       const db = await getDb();
       const result = await db.query<{ cnt: number }>(
-        'SELECT COUNT(*) as cnt FROM transactions WHERE payment_method = ?',
-        [paymentMethodName]
+        'SELECT COUNT(*) as cnt FROM transactions WHERE user_id = ? AND payment_method = ?',
+        [userId, paymentMethodName]
       );
       return result.rows[0]?.cnt ?? 0;
     },
 
-    async updateCategoryName(categoryId: string, newName: string): Promise<void> {
+    async updateCategoryName(userId: string, categoryId: string, newName: string): Promise<void> {
       const db = await getDb();
-      await db.query('UPDATE transactions SET category = ? WHERE category_id = ?', [
+      await db.query('UPDATE transactions SET category = ? WHERE user_id = ? AND category_id = ?', [
         newName,
+        userId,
         categoryId,
       ]);
     },
 
-    async getYearSummaries(): Promise<
-      { year: number; count: number; income: number; expense: number }[]
-    > {
+    async getYearSummaries(
+      userId: string
+    ): Promise<{ year: number; count: number; income: number; expense: number }[]> {
       const db = await getDb();
       const result = await db.query<{
         year: string;
@@ -220,8 +245,10 @@ export function createTransactionRepository() {
                 COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
                 COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
          FROM transactions
+         WHERE user_id = ?
          GROUP BY SUBSTR(date, 1, 4)
-         ORDER BY year DESC`
+         ORDER BY year DESC`,
+        [userId]
       );
       return result.rows.map((r) => ({
         year: parseInt(r.year, 10),
@@ -232,6 +259,7 @@ export function createTransactionRepository() {
     },
 
     async getMonthSummaries(
+      userId: string,
       year: number
     ): Promise<{ month: number; count: number; income: number; expense: number }[]> {
       const db = await getDb();
@@ -247,10 +275,10 @@ export function createTransactionRepository() {
                 COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
                 COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
          FROM transactions
-         WHERE date LIKE ? || '%'
+         WHERE user_id = ? AND date LIKE ? || '%'
          GROUP BY SUBSTR(date, 6, 2)
          ORDER BY month`,
-        [prefix]
+        [userId, prefix]
       );
       return result.rows.map((r) => ({
         month: Number(r.month),
@@ -260,28 +288,31 @@ export function createTransactionRepository() {
       }));
     },
 
-    async findFiltered(filters: {
-      month?: number;
-      year?: number;
-      yearOnly?: boolean;
-      type?: string;
-      categoryId?: string;
-      paymentMethod?: string;
-      search?: string;
-      page?: number;
-      pageSize?: number;
-      sortOrder?: 'asc' | 'desc';
-      // Advanced filters
-      amountMin?: number;
-      amountMax?: number;
-      categories?: string; // comma-separated category IDs
-      dateFrom?: string; // YYYY-MM-DD
-      dateTo?: string; // YYYY-MM-DD
-      includeNotes?: boolean;
-    }): Promise<{ rows: Transaction[]; total: number; income: number; expense: number }> {
+    async findFiltered(
+      userId: string,
+      filters: {
+        month?: number;
+        year?: number;
+        yearOnly?: boolean;
+        type?: string;
+        categoryId?: string;
+        paymentMethod?: string;
+        search?: string;
+        page?: number;
+        pageSize?: number;
+        sortOrder?: 'asc' | 'desc';
+        // Advanced filters
+        amountMin?: number;
+        amountMax?: number;
+        categories?: string; // comma-separated category IDs
+        dateFrom?: string; // YYYY-MM-DD
+        dateTo?: string; // YYYY-MM-DD
+        includeNotes?: boolean;
+      }
+    ): Promise<{ rows: Transaction[]; total: number; income: number; expense: number }> {
       const db = await getDb();
-      const conditions: string[] = [];
-      const params: unknown[] = [];
+      const conditions: string[] = ['user_id = ?'];
+      const params: unknown[] = [userId];
 
       // --- Date scope (dateFrom+dateTo takes priority over month/year) ---
       if (filters.dateFrom && filters.dateTo) {
@@ -346,7 +377,7 @@ export function createTransactionRepository() {
         params.push(filters.amountMax);
       }
 
-      const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+      const where = `WHERE ${conditions.join(' AND ')}`;
       const dir = filters.sortOrder === 'asc' ? 'ASC' : 'DESC';
 
       const countResult = await db.query<{

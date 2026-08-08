@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMonthlyReportData } from '@/server/services/report.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const result = await getMonthlyReportData(month, year);
+  const result = await getMonthlyReportData(requireUserId(request), month, year);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 500 });

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { listSavingsGoals, createSavingsGoal } from '@/server/services/savings-goal.service';
+import { requireUserId } from '@/server/auth/current-user';
 
-export async function GET() {
-  const result = await listSavingsGoals();
+export async function GET(request: NextRequest) {
+  const result = await listSavingsGoals(requireUserId(request));
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await createSavingsGoal(body);
+  const result = await createSavingsGoal(requireUserId(request), body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

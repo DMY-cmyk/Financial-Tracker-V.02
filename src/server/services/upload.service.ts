@@ -21,12 +21,15 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listUploads(): Promise<ServiceResult<UploadRecord[]>> {
+export async function listUploads(userId: string): Promise<ServiceResult<UploadRecord[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function createUpload(body: unknown): Promise<ServiceResult<UploadRecord>> {
+export async function createUpload(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<UploadRecord>> {
   await ensureSeeded();
   const parsed = createUploadSchema.safeParse(body);
   if (!parsed.success)
@@ -37,10 +40,11 @@ export async function createUpload(body: unknown): Promise<ServiceResult<UploadR
         details: formatZodError(parsed.error),
       },
     };
-  return { data: await repo.create(parsed.data) };
+  return { data: await repo.create(userId, parsed.data) };
 }
 
 export async function updateUpload(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<UploadRecord>> {
@@ -54,7 +58,7 @@ export async function updateUpload(
         details: formatZodError(parsed.error),
       },
     };
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) return { error: { message: 'Upload not found', code: 'NOT_FOUND' } };
   return { data: result };
 }

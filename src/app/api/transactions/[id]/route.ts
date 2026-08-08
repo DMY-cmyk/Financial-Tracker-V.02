@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { updateTransaction, deleteTransaction } from '@/server/services/transaction.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await updateTransaction(id, body);
+  const result = await updateTransaction(requireUserId(request), id, body);
 
   if (result.error) {
     const status = result.error.code === 'NOT_FOUND' ? 404 : 400;
@@ -18,11 +19,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const result = await deleteTransaction(id);
+  const result = await deleteTransaction(requireUserId(request), id);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 404 });

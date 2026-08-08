@@ -25,7 +25,7 @@ function rowToRecurringTransaction(row: RecurringTxRow): RecurringTransaction {
     category: row.category,
     categoryId: row.category_id || '',
     type: row.type as 'income' | 'expense',
-    amount: row.amount,
+    amount: Number(row.amount),
     paymentMethod: row.payment_method,
     notes: row.notes || '',
     frequency: row.frequency as RecurringTransaction['frequency'],
@@ -38,49 +38,55 @@ function rowToRecurringTransaction(row: RecurringTxRow): RecurringTransaction {
 
 export function createRecurringTransactionRepository() {
   return {
-    async findAll(): Promise<RecurringTransaction[]> {
+    async findAll(userId: string): Promise<RecurringTransaction[]> {
       const db = await getDb();
       const result = await db.query<RecurringTxRow>(
-        'SELECT * FROM recurring_transactions ORDER BY next_due_date ASC'
+        'SELECT * FROM recurring_transactions WHERE user_id = ? ORDER BY next_due_date ASC',
+        [userId]
       );
       return result.rows.map(rowToRecurringTransaction);
     },
 
-    async findById(id: string): Promise<RecurringTransaction | undefined> {
+    async findById(userId: string, id: string): Promise<RecurringTransaction | undefined> {
       const db = await getDb();
       const result = await db.query<RecurringTxRow>(
-        'SELECT * FROM recurring_transactions WHERE id = ?',
-        [id]
+        'SELECT * FROM recurring_transactions WHERE user_id = ? AND id = ?',
+        [userId, id]
       );
       return result.rows[0] ? rowToRecurringTransaction(result.rows[0]) : undefined;
     },
 
-    async findActive(): Promise<RecurringTransaction[]> {
+    async findActive(userId: string): Promise<RecurringTransaction[]> {
       const db = await getDb();
       const result = await db.query<RecurringTxRow>(
-        'SELECT * FROM recurring_transactions WHERE is_active = 1 ORDER BY next_due_date ASC'
+        'SELECT * FROM recurring_transactions WHERE user_id = ? AND is_active = 1 ORDER BY next_due_date ASC',
+        [userId]
       );
       return result.rows.map(rowToRecurringTransaction);
     },
 
-    async findDue(beforeDate: string): Promise<RecurringTransaction[]> {
+    async findDue(userId: string, beforeDate: string): Promise<RecurringTransaction[]> {
       const db = await getDb();
       const result = await db.query<RecurringTxRow>(
-        'SELECT * FROM recurring_transactions WHERE is_active = 1 AND next_due_date <= ? ORDER BY next_due_date ASC',
-        [beforeDate]
+        'SELECT * FROM recurring_transactions WHERE user_id = ? AND is_active = 1 AND next_due_date <= ? ORDER BY next_due_date ASC',
+        [userId, beforeDate]
       );
       return result.rows.map(rowToRecurringTransaction);
     },
 
-    async create(data: Omit<RecurringTransaction, 'id'>): Promise<RecurringTransaction> {
+    async create(
+      userId: string,
+      data: Omit<RecurringTransaction, 'id'>
+    ): Promise<RecurringTransaction> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
         `INSERT INTO recurring_transactions
-         (id, description, category, category_id, type, amount, payment_method, notes, frequency, start_date, end_date, next_due_date, is_active)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (id, user_id, description, category, category_id, type, amount, payment_method, notes, frequency, start_date, end_date, next_due_date, is_active)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
+          userId,
           data.description,
           data.category,
           data.categoryId,
@@ -99,13 +105,14 @@ export function createRecurringTransactionRepository() {
     },
 
     async update(
+      userId: string,
       id: string,
       data: Partial<Omit<RecurringTransaction, 'id'>>
     ): Promise<RecurringTransaction | undefined> {
       const db = await getDb();
       const existing = await db.query<RecurringTxRow>(
-        'SELECT * FROM recurring_transactions WHERE id = ?',
-        [id]
+        'SELECT * FROM recurring_transactions WHERE user_id = ? AND id = ?',
+        [userId, id]
       );
       if (!existing.rows[0]) return undefined;
       const current = rowToRecurringTransaction(existing.rows[0]);
@@ -114,7 +121,7 @@ export function createRecurringTransactionRepository() {
         `UPDATE recurring_transactions SET
          description=?, category=?, category_id=?, type=?, amount=?, payment_method=?,
          notes=?, frequency=?, start_date=?, end_date=?, next_due_date=?, is_active=?,
-         updated_at=CURRENT_TIMESTAMP WHERE id=?`,
+         updated_at=CURRENT_TIMESTAMP WHERE user_id=? AND id=?`,
         [
           updated.description,
           updated.category,
@@ -128,15 +135,19 @@ export function createRecurringTransactionRepository() {
           updated.endDate,
           updated.nextDueDate,
           updated.isActive ? 1 : 0,
+          userId,
           id,
         ]
       );
       return updated;
     },
 
-    async delete(id: string): Promise<boolean> {
+    async delete(userId: string, id: string): Promise<boolean> {
       const db = await getDb();
-      const result = await db.query('DELETE FROM recurring_transactions WHERE id = ?', [id]);
+      const result = await db.query(
+        'DELETE FROM recurring_transactions WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       return result.rowCount > 0;
     },
   };

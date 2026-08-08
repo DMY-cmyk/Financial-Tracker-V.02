@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { readJsonBody } from '@/lib/api/read-json';
 import { registerUser } from '@/server/services/auth.service';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -11,6 +12,9 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(`register:${getClientIp(request)}`, 5, 60 * 60 * 1000);
+    if (!limit.ok) return rateLimitResponse(limit.retryAfter);
+
     const parsedBody = await readJsonBody(request);
     if (parsedBody.error) return parsedBody.error;
     const body = parsedBody.data;

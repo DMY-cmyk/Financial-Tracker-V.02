@@ -34,6 +34,7 @@ interface ServiceResult<T> {
 }
 
 export async function listTransactions(
+  userId: string,
   rawQuery: Record<string, unknown>
 ): Promise<ServiceResult<TransactionListResponse>> {
   await ensureSeeded();
@@ -50,7 +51,7 @@ export async function listTransactions(
   }
 
   const query = parsed.data;
-  const { rows: transactions, total, income, expense } = await repo.findFiltered(query);
+  const { rows: transactions, total, income, expense } = await repo.findFiltered(userId, query);
   const page = query.page ?? 1;
   const pageSize = query.pageSize ?? 25;
   const totalPages = Math.ceil(total / pageSize);
@@ -60,7 +61,10 @@ export async function listTransactions(
   };
 }
 
-export async function createTransaction(body: unknown): Promise<ServiceResult<Transaction>> {
+export async function createTransaction(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<Transaction>> {
   await ensureSeeded();
 
   const parsed = createTransactionSchema.safeParse(body);
@@ -74,11 +78,12 @@ export async function createTransaction(body: unknown): Promise<ServiceResult<Tr
     };
   }
 
-  const transaction = await repo.create(parsed.data);
+  const transaction = await repo.create(userId, parsed.data);
   return { data: transaction };
 }
 
 export async function updateTransaction(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<Transaction>> {
@@ -95,7 +100,7 @@ export async function updateTransaction(
     };
   }
 
-  const transaction = await repo.update(id, parsed.data);
+  const transaction = await repo.update(userId, id, parsed.data);
   if (!transaction) {
     return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
   }
@@ -104,6 +109,7 @@ export async function updateTransaction(
 }
 
 export async function bulkCreateTransactions(
+  userId: string,
   body: unknown
 ): Promise<ServiceResult<BulkCreateTransactionResponse>> {
   await ensureSeeded();
@@ -119,7 +125,7 @@ export async function bulkCreateTransactions(
     };
   }
 
-  const result = await repo.createMany(parsed.data.transactions);
+  const result = await repo.createMany(userId, parsed.data.transactions);
 
   return {
     data: {
@@ -132,6 +138,7 @@ export async function bulkCreateTransactions(
 }
 
 export async function bulkDeleteTransactions(
+  userId: string,
   body: unknown
 ): Promise<ServiceResult<BulkDeleteTransactionResponse>> {
   await ensureSeeded();
@@ -147,14 +154,17 @@ export async function bulkDeleteTransactions(
     };
   }
 
-  const deleted = await repo.deleteMany(parsed.data.ids);
+  const deleted = await repo.deleteMany(userId, parsed.data.ids);
   return { data: { deleted } };
 }
 
-export async function deleteTransaction(id: string): Promise<ServiceResult<{ success: boolean }>> {
+export async function deleteTransaction(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
 
-  const deleted = await repo.delete(id);
+  const deleted = await repo.delete(userId, id);
   if (!deleted) {
     return { error: { message: 'Transaction not found', code: 'NOT_FOUND' } };
   }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSpendingInsights } from '@/server/services/insights.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const result = await getSpendingInsights(month, year);
+  const result = await getSpendingInsights(requireUserId(request), month, year);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 500 });

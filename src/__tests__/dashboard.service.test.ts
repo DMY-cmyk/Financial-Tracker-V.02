@@ -3,6 +3,7 @@ import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { createTransaction } from '@/server/services/transaction.service';
 import { getDashboardSummary } from '@/server/services/dashboard.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -11,7 +12,7 @@ beforeEach(async () => {
 });
 
 async function seedJanuary() {
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date: '2026-01-05',
     description: 'Salary',
     category: 'Salary',
@@ -21,7 +22,7 @@ async function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date: '2026-01-10',
     description: 'Freelance Project',
     category: 'Freelance',
@@ -31,7 +32,7 @@ async function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date: '2026-01-12',
     description: 'Groceries',
     category: 'Food',
@@ -41,7 +42,7 @@ async function seedJanuary() {
     paymentMethod: 'Cash',
     notes: '',
   });
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date: '2026-01-15',
     description: 'Electric Bill',
     category: 'Utilities',
@@ -51,7 +52,7 @@ async function seedJanuary() {
     paymentMethod: 'Bank BCA',
     notes: '',
   });
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date: '2026-01-20',
     description: 'Movie Tickets',
     category: 'Entertainment',
@@ -66,7 +67,7 @@ async function seedJanuary() {
 describe('getDashboardSummary', () => {
   it('returns correct summary for a month', async () => {
     await seedJanuary();
-    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 0, year: 2026 });
 
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
@@ -81,7 +82,7 @@ describe('getDashboardSummary', () => {
 
   it('returns category totals', async () => {
     await seedJanuary();
-    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 0, year: 2026 });
     const data = result.data!;
 
     expect(data.categoryTotals['cat-food']).toBe(500000);
@@ -91,7 +92,7 @@ describe('getDashboardSummary', () => {
 
   it('returns payment method totals', async () => {
     await seedJanuary();
-    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 0, year: 2026 });
     const data = result.data!;
 
     expect(data.paymentMethodTotals['Cash']).toBe(500000);
@@ -101,7 +102,7 @@ describe('getDashboardSummary', () => {
 
   it('returns recent transactions (max 5, sorted by date desc)', async () => {
     await seedJanuary();
-    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 0, year: 2026 });
     const data = result.data!;
 
     expect(data.recentTransactions.length).toBe(5);
@@ -110,7 +111,7 @@ describe('getDashboardSummary', () => {
 
   it('returns cash flow data with all days of month', async () => {
     await seedJanuary();
-    const result = await getDashboardSummary({ month: 0, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 0, year: 2026 });
     const data = result.data!;
 
     expect(data.cashFlow.length).toBe(31); // January has 31 days
@@ -119,7 +120,7 @@ describe('getDashboardSummary', () => {
   });
 
   it('returns zeros for empty month', async () => {
-    const result = await getDashboardSummary({ month: 6, year: 2026 });
+    const result = await getDashboardSummary(DEMO_USER_ID, { month: 6, year: 2026 });
     const data = result.data!;
 
     expect(data.income).toBe(0);
@@ -130,7 +131,7 @@ describe('getDashboardSummary', () => {
   });
 
   it('returns error for invalid query', async () => {
-    const result = await getDashboardSummary({});
+    const result = await getDashboardSummary(DEMO_USER_ID, {});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });

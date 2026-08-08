@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { buildGoogleAuthUrl } from '@/server/auth/google';
 import { generateVerifier, challengeFromVerifier } from '@/server/auth/pkce';
+import { getAppUrl } from '@/lib/auth/app-url';
 
 export async function GET(request: NextRequest) {
-  const appUrl = process.env.APP_URL ?? new URL(request.url).origin;
-  const redirectUri = `${appUrl.replace(/\/$/, '')}/api/auth/google/callback`;
+  const appUrl = getAppUrl(new URL(request.url).origin);
+  const redirectUri = `${appUrl}/api/auth/google/callback`;
   const state = randomBytes(32).toString('hex');
   const verifier = generateVerifier();
   const challenge = challengeFromVerifier(verifier);

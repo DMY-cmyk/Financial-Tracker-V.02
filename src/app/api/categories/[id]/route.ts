@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { updateCategory, deleteCategory } from '@/server/services/category.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await updateCategory(id, body);
+  const result = await updateCategory(requireUserId(request), id, body);
 
   if (result.error) {
     const status = result.error.code === 'NOT_FOUND' ? 404 : 400;
@@ -17,11 +18,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const result = await deleteCategory(id);
+  const result = await deleteCategory(requireUserId(request), id);
 
   if (result.error) {
     const status =

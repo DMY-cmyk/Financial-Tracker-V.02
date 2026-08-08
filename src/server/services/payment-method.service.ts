@@ -23,12 +23,15 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listPaymentMethods(): Promise<ServiceResult<PaymentMethod[]>> {
+export async function listPaymentMethods(userId: string): Promise<ServiceResult<PaymentMethod[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function createPaymentMethod(body: unknown): Promise<ServiceResult<PaymentMethod>> {
+export async function createPaymentMethod(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<PaymentMethod>> {
   await ensureSeeded();
   const parsed = createPaymentMethodSchema.safeParse(body);
   if (!parsed.success)
@@ -39,10 +42,11 @@ export async function createPaymentMethod(body: unknown): Promise<ServiceResult<
         details: formatZodError(parsed.error),
       },
     };
-  return { data: await repo.create(parsed.data) };
+  return { data: await repo.create(userId, parsed.data) };
 }
 
 export async function updatePaymentMethod(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<PaymentMethod>> {
@@ -56,21 +60,23 @@ export async function updatePaymentMethod(
         details: formatZodError(parsed.error),
       },
     };
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
 
 export async function deletePaymentMethod(
+  userId: string,
   id: string
 ): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  const method = await repo.findById(id);
+  const method = await repo.findById(userId, id);
   if (!method) return { error: { message: 'Payment method not found', code: 'NOT_FOUND' } };
 
-  const txRepo = createTransactionRepository();
-  const count = await txRepo.countByPaymentMethod(method.name);
-  if (count > 0) {
+  const deleted = await repo.deleteIfUnused(userId, id, method.name);
+  if (!deleted) {
+    const txRepo = createTransactionRepository();
+    const count = await txRepo.countByPaymentMethod(userId, method.name);
     return {
       error: {
         message: `Cannot delete "${method.name}" — ${count} transaction(s) still use it`,
@@ -78,7 +84,5 @@ export async function deletePaymentMethod(
       },
     };
   }
-
-  await repo.delete(id);
   return { data: { success: true } };
 }

@@ -12,6 +12,7 @@ interface ServiceResult<T> {
 }
 
 export async function getMonthlyReportData(
+  userId: string,
   month: number,
   year: number
 ): Promise<ServiceResult<MonthlyReportData>> {
@@ -19,10 +20,10 @@ export async function getMonthlyReportData(
 
   // Fetch income and expense transactions for the month
   const [incomeResult, expenseResult, balancesResult, billsResult] = await Promise.all([
-    txRepo.findFiltered({ month, year, type: 'income', page: 1, pageSize: 1000 }),
-    txRepo.findFiltered({ month, year, type: 'expense', page: 1, pageSize: 1000 }),
-    listPaymentMethodBalances(month, year),
-    listBills({ month, year }),
+    txRepo.findFiltered(userId, { month, year, type: 'income', page: 1, pageSize: 1000 }),
+    txRepo.findFiltered(userId, { month, year, type: 'expense', page: 1, pageSize: 1000 }),
+    listPaymentMethodBalances(userId, month, year),
+    listBills(userId, { month, year }),
   ]);
 
   if (balancesResult.error) return { error: balancesResult.error };
@@ -73,14 +74,17 @@ export async function getMonthlyReportData(
   };
 }
 
-export async function getAnnualReportData(year: number): Promise<ServiceResult<AnnualReportData>> {
+export async function getAnnualReportData(
+  userId: string,
+  year: number
+): Promise<ServiceResult<AnnualReportData>> {
   await ensureSeeded();
 
   const [monthSummaries, balancesResult, allYearResult, prevYearResult] = await Promise.all([
-    txRepo.getMonthSummaries(year),
-    listPaymentMethodBalances(),
-    txRepo.findFiltered({ year, yearOnly: true, page: 1, pageSize: 10000 }),
-    txRepo.findFiltered({ year: year - 1, yearOnly: true, page: 1, pageSize: 10000 }),
+    txRepo.getMonthSummaries(userId, year),
+    listPaymentMethodBalances(userId),
+    txRepo.findFiltered(userId, { year, yearOnly: true, page: 1, pageSize: 10000 }),
+    txRepo.findFiltered(userId, { year: year - 1, yearOnly: true, page: 1, pageSize: 10000 }),
   ]);
 
   if (balancesResult.error) return { error: balancesResult.error };

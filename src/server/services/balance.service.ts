@@ -19,6 +19,7 @@ interface BalanceRow {
 }
 
 export async function listPaymentMethodBalances(
+  userId: string,
   month?: number,
   year?: number
 ): Promise<ServiceResult<PaymentMethodBalance[]>> {
@@ -47,7 +48,8 @@ export async function listPaymentMethodBalances(
         COALESCE(SUM(CASE WHEN t.type = 'income' AND t.date LIKE ? THEN t.amount ELSE 0 END), 0) -
         COALESCE(SUM(CASE WHEN t.type = 'expense' AND t.date LIKE ? THEN t.amount ELSE 0 END), 0) AS balance
       FROM payment_methods pm
-      LEFT JOIN transactions t ON t.payment_method = pm.name
+      LEFT JOIN transactions t ON t.payment_method = pm.name AND t.user_id = pm.user_id
+      WHERE pm.user_id = ?
       GROUP BY pm.id, pm.name, pm.type, pm.icon, pm.beginning_balance
       ORDER BY balance DESC`,
       [
@@ -59,6 +61,7 @@ export async function listPaymentMethodBalances(
         monthStart,
         monthPattern,
         monthPattern,
+        userId,
       ]
     );
 
@@ -87,9 +90,11 @@ export async function listPaymentMethodBalances(
         COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount
                           WHEN t.type = 'expense' THEN -t.amount ELSE 0 END), 0) AS balance
     FROM payment_methods pm
-    LEFT JOIN transactions t ON t.payment_method = pm.name
+    LEFT JOIN transactions t ON t.payment_method = pm.name AND t.user_id = pm.user_id
+    WHERE pm.user_id = ?
     GROUP BY pm.id, pm.name, pm.type, pm.icon, pm.beginning_balance
-    ORDER BY balance DESC`
+    ORDER BY balance DESC`,
+    [userId]
   );
 
   return {

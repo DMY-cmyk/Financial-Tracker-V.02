@@ -46,23 +46,25 @@ function rowToSummary(row: TemplateRow): TemplateSummary {
 
 export function createBudgetTemplateRepository() {
   return {
-    async findAll(): Promise<TemplateSummary[]> {
+    async findAll(userId: string): Promise<TemplateSummary[]> {
       const db = await getDb();
       const result = await db.query<TemplateRow>(
-        'SELECT id, name, category_budgets, created_at FROM budget_templates ORDER BY created_at DESC, rowid DESC'
+        'SELECT id, name, category_budgets, created_at FROM budget_templates WHERE user_id = ? ORDER BY created_at DESC, rowid DESC',
+        [userId]
       );
       return result.rows.map(rowToSummary);
     },
 
     async findById(
+      userId: string,
       id: string
     ): Promise<
       { id: string; name: string; entries: CategoryBudgetEntry[]; createdAt: string } | undefined
     > {
       const db = await getDb();
       const result = await db.query<TemplateRow>(
-        'SELECT id, name, category_budgets, created_at FROM budget_templates WHERE id = ?',
-        [id]
+        'SELECT id, name, category_budgets, created_at FROM budget_templates WHERE user_id = ? AND id = ?',
+        [userId, id]
       );
       if (!result.rows[0]) return undefined;
       const row = result.rows[0];
@@ -74,13 +76,17 @@ export function createBudgetTemplateRepository() {
       };
     },
 
-    async create(name: string, entries: CategoryBudgetEntry[]): Promise<TemplateSummary> {
+    async create(
+      userId: string,
+      name: string,
+      entries: CategoryBudgetEntry[]
+    ): Promise<TemplateSummary> {
       const id = nanoid();
       const createdAt = new Date().toISOString();
       const db = await getDb();
       await db.query(
-        'INSERT INTO budget_templates (id, name, category_budgets, created_at) VALUES (?, ?, ?, ?)',
-        [id, name, JSON.stringify(entries), createdAt]
+        'INSERT INTO budget_templates (id, user_id, name, category_budgets, created_at) VALUES (?, ?, ?, ?, ?)',
+        [id, userId, name, JSON.stringify(entries), createdAt]
       );
       return {
         id,
@@ -91,13 +97,19 @@ export function createBudgetTemplateRepository() {
       };
     },
 
-    async delete(id: string): Promise<boolean> {
+    async delete(userId: string, id: string): Promise<boolean> {
       const db = await getDb();
-      const result = await db.query('DELETE FROM budget_templates WHERE id = ?', [id]);
+      const result = await db.query('DELETE FROM budget_templates WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
       return result.rowCount > 0;
     },
 
-    async getBudgetSuggestions(months: number): Promise<
+    async getBudgetSuggestions(
+      userId: string,
+      months: number
+    ): Promise<
       {
         categoryId: string;
         categoryName: string;
@@ -125,18 +137,20 @@ export function createBudgetTemplateRepository() {
          LEFT JOIN (
            SELECT
              category_id,
+             user_id,
              SUBSTR(date, 1, 7) AS month_key,
              SUM(amount) AS total
            FROM transactions
            WHERE type = 'expense'
+             AND user_id = ?
              AND date >= ?
              AND date < ?
-           GROUP BY category_id, SUBSTR(date, 1, 7)
-         ) monthly ON monthly.category_id = c.id
-         WHERE c.type = 'expense'
+           GROUP BY category_id, user_id, SUBSTR(date, 1, 7)
+         ) monthly ON monthly.category_id = c.id AND monthly.user_id = c.user_id
+         WHERE c.user_id = ? AND c.type = 'expense'
          GROUP BY c.id, c.name, c.color
          ORDER BY suggested_budget DESC`,
-        [startStr, endStr]
+        [userId, startStr, endStr, userId]
       );
 
       return result.rows.map((row) => ({

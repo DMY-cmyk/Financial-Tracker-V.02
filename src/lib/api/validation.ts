@@ -6,7 +6,7 @@ export const createTransactionSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   categoryId: z.string().min(1, 'Category ID is required'),
   type: z.enum(['income', 'expense']),
-  amount: z.number().positive('Amount must be positive'),
+  amount: z.number().int('Amount must be a whole rupiah').positive('Amount must be positive'),
   paymentMethod: z.string().min(1, 'Payment method is required'),
   notes: z.string().max(500).optional().default(''),
 });
@@ -95,7 +95,12 @@ export const createCategorySchema = z.object({
   type: z.enum(['income', 'expense']),
   color: z.string().min(1, 'Color is required').max(20),
   icon: z.string().max(50).optional().default('circle'),
-  budget: z.number().min(0, 'Budget must be non-negative').optional().default(0),
+  budget: z
+    .number()
+    .int('Budget must be a whole rupiah')
+    .min(0, 'Budget must be non-negative')
+    .optional()
+    .default(0),
 });
 
 export const updateCategorySchema = createCategorySchema.partial();
@@ -139,7 +144,7 @@ export const updateUploadSchema = z.object({
 
 export const createBillSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  amount: z.number().positive('Amount must be positive'),
+  amount: z.number().int('Amount must be a whole rupiah').positive('Amount must be positive'),
   dueDate: z.number().int().min(1).max(31),
   isPaid: z.boolean().optional().default(false),
   isRecurring: z.boolean().optional().default(false),
@@ -149,7 +154,11 @@ export const createBillSchema = z.object({
 
 export const updateBillSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100).optional(),
-  amount: z.number().positive('Amount must be positive').optional(),
+  amount: z
+    .number()
+    .int('Amount must be a whole rupiah')
+    .positive('Amount must be positive')
+    .optional(),
   dueDate: z.number().int().min(1).max(31).optional(),
   isPaid: z.boolean().optional(),
   isRecurring: z.boolean().optional(),
@@ -161,15 +170,31 @@ export const updateBillSchema = z.object({
 
 export const createSavingsGoalSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  targetAmount: z.number().positive('Target amount must be positive'),
-  savedAmount: z.number().min(0, 'Saved amount must be non-negative').optional().default(0),
+  targetAmount: z
+    .number()
+    .int('Target amount must be a whole rupiah')
+    .positive('Target amount must be positive'),
+  savedAmount: z
+    .number()
+    .int('Saved amount must be a whole rupiah')
+    .min(0, 'Saved amount must be non-negative')
+    .optional()
+    .default(0),
   color: z.string().min(1, 'Color is required').max(20),
 });
 
 export const updateSavingsGoalSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100).optional(),
-  targetAmount: z.number().positive('Target amount must be positive').optional(),
-  savedAmount: z.number().min(0, 'Saved amount must be non-negative').optional(),
+  targetAmount: z
+    .number()
+    .int('Target amount must be a whole rupiah')
+    .positive('Target amount must be positive')
+    .optional(),
+  savedAmount: z
+    .number()
+    .int('Saved amount must be a whole rupiah')
+    .min(0, 'Saved amount must be non-negative')
+    .optional(),
   color: z.string().min(1, 'Color is required').max(20).optional(),
 });
 
@@ -190,7 +215,7 @@ export const createRecurringTransactionSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   categoryId: z.string().min(1, 'Category ID is required'),
   type: z.enum(['income', 'expense']),
-  amount: z.number().positive('Amount must be positive'),
+  amount: z.number().int('Amount must be a whole rupiah').positive('Amount must be positive'),
   paymentMethod: z.string().min(1, 'Payment method is required'),
   notes: z.string().max(500).optional().default(''),
   frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
@@ -210,7 +235,11 @@ export const updateRecurringTransactionSchema = z.object({
   category: z.string().min(1, 'Category is required').optional(),
   categoryId: z.string().min(1, 'Category ID is required').optional(),
   type: z.enum(['income', 'expense']).optional(),
-  amount: z.number().positive('Amount must be positive').optional(),
+  amount: z
+    .number()
+    .int('Amount must be a whole rupiah')
+    .positive('Amount must be positive')
+    .optional(),
   paymentMethod: z.string().min(1, 'Payment method is required').optional(),
   notes: z.string().max(500).optional(),
   frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
@@ -247,7 +276,10 @@ export const createBudgetTemplateSchema = z.object({
 // so nonnegative() is intentional here instead of positive()
 export const createLiabilitySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
-  amount: z.number().nonnegative('Amount must be 0 or greater'),
+  amount: z
+    .number()
+    .int('Amount must be a whole rupiah')
+    .nonnegative('Amount must be 0 or greater'),
   category: z.enum(['loan', 'credit_card', 'other']).default('other'),
 });
 
@@ -259,7 +291,7 @@ export const upsertMonthlyBudgetSchema = z.object({
   categoryId: z.string().min(1),
   month: z.number().int().min(0).max(11),
   year: z.number().int().min(2000).max(2100),
-  budgetAmount: z.number().min(0),
+  budgetAmount: z.number().int('Budget amount must be a whole rupiah').min(0),
 });
 
 export const deleteMonthlyBudgetSchema = z.object({

@@ -22,12 +22,15 @@ function formatZodError(error: {
   return f;
 }
 
-export async function listLiabilities(): Promise<ServiceResult<Liability[]>> {
+export async function listLiabilities(userId: string): Promise<ServiceResult<Liability[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function createLiability(body: unknown): Promise<ServiceResult<Liability>> {
+export async function createLiability(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<Liability>> {
   await ensureSeeded();
   const parsed = createLiabilitySchema.safeParse(body);
   if (!parsed.success) {
@@ -39,10 +42,11 @@ export async function createLiability(body: unknown): Promise<ServiceResult<Liab
       },
     };
   }
-  return { data: await repo.create(parsed.data) };
+  return { data: await repo.create(userId, parsed.data) };
 }
 
 export async function updateLiability(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<Liability>> {
@@ -57,16 +61,19 @@ export async function updateLiability(
       },
     };
   }
-  const updated = await repo.update(id, parsed.data);
+  const updated = await repo.update(userId, id, parsed.data);
   if (!updated) {
     return { error: { message: 'Liability not found', code: 'NOT_FOUND' } };
   }
   return { data: updated };
 }
 
-export async function deleteLiability(id: string): Promise<ServiceResult<{ success: true }>> {
+export async function deleteLiability(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: true }>> {
   await ensureSeeded();
-  const deleted = await repo.delete(id);
+  const deleted = await repo.delete(userId, id);
   if (!deleted) {
     return { error: { message: 'Liability not found', code: 'NOT_FOUND' } };
   }

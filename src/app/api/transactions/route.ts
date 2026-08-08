@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { listTransactions, createTransaction } from '@/server/services/transaction.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
   const includeNotes = searchParams.get('includeNotes');
   if (includeNotes === 'true') query.includeNotes = true;
 
-  const result = await listTransactions(query);
+  const result = await listTransactions(requireUserId(request), query);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await createTransaction(body);
+  const result = await createTransaction(requireUserId(request), body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

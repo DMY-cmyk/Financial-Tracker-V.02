@@ -24,12 +24,15 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listExportJobs(): Promise<ServiceResult<ExportJobRecord[]>> {
+export async function listExportJobs(userId: string): Promise<ServiceResult<ExportJobRecord[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function createExportJob(body: unknown): Promise<ServiceResult<ExportJobRecord>> {
+export async function createExportJob(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<ExportJobRecord>> {
   await ensureSeeded();
   const parsed = createExportJobSchema.safeParse(body);
   if (!parsed.success)
@@ -40,9 +43,10 @@ export async function createExportJob(body: unknown): Promise<ServiceResult<Expo
         details: formatZodError(parsed.error),
       },
     };
-  const job = await repo.create(parsed.data);
+  const job = await repo.create(userId, parsed.data);
   // Mark as completed immediately (actual file generation is client-side for now)
   const completed = await repo.updateStatus(
+    userId,
     job.id,
     'completed',
     `export-${job.id}.${parsed.data.format}`

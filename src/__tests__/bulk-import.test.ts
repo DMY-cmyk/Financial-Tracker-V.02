@@ -6,6 +6,7 @@ import { bulkCreateTransactionSchema } from '@/lib/api/validation';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { bulkCreateTransactions } from '@/server/services/transaction.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 import type { Category } from '@/lib/types';
 
 // ---------------------------------------------------------------------------
@@ -449,7 +450,7 @@ describe('bulkCreateTransactions', () => {
   };
 
   it('creates all transactions from a valid array', async () => {
-    const result = await bulkCreateTransactions({
+    const result = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [
         validTransaction,
         {
@@ -472,7 +473,7 @@ describe('bulkCreateTransactions', () => {
   });
 
   it('returns validation error for empty transactions array', async () => {
-    const result = await bulkCreateTransactions({
+    const result = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [],
     });
 
@@ -486,14 +487,14 @@ describe('bulkCreateTransactions', () => {
       description: `Transaction ${i}`,
     }));
 
-    const result = await bulkCreateTransactions({ transactions });
+    const result = await bulkCreateTransactions(DEMO_USER_ID, { transactions });
 
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for invalid transaction in array', async () => {
-    const result = await bulkCreateTransactions({
+    const result = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [
         validTransaction,
         {
@@ -513,7 +514,7 @@ describe('bulkCreateTransactions', () => {
   });
 
   it('creates a single valid transaction', async () => {
-    const result = await bulkCreateTransactions({
+    const result = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [validTransaction],
     });
 
@@ -525,14 +526,14 @@ describe('bulkCreateTransactions', () => {
 
   it('skips duplicate transactions on re-import', async () => {
     // First import
-    const first = await bulkCreateTransactions({
+    const first = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [validTransaction],
     });
     expect(first.data!.created).toBe(1);
     expect(first.data!.duplicates).toBe(0);
 
     // Second import of same data
-    const second = await bulkCreateTransactions({
+    const second = await bulkCreateTransactions(DEMO_USER_ID, {
       transactions: [validTransaction],
     });
     expect(second.data!.created).toBe(0);
@@ -541,14 +542,14 @@ describe('bulkCreateTransactions', () => {
   });
 
   it('returns validation error when body is not an object', async () => {
-    const result = await bulkCreateTransactions('not an object');
+    const result = await bulkCreateTransactions(DEMO_USER_ID, 'not an object');
 
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error when transactions key is missing', async () => {
-    const result = await bulkCreateTransactions({});
+    const result = await bulkCreateTransactions(DEMO_USER_ID, {});
 
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');

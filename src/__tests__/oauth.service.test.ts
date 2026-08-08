@@ -39,12 +39,31 @@ describe('oauth service — linking rules', () => {
     expect(r.data!.isNew).toBe(false);
   });
 
-  it('rule 2: links existing email user when verified', async () => {
+  it('rule 2: refuses to auto-link when existing user has a password', async () => {
+    // A password-protected account on the same email could be hijacked if any
+    // Google account holder on that address auto-linked. Refuse silently and
+    // surface a code the UI can explain.
     await registerUser('a@b.co', 'A', 'pw1234');
+    const r = await handleGoogleCallbackUser(profile());
+    expect(r.error?.code).toBe('oauth_account_exists_password');
+    expect(r.data).toBeUndefined();
+  });
+
+  it('rule 2: links existing passwordless email user when verified', async () => {
+    // A user row with no password_hash can only have been created via OAuth
+    // in the first place, so re-linking on email match is safe.
+    const db = await getDb();
+    const id = 'u-passwordless';
+    await db.query('INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)', [
+      id,
+      'a@b.co',
+      'A',
+      null,
+    ]);
     const r = await handleGoogleCallbackUser(profile());
     expect(r.error).toBeUndefined();
     expect(r.data!.isNew).toBe(false);
-    expect(r.data!.user.email).toBe('a@b.co');
+    expect(r.data!.user.id).toBe(id);
   });
 
   it('rule 3: creates new user when no email match', async () => {

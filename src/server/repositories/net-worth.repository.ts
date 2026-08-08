@@ -28,45 +28,53 @@ function rowToSnapshot(row: NetWorthSnapshotRow): NetWorthSnapshot {
 
 export function createNetWorthRepository() {
   return {
-    async getHistory(limit = 12): Promise<NetWorthSnapshot[]> {
+    async getHistory(userId: string, limit = 12): Promise<NetWorthSnapshot[]> {
       const db = await getDb();
       const result = await db.query<NetWorthSnapshotRow>(
-        'SELECT * FROM net_worth_snapshots ORDER BY year ASC, month ASC LIMIT ?',
-        [limit]
+        'SELECT * FROM net_worth_snapshots WHERE user_id = ? ORDER BY year ASC, month ASC LIMIT ?',
+        [userId, limit]
       );
       return result.rows.map(rowToSnapshot);
     },
 
-    async findByMonth(month: number, year: number): Promise<NetWorthSnapshot | undefined> {
+    async findByMonth(
+      userId: string,
+      month: number,
+      year: number
+    ): Promise<NetWorthSnapshot | undefined> {
       const db = await getDb();
       const result = await db.query<NetWorthSnapshotRow>(
-        'SELECT * FROM net_worth_snapshots WHERE month = ? AND year = ?',
-        [month, year]
+        'SELECT * FROM net_worth_snapshots WHERE user_id = ? AND month = ? AND year = ?',
+        [userId, month, year]
       );
       return result.rows[0] ? rowToSnapshot(result.rows[0]) : undefined;
     },
 
-    async upsert(data: {
-      month: number;
-      year: number;
-      totalAssets: number;
-      totalLiabilities: number;
-      netWorth: number;
-      snapshotData: string;
-    }): Promise<NetWorthSnapshot> {
+    async upsert(
+      userId: string,
+      data: {
+        month: number;
+        year: number;
+        totalAssets: number;
+        totalLiabilities: number;
+        netWorth: number;
+        snapshotData: string;
+      }
+    ): Promise<NetWorthSnapshot> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
         `INSERT INTO net_worth_snapshots
-           (id, month, year, total_assets, total_liabilities, net_worth, snapshot_data)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(month, year) DO UPDATE SET
+           (id, user_id, month, year, total_assets, total_liabilities, net_worth, snapshot_data)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(user_id, month, year) DO UPDATE SET
            total_assets      = excluded.total_assets,
            total_liabilities = excluded.total_liabilities,
            net_worth         = excluded.net_worth,
            snapshot_data     = excluded.snapshot_data`,
         [
           id,
+          userId,
           data.month,
           data.year,
           data.totalAssets,
@@ -76,8 +84,8 @@ export function createNetWorthRepository() {
         ]
       );
       const result = await db.query<NetWorthSnapshotRow>(
-        'SELECT * FROM net_worth_snapshots WHERE month = ? AND year = ?',
-        [data.month, data.year]
+        'SELECT * FROM net_worth_snapshots WHERE user_id = ? AND month = ? AND year = ?',
+        [userId, data.month, data.year]
       );
       return rowToSnapshot(result.rows[0]);
     },

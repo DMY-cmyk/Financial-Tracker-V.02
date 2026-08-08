@@ -2,9 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '@/lib/api/client';
-import { parseExcelFile } from '@/lib/excel-import';
 import { parseOcrTextToTransactions } from '@/lib/ocr-import';
-import { generateBulkTemplate } from '@/lib/excel-template';
 import type {
   Category,
   PaymentMethod,
@@ -40,7 +38,7 @@ export interface UseBulkImportReturn {
   removeRow: (rowIndex: number) => void;
   updateRow: (rowIndex: number, updates: Partial<BulkImportRow>) => void;
   confirmImport: (validOnly?: boolean) => Promise<void>;
-  downloadTemplate: () => void;
+  downloadTemplate: () => Promise<void>;
   reset: () => void;
 }
 
@@ -125,6 +123,7 @@ export function useBulkImport(): UseBulkImportReturn {
       try {
         if (EXCEL_EXTENSIONS.includes(ext)) {
           setSource('excel');
+          const { parseExcelFile } = await import('@/lib/excel-import');
           const result = await parseExcelFile(file);
           setImportResult(result);
           setStatus('preview');
@@ -231,7 +230,8 @@ export function useBulkImport(): UseBulkImportReturn {
     [importResult, categories]
   );
 
-  const downloadTemplate = useCallback(() => {
+  const downloadTemplate = useCallback(async () => {
+    const { generateBulkTemplate } = await import('@/lib/excel-template');
     generateBulkTemplate(categories, paymentMethods);
   }, [categories, paymentMethods]);
 

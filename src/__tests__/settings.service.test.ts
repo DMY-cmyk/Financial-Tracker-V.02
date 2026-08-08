@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { getSettings, updateSettings } from '@/server/services/settings.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -11,7 +12,7 @@ beforeEach(async () => {
 
 describe('getSettings', () => {
   it('returns settings (may be empty on fresh DB)', async () => {
-    const result = await getSettings();
+    const result = await getSettings(DEMO_USER_ID);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(typeof result.data).toBe('object');
@@ -20,7 +21,7 @@ describe('getSettings', () => {
 
 describe('updateSettings', () => {
   it('sets and retrieves settings', async () => {
-    const result = await updateSettings({ theme: 'dark', locale: 'id' });
+    const result = await updateSettings(DEMO_USER_ID, { theme: 'dark', locale: 'id' });
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.theme).toBe('dark');
@@ -28,27 +29,27 @@ describe('updateSettings', () => {
   });
 
   it('updates existing settings', async () => {
-    await updateSettings({ theme: 'dark' });
-    const result = await updateSettings({ theme: 'light' });
+    await updateSettings(DEMO_USER_ID, { theme: 'dark' });
+    const result = await updateSettings(DEMO_USER_ID, { theme: 'light' });
     expect(result.data!.theme).toBe('light');
   });
 
   it('preserves unmodified settings', async () => {
-    await updateSettings({ theme: 'dark', locale: 'en' });
-    await updateSettings({ theme: 'light' });
-    const result = await getSettings();
+    await updateSettings(DEMO_USER_ID, { theme: 'dark', locale: 'en' });
+    await updateSettings(DEMO_USER_ID, { theme: 'light' });
+    const result = await getSettings(DEMO_USER_ID);
     expect(result.data!.theme).toBe('light');
     expect(result.data!.locale).toBe('en');
   });
 
   it('returns validation error for empty object', async () => {
-    const result = await updateSettings({});
+    const result = await updateSettings(DEMO_USER_ID, {});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for non-string values', async () => {
-    const result = await updateSettings({ theme: 123 as unknown as string });
+    const result = await updateSettings(DEMO_USER_ID, { theme: 123 as unknown as string });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });

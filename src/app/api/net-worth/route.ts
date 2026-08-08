@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentNetWorth, getNetWorthHistory } from '@/server/services/net-worth.service';
+import { requireUserId } from '@/server/auth/current-user';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const userId = requireUserId(request);
   const [currentResult, historyResult] = await Promise.all([
-    getCurrentNetWorth(),
-    getNetWorthHistory(),
+    getCurrentNetWorth(userId),
+    getNetWorthHistory(userId),
   ]);
 
   if (currentResult.error) {

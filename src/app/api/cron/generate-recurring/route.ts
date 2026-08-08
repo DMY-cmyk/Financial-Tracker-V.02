@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateRecurringTransactions } from '@/server/services/recurring-transaction.service';
+import { getDb } from '@/server/db/client';
+import { ensureSeeded } from '@/server/db/seed';
 
 if (!process.env.CRON_SECRET) {
   console.warn(
@@ -19,16 +21,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const result = await generateRecurringTransactions();
+  // Cron is system-wide. Run generation for every known user; propagate the
+  // first error so monitoring can alert. ensureSeeded() guarantees at least
+  // the demo user exists in fresh installs.
+  await ensureSeeded();
+  const db = await getDb();
+  const users = await db.query<{ id: string }>('SELECT id FROM users');
 
-  if (result.error) {
-    return NextResponse.json({ error: result.error.message }, { status: 500 });
+  let totalGenerated = 0;
+  let totalSkipped = 0;
+  for (const row of users.rows) {
+    const result = await generateRecurringTransactions(row.id);
+    if (result.error) {
+      return NextResponse.json({ error: result.error.message }, { status: 500 });
+    }
+    if (result.data) {
+      totalGenerated += result.data.generated;
+      totalSkipped += result.data.skipped;
+    }
   }
 
   return NextResponse.json({
     data: {
-      generated: result.data?.generated ?? 0,
-      skipped: result.data?.skipped ?? 0,
+      generated: totalGenerated,
+      skipped: totalSkipped,
+      users: users.rows.length,
     },
   });
 }

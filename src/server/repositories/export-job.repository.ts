@@ -44,31 +44,41 @@ function rowToJob(r: JobRow): ExportJobRecord {
 
 export function createExportJobRepository() {
   return {
-    async findAll(): Promise<ExportJobRecord[]> {
+    async findAll(userId: string): Promise<ExportJobRecord[]> {
       const db = await getDb();
-      const result = await db.query<JobRow>('SELECT * FROM export_jobs ORDER BY created_at DESC');
+      const result = await db.query<JobRow>(
+        'SELECT * FROM export_jobs WHERE user_id = ? ORDER BY created_at DESC',
+        [userId]
+      );
       return result.rows.map(rowToJob);
     },
 
-    async findById(id: string): Promise<ExportJobRecord | undefined> {
+    async findById(userId: string, id: string): Promise<ExportJobRecord | undefined> {
       const db = await getDb();
-      const result = await db.query<JobRow>('SELECT * FROM export_jobs WHERE id = ?', [id]);
+      const result = await db.query<JobRow>(
+        'SELECT * FROM export_jobs WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       return result.rows[0] ? rowToJob(result.rows[0]) : undefined;
     },
 
-    async create(data: {
-      format: string;
-      scope: string;
-      filters?: string;
-      options?: string;
-      recordCount?: number;
-    }): Promise<ExportJobRecord> {
+    async create(
+      userId: string,
+      data: {
+        format: string;
+        scope: string;
+        filters?: string;
+        options?: string;
+        recordCount?: number;
+      }
+    ): Promise<ExportJobRecord> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO export_jobs (id, format, scope, filters, options, record_count) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO export_jobs (id, user_id, format, scope, filters, options, record_count) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [
           id,
+          userId,
           data.format,
           data.scope,
           data.filters || null,
@@ -76,27 +86,32 @@ export function createExportJobRepository() {
           data.recordCount || 0,
         ]
       );
-      const record = await this.findById(id);
+      const record = await this.findById(userId, id);
       return record!;
     },
 
     async updateStatus(
+      userId: string,
       id: string,
       status: string,
       filename?: string
     ): Promise<ExportJobRecord | undefined> {
-      const existing = await this.findById(id);
+      const existing = await this.findById(userId, id);
       if (!existing) return undefined;
       const db = await getDb();
       if (status === 'completed') {
         await db.query(
-          'UPDATE export_jobs SET status=?, filename=?, completed_at=CURRENT_TIMESTAMP WHERE id=?',
-          [status, filename || null, id]
+          'UPDATE export_jobs SET status=?, filename=?, completed_at=CURRENT_TIMESTAMP WHERE user_id=? AND id=?',
+          [status, filename || null, userId, id]
         );
       } else {
-        await db.query('UPDATE export_jobs SET status=? WHERE id=?', [status, id]);
+        await db.query('UPDATE export_jobs SET status=? WHERE user_id=? AND id=?', [
+          status,
+          userId,
+          id,
+        ]);
       }
-      return this.findById(id).then((r) => r!);
+      return this.findById(userId, id).then((r) => r!);
     },
   };
 }

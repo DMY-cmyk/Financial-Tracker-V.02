@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { listExportJobs, createExportJob } from '@/server/services/export-job.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -11,7 +12,7 @@ beforeEach(async () => {
 
 describe('createExportJob', () => {
   it('creates an export job and marks as completed', async () => {
-    const result = await createExportJob({ format: 'csv', scope: 'current' });
+    const result = await createExportJob(DEMO_USER_ID, { format: 'csv', scope: 'current' });
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -22,7 +23,7 @@ describe('createExportJob', () => {
   });
 
   it('creates an export job with all options', async () => {
-    const result = await createExportJob({
+    const result = await createExportJob(DEMO_USER_ID, {
       format: 'xlsx',
       scope: 'all',
       filters: '{"month":0}',
@@ -36,19 +37,19 @@ describe('createExportJob', () => {
   });
 
   it('returns validation error for invalid format', async () => {
-    const result = await createExportJob({ format: 'docx', scope: 'current' });
+    const result = await createExportJob(DEMO_USER_ID, { format: 'docx', scope: 'current' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for invalid scope', async () => {
-    const result = await createExportJob({ format: 'csv', scope: 'monthly' });
+    const result = await createExportJob(DEMO_USER_ID, { format: 'csv', scope: 'monthly' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for missing fields', async () => {
-    const result = await createExportJob({});
+    const result = await createExportJob(DEMO_USER_ID, {});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
@@ -56,16 +57,16 @@ describe('createExportJob', () => {
 
 describe('listExportJobs', () => {
   it('returns all export jobs', async () => {
-    await createExportJob({ format: 'csv', scope: 'current' });
-    await createExportJob({ format: 'xlsx', scope: 'all' });
+    await createExportJob(DEMO_USER_ID, { format: 'csv', scope: 'current' });
+    await createExportJob(DEMO_USER_ID, { format: 'xlsx', scope: 'all' });
 
-    const result = await listExportJobs();
+    const result = await listExportJobs(DEMO_USER_ID);
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(2);
   });
 
   it('returns empty array when no jobs', async () => {
-    const result = await listExportJobs();
+    const result = await listExportJobs(DEMO_USER_ID);
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(0);
   });

@@ -4,9 +4,10 @@ import {
   createRecurringTransaction,
 } from '@/server/services/recurring-transaction.service';
 import { readJsonBody } from '@/lib/api/read-json';
+import { requireUserId } from '@/server/auth/current-user';
 
-export async function GET() {
-  const result = await listRecurringTransactions();
+export async function GET(request: NextRequest) {
+  const result = await listRecurringTransactions(requireUserId(request));
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await createRecurringTransaction(body);
+  const result = await createRecurringTransaction(requireUserId(request), body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

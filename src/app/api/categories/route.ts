@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { listCategories, createCategory } from '@/server/services/category.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
   const year = yearRaw !== undefined && !isNaN(yearRaw) ? yearRaw : undefined;
 
   const result = await listCategories(
+    requireUserId(request),
     type || month !== undefined || year !== undefined ? { type, month, year } : undefined
   );
 
@@ -26,7 +28,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await createCategory(body);
+  const result = await createCategory(requireUserId(request), body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

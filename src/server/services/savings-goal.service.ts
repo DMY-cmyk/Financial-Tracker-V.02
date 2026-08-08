@@ -22,19 +22,25 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listSavingsGoals(): Promise<ServiceResult<SavingsGoal[]>> {
+export async function listSavingsGoals(userId: string): Promise<ServiceResult<SavingsGoal[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function getSavingsGoal(id: string): Promise<ServiceResult<SavingsGoal>> {
+export async function getSavingsGoal(
+  userId: string,
+  id: string
+): Promise<ServiceResult<SavingsGoal>> {
   await ensureSeeded();
-  const goal = await repo.findById(id);
+  const goal = await repo.findById(userId, id);
   if (!goal) return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
   return { data: goal };
 }
 
-export async function createSavingsGoal(body: unknown): Promise<ServiceResult<SavingsGoal>> {
+export async function createSavingsGoal(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<SavingsGoal>> {
   await ensureSeeded();
   const parsed = createSavingsGoalSchema.safeParse(body);
   if (!parsed.success) {
@@ -48,7 +54,7 @@ export async function createSavingsGoal(body: unknown): Promise<ServiceResult<Sa
   }
   const data = parsed.data;
   return {
-    data: await repo.create({
+    data: await repo.create(userId, {
       name: data.name,
       targetAmount: data.targetAmount,
       savedAmount: data.savedAmount ?? 0,
@@ -58,6 +64,7 @@ export async function createSavingsGoal(body: unknown): Promise<ServiceResult<Sa
 }
 
 export async function updateSavingsGoal(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<SavingsGoal>> {
@@ -72,14 +79,17 @@ export async function updateSavingsGoal(
       },
     };
   }
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
 
-export async function deleteSavingsGoal(id: string): Promise<ServiceResult<{ success: boolean }>> {
+export async function deleteSavingsGoal(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id)))
+  if (!(await repo.delete(userId, id)))
     return { error: { message: 'Savings goal not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
 }

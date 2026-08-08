@@ -21,12 +21,13 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function getSettings(): Promise<ServiceResult<Record<string, string>>> {
+export async function getSettings(userId: string): Promise<ServiceResult<Record<string, string>>> {
   await ensureSeeded();
-  return { data: await repo.getAll() };
+  return { data: await repo.getAll(userId) };
 }
 
 export async function updateSettings(
+  userId: string,
   body: unknown
 ): Promise<ServiceResult<Record<string, string>>> {
   await ensureSeeded();
@@ -39,6 +40,6 @@ export async function updateSettings(
         details: formatZodError(parsed.error),
       },
     };
-  await repo.setMany(parsed.data);
-  return { data: await repo.getAll() };
+  await repo.setMany(userId, parsed.data);
+  return { data: await repo.getAll(userId) };
 }

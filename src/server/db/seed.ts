@@ -1,5 +1,6 @@
 import { getDb } from './client';
 import { getSampleData } from '@/data/sample-data';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 let seeded = false;
 
@@ -15,16 +16,25 @@ export async function ensureSeeded() {
   if (seeded) return;
 
   const db = await getDb();
+
+  // Always make sure the demo user exists. Owns all seed data; also serves as
+  // the backfill target for pre-multitenant rows that have user_id = ''.
+  await db.query(
+    'INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
+    [DEMO_USER_ID, 'demo@local', 'Demo', null]
+  );
+
   const result = await db.query<{ c: number }>('SELECT COUNT(*) as c FROM transactions');
 
   if (result.rows[0]?.c > 0) {
     // Run migrations for existing data
     await migrateCategoryIds(db);
     await cleanup2025Data(db);
+    await backfillUserIds(db);
     // Ensure "Saldo Awal" income category always exists (even on pre-existing databases)
     await db.query(
-      'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      ['cat-saldo-awal', 'Saldo Awal', 'income', '#059669', 'wallet', 0]
+      'INSERT INTO categories (id, user_id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      ['cat-saldo-awal', DEMO_USER_ID, 'Saldo Awal', 'income', '#059669', 'wallet', 0]
     );
     seeded = true;
     return;
@@ -35,15 +45,15 @@ export async function ensureSeeded() {
   // Seed categories first so we can resolve IDs for transactions
   for (const c of data.categories) {
     await db.query(
-      'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [c.id, c.name, c.type, c.color, c.icon, c.budget]
+      'INSERT INTO categories (id, user_id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      [c.id, DEMO_USER_ID, c.name, c.type, c.color, c.icon, c.budget]
     );
   }
 
   // Ensure "Saldo Awal" income category always exists
   await db.query(
-    'INSERT INTO categories (id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-    ['cat-saldo-awal', 'Saldo Awal', 'income', '#059669', 'wallet', 0]
+    'INSERT INTO categories (id, user_id, name, type, color, icon, budget) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+    ['cat-saldo-awal', DEMO_USER_ID, 'Saldo Awal', 'income', '#059669', 'wallet', 0]
   );
 
   // Build name→id map for category resolution
@@ -52,9 +62,10 @@ export async function ensureSeeded() {
   for (const t of data.transactions) {
     const categoryId = catMap.get(t.category) || '';
     await db.query(
-      'INSERT INTO transactions (id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      'INSERT INTO transactions (id, user_id, date, description, category, category_id, type, amount, payment_method, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
       [
         t.id,
+        DEMO_USER_ID,
         t.date,
         t.description,
         t.category,
@@ -95,34 +106,61 @@ export async function ensureSeeded() {
       p.icon ??
       'initials';
     await db.query(
-      'INSERT INTO payment_methods (id, name, icon, type) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [p.id, p.name, icon, p.type]
+      'INSERT INTO payment_methods (id, user_id, name, icon, type) VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      [p.id, DEMO_USER_ID, p.name, icon, p.type]
     );
   }
   for (const b of data.bills) {
     await db.query(
-      'INSERT INTO bills (id, name, amount, due_date, is_paid, month, year) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [b.id, b.name, b.amount, b.dueDate, b.isPaid ? 1 : 0, b.month, b.year]
+      'INSERT INTO bills (id, user_id, name, amount, due_date, is_paid, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      [b.id, DEMO_USER_ID, b.name, b.amount, b.dueDate, b.isPaid ? 1 : 0, b.month, b.year]
     );
   }
   for (const s of data.savingsGoals) {
     await db.query(
-      'INSERT INTO savings_goals (id, name, target_amount, saved_amount, color) VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
-      [s.id, s.name, s.targetAmount, s.savedAmount, s.color]
+      'INSERT INTO savings_goals (id, user_id, name, target_amount, saved_amount, color) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      [s.id, DEMO_USER_ID, s.name, s.targetAmount, s.savedAmount, s.color]
     );
   }
 
-  // Default settings
-  await db.query('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING', [
-    'theme',
-    'system',
-  ]);
-  await db.query('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT DO NOTHING', [
-    'locale',
-    'en',
-  ]);
+  // Default settings (per-user — composite PK on (key, user_id))
+  await db.query(
+    'INSERT INTO settings (key, user_id, value) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
+    ['theme', DEMO_USER_ID, 'system']
+  );
+  await db.query(
+    'INSERT INTO settings (key, user_id, value) VALUES (?, ?, ?) ON CONFLICT DO NOTHING',
+    ['locale', DEMO_USER_ID, 'en']
+  );
 
   seeded = true;
+}
+
+/**
+ * Backfill user_id = DEMO_USER_ID for any row still carrying the empty default.
+ * Idempotent — affects only rows from before per-user scoping landed.
+ */
+async function backfillUserIds(db: {
+  query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }>;
+}) {
+  const tables = [
+    'transactions',
+    'categories',
+    'payment_methods',
+    'bills',
+    'savings_goals',
+    'settings',
+    'uploads',
+    'export_jobs',
+    'recurring_transactions',
+    'budget_templates',
+    'liabilities',
+    'net_worth_snapshots',
+    'monthly_budgets',
+  ];
+  for (const table of tables) {
+    await db.query(`UPDATE ${table} SET user_id = ? WHERE user_id = ''`, [DEMO_USER_ID]);
+  }
 }
 
 /** One-time cleanup: delete all 2025 seed data from production */

@@ -38,53 +38,59 @@ function rowToUpload(r: UploadRow): UploadRecord {
 
 export function createUploadRepository() {
   return {
-    async findAll(): Promise<UploadRecord[]> {
+    async findAll(userId: string): Promise<UploadRecord[]> {
       const db = await getDb();
-      const result = await db.query<UploadRow>('SELECT * FROM uploads ORDER BY created_at DESC');
+      const result = await db.query<UploadRow>(
+        'SELECT * FROM uploads WHERE user_id = ? ORDER BY created_at DESC',
+        [userId]
+      );
       return result.rows.map(rowToUpload);
     },
 
-    async findById(id: string): Promise<UploadRecord | undefined> {
+    async findById(userId: string, id: string): Promise<UploadRecord | undefined> {
       const db = await getDb();
-      const result = await db.query<UploadRow>('SELECT * FROM uploads WHERE id = ?', [id]);
+      const result = await db.query<UploadRow>(
+        'SELECT * FROM uploads WHERE user_id = ? AND id = ?',
+        [userId, id]
+      );
       return result.rows[0] ? rowToUpload(result.rows[0]) : undefined;
     },
 
-    async create(data: {
-      filename: string;
-      fileSize: number;
-      mimeType: string;
-    }): Promise<UploadRecord> {
+    async create(
+      userId: string,
+      data: { filename: string; fileSize: number; mimeType: string }
+    ): Promise<UploadRecord> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO uploads (id, filename, file_size, mime_type) VALUES (?, ?, ?, ?)',
-        [id, data.filename, data.fileSize, data.mimeType]
+        'INSERT INTO uploads (id, user_id, filename, file_size, mime_type) VALUES (?, ?, ?, ?, ?)',
+        [id, userId, data.filename, data.fileSize, data.mimeType]
       );
-      const record = await this.findById(id);
+      const record = await this.findById(userId, id);
       return record!;
     },
 
     async update(
+      userId: string,
       id: string,
       data: { status?: string; extractedData?: string }
     ): Promise<UploadRecord | undefined> {
-      const existing = await this.findById(id);
+      const existing = await this.findById(userId, id);
       if (!existing) return undefined;
       const db = await getDb();
       if (data.status) {
-        await db.query('UPDATE uploads SET status=?, updated_at=CURRENT_TIMESTAMP WHERE id=?', [
-          data.status,
-          id,
-        ]);
+        await db.query(
+          'UPDATE uploads SET status=?, updated_at=CURRENT_TIMESTAMP WHERE user_id=? AND id=?',
+          [data.status, userId, id]
+        );
       }
       if (data.extractedData !== undefined) {
         await db.query(
-          'UPDATE uploads SET extracted_data=?, updated_at=CURRENT_TIMESTAMP WHERE id=?',
-          [data.extractedData, id]
+          'UPDATE uploads SET extracted_data=?, updated_at=CURRENT_TIMESTAMP WHERE user_id=? AND id=?',
+          [data.extractedData, userId, id]
         );
       }
-      return this.findById(id).then((r) => r!);
+      return this.findById(userId, id).then((r) => r!);
     },
   };
 }

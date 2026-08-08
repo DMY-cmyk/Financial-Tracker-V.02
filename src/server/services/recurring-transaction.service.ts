@@ -6,6 +6,7 @@ import {
   updateRecurringTransactionSchema,
 } from '@/lib/api/validation';
 import type { RecurringTransaction } from '@/lib/types';
+import { todayInWIB } from '@/lib/wib-date';
 
 const repo = createRecurringTransactionRepository();
 const txRepo = createTransactionRepository();
@@ -27,21 +28,25 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listRecurringTransactions(): Promise<ServiceResult<RecurringTransaction[]>> {
+export async function listRecurringTransactions(
+  userId: string
+): Promise<ServiceResult<RecurringTransaction[]>> {
   await ensureSeeded();
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
 export async function getRecurringTransaction(
+  userId: string,
   id: string
 ): Promise<ServiceResult<RecurringTransaction>> {
   await ensureSeeded();
-  const rt = await repo.findById(id);
+  const rt = await repo.findById(userId, id);
   if (!rt) return { error: { message: 'Recurring transaction not found', code: 'NOT_FOUND' } };
   return { data: rt };
 }
 
 export async function createRecurringTransaction(
+  userId: string,
   body: unknown
 ): Promise<ServiceResult<RecurringTransaction>> {
   await ensureSeeded();
@@ -57,7 +62,7 @@ export async function createRecurringTransaction(
   }
   const data = parsed.data;
   return {
-    data: await repo.create({
+    data: await repo.create(userId, {
       description: data.description,
       category: data.category,
       categoryId: data.categoryId,
@@ -75,6 +80,7 @@ export async function createRecurringTransaction(
 }
 
 export async function updateRecurringTransaction(
+  userId: string,
   id: string,
   body: unknown
 ): Promise<ServiceResult<RecurringTransaction>> {
@@ -89,7 +95,7 @@ export async function updateRecurringTransaction(
       },
     };
   }
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) {
     return { error: { message: 'Recurring transaction not found', code: 'NOT_FOUND' } };
   }
@@ -97,10 +103,11 @@ export async function updateRecurringTransaction(
 }
 
 export async function deleteRecurringTransaction(
+  userId: string,
   id: string
 ): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id))) {
+  if (!(await repo.delete(userId, id))) {
     return { error: { message: 'Recurring transaction not found', code: 'NOT_FOUND' } };
   }
   return { data: { success: true } };
@@ -131,12 +138,14 @@ function advanceDate(dateStr: string, frequency: RecurringTransaction['frequency
 }
 
 // Generate pending transactions from all active recurring rules up to today
-export async function generateRecurringTransactions(): Promise<
+export async function generateRecurringTransactions(
+  userId: string
+): Promise<
   ServiceResult<{ generated: number; skipped: number; totalIncome: number; totalExpense: number }>
 > {
   await ensureSeeded();
-  const today = new Date().toISOString().slice(0, 10);
-  const dueRules = await repo.findDue(today);
+  const today = todayInWIB();
+  const dueRules = await repo.findDue(userId, today);
 
   let generated = 0;
   let skipped = 0;
@@ -152,14 +161,14 @@ export async function generateRecurringTransactions(): Promise<
       if (rule.endDate && nextDate > rule.endDate) break;
 
       // Idempotency check: skip if a transaction already exists for this rule + due date
-      const existing = await txRepo.findBySource(rule.id, nextDate);
+      const existing = await txRepo.findBySource(userId, rule.id, nextDate);
       if (existing) {
         skipped++;
         nextDate = advanceDate(nextDate, rule.frequency);
         continue;
       }
 
-      await txRepo.create({
+      await txRepo.create(userId, {
         date: nextDate,
         description: rule.description,
         category: rule.category,
@@ -184,9 +193,9 @@ export async function generateRecurringTransactions(): Promise<
 
     // Check if rule should be deactivated (past endDate)
     if (rule.endDate && nextDate > rule.endDate) {
-      await repo.update(rule.id, { isActive: false, nextDueDate: nextDate });
+      await repo.update(userId, rule.id, { isActive: false, nextDueDate: nextDate });
     } else {
-      await repo.update(rule.id, { nextDueDate: nextDate });
+      await repo.update(userId, rule.id, { nextDueDate: nextDate });
     }
   }
 
@@ -194,7 +203,7 @@ export async function generateRecurringTransactions(): Promise<
 }
 
 // Compute overdue counts per rule for the dashboard banner (read-only, no side effects)
-export async function getDueItems(): Promise<
+export async function getDueItems(userId: string): Promise<
   ServiceResult<{
     dueItems: Array<{
       id: string;
@@ -212,8 +221,8 @@ export async function getDueItems(): Promise<
   }>
 > {
   await ensureSeeded();
-  const today = new Date().toISOString().slice(0, 10);
-  const dueRules = await repo.findDue(today);
+  const today = todayInWIB();
+  const dueRules = await repo.findDue(userId, today);
 
   const dueItems = dueRules.map((rule) => {
     let count = 0;

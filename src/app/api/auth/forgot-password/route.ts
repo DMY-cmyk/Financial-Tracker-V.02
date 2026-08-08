@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { readJsonBody } from '@/lib/api/read-json';
 import { requestPasswordReset } from '@/server/services/password-reset.service';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { getAppUrl } from '@/lib/auth/app-url';
 
 const schema = z.object({
   email: z.string().email(),
@@ -10,6 +12,9 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(`forgot:${getClientIp(request)}`, 3, 5 * 60 * 1000);
+    if (!limit.ok) return rateLimitResponse(limit.retryAfter);
+
     const parsedBody = await readJsonBody(request);
     if (parsedBody.error) return parsedBody.error;
     const body = parsedBody.data;
@@ -20,7 +25,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    const appUrl = process.env.APP_URL ?? new URL(request.url).origin;
+    const appUrl = getAppUrl(new URL(request.url).origin);
     const result = await requestPasswordReset({ ...parsed.data, appUrl });
     if (result.error) {
       return NextResponse.json({ error: { message: result.error.message } }, { status: 500 });

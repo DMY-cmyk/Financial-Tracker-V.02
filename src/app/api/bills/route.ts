@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { listBills, createBill } from '@/server/services/bill.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const monthParam = request.nextUrl.searchParams.get('month');
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
       ? { month: parseInt(monthParam, 10), year: parseInt(yearParam, 10) }
       : undefined;
 
-  const result = await listBills(query);
+  const result = await listBills(requireUserId(request), query);
 
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await createBill(body);
+  const result = await createBill(requireUserId(request), body);
 
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;

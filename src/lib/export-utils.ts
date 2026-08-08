@@ -253,8 +253,7 @@ export async function exportPDF(input: ExportReportInput): Promise<void> {
   // If a period has neither income nor expense categories (e.g. an empty
   // month), no autoTable ran above and `lastAutoTable` is undefined — guard
   // it like the later sections do, otherwise reading `.finalY` crashes.
-  y =
-    ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 6;
+  y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 6;
 
   // ── Saldo per Metode Pembayaran (full width) ──────────────────────────────
   if (paymentMethodBalances.length > 0) {

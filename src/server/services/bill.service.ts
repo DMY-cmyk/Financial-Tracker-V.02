@@ -22,25 +22,25 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listBills(query?: {
-  month?: number;
-  year?: number;
-}): Promise<ServiceResult<Bill[]>> {
+export async function listBills(
+  userId: string,
+  query?: { month?: number; year?: number }
+): Promise<ServiceResult<Bill[]>> {
   await ensureSeeded();
   if (query?.month !== undefined && query?.year !== undefined) {
-    return { data: await repo.findByMonth(query.month, query.year) };
+    return { data: await repo.findByMonth(userId, query.month, query.year) };
   }
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function getBill(id: string): Promise<ServiceResult<Bill>> {
+export async function getBill(userId: string, id: string): Promise<ServiceResult<Bill>> {
   await ensureSeeded();
-  const bill = await repo.findById(id);
+  const bill = await repo.findById(userId, id);
   if (!bill) return { error: { message: 'Bill not found', code: 'NOT_FOUND' } };
   return { data: bill };
 }
 
-export async function createBill(body: unknown): Promise<ServiceResult<Bill>> {
+export async function createBill(userId: string, body: unknown): Promise<ServiceResult<Bill>> {
   await ensureSeeded();
   const parsed = createBillSchema.safeParse(body);
   if (!parsed.success) {
@@ -54,7 +54,7 @@ export async function createBill(body: unknown): Promise<ServiceResult<Bill>> {
   }
   const data = parsed.data;
   return {
-    data: await repo.create({
+    data: await repo.create(userId, {
       name: data.name,
       amount: data.amount,
       dueDate: data.dueDate,
@@ -66,7 +66,11 @@ export async function createBill(body: unknown): Promise<ServiceResult<Bill>> {
   };
 }
 
-export async function updateBill(id: string, body: unknown): Promise<ServiceResult<Bill>> {
+export async function updateBill(
+  userId: string,
+  id: string,
+  body: unknown
+): Promise<ServiceResult<Bill>> {
   await ensureSeeded();
   const parsed = updateBillSchema.safeParse(body);
   if (!parsed.success) {
@@ -78,26 +82,31 @@ export async function updateBill(id: string, body: unknown): Promise<ServiceResu
       },
     };
   }
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) return { error: { message: 'Bill not found', code: 'NOT_FOUND' } };
   return { data: result };
 }
 
-export async function deleteBill(id: string): Promise<ServiceResult<{ success: boolean }>> {
+export async function deleteBill(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  if (!(await repo.delete(id))) return { error: { message: 'Bill not found', code: 'NOT_FOUND' } };
+  if (!(await repo.delete(userId, id)))
+    return { error: { message: 'Bill not found', code: 'NOT_FOUND' } };
   return { data: { success: true } };
 }
 
 /** Copy recurring bills from a previous month into the target month (unpaid). */
 export async function generateRecurringBills(
+  userId: string,
   month: number,
   year: number
 ): Promise<ServiceResult<{ generated: number }>> {
   await ensureSeeded();
 
   // Find if target month already has bills
-  const existing = await repo.findByMonth(month, year);
+  const existing = await repo.findByMonth(userId, month, year);
   if (existing.length > 0) {
     return { data: { generated: 0 } };
   }
@@ -112,7 +121,7 @@ export async function generateRecurringBills(
 
   let recurringBills: Bill[] = [];
   for (let i = 0; i < 12; i++) {
-    recurringBills = await repo.findRecurringByMonth(sourceMonth, sourceYear);
+    recurringBills = await repo.findRecurringByMonth(userId, sourceMonth, sourceYear);
     if (recurringBills.length > 0) break;
     sourceMonth--;
     if (sourceMonth < 0) {
@@ -127,7 +136,7 @@ export async function generateRecurringBills(
 
   let generated = 0;
   for (const bill of recurringBills) {
-    await repo.create({
+    await repo.create(userId, {
       name: bill.name,
       amount: bill.amount,
       dueDate: bill.dueDate,

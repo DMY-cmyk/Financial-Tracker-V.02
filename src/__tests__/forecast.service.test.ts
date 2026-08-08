@@ -3,6 +3,7 @@ import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { computeOccurrences, getForecast } from '@/server/services/forecast.service';
 import { createRecurringTransaction } from '@/server/services/recurring-transaction.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 import type { RecurringTransaction } from '@/lib/types';
 
 beforeEach(async () => {
@@ -114,25 +115,25 @@ describe('computeOccurrences – yearly', () => {
 
 describe('getForecast', () => {
   it('returns forecast array with the requested number of months', async () => {
-    const result = await getForecast(6);
+    const result = await getForecast(DEMO_USER_ID, 6);
     expect(result.error).toBeUndefined();
     expect(result.data!.forecast).toHaveLength(6);
   });
 
   it('respects custom months count', async () => {
-    const result = await getForecast(3);
+    const result = await getForecast(DEMO_USER_ID, 3);
     expect(result.data!.forecast).toHaveLength(3);
   });
 
   it('returns zeros when no recurring transactions exist', async () => {
-    const result = await getForecast(1);
+    const result = await getForecast(DEMO_USER_ID, 1);
     expect(result.data!.forecast[0].projectedIncome).toBe(0);
     expect(result.data!.forecast[0].projectedExpense).toBe(0);
     expect(result.data!.forecast[0].recurringItems).toHaveLength(0);
   });
 
   it('includes active monthly recurring income in forecast', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       description: 'Monthly Salary',
       category: 'Income',
       categoryId: 'cat-1',
@@ -146,14 +147,14 @@ describe('getForecast', () => {
       nextDueDate: '2026-01-01',
       isActive: true,
     });
-    const result = await getForecast(1);
+    const result = await getForecast(DEMO_USER_ID, 1);
     expect(result.data!.forecast[0].projectedIncome).toBe(5000000);
     expect(result.data!.forecast[0].recurringItems).toHaveLength(1);
     expect(result.data!.forecast[0].recurringItems[0].description).toBe('Monthly Salary');
   });
 
   it('excludes inactive recurring transactions', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       description: 'Inactive',
       category: 'Expense',
       categoryId: 'cat-2',
@@ -167,12 +168,12 @@ describe('getForecast', () => {
       nextDueDate: '2026-01-01',
       isActive: false,
     });
-    const result = await getForecast(1);
+    const result = await getForecast(DEMO_USER_ID, 1);
     expect(result.data!.forecast[0].projectedExpense).toBe(0);
   });
 
   it('includes currentMonth with actual income and expense fields', async () => {
-    const result = await getForecast(1);
+    const result = await getForecast(DEMO_USER_ID, 1);
     expect(result.data!.currentMonth).toBeDefined();
     expect(typeof result.data!.currentMonth.actualIncome).toBe('number');
     expect(typeof result.data!.currentMonth.actualExpense).toBe('number');
@@ -182,7 +183,7 @@ describe('getForecast', () => {
   });
 
   it('sets projectedNet to 0 when no transactions and no recurring exist', async () => {
-    const result = await getForecast(1);
+    const result = await getForecast(DEMO_USER_ID, 1);
     expect(result.data!.currentMonth.projectedNet).toBe(0);
   });
 });

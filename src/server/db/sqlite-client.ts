@@ -10,7 +10,13 @@ export function createSqliteClient(dbPath?: string): DbClient {
   const resolvedPath = dbPath ?? ':memory:';
   const db = new Database(resolvedPath);
   db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
+  // FK enforcement intentionally OFF for dev/test. The schema declares
+  // REFERENCES ... ON DELETE CASCADE on every user-owned table; Postgres
+  // enforces those in production. We leave SQLite permissive so unit tests
+  // can insert rows with synthetic user_ids/category_ids without first
+  // seeding the parent — app-layer guards (`deleteIfUnused`, scoped
+  // queries) keep dev safe.
+  db.pragma('foreign_keys = OFF');
 
   return {
     async query<T = Record<string, unknown>>(

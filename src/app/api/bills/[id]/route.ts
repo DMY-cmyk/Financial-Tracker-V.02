@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { updateBill, deleteBill } from '@/server/services/bill.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await updateBill(id, body);
+  const result = await updateBill(requireUserId(request), id, body);
 
   if (result.error) {
     const status = result.error.code === 'NOT_FOUND' ? 404 : 400;
@@ -17,11 +18,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const result = await deleteBill(id);
+  const result = await deleteBill(requireUserId(request), id);
 
   if (result.error) {
     const status = result.error.code === 'NOT_FOUND' ? 404 : 400;

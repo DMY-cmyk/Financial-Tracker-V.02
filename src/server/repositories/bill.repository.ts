@@ -17,7 +17,7 @@ function rowToBill(row: BillRow): Bill {
   return {
     id: row.id,
     name: row.name,
-    amount: row.amount,
+    amount: Number(row.amount),
     dueDate: row.due_date,
     isPaid: Boolean(row.is_paid),
     isRecurring: Boolean(row.is_recurring),
@@ -28,43 +28,50 @@ function rowToBill(row: BillRow): Bill {
 
 export function createBillRepository() {
   return {
-    async findAll(): Promise<Bill[]> {
-      const db = await getDb();
-      const result = await db.query<BillRow>('SELECT * FROM bills ORDER BY due_date');
-      return result.rows.map(rowToBill);
-    },
-
-    async findByMonth(month: number, year: number): Promise<Bill[]> {
+    async findAll(userId: string): Promise<Bill[]> {
       const db = await getDb();
       const result = await db.query<BillRow>(
-        'SELECT * FROM bills WHERE month = ? AND year = ? ORDER BY due_date',
-        [month, year]
+        'SELECT * FROM bills WHERE user_id = ? ORDER BY due_date',
+        [userId]
       );
       return result.rows.map(rowToBill);
     },
 
-    async findRecurringByMonth(month: number, year: number): Promise<Bill[]> {
+    async findByMonth(userId: string, month: number, year: number): Promise<Bill[]> {
       const db = await getDb();
       const result = await db.query<BillRow>(
-        'SELECT * FROM bills WHERE month = ? AND year = ? AND is_recurring = 1 ORDER BY due_date',
-        [month, year]
+        'SELECT * FROM bills WHERE user_id = ? AND month = ? AND year = ? ORDER BY due_date',
+        [userId, month, year]
       );
       return result.rows.map(rowToBill);
     },
 
-    async findById(id: string): Promise<Bill | undefined> {
+    async findRecurringByMonth(userId: string, month: number, year: number): Promise<Bill[]> {
       const db = await getDb();
-      const result = await db.query<BillRow>('SELECT * FROM bills WHERE id = ?', [id]);
+      const result = await db.query<BillRow>(
+        'SELECT * FROM bills WHERE user_id = ? AND month = ? AND year = ? AND is_recurring = 1 ORDER BY due_date',
+        [userId, month, year]
+      );
+      return result.rows.map(rowToBill);
+    },
+
+    async findById(userId: string, id: string): Promise<Bill | undefined> {
+      const db = await getDb();
+      const result = await db.query<BillRow>('SELECT * FROM bills WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
       return result.rows[0] ? rowToBill(result.rows[0]) : undefined;
     },
 
-    async create(data: Omit<Bill, 'id'>): Promise<Bill> {
+    async create(userId: string, data: Omit<Bill, 'id'>): Promise<Bill> {
       const id = nanoid();
       const db = await getDb();
       await db.query(
-        'INSERT INTO bills (id, name, amount, due_date, is_paid, is_recurring, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO bills (id, user_id, name, amount, due_date, is_paid, is_recurring, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           id,
+          userId,
           data.name,
           data.amount,
           data.dueDate,
@@ -77,14 +84,21 @@ export function createBillRepository() {
       return { ...data, id };
     },
 
-    async update(id: string, data: Partial<Omit<Bill, 'id'>>): Promise<Bill | undefined> {
+    async update(
+      userId: string,
+      id: string,
+      data: Partial<Omit<Bill, 'id'>>
+    ): Promise<Bill | undefined> {
       const db = await getDb();
-      const existing = await db.query<BillRow>('SELECT * FROM bills WHERE id = ?', [id]);
+      const existing = await db.query<BillRow>('SELECT * FROM bills WHERE user_id = ? AND id = ?', [
+        userId,
+        id,
+      ]);
       if (!existing.rows[0]) return undefined;
       const current = rowToBill(existing.rows[0]);
       const updated: Bill = { ...current, ...data };
       await db.query(
-        'UPDATE bills SET name=?, amount=?, due_date=?, is_paid=?, is_recurring=?, month=?, year=? WHERE id=?',
+        'UPDATE bills SET name=?, amount=?, due_date=?, is_paid=?, is_recurring=?, month=?, year=? WHERE user_id=? AND id=?',
         [
           updated.name,
           updated.amount,
@@ -93,15 +107,16 @@ export function createBillRepository() {
           updated.isRecurring ? 1 : 0,
           updated.month,
           updated.year,
+          userId,
           id,
         ]
       );
       return updated;
     },
 
-    async delete(id: string): Promise<boolean> {
+    async delete(userId: string, id: string): Promise<boolean> {
       const db = await getDb();
-      const result = await db.query('DELETE FROM bills WHERE id = ?', [id]);
+      const result = await db.query('DELETE FROM bills WHERE user_id = ? AND id = ?', [userId, id]);
       return result.rowCount > 0;
     },
   };

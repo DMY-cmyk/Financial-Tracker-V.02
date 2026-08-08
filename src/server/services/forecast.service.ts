@@ -74,7 +74,10 @@ export function computeOccurrences(tx: RecurringTransaction, month: number, year
   }
 }
 
-export async function getForecast(months: number): Promise<ServiceResult<ForecastResponse>> {
+export async function getForecast(
+  userId: string,
+  months: number
+): Promise<ServiceResult<ForecastResponse>> {
   await ensureSeeded();
 
   // Uses the system clock; forecast months are relative to today.
@@ -85,8 +88,8 @@ export async function getForecast(months: number): Promise<ServiceResult<Forecas
   const currentMonth = now.getMonth();
 
   const [activeRecurring, currentMonthTxs] = await Promise.all([
-    recurringRepo.findActive(),
-    txRepo.findByMonth(currentMonth, currentYear),
+    recurringRepo.findActive(userId),
+    txRepo.findByMonth(userId, currentMonth, currentYear),
   ]);
 
   const actualIncome = currentMonthTxs

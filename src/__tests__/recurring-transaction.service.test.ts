@@ -9,6 +9,7 @@ import {
   deleteRecurringTransaction,
   generateRecurringTransactions,
 } from '@/server/services/recurring-transaction.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -33,7 +34,7 @@ const validRecurring = {
 
 describe('createRecurringTransaction', () => {
   it('creates a recurring transaction with valid input', async () => {
-    const result = await createRecurringTransaction(validRecurring);
+    const result = await createRecurringTransaction(DEMO_USER_ID, validRecurring);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -42,7 +43,7 @@ describe('createRecurringTransaction', () => {
   });
 
   it('defaults notes to empty string when not provided', async () => {
-    const result = await createRecurringTransaction({
+    const result = await createRecurringTransaction(DEMO_USER_ID, {
       description: validRecurring.description,
       category: validRecurring.category,
       categoryId: validRecurring.categoryId,
@@ -58,17 +59,23 @@ describe('createRecurringTransaction', () => {
   });
 
   it('returns VALIDATION_ERROR for empty description', async () => {
-    const result = await createRecurringTransaction({ ...validRecurring, description: '' });
+    const result = await createRecurringTransaction(DEMO_USER_ID, {
+      ...validRecurring,
+      description: '',
+    });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for invalid frequency', async () => {
-    const result = await createRecurringTransaction({ ...validRecurring, frequency: 'quarterly' });
+    const result = await createRecurringTransaction(DEMO_USER_ID, {
+      ...validRecurring,
+      frequency: 'quarterly',
+    });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for invalid date format', async () => {
-    const result = await createRecurringTransaction({
+    const result = await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       startDate: '01-01-2026',
     });
@@ -76,103 +83,106 @@ describe('createRecurringTransaction', () => {
   });
 
   it('returns VALIDATION_ERROR for negative amount', async () => {
-    const result = await createRecurringTransaction({ ...validRecurring, amount: -100 });
+    const result = await createRecurringTransaction(DEMO_USER_ID, {
+      ...validRecurring,
+      amount: -100,
+    });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('listRecurringTransactions', () => {
   it('returns empty array when none exist', async () => {
-    const result = await listRecurringTransactions();
+    const result = await listRecurringTransactions(DEMO_USER_ID);
     expect(result.data).toEqual([]);
   });
 
   it('returns all recurring transactions', async () => {
-    await createRecurringTransaction(validRecurring);
-    await createRecurringTransaction({ ...validRecurring, description: 'Rent' });
-    const result = await listRecurringTransactions();
+    await createRecurringTransaction(DEMO_USER_ID, validRecurring);
+    await createRecurringTransaction(DEMO_USER_ID, { ...validRecurring, description: 'Rent' });
+    const result = await listRecurringTransactions(DEMO_USER_ID);
     expect(result.data!.length).toBe(2);
   });
 });
 
 describe('getRecurringTransaction', () => {
   it('returns the transaction by id', async () => {
-    const { data: created } = await createRecurringTransaction(validRecurring);
-    const result = await getRecurringTransaction(created!.id);
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, validRecurring);
+    const result = await getRecurringTransaction(DEMO_USER_ID, created!.id);
     expect(result.error).toBeUndefined();
     expect(result.data!.description).toBe('Monthly Salary');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await getRecurringTransaction('nonexistent');
+    const result = await getRecurringTransaction(DEMO_USER_ID, 'nonexistent');
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 });
 
 describe('updateRecurringTransaction', () => {
   it('updates only the provided fields', async () => {
-    const { data: created } = await createRecurringTransaction(validRecurring);
-    const result = await updateRecurringTransaction(created!.id, { amount: 6000000 });
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, validRecurring);
+    const result = await updateRecurringTransaction(DEMO_USER_ID, created!.id, { amount: 6000000 });
     expect(result.error).toBeUndefined();
     expect(result.data!.amount).toBe(6000000);
   });
 
   it('preserves isActive=false when updating amount', async () => {
-    const { data: created } = await createRecurringTransaction({
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       isActive: false,
     });
     // BUG: updateRecurringTransactionSchema inherits default(true) for isActive
     // so patching just the amount resets isActive to true
-    const result = await updateRecurringTransaction(created!.id, { amount: 6000000 });
+    const result = await updateRecurringTransaction(DEMO_USER_ID, created!.id, { amount: 6000000 });
     expect(result.data!.isActive).toBe(false);
   });
 
   it('preserves notes when updating amount', async () => {
-    const { data: created } = await createRecurringTransaction({
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       notes: 'Important note',
     });
     // BUG: updateRecurringTransactionSchema inherits default('') for notes
-    const result = await updateRecurringTransaction(created!.id, { amount: 6000000 });
+    const result = await updateRecurringTransaction(DEMO_USER_ID, created!.id, { amount: 6000000 });
     expect(result.data!.notes).toBe('Important note');
   });
 
   it('preserves endDate when updating amount', async () => {
-    const { data: created } = await createRecurringTransaction({
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       endDate: '2026-12-31',
     });
     // BUG: updateRecurringTransactionSchema inherits default(null) for endDate
-    const result = await updateRecurringTransaction(created!.id, { amount: 6000000 });
+    const result = await updateRecurringTransaction(DEMO_USER_ID, created!.id, { amount: 6000000 });
     expect(result.data!.endDate).toBe('2026-12-31');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await updateRecurringTransaction('nonexistent', { amount: 100 });
+    const result = await updateRecurringTransaction(DEMO_USER_ID, 'nonexistent', { amount: 100 });
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 
   it('returns VALIDATION_ERROR for invalid amount', async () => {
-    const { data: created } = await createRecurringTransaction(validRecurring);
-    const result = await updateRecurringTransaction(created!.id, { amount: -1 });
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, validRecurring);
+    const result = await updateRecurringTransaction(DEMO_USER_ID, created!.id, { amount: -1 });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('deleteRecurringTransaction', () => {
   it('deletes an existing recurring transaction', async () => {
-    const { data: created } = await createRecurringTransaction(validRecurring);
-    const result = await deleteRecurringTransaction(created!.id);
+    const { data: created } = await createRecurringTransaction(DEMO_USER_ID, validRecurring);
+    const result = await deleteRecurringTransaction(DEMO_USER_ID, created!.id);
     expect(result.error).toBeUndefined();
     expect(result.data!.success).toBe(true);
 
-    const fetched = await getRecurringTransaction(created!.id);
+    const fetched = await getRecurringTransaction(DEMO_USER_ID, created!.id);
     expect(fetched.error!.code).toBe('NOT_FOUND');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await deleteRecurringTransaction('nonexistent');
+    const result = await deleteRecurringTransaction(DEMO_USER_ID, 'nonexistent');
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 });
@@ -180,23 +190,23 @@ describe('deleteRecurringTransaction', () => {
 describe('generateRecurringTransactions', () => {
   it('returns 0 generated when no due transactions exist', async () => {
     // Create a recurring transaction with future nextDueDate
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       nextDueDate: '2099-01-01',
     });
-    const result = await generateRecurringTransactions();
+    const result = await generateRecurringTransactions(DEMO_USER_ID);
     expect(result.data!.generated).toBe(0);
   });
 
   it('generates transactions for due recurring rules', async () => {
     // Create a recurring transaction due in the past
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       nextDueDate: '2026-01-01',
       frequency: 'monthly',
     });
 
-    const result = await generateRecurringTransactions();
+    const result = await generateRecurringTransactions(DEMO_USER_ID);
     // Should generate transactions from 2026-01-01 up to today (2026-03-17)
     // Jan, Feb, Mar = 3 transactions (or 2 depending on exact cutoff)
     expect(result.data!.generated).toBeGreaterThan(0);
@@ -204,14 +214,14 @@ describe('generateRecurringTransactions', () => {
 
   it('does not generate past endDate', async () => {
     // Recurring transaction that ended before today
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...validRecurring,
       nextDueDate: '2026-01-01',
       endDate: '2026-01-31',
       frequency: 'monthly',
     });
 
-    const result = await generateRecurringTransactions();
+    const result = await generateRecurringTransactions(DEMO_USER_ID);
     expect(result.data!.generated).toBe(1); // only January
   });
 });

@@ -8,6 +8,7 @@ import {
   updateSavingsGoal,
   deleteSavingsGoal,
 } from '@/server/services/savings-goal.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -24,7 +25,7 @@ const validGoal = {
 
 describe('createSavingsGoal', () => {
   it('creates a savings goal with valid input', async () => {
-    const result = await createSavingsGoal(validGoal);
+    const result = await createSavingsGoal(DEMO_USER_ID, validGoal);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -33,7 +34,7 @@ describe('createSavingsGoal', () => {
   });
 
   it('defaults savedAmount to 0 when not provided', async () => {
-    const result = await createSavingsGoal({
+    const result = await createSavingsGoal(DEMO_USER_ID, {
       name: validGoal.name,
       targetAmount: validGoal.targetAmount,
       color: validGoal.color,
@@ -42,108 +43,110 @@ describe('createSavingsGoal', () => {
   });
 
   it('returns VALIDATION_ERROR for empty name', async () => {
-    const result = await createSavingsGoal({ ...validGoal, name: '' });
+    const result = await createSavingsGoal(DEMO_USER_ID, { ...validGoal, name: '' });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for zero targetAmount', async () => {
-    const result = await createSavingsGoal({ ...validGoal, targetAmount: 0 });
+    const result = await createSavingsGoal(DEMO_USER_ID, { ...validGoal, targetAmount: 0 });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for negative savedAmount', async () => {
-    const result = await createSavingsGoal({ ...validGoal, savedAmount: -1 });
+    const result = await createSavingsGoal(DEMO_USER_ID, { ...validGoal, savedAmount: -1 });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for missing required fields', async () => {
-    const result = await createSavingsGoal({});
+    const result = await createSavingsGoal(DEMO_USER_ID, {});
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('listSavingsGoals', () => {
   it('returns empty array when no goals exist', async () => {
-    const result = await listSavingsGoals();
+    const result = await listSavingsGoals(DEMO_USER_ID);
     expect(result.data).toEqual([]);
   });
 
   it('returns all savings goals', async () => {
-    await createSavingsGoal(validGoal);
-    await createSavingsGoal({ ...validGoal, name: 'Vacation' });
-    const result = await listSavingsGoals();
+    await createSavingsGoal(DEMO_USER_ID, validGoal);
+    await createSavingsGoal(DEMO_USER_ID, { ...validGoal, name: 'Vacation' });
+    const result = await listSavingsGoals(DEMO_USER_ID);
     expect(result.data!.length).toBe(2);
   });
 });
 
 describe('getSavingsGoal', () => {
   it('returns the goal by id', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await getSavingsGoal(created!.id);
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await getSavingsGoal(DEMO_USER_ID, created!.id);
     expect(result.error).toBeUndefined();
     expect(result.data!.name).toBe('Emergency Fund');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await getSavingsGoal('nonexistent');
+    const result = await getSavingsGoal(DEMO_USER_ID, 'nonexistent');
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 });
 
 describe('updateSavingsGoal', () => {
   it('updates only the provided fields', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await updateSavingsGoal(created!.id, { name: 'Big Emergency Fund' });
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await updateSavingsGoal(DEMO_USER_ID, created!.id, {
+      name: 'Big Emergency Fund',
+    });
     expect(result.error).toBeUndefined();
     expect(result.data!.name).toBe('Big Emergency Fund');
   });
 
   it('preserves savedAmount when only name is updated', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await updateSavingsGoal(created!.id, { name: 'Renamed' });
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await updateSavingsGoal(DEMO_USER_ID, created!.id, { name: 'Renamed' });
     // BUG: updateSavingsGoalSchema inherits default(0) from createSavingsGoalSchema
     // causing savedAmount to be reset to 0 when not explicitly provided
     expect(result.data!.savedAmount).toBe(5000000);
   });
 
   it('preserves targetAmount when only savedAmount is updated', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await updateSavingsGoal(created!.id, { savedAmount: 7000000 });
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await updateSavingsGoal(DEMO_USER_ID, created!.id, { savedAmount: 7000000 });
     expect(result.data!.targetAmount).toBe(10000000);
     expect(result.data!.savedAmount).toBe(7000000);
   });
 
   it('preserves color when updating amounts', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await updateSavingsGoal(created!.id, { savedAmount: 3000000 });
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await updateSavingsGoal(DEMO_USER_ID, created!.id, { savedAmount: 3000000 });
     expect(result.data!.color).toBe('#3B82F6');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await updateSavingsGoal('nonexistent', { name: 'X' });
+    const result = await updateSavingsGoal(DEMO_USER_ID, 'nonexistent', { name: 'X' });
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 
   it('returns VALIDATION_ERROR for negative savedAmount', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await updateSavingsGoal(created!.id, { savedAmount: -100 });
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await updateSavingsGoal(DEMO_USER_ID, created!.id, { savedAmount: -100 });
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('deleteSavingsGoal', () => {
   it('deletes an existing goal', async () => {
-    const { data: created } = await createSavingsGoal(validGoal);
-    const result = await deleteSavingsGoal(created!.id);
+    const { data: created } = await createSavingsGoal(DEMO_USER_ID, validGoal);
+    const result = await deleteSavingsGoal(DEMO_USER_ID, created!.id);
     expect(result.error).toBeUndefined();
     expect(result.data!.success).toBe(true);
 
-    const fetched = await getSavingsGoal(created!.id);
+    const fetched = await getSavingsGoal(DEMO_USER_ID, created!.id);
     expect(fetched.error!.code).toBe('NOT_FOUND');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await deleteSavingsGoal('nonexistent');
+    const result = await deleteSavingsGoal(DEMO_USER_ID, 'nonexistent');
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 });

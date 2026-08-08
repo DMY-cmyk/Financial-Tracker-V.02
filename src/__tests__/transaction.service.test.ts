@@ -7,6 +7,7 @@ import {
   updateTransaction,
   deleteTransaction,
 } from '@/server/services/transaction.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -27,7 +28,7 @@ describe('createTransaction', () => {
   };
 
   it('creates a transaction with valid input', async () => {
-    const result = await createTransaction(validInput);
+    const result = await createTransaction(DEMO_USER_ID, validInput);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -36,7 +37,7 @@ describe('createTransaction', () => {
   });
 
   it('returns validation error for invalid input', async () => {
-    const result = await createTransaction({
+    const result = await createTransaction(DEMO_USER_ID, {
       ...validInput,
       amount: -100,
     });
@@ -46,7 +47,7 @@ describe('createTransaction', () => {
   });
 
   it('returns validation error for missing fields', async () => {
-    const result = await createTransaction({});
+    const result = await createTransaction(DEMO_USER_ID, {});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
@@ -54,7 +55,7 @@ describe('createTransaction', () => {
 
 describe('listTransactions', () => {
   beforeEach(async () => {
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-15',
       description: 'Salary',
       category: 'Salary',
@@ -64,7 +65,7 @@ describe('listTransactions', () => {
       paymentMethod: 'Bank BCA',
       notes: '',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-20',
       description: 'Groceries',
       category: 'Food',
@@ -74,7 +75,7 @@ describe('listTransactions', () => {
       paymentMethod: 'Cash',
       notes: '',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-02-10',
       description: 'Rent',
       category: 'Utilities',
@@ -87,36 +88,36 @@ describe('listTransactions', () => {
   });
 
   it('returns all transactions without filters', async () => {
-    const result = await listTransactions({});
+    const result = await listTransactions(DEMO_USER_ID, {});
     expect(result.data).toBeDefined();
     expect(result.data!.total).toBe(3);
   });
 
   it('filters by month and year', async () => {
-    const result = await listTransactions({ month: 0, year: 2026 });
+    const result = await listTransactions(DEMO_USER_ID, { month: 0, year: 2026 });
     expect(result.data!.total).toBe(2);
   });
 
   it('filters by type', async () => {
-    const result = await listTransactions({ type: 'expense' });
+    const result = await listTransactions(DEMO_USER_ID, { type: 'expense' });
     expect(result.data!.total).toBe(2);
     expect(result.data!.expense).toBe(3500000);
   });
 
   it('filters by search term', async () => {
-    const result = await listTransactions({ search: 'Groceries' });
+    const result = await listTransactions(DEMO_USER_ID, { search: 'Groceries' });
     expect(result.data!.total).toBe(1);
     expect(result.data!.transactions[0].description).toBe('Groceries');
   });
 
   it('calculates income and expense totals', async () => {
-    const result = await listTransactions({ month: 0, year: 2026 });
+    const result = await listTransactions(DEMO_USER_ID, { month: 0, year: 2026 });
     expect(result.data!.income).toBe(8500000);
     expect(result.data!.expense).toBe(500000);
   });
 
   it('returns sorted by date descending', async () => {
-    const result = await listTransactions({ month: 0, year: 2026 });
+    const result = await listTransactions(DEMO_USER_ID, { month: 0, year: 2026 });
     expect(result.data!.transactions[0].date).toBe('2026-01-20');
     expect(result.data!.transactions[1].date).toBe('2026-01-15');
   });
@@ -124,7 +125,7 @@ describe('listTransactions', () => {
 
 describe('updateTransaction', () => {
   it('updates an existing transaction', async () => {
-    const created = await createTransaction({
+    const created = await createTransaction(DEMO_USER_ID, {
       date: '2026-01-15',
       description: 'Original',
       category: 'Food',
@@ -135,7 +136,7 @@ describe('updateTransaction', () => {
       notes: '',
     });
 
-    const result = await updateTransaction(created.data!.id, {
+    const result = await updateTransaction(DEMO_USER_ID, created.data!.id, {
       description: 'Updated',
       amount: 200000,
     });
@@ -146,7 +147,7 @@ describe('updateTransaction', () => {
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
-    const result = await updateTransaction('nonexistent', {
+    const result = await updateTransaction(DEMO_USER_ID, 'nonexistent', {
       description: 'Test',
     });
     expect(result.error).toBeDefined();
@@ -156,7 +157,7 @@ describe('updateTransaction', () => {
 
 describe('deleteTransaction', () => {
   it('deletes an existing transaction', async () => {
-    const created = await createTransaction({
+    const created = await createTransaction(DEMO_USER_ID, {
       date: '2026-01-15',
       description: 'To Delete',
       category: 'Food',
@@ -167,16 +168,16 @@ describe('deleteTransaction', () => {
       notes: '',
     });
 
-    const result = await deleteTransaction(created.data!.id);
+    const result = await deleteTransaction(DEMO_USER_ID, created.data!.id);
     expect(result.data).toEqual({ success: true });
 
     // Verify it's actually gone
-    const list = await listTransactions({});
+    const list = await listTransactions(DEMO_USER_ID, {});
     expect(list.data!.total).toBe(0);
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
-    const result = await deleteTransaction('nonexistent');
+    const result = await deleteTransaction(DEMO_USER_ID, 'nonexistent');
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
   });
@@ -184,7 +185,7 @@ describe('deleteTransaction', () => {
 
 describe('listTransactions — advanced filters', () => {
   beforeEach(async () => {
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-15',
       description: 'Groceries',
       category: 'Food',
@@ -194,7 +195,7 @@ describe('listTransactions — advanced filters', () => {
       paymentMethod: 'Cash',
       notes: 'Weekly market run',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-20',
       description: 'Electricity Bill',
       category: 'Utilities',
@@ -204,7 +205,7 @@ describe('listTransactions — advanced filters', () => {
       paymentMethod: 'Bank BCA',
       notes: '',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-02-05',
       description: 'Salary',
       category: 'Income',
@@ -217,7 +218,10 @@ describe('listTransactions — advanced filters', () => {
   });
 
   it('filters by amount range — returns only transactions within range', async () => {
-    const result = await listTransactions({ amountMin: '100000', amountMax: '600000' });
+    const result = await listTransactions(DEMO_USER_ID, {
+      amountMin: '100000',
+      amountMax: '600000',
+    });
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(2);
     expect(
@@ -226,7 +230,7 @@ describe('listTransactions — advanced filters', () => {
   });
 
   it('filters by multi-category — returns transactions for all selected categories', async () => {
-    const result = await listTransactions({ categories: 'cat-food,cat-utilities' });
+    const result = await listTransactions(DEMO_USER_ID, { categories: 'cat-food,cat-utilities' });
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(2);
     const ids = result.data!.transactions.map((tx) => tx.categoryId);
@@ -237,7 +241,7 @@ describe('listTransactions — advanced filters', () => {
   it('filters by date range — overrides month/year when both provided', async () => {
     // month=1 (Feb, 0-indexed) + year=2026 would restrict to Feb transactions only,
     // but dateFrom+dateTo for Jan should override and return Jan transactions
-    const result = await listTransactions({
+    const result = await listTransactions(DEMO_USER_ID, {
       month: 1,
       year: 2026,
       dateFrom: '2026-01-01',
@@ -249,20 +253,20 @@ describe('listTransactions — advanced filters', () => {
   });
 
   it('includeNotes=true — matches keyword in notes field', async () => {
-    const result = await listTransactions({ search: 'market', includeNotes: 'true' });
+    const result = await listTransactions(DEMO_USER_ID, { search: 'market', includeNotes: 'true' });
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(1);
     expect(result.data!.transactions[0].description).toBe('Groceries');
   });
 
   it('includeNotes not set — does NOT match keyword found only in notes', async () => {
-    const result = await listTransactions({ search: 'market' });
+    const result = await listTransactions(DEMO_USER_ID, { search: 'market' });
     expect(result.error).toBeUndefined();
     expect(result.data!.transactions).toHaveLength(0);
   });
 
   it('treats amountMin=0 as no minimum filter', async () => {
-    const result = await listTransactions({
+    const result = await listTransactions(DEMO_USER_ID, {
       year: 2026,
       yearOnly: true,
       amountMin: '0',
@@ -271,18 +275,18 @@ describe('listTransactions — advanced filters', () => {
     // Should return all transactions (not filtered to amount >= 0 with exclusion behavior)
     expect(result.data!.total).toBeGreaterThan(0);
     // Should return same count as no amount filter
-    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    const baseline = await listTransactions(DEMO_USER_ID, { year: 2026, yearOnly: true });
     expect(result.data!.total).toBe(baseline.data!.total);
   });
 
   it('treats empty categories string as no category filter', async () => {
-    const result = await listTransactions({
+    const result = await listTransactions(DEMO_USER_ID, {
       year: 2026,
       yearOnly: true,
       categories: '',
     });
     expect(result.error).toBeUndefined();
-    const baseline = await listTransactions({ year: 2026, yearOnly: true });
+    const baseline = await listTransactions(DEMO_USER_ID, { year: 2026, yearOnly: true });
     expect(result.data!.total).toBe(baseline.data!.total);
   });
 
@@ -291,7 +295,7 @@ describe('listTransactions — advanced filters', () => {
     // If categoryId were used, the result would be 1 row.
     // If categories is used (nonexistent), the result is 0 rows.
     // Asserting 0 proves categories took priority over categoryId.
-    const result = await listTransactions({
+    const result = await listTransactions(DEMO_USER_ID, {
       year: 2026,
       yearOnly: true,
       categories: 'nonexistent-cat-id', // nonexistent → 0 rows if this wins
@@ -305,7 +309,7 @@ describe('listTransactions — advanced filters', () => {
 
 describe('listTransactions — sortOrder', () => {
   beforeEach(async () => {
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-10',
       description: 'Oldest',
       category: 'A',
@@ -315,7 +319,7 @@ describe('listTransactions — sortOrder', () => {
       paymentMethod: 'BCA',
       notes: '',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-20',
       description: 'Middle',
       category: 'A',
@@ -325,7 +329,7 @@ describe('listTransactions — sortOrder', () => {
       paymentMethod: 'BCA',
       notes: '',
     });
-    await createTransaction({
+    await createTransaction(DEMO_USER_ID, {
       date: '2026-01-30',
       description: 'Newest',
       category: 'A',
@@ -338,19 +342,19 @@ describe('listTransactions — sortOrder', () => {
   });
 
   it('defaults to newest first (desc)', async () => {
-    const r = await listTransactions({});
+    const r = await listTransactions(DEMO_USER_ID, {});
     expect(r.data!.transactions[0].description).toBe('Newest');
     expect(r.data!.transactions[2].description).toBe('Oldest');
   });
 
   it('sortOrder asc returns oldest first', async () => {
-    const r = await listTransactions({ sortOrder: 'asc' });
+    const r = await listTransactions(DEMO_USER_ID, { sortOrder: 'asc' });
     expect(r.data!.transactions[0].description).toBe('Oldest');
     expect(r.data!.transactions[2].description).toBe('Newest');
   });
 
   it('sortOrder desc explicitly returns newest first', async () => {
-    const r = await listTransactions({ sortOrder: 'desc' });
+    const r = await listTransactions(DEMO_USER_ID, { sortOrder: 'desc' });
     expect(r.data!.transactions[0].description).toBe('Newest');
   });
 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readJsonBody } from '@/lib/api/read-json';
 import { generateRecurringBills } from '@/server/services/bill.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = await generateRecurringBills(month, year);
+  const result = await generateRecurringBills(requireUserId(request), month, year);
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 500 });
   }

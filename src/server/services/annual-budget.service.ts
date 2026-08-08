@@ -14,11 +14,12 @@ const catRepo = createCategoryRepository();
 const mbRepo = createMonthlyBudgetRepository();
 
 export async function getAnnualBudgetGrid(
+  userId: string,
   year: number
 ): Promise<ServiceResult<AnnualBudgetGridResponse>> {
   await ensureSeeded();
-  const categories = await catRepo.findByType('expense');
-  const overrides = await mbRepo.findByYear(year);
+  const categories = await catRepo.findByType(userId, 'expense');
+  const overrides = await mbRepo.findByYear(userId, year);
 
   const db = await getDb();
   const spendingResult = await db.query<{
@@ -30,9 +31,9 @@ export async function getAnnualBudgetGrid(
        CAST(substr(date, 6, 2) AS INTEGER) - 1 AS month,
        SUM(amount) AS spent
      FROM transactions
-     WHERE type = 'expense' AND substr(date, 1, 4) = ?
+     WHERE user_id = ? AND type = 'expense' AND substr(date, 1, 4) = ?
      GROUP BY category_id, month`,
-    [String(year)]
+    [userId, String(year)]
   );
 
   return {
@@ -49,17 +50,21 @@ export async function getAnnualBudgetGrid(
   };
 }
 
-export async function upsertMonthlyBudget(body: unknown): Promise<ServiceResult<MonthlyBudget>> {
+export async function upsertMonthlyBudget(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<MonthlyBudget>> {
   await ensureSeeded();
   const parsed = upsertMonthlyBudgetSchema.safeParse(body);
   if (!parsed.success) {
     return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR' } };
   }
-  const result = await mbRepo.upsert(parsed.data);
+  const result = await mbRepo.upsert(userId, parsed.data);
   return { data: result };
 }
 
 export async function deleteMonthlyBudget(
+  userId: string,
   body: unknown
 ): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
@@ -68,6 +73,6 @@ export async function deleteMonthlyBudget(
     return { error: { message: 'Validation failed', code: 'VALIDATION_ERROR' } };
   }
   const { categoryId, month, year } = parsed.data;
-  const deleted = await mbRepo.delete(categoryId, month, year);
+  const deleted = await mbRepo.delete(userId, categoryId, month, year);
   return { data: { success: deleted } };
 }

@@ -29,6 +29,8 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
         return t(locale, 'oauthErrorEmailUnverified');
       case 'oauth_state_mismatch':
         return t(locale, 'oauthErrorStateMismatch');
+      case 'oauth_account_exists_password':
+        return t(locale, 'oauthErrorAccountExistsPassword');
       default:
         return t(locale, 'oauthErrorGeneric');
     }
@@ -46,14 +48,14 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.error?.message ?? 'Login failed');
+        setError(data?.error?.message ?? t(locale, 'authLoginFailed'));
       } else {
         onSuccess?.();
         router.push('/home');
         router.refresh();
       }
     } catch {
-      setError('Something went wrong. Please try again.');
+      setError(t(locale, 'authGenericError'));
     } finally {
       setBusy(false);
     }
@@ -89,7 +91,7 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
 
       <div className="ft-rise-4 mt-3 flex flex-col gap-3">
         <EditorialField
-          label="Email"
+          label={t(locale, 'emailLabel')}
           value={email}
           onChange={setEmail}
           type="email"

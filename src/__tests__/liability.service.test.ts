@@ -7,6 +7,7 @@ import {
   updateLiability,
   deleteLiability,
 } from '@/server/services/liability.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -16,7 +17,7 @@ beforeEach(async () => {
 
 describe('createLiability', () => {
   it('creates a liability with valid data', async () => {
-    const result = await createLiability({
+    const result = await createLiability(DEMO_USER_ID, {
       name: 'KPR BCA',
       amount: 450_000_000,
       category: 'loan',
@@ -29,33 +30,45 @@ describe('createLiability', () => {
   });
 
   it('defaults category to "other" when omitted', async () => {
-    const result = await createLiability({ name: 'Misc', amount: 500_000 });
+    const result = await createLiability(DEMO_USER_ID, { name: 'Misc', amount: 500_000 });
     expect(result.data?.category).toBe('other');
   });
 
   it('returns VALIDATION_ERROR for empty name', async () => {
-    const result = await createLiability({ name: '', amount: 100_000, category: 'other' });
+    const result = await createLiability(DEMO_USER_ID, {
+      name: '',
+      amount: 100_000,
+      category: 'other',
+    });
     expect(result.error?.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns VALIDATION_ERROR for negative amount', async () => {
-    const result = await createLiability({ name: 'Bad', amount: -100, category: 'other' });
+    const result = await createLiability(DEMO_USER_ID, {
+      name: 'Bad',
+      amount: -100,
+      category: 'other',
+    });
     expect(result.error?.code).toBe('VALIDATION_ERROR');
   });
 });
 
 describe('listLiabilities', () => {
   it('returns empty array when no liabilities exist', async () => {
-    const result = await listLiabilities();
+    const result = await listLiabilities(DEMO_USER_ID);
     expect(result.data).toEqual([]);
   });
 
   it('returns liabilities sorted by amount DESC', async () => {
-    await createLiability({ name: 'Small', amount: 1_000, category: 'other' });
-    await createLiability({ name: 'Large', amount: 5_000_000, category: 'loan' });
-    await createLiability({ name: 'Medium', amount: 100_000, category: 'credit_card' });
+    await createLiability(DEMO_USER_ID, { name: 'Small', amount: 1_000, category: 'other' });
+    await createLiability(DEMO_USER_ID, { name: 'Large', amount: 5_000_000, category: 'loan' });
+    await createLiability(DEMO_USER_ID, {
+      name: 'Medium',
+      amount: 100_000,
+      category: 'credit_card',
+    });
 
-    const result = await listLiabilities();
+    const result = await listLiabilities(DEMO_USER_ID);
     expect(result.data).toHaveLength(3);
     expect(result.data![0].name).toBe('Large');
     expect(result.data![1].name).toBe('Medium');
@@ -65,30 +78,41 @@ describe('listLiabilities', () => {
 
 describe('updateLiability', () => {
   it('updates name and amount, leaves category unchanged', async () => {
-    const created = await createLiability({ name: 'Old', amount: 100_000, category: 'other' });
-    const result = await updateLiability(created.data!.id, { name: 'New', amount: 200_000 });
+    const created = await createLiability(DEMO_USER_ID, {
+      name: 'Old',
+      amount: 100_000,
+      category: 'other',
+    });
+    const result = await updateLiability(DEMO_USER_ID, created.data!.id, {
+      name: 'New',
+      amount: 200_000,
+    });
     expect(result.data?.name).toBe('New');
     expect(result.data?.amount).toBe(200_000);
     expect(result.data?.category).toBe('other');
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await updateLiability('nonexistent', { name: 'X' });
+    const result = await updateLiability(DEMO_USER_ID, 'nonexistent', { name: 'X' });
     expect(result.error?.code).toBe('NOT_FOUND');
   });
 });
 
 describe('deleteLiability', () => {
   it('deletes the liability and returns success', async () => {
-    const created = await createLiability({ name: 'ToDelete', amount: 50_000, category: 'other' });
-    const del = await deleteLiability(created.data!.id);
+    const created = await createLiability(DEMO_USER_ID, {
+      name: 'ToDelete',
+      amount: 50_000,
+      category: 'other',
+    });
+    const del = await deleteLiability(DEMO_USER_ID, created.data!.id);
     expect(del.data?.success).toBe(true);
-    const list = await listLiabilities();
+    const list = await listLiabilities(DEMO_USER_ID);
     expect(list.data).toHaveLength(0);
   });
 
   it('returns NOT_FOUND for unknown id', async () => {
-    const result = await deleteLiability('nonexistent');
+    const result = await deleteLiability(DEMO_USER_ID, 'nonexistent');
     expect(result.error?.code).toBe('NOT_FOUND');
   });
 });

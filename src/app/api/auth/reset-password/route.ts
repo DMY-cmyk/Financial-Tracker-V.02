@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { readJsonBody } from '@/lib/api/read-json';
 import { consumePasswordReset } from '@/server/services/password-reset.service';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const schema = z.object({
   token: z.string().min(1),
@@ -10,6 +11,9 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = checkRateLimit(`reset:${getClientIp(request)}`, 5, 15 * 60 * 1000);
+    if (!limit.ok) return rateLimitResponse(limit.retryAfter);
+
     const parsedBody = await readJsonBody(request);
     if (parsedBody.error) return parsedBody.error;
     const body = parsedBody.data;

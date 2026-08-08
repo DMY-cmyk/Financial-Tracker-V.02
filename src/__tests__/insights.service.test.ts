@@ -3,6 +3,7 @@ import { resetDb } from '@/server/db/client';
 import { resetSeeded, markSeeded } from '@/server/db/seed';
 import { createTransaction } from '@/server/services/transaction.service';
 import { getSpendingInsights } from '@/server/services/insights.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -19,7 +20,7 @@ async function createExpense(
   categoryId = 'cat-food'
 ) {
   const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date,
     description: `Expense ${date}`,
     category,
@@ -33,7 +34,7 @@ async function createExpense(
 
 async function createIncome(month: number, year: number, day: number, amount: number) {
   const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  await createTransaction({
+  await createTransaction(DEMO_USER_ID, {
     date,
     description: `Income ${date}`,
     category: 'Salary',
@@ -49,7 +50,7 @@ describe('getSpendingInsights', () => {
   describe('healthScore', () => {
     it('computes savingsRate = 0 when income is 0', async () => {
       await createExpense(2, 2026, 5, 500000);
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.error).toBeUndefined();
       expect(result.data!.healthScore.savingsRate).toBe(0);
       expect(result.data!.healthScore.income).toBe(0);
@@ -59,7 +60,7 @@ describe('getSpendingInsights', () => {
     it('returns lastMonthRate as null when no prior month data', async () => {
       await createIncome(2, 2026, 1, 5000000);
       await createExpense(2, 2026, 5, 3000000);
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.data!.healthScore.savingsRate).toBe(40);
       expect(result.data!.healthScore.lastMonthRate).toBeNull();
       expect(result.data!.healthScore.rateChange).toBeNull();
@@ -73,7 +74,7 @@ describe('getSpendingInsights', () => {
       await createIncome(2, 2026, 1, 10000000);
       await createExpense(2, 2026, 10, 7000000);
 
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.data!.healthScore.savingsRate).toBe(30);
       expect(result.data!.healthScore.lastMonthRate).toBe(50);
       expect(result.data!.healthScore.rateChange).toBe(-20);
@@ -87,7 +88,7 @@ describe('getSpendingInsights', () => {
       await createIncome(0, 2026, 5, 8000000);
       await createExpense(0, 2026, 10, 6000000);
 
-      const result = await getSpendingInsights(0, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 0, 2026);
       expect(result.data!.healthScore.savingsRate).toBe(25);
       expect(result.data!.healthScore.lastMonthRate).toBe(50);
       expect(result.data!.healthScore.rateChange).toBe(-25);
@@ -99,7 +100,7 @@ describe('getSpendingInsights', () => {
       // March: only expense, no income
       await createExpense(2, 2026, 5, 300000);
 
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.data!.healthScore.savingsRate).toBe(0);
       expect(result.data!.healthScore.lastMonthRate).toBe(0);
       expect(result.data!.healthScore.rateChange).toBe(0);
@@ -107,7 +108,7 @@ describe('getSpendingInsights', () => {
 
     it('returns empty defaults for other sections', async () => {
       await createIncome(2, 2026, 1, 5000000);
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.data!.categoryComparison).toEqual([]);
       expect(result.data!.biggestTransactions).toEqual([]);
       expect(result.data!.outliers).toEqual([]);
@@ -116,7 +117,7 @@ describe('getSpendingInsights', () => {
     });
 
     it('dayOfWeekPattern has 7 items with zero defaults', async () => {
-      const result = await getSpendingInsights(2, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 2, 2026);
       expect(result.data!.dayOfWeekPattern).toHaveLength(7);
       for (let i = 0; i < 7; i++) {
         expect(result.data!.dayOfWeekPattern[i]).toEqual({
@@ -134,7 +135,7 @@ describe('getSpendingInsights', () => {
       for (let i = 1; i <= 7; i++) {
         await createExpense(1, 2026, i, i * 100000);
       }
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       expect(result.data!.biggestTransactions).toHaveLength(5);
       expect(result.data!.biggestTransactions[0].amount).toBe(700000);
       expect(result.data!.biggestTransactions[4].amount).toBe(300000);
@@ -143,7 +144,7 @@ describe('getSpendingInsights', () => {
     it('excludes income transactions', async () => {
       await createIncome(1, 2026, 1, 10000000);
       await createExpense(1, 2026, 5, 500000);
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       expect(result.data!.biggestTransactions).toHaveLength(1);
       expect(result.data!.biggestTransactions[0].amount).toBe(500000);
     });
@@ -152,7 +153,7 @@ describe('getSpendingInsights', () => {
   describe('dayOfWeekPattern', () => {
     it('returns 7 items even if some days have 0 spend', async () => {
       await createExpense(1, 2026, 2, 500000); // Feb 2, 2026 = Monday (dayIndex 1)
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       expect(result.data!.dayOfWeekPattern).toHaveLength(7);
       const zeroDays = result.data!.dayOfWeekPattern.filter((d) => d.totalAmount === 0);
       expect(zeroDays.length).toBe(6);
@@ -161,7 +162,7 @@ describe('getSpendingInsights', () => {
     it('computes avgAmount = totalAmount / count for each day', async () => {
       await createExpense(1, 2026, 2, 400000); // Monday Feb 2
       await createExpense(1, 2026, 9, 600000); // Monday Feb 9
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       const monday = result.data!.dayOfWeekPattern.find((d) => d.dayIndex === 1);
       expect(monday!.totalAmount).toBe(1000000);
       expect(monday!.count).toBe(2);
@@ -173,7 +174,7 @@ describe('getSpendingInsights', () => {
     it('returns correct thisMonth/lastMonth totals with changePct', async () => {
       await createExpense(0, 2026, 5, 500000, 'Food', 'cat-food'); // Jan (last month)
       await createExpense(1, 2026, 5, 700000, 'Food', 'cat-food'); // Feb (this month)
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       const food = result.data!.categoryComparison.find((c) => c.categoryId === 'cat-food');
       expect(food).toBeDefined();
       expect(food!.thisMonth).toBe(700000);
@@ -184,7 +185,7 @@ describe('getSpendingInsights', () => {
 
     it('returns changePct as null when lastMonth is 0', async () => {
       await createExpense(1, 2026, 5, 300000, 'Shopping', 'cat-shop');
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       const shop = result.data!.categoryComparison.find((c) => c.categoryId === 'cat-shop');
       expect(shop!.changePct).toBeNull();
     });
@@ -193,7 +194,7 @@ describe('getSpendingInsights', () => {
       for (let i = 0; i < 10; i++) {
         await createExpense(1, 2026, 5, (10 - i) * 100000, `Cat${i}`, `cat-${i}`);
       }
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       expect(result.data!.categoryComparison.length).toBeLessThanOrEqual(8);
     });
   });
@@ -210,7 +211,7 @@ describe('getSpendingInsights', () => {
       // Small outlier (220K, delta = 20K < 50K — should NOT appear)
       await createExpense(1, 2026, 15, 220000, 'Food', 'cat-food');
 
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       const bigOutlier = result.data!.outliers.find((o) => o.amount === 500000);
       expect(bigOutlier).toBeDefined();
       expect(bigOutlier!.delta).toBeGreaterThanOrEqual(50000);
@@ -220,7 +221,7 @@ describe('getSpendingInsights', () => {
 
     it('returns empty array when less than 3 months of data', async () => {
       await createExpense(1, 2026, 5, 500000, 'Food', 'cat-food');
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       expect(result.data!.outliers).toHaveLength(0);
     });
 
@@ -231,7 +232,7 @@ describe('getSpendingInsights', () => {
       await createExpense(0, 2026, 5, 100000, 'Food', 'cat-food');
       await createExpense(1, 2026, 10, 400000, 'Food', 'cat-food');
 
-      const result = await getSpendingInsights(1, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 1, 2026);
       const outlier = result.data!.outliers.find((o) => o.amount === 400000);
       expect(outlier).toBeDefined();
       expect(outlier!.multiplier).toBeCloseTo(4, 0);
@@ -240,7 +241,7 @@ describe('getSpendingInsights', () => {
 
   describe('edge cases', () => {
     it('returns all sections empty/zeroed for a month with no transactions', async () => {
-      const result = await getSpendingInsights(5, 2026);
+      const result = await getSpendingInsights(DEMO_USER_ID, 5, 2026);
       expect(result.error).toBeUndefined();
       expect(result.data!.categoryComparison).toHaveLength(0);
       expect(result.data!.biggestTransactions).toHaveLength(0);

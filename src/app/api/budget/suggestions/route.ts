@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBudgetSuggestions } from '@/server/services/budget-template.service';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const monthsParam = request.nextUrl.searchParams.get('months');
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-  const result = await getBudgetSuggestions(months);
+  const result = await getBudgetSuggestions(requireUserId(request), months);
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }

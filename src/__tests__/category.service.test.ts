@@ -7,6 +7,7 @@ import {
   updateCategory,
   deleteCategory,
 } from '@/server/services/category.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
 import { createMonthlyBudgetRepository } from '@/server/repositories/monthly-budget.repository';
@@ -27,7 +28,7 @@ describe('createCategory', () => {
   };
 
   it('creates a category with valid input', async () => {
-    const result = await createCategory(validInput);
+    const result = await createCategory(DEMO_USER_ID, validInput);
     expect(result.error).toBeUndefined();
     expect(result.data).toBeDefined();
     expect(result.data!.id).toBeDefined();
@@ -36,32 +37,36 @@ describe('createCategory', () => {
   });
 
   it('creates a category with defaults', async () => {
-    const result = await createCategory({ name: 'Test', type: 'income', color: '#000' });
+    const result = await createCategory(DEMO_USER_ID, {
+      name: 'Test',
+      type: 'income',
+      color: '#000',
+    });
     expect(result.data).toBeDefined();
     expect(result.data!.icon).toBe('circle');
     expect(result.data!.budget).toBe(0);
   });
 
   it('returns validation error for empty name', async () => {
-    const result = await createCategory({ ...validInput, name: '' });
+    const result = await createCategory(DEMO_USER_ID, { ...validInput, name: '' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for invalid type', async () => {
-    const result = await createCategory({ ...validInput, type: 'invalid' });
+    const result = await createCategory(DEMO_USER_ID, { ...validInput, type: 'invalid' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for missing fields', async () => {
-    const result = await createCategory({});
+    const result = await createCategory(DEMO_USER_ID, {});
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns validation error for negative budget', async () => {
-    const result = await createCategory({ ...validInput, budget: -100 });
+    const result = await createCategory(DEMO_USER_ID, { ...validInput, budget: -100 });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('VALIDATION_ERROR');
   });
@@ -69,21 +74,21 @@ describe('createCategory', () => {
 
 describe('listCategories', () => {
   beforeEach(async () => {
-    await createCategory({
+    await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
-    await createCategory({
+    await createCategory(DEMO_USER_ID, {
       name: 'Transport',
       type: 'expense',
       color: '#3B82F6',
       icon: 'circle',
       budget: 300000,
     });
-    await createCategory({
+    await createCategory(DEMO_USER_ID, {
       name: 'Salary',
       type: 'income',
       color: '#059669',
@@ -93,19 +98,19 @@ describe('listCategories', () => {
   });
 
   it('returns all categories', async () => {
-    const result = await listCategories();
+    const result = await listCategories(DEMO_USER_ID);
     expect(result.data).toBeDefined();
     expect(result.data!.length).toBe(3);
   });
 
   it('filters by type', async () => {
-    const result = await listCategories({ type: 'expense' });
+    const result = await listCategories(DEMO_USER_ID, { type: 'expense' });
     expect(result.data!.length).toBe(2);
     expect(result.data!.every((c) => c.type === 'expense')).toBe(true);
   });
 
   it('filters income categories', async () => {
-    const result = await listCategories({ type: 'income' });
+    const result = await listCategories(DEMO_USER_ID, { type: 'income' });
     expect(result.data!.length).toBe(1);
     expect(result.data![0].name).toBe('Salary');
   });
@@ -113,14 +118,17 @@ describe('listCategories', () => {
 
 describe('updateCategory', () => {
   it('updates an existing category', async () => {
-    const created = await createCategory({
+    const created = await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
-    const result = await updateCategory(created.data!.id, { name: 'Food & Drink', budget: 700000 });
+    const result = await updateCategory(DEMO_USER_ID, created.data!.id, {
+      name: 'Food & Drink',
+      budget: 700000,
+    });
 
     expect(result.error).toBeUndefined();
     expect(result.data!.name).toBe('Food & Drink');
@@ -129,7 +137,7 @@ describe('updateCategory', () => {
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
-    const result = await updateCategory('nonexistent', { name: 'Test' });
+    const result = await updateCategory(DEMO_USER_ID, 'nonexistent', { name: 'Test' });
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
   });
@@ -137,28 +145,28 @@ describe('updateCategory', () => {
 
 describe('deleteCategory', () => {
   it('deletes an existing category', async () => {
-    const created = await createCategory({
+    const created = await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
       icon: 'circle',
       budget: 500000,
     });
-    const result = await deleteCategory(created.data!.id);
+    const result = await deleteCategory(DEMO_USER_ID, created.data!.id);
     expect(result.data).toEqual({ success: true });
 
-    const list = await listCategories();
+    const list = await listCategories(DEMO_USER_ID);
     expect(list.data!.length).toBe(0);
   });
 
   it('returns NOT_FOUND for nonexistent ID', async () => {
-    const result = await deleteCategory('nonexistent');
+    const result = await deleteCategory(DEMO_USER_ID, 'nonexistent');
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('NOT_FOUND');
   });
 
   it('blocks deletion when transactions reference the category', async () => {
-    const cat = await createCategory({
+    const cat = await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
@@ -166,7 +174,7 @@ describe('deleteCategory', () => {
       budget: 500000,
     });
     const txRepo = createTransactionRepository();
-    await txRepo.create({
+    await txRepo.create(DEMO_USER_ID, {
       date: '2026-03-01',
       description: 'Lunch',
       category: 'Food',
@@ -177,16 +185,16 @@ describe('deleteCategory', () => {
       notes: '',
     });
 
-    const result = await deleteCategory(cat.data!.id);
+    const result = await deleteCategory(DEMO_USER_ID, cat.data!.id);
     expect(result.error).toBeDefined();
     expect(result.error!.code).toBe('CONFLICT');
 
-    const list = await listCategories();
+    const list = await listCategories(DEMO_USER_ID);
     expect(list.data!.length).toBe(1);
   });
 
   it('allows deletion when no transactions reference the category', async () => {
-    const cat = await createCategory({
+    const cat = await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
@@ -194,10 +202,10 @@ describe('deleteCategory', () => {
       budget: 500000,
     });
 
-    const result = await deleteCategory(cat.data!.id);
+    const result = await deleteCategory(DEMO_USER_ID, cat.data!.id);
     expect(result.data).toEqual({ success: true });
 
-    const list = await listCategories();
+    const list = await listCategories(DEMO_USER_ID);
     expect(list.data!.length).toBe(0);
   });
 });
@@ -205,7 +213,7 @@ describe('deleteCategory', () => {
 describe('findWithEffectiveBudget', () => {
   it('returns default budget when no override exists', async () => {
     const catRepo = createCategoryRepository();
-    const cat = await catRepo.create({
+    const cat = await catRepo.create(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
@@ -213,7 +221,7 @@ describe('findWithEffectiveBudget', () => {
       budget: 1800000,
     });
 
-    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    const results = await catRepo.findWithEffectiveBudget(DEMO_USER_ID, 'expense', 3, 2026);
     const found = results.find((c) => c.id === cat.id);
     expect(found).toBeDefined();
     expect(found!.budget).toBe(1800000);
@@ -222,30 +230,35 @@ describe('findWithEffectiveBudget', () => {
   it('returns override budget when monthly override exists', async () => {
     const catRepo = createCategoryRepository();
     const mbRepo = createMonthlyBudgetRepository();
-    const cat = await catRepo.create({
+    const cat = await catRepo.create(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
       icon: 'utensils',
       budget: 1800000,
     });
-    await mbRepo.upsert({ categoryId: cat.id, month: 3, year: 2026, budgetAmount: 2500000 });
+    await mbRepo.upsert(DEMO_USER_ID, {
+      categoryId: cat.id,
+      month: 3,
+      year: 2026,
+      budgetAmount: 2500000,
+    });
 
-    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    const results = await catRepo.findWithEffectiveBudget(DEMO_USER_ID, 'expense', 3, 2026);
     const found = results.find((c) => c.id === cat.id);
     expect(found!.budget).toBe(2500000);
   });
 
   it('only returns the requested type', async () => {
     const catRepo = createCategoryRepository();
-    await catRepo.create({
+    await catRepo.create(DEMO_USER_ID, {
       name: 'Salary',
       type: 'income',
       color: '#22C55E',
       icon: 'wallet',
       budget: 0,
     });
-    await catRepo.create({
+    await catRepo.create(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
@@ -253,14 +266,14 @@ describe('findWithEffectiveBudget', () => {
       budget: 1000000,
     });
 
-    const results = await catRepo.findWithEffectiveBudget('expense', 3, 2026);
+    const results = await catRepo.findWithEffectiveBudget(DEMO_USER_ID, 'expense', 3, 2026);
     expect(results.every((c) => c.type === 'expense')).toBe(true);
   });
 });
 
 describe('listCategories with month/year', () => {
   it('returns effective budget (default) when no override', async () => {
-    await createCategory({
+    await createCategory(DEMO_USER_ID, {
       name: 'Food',
       type: 'expense',
       color: '#D97706',
@@ -268,13 +281,13 @@ describe('listCategories with month/year', () => {
       budget: 1800000,
     });
 
-    const result = await listCategories({ type: 'expense', month: 3, year: 2026 });
+    const result = await listCategories(DEMO_USER_ID, { type: 'expense', month: 3, year: 2026 });
     expect(result.error).toBeUndefined();
     expect(result.data![0].budget).toBe(1800000);
   });
 
   it('returns override budget when monthly override exists', async () => {
-    const catResult = await createCategory({
+    const catResult = await createCategory(DEMO_USER_ID, {
       name: 'Transport',
       type: 'expense',
       color: '#3B82F6',
@@ -284,20 +297,20 @@ describe('listCategories with month/year', () => {
     const { createMonthlyBudgetRepository } =
       await import('@/server/repositories/monthly-budget.repository');
     const mbRepo = createMonthlyBudgetRepository();
-    await mbRepo.upsert({
+    await mbRepo.upsert(DEMO_USER_ID, {
       categoryId: catResult.data!.id,
       month: 3,
       year: 2026,
       budgetAmount: 2500000,
     });
 
-    const result = await listCategories({ type: 'expense', month: 3, year: 2026 });
+    const result = await listCategories(DEMO_USER_ID, { type: 'expense', month: 3, year: 2026 });
     const found = result.data!.find((c) => c.id === catResult.data!.id);
     expect(found!.budget).toBe(2500000);
   });
 
   it('falls back to findAll when no type provided with month/year', async () => {
-    const result = await listCategories({ month: 3, year: 2026 });
+    const result = await listCategories(DEMO_USER_ID, { month: 3, year: 2026 });
     expect(result.error).toBeUndefined();
     expect(Array.isArray(result.data)).toBe(true);
   });

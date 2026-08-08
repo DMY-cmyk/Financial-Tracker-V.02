@@ -23,26 +23,34 @@ interface ServiceResult<T> {
   error?: { message: string; code: string; details?: Record<string, string[]> };
 }
 
-export async function listCategories(query?: {
-  type?: string;
-  month?: number;
-  year?: number;
-}): Promise<ServiceResult<Category[]>> {
+export async function listCategories(
+  userId: string,
+  query?: {
+    type?: string;
+    month?: number;
+    year?: number;
+  }
+): Promise<ServiceResult<Category[]>> {
   await ensureSeeded();
   if (
     query?.month !== undefined &&
     query?.year !== undefined &&
     (query.type === 'income' || query.type === 'expense')
   ) {
-    return { data: await repo.findWithEffectiveBudget(query.type, query.month, query.year) };
+    return {
+      data: await repo.findWithEffectiveBudget(userId, query.type, query.month, query.year),
+    };
   }
   if (query?.type === 'income' || query?.type === 'expense') {
-    return { data: await repo.findByType(query.type) };
+    return { data: await repo.findByType(userId, query.type) };
   }
-  return { data: await repo.findAll() };
+  return { data: await repo.findAll(userId) };
 }
 
-export async function createCategory(body: unknown): Promise<ServiceResult<Category>> {
+export async function createCategory(
+  userId: string,
+  body: unknown
+): Promise<ServiceResult<Category>> {
   await ensureSeeded();
   const parsed = createCategorySchema.safeParse(body);
   if (!parsed.success)
@@ -53,10 +61,14 @@ export async function createCategory(body: unknown): Promise<ServiceResult<Categ
         details: formatZodError(parsed.error),
       },
     };
-  return { data: await repo.create(parsed.data) };
+  return { data: await repo.create(userId, parsed.data) };
 }
 
-export async function updateCategory(id: string, body: unknown): Promise<ServiceResult<Category>> {
+export async function updateCategory(
+  userId: string,
+  id: string,
+  body: unknown
+): Promise<ServiceResult<Category>> {
   await ensureSeeded();
   const parsed = updateCategorySchema.safeParse(body);
   if (!parsed.success)
@@ -68,26 +80,33 @@ export async function updateCategory(id: string, body: unknown): Promise<Service
       },
     };
 
-  const result = await repo.update(id, parsed.data);
+  const result = await repo.update(userId, id, parsed.data);
   if (!result) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
 
   // Cascade name change to denormalized transaction.category field
   if (parsed.data.name) {
     const txRepo = createTransactionRepository();
-    await txRepo.updateCategoryName(id, parsed.data.name);
+    await txRepo.updateCategoryName(userId, id, parsed.data.name);
   }
 
   return { data: result };
 }
 
-export async function deleteCategory(id: string): Promise<ServiceResult<{ success: boolean }>> {
+export async function deleteCategory(
+  userId: string,
+  id: string
+): Promise<ServiceResult<{ success: boolean }>> {
   await ensureSeeded();
-  const category = await repo.findById(id);
+  const category = await repo.findById(userId, id);
   if (!category) return { error: { message: 'Category not found', code: 'NOT_FOUND' } };
 
-  const txRepo = createTransactionRepository();
-  const count = await txRepo.countByCategory(id);
-  if (count > 0) {
+  // Atomic conditional delete — removes only if zero transactions reference it.
+  // Closes the check-then-delete race where a concurrent insert could orphan
+  // transactions whose category_id no longer resolves.
+  const deleted = await repo.deleteIfUnused(userId, id);
+  if (!deleted) {
+    const txRepo = createTransactionRepository();
+    const count = await txRepo.countByCategory(userId, id);
     return {
       error: {
         message: `Cannot delete "${category.name}" — ${count} transaction(s) still use it`,
@@ -96,6 +115,5 @@ export async function deleteCategory(id: string): Promise<ServiceResult<{ succes
     };
   }
 
-  await repo.delete(id);
   return { data: { success: true } };
 }

@@ -5,6 +5,7 @@ import {
   deleteMonthlyBudget,
 } from '@/server/services/annual-budget.service';
 import { readJsonBody } from '@/lib/api/read-json';
+import { requireUserId } from '@/server/auth/current-user';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-  const result = await getAnnualBudgetGrid(year);
+  const result = await getAnnualBudgetGrid(requireUserId(request), year);
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 500 });
   }
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await upsertMonthlyBudget(body);
+  const result = await upsertMonthlyBudget(requireUserId(request), body);
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;
     return NextResponse.json({ error: result.error }, { status });
@@ -45,7 +46,7 @@ export async function DELETE(request: NextRequest) {
   const parsed = await readJsonBody(request);
   if (parsed.error) return parsed.error;
   const body = parsed.data;
-  const result = await deleteMonthlyBudget(body);
+  const result = await deleteMonthlyBudget(requireUserId(request), body);
   if (result.error) {
     const status = result.error.code === 'VALIDATION_ERROR' ? 400 : 500;
     return NextResponse.json({ error: result.error }, { status });

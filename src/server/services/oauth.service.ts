@@ -32,12 +32,26 @@ export async function handleGoogleCallbackUser(
     if (r.rows[0]) return { data: { user: r.rows[0], isNew: false } };
   }
 
-  // Rule 2: existing email match → link
-  const byEmail = await db.query<{ id: string; email: string; name: string }>(
-    'SELECT id, email, name FROM users WHERE email = ?',
-    [emailLower]
-  );
+  // Rule 2: existing email match → link ONLY if no password is set.
+  // Auto-linking accounts that already have a password would let any Google
+  // account holder on the same email hijack the password account. Users with
+  // a password must explicitly link Google from settings (a future feature)
+  // after authenticating with their password.
+  const byEmail = await db.query<{
+    id: string;
+    email: string;
+    name: string;
+    password_hash: string | null;
+  }>('SELECT id, email, name, password_hash FROM users WHERE email = ?', [emailLower]);
   if (byEmail.rows[0]) {
+    if (byEmail.rows[0].password_hash) {
+      return {
+        error: {
+          message: 'Account exists with password — sign in with password first to link Google',
+          code: 'oauth_account_exists_password',
+        },
+      };
+    }
     await insertOAuthAccount({
       userId: byEmail.rows[0].id,
       provider: 'google',
@@ -46,7 +60,8 @@ export async function handleGoogleCallbackUser(
       displayName: profile.name ?? null,
       avatarUrl: profile.picture ?? null,
     });
-    return { data: { user: byEmail.rows[0], isNew: false } };
+    const { id, email, name } = byEmail.rows[0];
+    return { data: { user: { id, email, name }, isNew: false } };
   }
 
   // Rule 3: create new user with no password

@@ -5,6 +5,7 @@ import {
   createRecurringTransaction,
   getDueItems,
 } from '@/server/services/recurring-transaction.service';
+import { DEMO_USER_ID } from '@/server/auth/current-user';
 
 beforeEach(async () => {
   await resetDb();
@@ -28,23 +29,23 @@ const baseRule = {
 
 describe('getDueItems', () => {
   it('returns empty array when no rules are due', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       nextDueDate: '2099-12-01',
     });
-    const result = await getDueItems();
+    const result = await getDueItems(DEMO_USER_ID);
     expect(result.error).toBeUndefined();
     expect(result.data!.dueItems).toHaveLength(0);
     expect(result.data!.totalTransactions).toBe(0);
   });
 
   it('computes correct overdueCount for a monthly rule', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       nextDueDate: '2026-01-01',
       frequency: 'monthly',
     });
-    const result = await getDueItems();
+    const result = await getDueItems(DEMO_USER_ID);
     expect(result.error).toBeUndefined();
     expect(result.data!.dueItems).toHaveLength(1);
     const item = result.data!.dueItems[0];
@@ -56,26 +57,26 @@ describe('getDueItems', () => {
   });
 
   it('computes totalAmount as amount * overdueCount', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       amount: 500000,
       nextDueDate: '2026-01-01',
       frequency: 'monthly',
     });
-    const result = await getDueItems();
+    const result = await getDueItems(DEMO_USER_ID);
     const item = result.data!.dueItems[0];
     expect(item.totalAmount).toBe(500000 * item.overdueCount);
   });
 
   it('aggregates totalTransactions, totalIncome, totalExpense', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       type: 'income',
       amount: 1000000,
       nextDueDate: '2026-03-01',
       frequency: 'monthly',
     });
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       description: 'Expense Rule',
       type: 'expense',
@@ -83,7 +84,7 @@ describe('getDueItems', () => {
       nextDueDate: '2026-03-01',
       frequency: 'monthly',
     });
-    const result = await getDueItems();
+    const result = await getDueItems(DEMO_USER_ID);
     expect(result.data!.dueItems).toHaveLength(2);
     expect(result.data!.totalTransactions).toBe(
       result.data!.dueItems.reduce((sum, i) => sum + i.overdueCount, 0)
@@ -93,26 +94,26 @@ describe('getDueItems', () => {
   });
 
   it('excludes inactive rules', async () => {
-    const created = await createRecurringTransaction({
+    const created = await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       nextDueDate: '2026-01-01',
       isActive: true,
     });
     const { updateRecurringTransaction } =
       await import('@/server/services/recurring-transaction.service');
-    await updateRecurringTransaction(created.data!.id, { isActive: false });
-    const result = await getDueItems();
+    await updateRecurringTransaction(DEMO_USER_ID, created.data!.id, { isActive: false });
+    const result = await getDueItems(DEMO_USER_ID);
     expect(result.data!.dueItems).toHaveLength(0);
   });
 
   it('stops counting at endDate', async () => {
-    await createRecurringTransaction({
+    await createRecurringTransaction(DEMO_USER_ID, {
       ...baseRule,
       nextDueDate: '2026-01-01',
       endDate: '2026-02-15',
       frequency: 'monthly',
     });
-    const result = await getDueItems();
+    const result = await getDueItems(DEMO_USER_ID);
     if (result.data!.dueItems.length > 0) {
       expect(result.data!.dueItems[0].overdueCount).toBeLessThanOrEqual(2);
     }
