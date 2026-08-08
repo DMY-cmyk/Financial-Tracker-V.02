@@ -11,6 +11,7 @@ import {
 } from '@/lib/types';
 import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
+import { fetchAllTransactions } from './fetch-all-transactions';
 
 interface UseExportReturn {
   // Config
@@ -54,9 +55,18 @@ export function useExport(): UseExportReturn {
   const [exportError, setExportError] = useState<string | null>(null);
   useEffect(() => {
     if (!initialized) return;
-    api.transactions.list().then((result) => {
-      if (result.data) setAllTransactions(result.data.transactions);
+    let cancelled = false;
+    fetchAllTransactions((params) => api.transactions.list(params)).then((result) => {
+      if (cancelled) return;
+      if (result.error) {
+        setExportError(result.error);
+        return;
+      }
+      setAllTransactions(result.transactions);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [initialized]);
 
   const scopedTransactions = useMemo(() => {
