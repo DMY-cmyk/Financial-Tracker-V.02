@@ -37,7 +37,9 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
 
   useEffect(() => {
     api.categories.list().then((r) => {
-      if (r.data) setCategories(r.data.categories);
+      // Archived categories are hidden from new-transaction pickers;
+      // existing transactions keep their category via free-text `category`.
+      if (r.data) setCategories(r.data.categories.filter((c) => !c.archived));
     });
     api.paymentMethods.list().then((r) => {
       if (r.data) setPaymentMethods(r.data.paymentMethods);

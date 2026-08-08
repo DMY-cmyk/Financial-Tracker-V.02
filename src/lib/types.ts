@@ -19,6 +19,8 @@ export interface Category {
   color: string;
   icon: string;
   budget: number;
+  /** Archived categories are hidden from new-transaction pickers but keep history. */
+  archived?: boolean;
 }
 
 export interface PaymentMethod {

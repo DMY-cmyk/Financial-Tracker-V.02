@@ -13,6 +13,8 @@ import {
   Plus,
   Trash2,
   Loader2,
+  Archive,
+  ArchiveRestore,
   GripVertical,
   ShoppingCart,
   Coffee,
@@ -204,6 +206,16 @@ export default function CategoriesPage() {
     }
   };
 
+  const handleToggleArchive = async (id: string, archived: boolean) => {
+    const result = await api.categories.update(id, { archived });
+    if (result.data) {
+      setCategories((prev) => prev.map((c) => (c.id === id ? result.data! : c)));
+      toast.success(t(locale, archived ? 'categoryArchived' : 'categoryUnarchived'));
+    } else {
+      toast.error(result.error?.message || t(locale, 'failedSave'));
+    }
+  };
+
   const handleDeleteCategory = async (id: string) => {
     const result = await api.categories.delete(id);
     if (result.error) {
@@ -319,7 +331,10 @@ export default function CategoriesPage() {
                 <Reorder.Item
                   value={c}
                   key={c.id}
-                  className="hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors"
+                  className={cn(
+                    'hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors',
+                    c.archived && 'opacity-50'
+                  )}
                 >
                   <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
                   <Icon className="h-4 w-4" style={{ color: c.color }} />
@@ -336,6 +351,19 @@ export default function CategoriesPage() {
                       handleUpdateBudget(c.id, budget);
                     }}
                   />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground h-7 w-7"
+                    onClick={() => handleToggleArchive(c.id, !c.archived)}
+                    aria-label={t(locale, c.archived ? 'unarchive' : 'archive')}
+                  >
+                    {c.archived ? (
+                      <ArchiveRestore className="h-3.5 w-3.5" />
+                    ) : (
+                      <Archive className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -366,11 +394,27 @@ export default function CategoriesPage() {
                 <Reorder.Item
                   value={c}
                   key={c.id}
-                  className="hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors"
+                  className={cn(
+                    'hover:bg-surface-inset flex items-center gap-2 rounded-lg p-2 transition-colors',
+                    c.archived && 'opacity-50'
+                  )}
                 >
                   <GripVertical className="text-muted-foreground/40 h-4 w-4 cursor-grab" />
                   <Icon className="h-4 w-4" style={{ color: c.color }} />
                   <span className="flex-1 text-sm">{c.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground h-7 w-7"
+                    onClick={() => handleToggleArchive(c.id, !c.archived)}
+                    aria-label={t(locale, c.archived ? 'unarchive' : 'archive')}
+                  >
+                    {c.archived ? (
+                      <ArchiveRestore className="h-3.5 w-3.5" />
+                    ) : (
+                      <Archive className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
