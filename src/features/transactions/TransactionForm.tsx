@@ -24,10 +24,11 @@ import { PaymentMethodIcon } from '@/components/shared/PaymentMethodIcon';
 
 interface TransactionFormProps {
   transaction?: Transaction;
+  initialType?: 'income' | 'expense';
   onClose: () => void;
 }
 
-export function TransactionForm({ transaction, onClose }: TransactionFormProps) {
+export function TransactionForm({ transaction, initialType = 'expense', onClose }: TransactionFormProps) {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
@@ -46,7 +47,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     });
   }, []);
 
-  const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense');
+  const [type, setType] = useState<'income' | 'expense'>(transaction?.type || initialType);
   const [description, setDescription] = useState(transaction?.description || '');
   const [amountStr, setAmountStr] = useState(
     transaction ? formatCurrencyInput(transaction.amount) : ''

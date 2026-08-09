@@ -1,17 +1,21 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TransactionForm } from '@/features/transactions/TransactionForm';
+import { resolveInitialType } from '@/features/transactions/initial-type';
 import { t, useLocale } from '@/lib/i18n';
 import { fadeInUp } from '@/lib/motion';
 import { ArrowLeft } from 'lucide-react';
 
-export default function NewTransactionPage() {
+function NewTransactionContent() {
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const initialType = resolveInitialType(searchParams.get('type'));
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
@@ -35,8 +39,16 @@ export default function NewTransactionPage() {
         transition={{ duration: 0.35, delay: 0.1 }}
         className="border-border bg-card shadow-card rounded-2xl border p-4 sm:p-6"
       >
-        <TransactionForm onClose={() => router.push('/transactions')} />
+        <TransactionForm initialType={initialType} onClose={() => router.push('/transactions')} />
       </motion.div>
     </div>
+  );
+}
+
+export default function NewTransactionPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewTransactionContent />
+    </Suspense>
   );
 }
