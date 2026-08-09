@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
+import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageTransition } from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -203,8 +204,14 @@ export default function CategoriesPage() {
     const result = await api.categories.update(id, { budget });
     if (result.data) {
       setCategories((prev) => prev.map((c) => (c.id === id ? result.data! : c)));
+    } else {
+      toast.error(t(locale, 'somethingWentWrong'));
     }
   };
+
+  const debouncedUpdateBudget = useDebouncedCallback((id: string, budget: number) => {
+    void handleUpdateBudget(id, budget);
+  }, 500);
 
   const handleToggleArchive = async (id: string, archived: boolean) => {
     const result = await api.categories.update(id, { archived });
@@ -348,7 +355,7 @@ export default function CategoriesPage() {
                       setCategories((prev) =>
                         prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat))
                       );
-                      handleUpdateBudget(c.id, budget);
+                      debouncedUpdateBudget(c.id, budget);
                     }}
                   />
                   <Button
