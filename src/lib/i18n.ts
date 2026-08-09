@@ -176,9 +176,12 @@ type TranslationKeys = {
 
   // Pages
   pageNotFound: string;
+  pageNotFoundBody: string;
   somethingWentWrong: string;
+  unexpectedErrorBody: string;
   refreshPage: string;
   backToDashboard: string;
+  skipToContent: string;
 
   // Misc
   type: string;
@@ -787,9 +790,12 @@ const translations: Record<Locale, TranslationKeys> = {
     dataClearedToast: 'All data cleared',
 
     pageNotFound: 'Page Not Found',
+    pageNotFoundBody: "The page you're looking for doesn't exist or has been moved.",
     somethingWentWrong: 'Something went wrong',
+    unexpectedErrorBody: 'An unexpected error occurred. Please try again or refresh the page.',
     refreshPage: 'Refresh Page',
     backToDashboard: 'Back to Dashboard',
+    skipToContent: 'Skip to main content',
 
     type: 'Type',
 
@@ -1381,9 +1387,12 @@ const translations: Record<Locale, TranslationKeys> = {
     dataClearedToast: 'Semua data dihapus',
 
     pageNotFound: 'Halaman Tidak Ditemukan',
+    pageNotFoundBody: 'Halaman yang Anda cari tidak ada atau sudah dipindahkan.',
     somethingWentWrong: 'Terjadi Kesalahan',
+    unexpectedErrorBody: 'Terjadi kesalahan. Silakan coba lagi atau muat ulang halaman.',
     refreshPage: 'Muat Ulang',
     backToDashboard: 'Kembali ke Dasbor',
+    skipToContent: 'Lompat ke konten utama',
 
     type: 'Tipe',
 

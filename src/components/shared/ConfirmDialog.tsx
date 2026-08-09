@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
+import { t, useLocale } from '@/lib/i18n';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -29,12 +30,16 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = 'Delete',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   loading = false,
   variant = 'destructive',
 }: ConfirmDialogProps) {
+  const locale = useLocale();
+  const confirm = confirmLabel ?? t(locale, 'delete');
+  const cancel = cancelLabel ?? t(locale, 'cancel');
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -43,7 +48,7 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{cancel}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
@@ -57,7 +62,7 @@ export function ConfirmDialog({
             }
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {confirmLabel}
+            {confirm}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

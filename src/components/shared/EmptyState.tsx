@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SearchX } from 'lucide-react';
+import { t, useLocale } from '@/lib/i18n';
 
 interface EmptyStateProps {
   title: string;
@@ -69,19 +70,18 @@ interface NoResultsProps {
   className?: string;
 }
 
-export function NoResults({
-  message = 'No results found',
-  onClear,
-  clearLabel = 'Clear filters',
-  className,
-}: NoResultsProps) {
+export function NoResults({ message, onClear, clearLabel, className }: NoResultsProps) {
+  const locale = useLocale();
+
   return (
     <div className={cn('flex flex-col items-center justify-center py-10 text-center', className)}>
       <SearchX className="text-muted-foreground/40 mb-3 h-10 w-10" />
-      <p className="text-muted-foreground text-sm font-medium">{message}</p>
+      <p className="text-muted-foreground text-sm font-medium">
+        {message ?? t(locale, 'noResults')}
+      </p>
       {onClear && (
         <button onClick={onClear} className="text-primary mt-2 text-xs font-medium hover:underline">
-          {clearLabel}
+          {clearLabel ?? t(locale, 'clearFilters')}
         </button>
       )}
     </div>
@@ -95,12 +95,9 @@ interface InlineErrorProps {
   className?: string;
 }
 
-export function InlineError({
-  message,
-  onRetry,
-  retryLabel = 'Try again',
-  className,
-}: InlineErrorProps) {
+export function InlineError({ message, onRetry, retryLabel, className }: InlineErrorProps) {
+  const locale = useLocale();
+
   return (
     <div
       className={cn(
@@ -114,7 +111,7 @@ export function InlineError({
           onClick={onRetry}
           className="mt-2 text-xs font-medium text-red-600 hover:underline dark:text-red-400"
         >
-          {retryLabel}
+          {retryLabel ?? t(locale, 'tryAgain')}
         </button>
       )}
     </div>

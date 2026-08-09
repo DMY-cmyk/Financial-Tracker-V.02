@@ -25,11 +25,7 @@ export default function Error({
       </div>
       <div className="space-y-2">
         <h2 className="text-xl font-semibold">{t(locale, 'somethingWentWrong')}</h2>
-        <p className="text-muted-foreground max-w-md text-sm">
-          {locale === 'id'
-            ? 'Terjadi kesalahan. Silakan coba lagi atau muat ulang halaman.'
-            : 'An unexpected error occurred. Please try again or refresh the page.'}
-        </p>
+        <p className="text-muted-foreground max-w-md text-sm">{t(locale, 'unexpectedErrorBody')}</p>
       </div>
       <div className="flex gap-3">
         <Button variant="outline" onClick={() => window.location.reload()}>
