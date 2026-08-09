@@ -28,7 +28,11 @@ interface TransactionFormProps {
   onClose: () => void;
 }
 
-export function TransactionForm({ transaction, initialType = 'expense', onClose }: TransactionFormProps) {
+export function TransactionForm({
+  transaction,
+  initialType = 'expense',
+  onClose,
+}: TransactionFormProps) {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
