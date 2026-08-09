@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
-import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
+import { useKeyedDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageTransition } from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -209,7 +209,7 @@ export default function CategoriesPage() {
     }
   };
 
-  const debouncedUpdateBudget = useDebouncedCallback((id: string, budget: number) => {
+  const debouncedUpdateBudget = useKeyedDebouncedCallback((id: string, budget: number) => {
     void handleUpdateBudget(id, budget);
   }, 500);
 
