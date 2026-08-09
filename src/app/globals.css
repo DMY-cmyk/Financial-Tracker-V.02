@@ -182,6 +182,23 @@
   --shadow-card: var(--card-shadow);
   --shadow-card-hover: var(--card-shadow-hover);
   --shadow-elevated: var(--elevated-shadow);
+
+  /* Editorial palette — direct utilities (text-pos, bg-neg-soft, bg-ink, …) */
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-card-2: var(--card-2);
+  --color-accent-2: var(--accent-2);
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
 }
 
 :root {
@@ -222,28 +239,28 @@
   --border: var(--rule-soft);
   --input: var(--rule-soft);
   --ring: var(--accent);
-  --success: #059669;
-  --success-foreground: #ffffff;
-  --warning: #d97706;
-  --warning-foreground: #ffffff;
-  --chart-1: #1d4ed8;
-  --chart-2: #059669;
-  --chart-3: #d97706;
-  --chart-4: #dc2626;
-  --chart-5: #8b5cf6;
+  --success: var(--pos);
+  --success-foreground: var(--paper);
+  --warning: var(--warn);
+  --warning-foreground: var(--paper);
+  --chart-1: var(--accent);
+  --chart-2: var(--pos);
+  --chart-3: var(--warn);
+  --chart-4: var(--neg);
+  --chart-5: var(--accent-2);
   /* Chart semantic tokens */
-  --chart-income: #059669;
-  --chart-expense: #dc2626;
-  --chart-primary: #3b82f6;
-  --chart-muted: #94a3b8;
-  --chart-grid: #e2e8f0;
+  --chart-income: var(--pos);
+  --chart-expense: var(--neg);
+  --chart-primary: var(--accent);
+  --chart-muted: var(--ink-3);
+  --chart-grid: var(--rule-soft);
   /* Chart palette tokens (index-based, for dynamic series) */
-  --chart-color-1: #3b82f6;
-  --chart-color-2: #059669;
-  --chart-color-3: #8b5cf6;
-  --chart-color-4: #d97706;
-  --chart-color-5: #ec4899;
-  --chart-color-6: #06b6d4;
+  --chart-color-1: var(--accent);
+  --chart-color-2: var(--pos);
+  --chart-color-3: var(--warn);
+  --chart-color-4: var(--neg);
+  --chart-color-5: var(--accent-2);
+  --chart-color-6: var(--ink-3);
   --radius: 1rem;
 
   /* Brand mint — used only on opt-in chrome */
@@ -282,12 +299,12 @@
   --border-strong: #cbd5e1;
 
   /* Soft semantic surfaces */
-  --success-soft: #d1fae5;
-  --success-soft-foreground: #047857;
-  --danger-soft: #fee2e2;
-  --danger-soft-foreground: #b91c1c;
-  --warning-soft: #fef3c7;
-  --warning-soft-foreground: #b45309;
+  --success-soft: var(--pos-soft);
+  --success-soft-foreground: var(--pos);
+  --danger-soft: var(--neg-soft);
+  --danger-soft-foreground: var(--neg);
+  --warning-soft: var(--warn-soft);
+  --warning-soft-foreground: var(--warn);
   --info-soft: #dbeafe;
   --info-soft-foreground: #1d4ed8;
 
@@ -338,26 +355,26 @@
   --border: var(--rule-soft);
   --input: var(--rule-soft);
   --ring: var(--accent);
-  --success: #34d399;
-  --success-foreground: #ffffff;
-  --warning: #fbbf24;
-  --warning-foreground: #ffffff;
-  --chart-1: #3b82f6;
-  --chart-2: #34d399;
-  --chart-3: #fbbf24;
-  --chart-4: #f87171;
-  --chart-5: #a78bfa;
-  --chart-income: #34d399;
-  --chart-expense: #f87171;
-  --chart-primary: #60a5fa;
-  --chart-muted: #64748b;
-  --chart-grid: #334155;
-  --chart-color-1: #60a5fa;
-  --chart-color-2: #34d399;
-  --chart-color-3: #a78bfa;
-  --chart-color-4: #fcd34d;
-  --chart-color-5: #f9a8d4;
-  --chart-color-6: #67e8f9;
+  --success: var(--pos);
+  --success-foreground: var(--paper);
+  --warning: var(--warn);
+  --warning-foreground: var(--paper);
+  --chart-1: var(--accent);
+  --chart-2: var(--pos);
+  --chart-3: var(--warn);
+  --chart-4: var(--neg);
+  --chart-5: var(--accent-2);
+  --chart-income: var(--pos);
+  --chart-expense: var(--neg);
+  --chart-primary: var(--accent);
+  --chart-muted: var(--ink-3);
+  --chart-grid: var(--rule-soft);
+  --chart-color-1: var(--accent);
+  --chart-color-2: var(--pos);
+  --chart-color-3: var(--warn);
+  --chart-color-4: var(--neg);
+  --chart-color-5: var(--accent-2);
+  --chart-color-6: var(--ink-3);
   --sidebar: #1e293b;
   --sidebar-foreground: #f1f5f9;
   --sidebar-primary: #3b82f6;
@@ -391,12 +408,12 @@
   --border-strong: #475569;
 
   /* Soft semantic surfaces — tinted shadows of the semantic colors */
-  --success-soft: #052e1f;
-  --success-soft-foreground: #6ee7b7;
-  --danger-soft: #3a1212;
-  --danger-soft-foreground: #fca5a5;
-  --warning-soft: #3b260a;
-  --warning-soft-foreground: #fcd34d;
+  --success-soft: var(--pos-soft);
+  --success-soft-foreground: var(--pos);
+  --danger-soft: var(--neg-soft);
+  --danger-soft-foreground: var(--neg);
+  --warning-soft: var(--warn-soft);
+  --warning-soft-foreground: var(--warn);
   --info-soft: #112444;
   --info-soft-foreground: #93c5fd;
 

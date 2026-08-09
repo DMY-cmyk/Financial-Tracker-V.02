@@ -40,10 +40,13 @@ This is a modern personal finance tracking dashboard designed for Indonesian Rup
 ## Design Direction
 
 ### Visual Language
-- Rounded cards (rounded-2xl), soft borders, subtle shadows
-- Blue primary (#2563EB), Emerald for income, Red for expense, Amber for warnings
-- Plus Jakarta Sans for UI text, JetBrains Mono for currency amounts
-- Light and dark mode via `.dark` class on `<html>`
+
+> **Source of truth: `design-system/financial-tracker-v.02/MASTER.md`** — baca file itu sebelum menyentuh UI.
+
+- Editorial paper-and-ink: latar `--paper`, teks `--ink`, aksen `--accent` (oranye `#ff5b1f` light / brass `#d3b266` dark)
+- Income `--pos`, expense `--neg`, warning `--warn` (+ tint `*-soft`) — selalu lewat token/utility (`text-pos`, `bg-neg-soft`), JANGAN hex mentah atau palet Tailwind mentah
+- Fraunces untuk display/heading (`--font-display`), Geist untuk UI, Geist Mono untuk angka mata uang
+- Rounded cards (rounded-2xl), hard rule editorial (`--rule`), light & dark mode via `.dark` class on `<html>`
 
 ### Spacing & Layout
 - Sidebar navigation on desktop (lg+), bottom nav on mobile
