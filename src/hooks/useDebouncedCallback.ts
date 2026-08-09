@@ -1,20 +1,32 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
-import { createDebounced, createKeyedDebounced } from '@/lib/debounce';
+import { useCallback, useEffect, useRef } from 'react';
 
 export function useDebouncedCallback<A extends unknown[]>(
   fn: (...args: A) => void,
   delayMs: number
 ): (...args: A) => void {
   const fnRef = useRef(fn);
-  fnRef.current = fn;
-  const debounced = useMemo(
-    () => createDebounced((...args: A) => fnRef.current(...args), delayMs),
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    fnRef.current = fn;
+  }, [fn]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    []
+  );
+  return useCallback(
+    (...args: A) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null;
+        fnRef.current(...args);
+      }, delayMs);
+    },
     [delayMs]
   );
-  useEffect(() => () => debounced.cancel(), [debounced]);
-  return debounced;
 }
 
 export function useKeyedDebouncedCallback<A extends unknown[]>(
@@ -22,11 +34,30 @@ export function useKeyedDebouncedCallback<A extends unknown[]>(
   delayMs: number
 ): (key: string, ...args: A) => void {
   const fnRef = useRef(fn);
-  fnRef.current = fn;
-  const debounced = useMemo(
-    () => createKeyedDebounced((key: string, ...args: A) => fnRef.current(key, ...args), delayMs),
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  useEffect(() => {
+    fnRef.current = fn;
+  }, [fn]);
+  useEffect(
+    () => () => {
+      for (const timer of timersRef.current.values()) clearTimeout(timer);
+      timersRef.current.clear();
+    },
+    []
+  );
+  return useCallback(
+    (key: string, ...args: A) => {
+      const timers = timersRef.current;
+      const existing = timers.get(key);
+      if (existing) clearTimeout(existing);
+      timers.set(
+        key,
+        setTimeout(() => {
+          timers.delete(key);
+          fnRef.current(key, ...args);
+        }, delayMs)
+      );
+    },
     [delayMs]
   );
-  useEffect(() => () => debounced.cancelAll(), [debounced]);
-  return debounced;
 }
