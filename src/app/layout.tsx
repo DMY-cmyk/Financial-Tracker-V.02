@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Fraunces } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/components/providers/StoreProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
-import { HtmlLangSync } from '@/components/providers/HtmlLangSync';
 import { AppShell } from '@/components/layout/AppShell';
 import { SkipLink } from '@/components/layout/SkipLink';
 import { Toaster } from '@/components/ui/sonner';
@@ -63,7 +62,6 @@ export default function RootLayout({
       >
         <StoreProvider>
           <SkipLink />
-          <HtmlLangSync />
           <QueryProvider>
             <AppShell>{children}</AppShell>
             <EndOfMonthReminder />
