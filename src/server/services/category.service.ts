@@ -1,7 +1,11 @@
 import { ensureSeeded } from '@/server/db/seed';
 import { createCategoryRepository } from '@/server/repositories/category.repository';
 import { createTransactionRepository } from '@/server/repositories/transaction.repository';
-import { createCategorySchema, updateCategorySchema } from '@/lib/api/validation';
+import {
+  createCategorySchema,
+  updateCategorySchema,
+  reorderCategoriesSchema,
+} from '@/lib/api/validation';
 import type { Category } from '@/lib/types';
 
 const repo = createCategoryRepository();
@@ -90,6 +94,25 @@ export async function updateCategory(
   }
 
   return { data: result };
+}
+
+export async function reorderCategories(
+  userId: string,
+  ids: string[]
+): Promise<ServiceResult<{ success: boolean }>> {
+  await ensureSeeded();
+  const parsed = reorderCategoriesSchema.safeParse({ ids });
+  if (!parsed.success)
+    return {
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: formatZodError(parsed.error),
+      },
+    };
+
+  await repo.reorder(userId, parsed.data.ids);
+  return { data: { success: true } };
 }
 
 export async function deleteCategory(

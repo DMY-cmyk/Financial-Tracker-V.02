@@ -170,12 +170,22 @@ export default function CategoriesPage() {
     return ordered;
   })();
 
+  const persistOrder = useKeyedDebouncedCallback((_key: string, ids: string[]) => {
+    api.categories.reorder(ids).then((r) => {
+      if (r.error) toast.error(t(locale, 'somethingWentWrong'));
+    });
+  }, 800);
+
   const handleReorderExpense = (reordered: Category[]) => {
-    setExpenseOrder(reordered.map((c) => c.id));
+    const ids = reordered.map((c) => c.id);
+    setExpenseOrder(ids);
+    persistOrder('expense', ids);
   };
 
   const handleReorderIncome = (reordered: Category[]) => {
-    setIncomeOrder(reordered.map((c) => c.id));
+    const ids = reordered.map((c) => c.id);
+    setIncomeOrder(ids);
+    persistOrder('income', ids);
   };
 
   const handleAddCategory = async () => {

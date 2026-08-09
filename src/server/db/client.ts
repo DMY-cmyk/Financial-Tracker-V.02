@@ -85,6 +85,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
       icon TEXT NOT NULL DEFAULT 'circle',
       budget BIGINT DEFAULT 0,
       archived INTEGER NOT NULL DEFAULT 0,
+      sort_order INTEGER NOT NULL DEFAULT 0,
       created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     )`,
     `CREATE TABLE IF NOT EXISTS transactions (
@@ -250,6 +251,7 @@ async function initializeSchema(client: DbClient): Promise<void> {
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'circle'`,
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS budget BIGINT DEFAULT 0`,
     `ALTER TABLE categories ADD COLUMN IF NOT EXISTS archived INTEGER NOT NULL DEFAULT 0`,
+    `ALTER TABLE categories ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT 'wallet'`,
     `ALTER TABLE payment_methods ADD COLUMN IF NOT EXISTS beginning_balance BIGINT NOT NULL DEFAULT 0`,
     `ALTER TABLE transactions ADD COLUMN IF NOT EXISTS source_recurring_id TEXT DEFAULT NULL`,

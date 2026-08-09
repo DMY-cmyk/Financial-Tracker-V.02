@@ -179,6 +179,13 @@ export const api = {
         method: 'DELETE',
       });
     },
+
+    reorder(ids: string[]) {
+      return fetchApi<{ success: boolean }>('/categories/reorder', {
+        method: 'PATCH',
+        body: JSON.stringify({ ids }),
+      });
+    },
   },
 
   paymentMethods: {
