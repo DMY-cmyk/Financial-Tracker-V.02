@@ -102,11 +102,13 @@ async function getCategoryExpenseTotals(
   prefix: string
 ): Promise<CategoryTotalRow[]> {
   const db = await getDb();
+  // GROUP BY must list every non-aggregated selected column — SQLite tolerates
+  // omitting `category`, Postgres rejects it (production /insights 500).
   const result = await db.query<CategoryTotalRow>(
     `SELECT category_id, category, SUM(amount) AS total
      FROM transactions
      WHERE user_id = ? AND type = 'expense' AND date LIKE ? || '%'
-     GROUP BY category_id`,
+     GROUP BY category_id, category`,
     [userId, prefix]
   );
   return result.rows;
