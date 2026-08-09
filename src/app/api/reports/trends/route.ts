@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ensureSeeded } from '@/server/db/seed';
 import { getDb } from '@/server/db/client';
+import { requireUserId } from '@/server/auth/current-user';
 
 interface MonthlyAggregate {
   month_key: string;
@@ -9,6 +10,13 @@ interface MonthlyAggregate {
 }
 
 export async function GET(request: NextRequest) {
+  let userId: string;
+  try {
+    userId = requireUserId(request);
+  } catch {
+    return NextResponse.json({ error: { message: 'Unauthorized' } }, { status: 401 });
+  }
+
   await ensureSeeded();
   const db = await getDb();
 
@@ -21,10 +29,11 @@ export async function GET(request: NextRequest) {
        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expense
      FROM transactions
+     WHERE user_id = ?
      GROUP BY month_key
      ORDER BY month_key DESC
      LIMIT ?`,
-    [limit]
+    [userId, limit]
   );
 
   const months = result.rows.reverse().map((row) => ({

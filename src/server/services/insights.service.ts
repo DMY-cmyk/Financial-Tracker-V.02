@@ -102,11 +102,13 @@ async function getCategoryExpenseTotals(
   prefix: string
 ): Promise<CategoryTotalRow[]> {
   const db = await getDb();
+  // GROUP BY must list every non-aggregated selected column — SQLite tolerates
+  // omitting `category`, Postgres rejects it (production /insights 500).
   const result = await db.query<CategoryTotalRow>(
     `SELECT category_id, category, SUM(amount) AS total
      FROM transactions
      WHERE user_id = ? AND type = 'expense' AND date LIKE ? || '%'
-     GROUP BY category_id`,
+     GROUP BY category_id, category`,
     [userId, prefix]
   );
   return result.rows;
@@ -249,35 +251,30 @@ async function computeBiggestTransactions(
   }));
 }
 
-interface DayOfWeekRow {
-  day_index: number;
-  total_amount: number;
-  count: number;
-}
-
-async function computeDayOfWeekPattern(
+export async function computeDayOfWeekPattern(
   userId: string,
   month: number,
   year: number
 ): Promise<DayOfWeekItem[]> {
   const db = await getDb();
   const prefix = buildMonthPrefix(month, year);
-  const result = await db.query<DayOfWeekRow>(
-    `SELECT CAST(strftime('%w', date) AS INTEGER) as day_index,
-            SUM(amount) as total_amount,
-            COUNT(*) as count
+  const result = await db.query<{ date: string; amount: number }>(
+    `SELECT date, amount
      FROM transactions
-     WHERE user_id = ? AND type = 'expense' AND date LIKE ? || '%'
-     GROUP BY strftime('%w', date)`,
+     WHERE user_id = ? AND type = 'expense' AND date LIKE ? || '%'`,
     [userId, prefix]
   );
 
+  // Hitung hari-dalam-minggu di JS — SQLite date functions like weekday extraction
+  // only work in SQLite and crash on Postgres (production /insights incident 2026-08).
   const dayMap = new Map<number, { totalAmount: number; count: number }>();
   for (const row of result.rows) {
-    dayMap.set(row.day_index, {
-      totalAmount: row.total_amount,
-      count: row.count,
-    });
+    const dayIndex = new Date(`${row.date.slice(0, 10)}T00:00:00Z`).getUTCDay();
+    if (Number.isNaN(dayIndex)) continue;
+    const entry = dayMap.get(dayIndex) ?? { totalAmount: 0, count: 0 };
+    entry.totalAmount += row.amount;
+    entry.count += 1;
+    dayMap.set(dayIndex, entry);
   }
 
   return Array.from({ length: 7 }, (_, i) => {

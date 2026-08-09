@@ -29,7 +29,6 @@ export async function ensureSeeded() {
   if (result.rows[0]?.c > 0) {
     // Run migrations for existing data
     await migrateCategoryIds(db);
-    await cleanup2025Data(db);
     await backfillUserIds(db);
     // Ensure "Saldo Awal" income category always exists (even on pre-existing databases)
     await db.query(
@@ -163,20 +162,6 @@ async function backfillUserIds(db: {
   }
 }
 
-/** One-time cleanup: delete all 2025 seed data from production */
-async function cleanup2025Data(db: {
-  query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }>;
-}) {
-  const flag = await db.query<{ value: string }>(
-    "SELECT value FROM settings WHERE key = 'migration_cleanup_2025'"
-  );
-  if (flag.rows.length > 0) return;
-
-  await db.query("DELETE FROM transactions WHERE date LIKE '2025-%'", []);
-  await db.query('DELETE FROM bills WHERE year = 2025', []);
-  await db.query("INSERT INTO settings (key, value) VALUES ('migration_cleanup_2025', 'done')", []);
-}
-
 /** Backfill category_id for any transactions that have an empty category_id */
 async function migrateCategoryIds(db: {
   query: <T>(sql: string, params?: unknown[]) => Promise<{ rows: T[]; rowCount: number }>;
@@ -186,12 +171,15 @@ async function migrateCategoryIds(db: {
   );
   if ((orphaned.rows[0]?.cnt ?? 0) === 0) return;
 
-  // Resolve from categories table
+  // Resolve from the SAME user's categories only — an uncorrelated lookup
+  // once pointed transactions at other users' category rows.
   await db.query(
     `UPDATE transactions SET category_id = (
-      SELECT id FROM categories WHERE categories.name = transactions.category LIMIT 1
+      SELECT id FROM categories WHERE categories.name = transactions.category
+        AND categories.user_id = transactions.user_id LIMIT 1
     ) WHERE (category_id = '' OR category_id IS NULL)
-      AND EXISTS (SELECT 1 FROM categories WHERE categories.name = transactions.category)`,
+      AND EXISTS (SELECT 1 FROM categories WHERE categories.name = transactions.category
+        AND categories.user_id = transactions.user_id)`,
     []
   );
 }

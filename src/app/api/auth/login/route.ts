@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password, keepSignedIn } = parsed.data;
-    const result = await loginUser(email, password);
+    const result = await loginUser(email, password, keepSignedIn === true);
 
     if ('error' in result) {
       return NextResponse.json({ error: { message: result.error } }, { status: 401 });

@@ -4,7 +4,8 @@ import { getDb } from '@/server/db/client';
 import { getJwtSecret, JWT_ISSUER } from '@/lib/auth/jwt-secret';
 import { provisionDefaultsForUser } from '@/server/services/user-provisioning.service';
 
-const JWT_EXPIRY = '7d';
+const JWT_EXPIRY_DEFAULT = '7d';
+const JWT_EXPIRY_EXTENDED = '30d';
 
 // A real (12-round) bcrypt hash used only to equalize response time when an
 // account does not exist, so login timing cannot be used to enumerate emails.
@@ -80,7 +81,8 @@ export async function registerUser(
 
 export async function loginUser(
   email: string,
-  password: string
+  password: string,
+  keepSignedIn = false
 ): Promise<{ user: AuthUser; token: string } | { error: string }> {
   const db = await getDb();
 
@@ -108,7 +110,7 @@ export async function loginUser(
     name: row.name,
     createdAt: row.created_at,
   };
-  const token = await createToken(user);
+  const token = await createToken(user, keepSignedIn ? JWT_EXPIRY_EXTENDED : JWT_EXPIRY_DEFAULT);
 
   return { user, token };
 }
@@ -127,7 +129,7 @@ export async function getUserFromToken(token: string): Promise<AuthUser | null> 
   }
 }
 
-async function createToken(user: AuthUser): Promise<string> {
+async function createToken(user: AuthUser, expiry: string = JWT_EXPIRY_DEFAULT): Promise<string> {
   return new SignJWT({
     email: user.email,
     name: user.name,
@@ -137,7 +139,7 @@ async function createToken(user: AuthUser): Promise<string> {
     .setSubject(user.id)
     .setIssuer(JWT_ISSUER)
     .setIssuedAt()
-    .setExpirationTime(JWT_EXPIRY)
+    .setExpirationTime(expiry)
     .sign(getJwtSecret());
 }
 
@@ -161,5 +163,5 @@ export async function issueSessionForUser(userId: string): Promise<string> {
     name: row.name,
     createdAt: row.created_at,
   };
-  return createToken(user);
+  return createToken(user, JWT_EXPIRY_EXTENDED);
 }

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import * as XLSX from 'xlsx';
-import { parseExcelWorkbook } from '@/lib/excel-import';
+import { parseSheetRows } from '@/lib/excel-import';
 import { parseOcrTextToTransactions } from '@/lib/ocr-import';
 import { bulkCreateTransactionSchema } from '@/lib/api/validation';
 import { resetDb } from '@/server/db/client';
@@ -18,8 +17,10 @@ import type { Category } from '@/lib/types';
 //   Col 6: empty separator
 //   Col 7: Expense Tanggal  Col 8: Expense Jumlah  Col 9: Expense Kategori  Col 10: Expense Account  Col 11: Expense Notes
 
-function createTestWorkbook(incomeRows: unknown[][], expenseRows: unknown[][]): XLSX.WorkBook {
-  const data: unknown[][] = [];
+type TestCell = string | number | boolean | Date | null | undefined;
+
+function createTestWorkbook(incomeRows: TestCell[][], expenseRows: TestCell[][]): TestCell[][] {
+  const data: TestCell[][] = [];
   // Row 0: section titles
   data.push([null, null, 'P E M A S U K A N', null, null, null, null, 'P E N G E L U A R A N']);
   // Row 1: headers
@@ -45,23 +46,19 @@ function createTestWorkbook(incomeRows: unknown[][], expenseRows: unknown[][]): 
     const expense = expenseRows[i] || [null, null, null, null, null];
     data.push([null, null, ...income, null, ...expense]);
   }
-
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  return wb;
+  return data;
 }
 
 // ---------------------------------------------------------------------------
 // 1. Excel Import Parser
 // ---------------------------------------------------------------------------
-describe('parseExcelWorkbook', () => {
+describe('parseSheetRows', () => {
   it('parses a valid workbook with income and expense rows', () => {
     const wb = createTestWorkbook(
       [['01/03/2026', 5000000, 'Salary', 'Bank BCA']],
       [['02/03/2026', 150000, 'Food', 'Cash', 'Lunch']]
     );
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
 
     expect(result.rows).toHaveLength(2);
     expect(result.validCount).toBe(2);
@@ -93,7 +90,7 @@ describe('parseExcelWorkbook', () => {
       ],
       []
     );
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
 
     expect(result.rows).toHaveLength(2);
     expect(result.rows.every((r) => r.type === 'income')).toBe(true);
@@ -109,7 +106,7 @@ describe('parseExcelWorkbook', () => {
         ['12/03/2026', 50000, 'Transport', 'GoPay', 'Grab'],
       ]
     );
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
 
     expect(result.rows).toHaveLength(2);
     expect(result.rows.every((r) => r.type === 'expense')).toBe(true);
@@ -118,14 +115,12 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('returns error result for invalid/missing headers', () => {
-    const ws = XLSX.utils.aoa_to_sheet([
+    const wb: TestCell[][] = [
       ['Name', 'Value'],
       ['Alice', 100],
-    ]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    ];
 
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.validCount).toBe(0);
     expect(result.rows.length).toBeGreaterThanOrEqual(0);
     // Should contain an error message about missing headers
@@ -137,43 +132,58 @@ describe('parseExcelWorkbook', () => {
 
   it('returns empty result for empty data rows', () => {
     const wb = createTestWorkbook([], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows).toHaveLength(0);
     expect(result.validCount).toBe(0);
     expect(result.invalidCount).toBe(0);
   });
 
-  it('returns error for workbook with no sheets', () => {
-    const wb: XLSX.WorkBook = { SheetNames: [], Sheets: {} };
-    const result = parseExcelWorkbook(wb);
+  it('returns empty result for a completely empty sheet (no rows at all)', () => {
+    // No workbook/sheet concept in the matrix-based parser — the entry point
+    // (parseExcelFile) handles "no worksheet found" before calling
+    // parseSheetRows. At this level, a zero-length matrix hits the same
+    // early-return branch and yields an empty (non-error) result.
+    const wb: TestCell[][] = [];
+    const result = parseSheetRows(wb);
+    expect(result.rows).toHaveLength(0);
     expect(result.validCount).toBe(0);
-    expect(result.rows.length).toBeGreaterThanOrEqual(1);
-    expect(result.rows[0].isValid).toBe(false);
+    expect(result.invalidCount).toBe(0);
   });
 
   // --- Date format variations ---
 
   it('handles DD/MM/YYYY date strings', () => {
     const wb = createTestWorkbook([['15/06/2026', 1000000, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].date).toBe('2026-06-15');
   });
 
   it('handles ISO YYYY-MM-DD date strings', () => {
     const wb = createTestWorkbook([['2026-06-15', 1000000, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].date).toBe('2026-06-15');
   });
 
   it('handles DD-MM-YYYY date strings (dash separator)', () => {
     const wb = createTestWorkbook([['15-06-2026', 1000000, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].date).toBe('2026-06-15');
+  });
+
+  it('parses UTC-midnight Date cells without timezone day-shift', () => {
+    const wb = createTestWorkbook(
+      [[new Date(Date.UTC(2026, 2, 15)), 5000000, 'Salary', 'Bank BCA']],
+      []
+    );
+    const result = parseSheetRows(wb);
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].date).toBe('2026-03-15');
   });
 
   it('handles text dates like "1 Mar 2026"', () => {
     const wb = createTestWorkbook([['1 Mar 2026', 1000000, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].date).toBe('2026-03-01');
   });
 
@@ -181,25 +191,25 @@ describe('parseExcelWorkbook', () => {
 
   it('handles plain number amounts', () => {
     const wb = createTestWorkbook([['01/01/2026', 5000000, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Indonesian dot separators (5.000.000)', () => {
     const wb = createTestWorkbook([['01/01/2026', '5.000.000', 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
   it('handles amounts with Rp prefix', () => {
     const wb = createTestWorkbook([['01/01/2026', 'Rp 2.500.000', 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].amount).toBe(2500000);
   });
 
   it('handles amounts with western comma separators (5,000,000)', () => {
     const wb = createTestWorkbook([['01/01/2026', '5,000,000', 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].amount).toBe(5000000);
   });
 
@@ -207,7 +217,7 @@ describe('parseExcelWorkbook', () => {
 
   it('marks row with missing category as invalid', () => {
     const wb = createTestWorkbook([['01/01/2026', 1000000, '', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     expect(result.rows[0].isValid).toBe(false);
     expect(result.rows[0].errors).toContain('Category is required');
     expect(result.invalidCount).toBe(1);
@@ -215,7 +225,7 @@ describe('parseExcelWorkbook', () => {
 
   it('marks row with zero amount as invalid', () => {
     const wb = createTestWorkbook([['01/01/2026', 0, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     // Zero amount rows have both tanggal and jumlah, but jumlah is 0
     // The parser checks `jumlah != null && String(jumlah).trim() !== ''`
     // "0" is truthy for that check, so the row IS parsed, then validateRow flags it
@@ -227,7 +237,7 @@ describe('parseExcelWorkbook', () => {
 
   it('marks row with negative amount as invalid', () => {
     const wb = createTestWorkbook([['01/01/2026', -500, 'Salary', 'Cash']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     // parseAmount uses Math.abs, so -500 becomes 500 — row should be valid
     // Verify the parser's behavior with negative numbers
     if (result.rows.length > 0 && result.rows[0].amount === 0) {
@@ -239,12 +249,12 @@ describe('parseExcelWorkbook', () => {
   });
 
   it('respects the 500 row limit', () => {
-    const incomeRows: unknown[][] = [];
+    const incomeRows: TestCell[][] = [];
     for (let i = 0; i < 501; i++) {
       incomeRows.push([`01/01/2026`, 1000, 'Salary', 'Cash']);
     }
     const wb = createTestWorkbook(incomeRows, []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
 
     // Should return an error about too many rows
     expect(result.validCount).toBe(0);
@@ -255,7 +265,7 @@ describe('parseExcelWorkbook', () => {
 
   it('defaults paymentMethod to Cash when empty', () => {
     const wb = createTestWorkbook([['01/01/2026', 1000000, 'Salary', '']], []);
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     if (result.rows.length > 0) {
       expect(result.rows[0].paymentMethod).toBe('Cash');
     }
@@ -266,7 +276,7 @@ describe('parseExcelWorkbook', () => {
       [['01/01/2026', 1000000, 'Salary', 'Cash']],
       [['01/01/2026', 50000, 'Food', 'Cash', '']]
     );
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
     const incomeRow = result.rows.find((r) => r.type === 'income');
     const expenseRow = result.rows.find((r) => r.type === 'expense');
     expect(incomeRow!.description).toBe('Salary - Income');
@@ -285,7 +295,7 @@ describe('parseExcelWorkbook', () => {
         ['04/01/2026', 50000, 'Entertainment', 'Cash', 'Movie'],
       ]
     );
-    const result = parseExcelWorkbook(wb);
+    const result = parseSheetRows(wb);
 
     expect(result.rows).toHaveLength(5);
     expect(result.validCount).toBe(5);

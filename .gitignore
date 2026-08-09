@@ -16,3 +16,9 @@ out/
 next-env.d.ts
 .env.local
 .env*.local
+.vercel
+
+# Credentials must never enter the repo
+*client_secret*
+*recovery-codes*
+*Backup codes*

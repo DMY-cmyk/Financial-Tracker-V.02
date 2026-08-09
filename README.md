@@ -144,7 +144,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] **Dashboard Banner** — card banner shows overdue recurring rules with amounts, frequency badges, and x×N multipliers
 - [x] 4-state banner UX: hidden → showing → generating (spinner) → success (green card, auto-collapse after 2s)
 - [x] **Source tracking idempotency** — `source_recurring_id` + `source_due_date` columns on transactions table prevent duplicates
-- [x] **Dual auth cron endpoint** — accepts `CRON_SECRET` Bearer token OR `x-vercel-cron-signature` Vercel header
+- [x] **Fail-closed cron endpoint** — requires `CRON_SECRET` Bearer token (Vercel Cron sends it automatically when env var is set)
 - [x] `/api/cron/*` whitelisted from JWT middleware (handles own auth)
 - [x] `GET /api/recurring-transactions/due` — returns overdue rules with `overdueCount` and `totalAmount` per rule
 - [x] Multi-period catch-up: generates all missed periods in one call (e.g., 3 months of missed salary)
@@ -350,7 +350,7 @@ src/
       payment-methods/        # GET (list) + POST, [id] PATCH/DELETE
       liabilities/            # GET + POST, [id] PATCH/DELETE
       net-worth/              # GET (current + history), snapshot/ POST
-      cron/generate-recurring/ # POST (Vercel Cron, dual auth)
+      cron/generate-recurring/ # POST (Vercel Cron, Bearer CRON_SECRET)
       recurring-transactions/  # GET/POST + [id] PATCH/DELETE + generate/ POST + due/ GET
       settings/               # GET + PATCH
       uploads/                # GET (list) + POST, [id] PATCH/DELETE
