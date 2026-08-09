@@ -5,27 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
 import { t, useLocale } from '@/lib/i18n';
+import { getMonthNames } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import type { ForecastMonth } from '@/lib/api/contracts';
 
 interface ForecastBreakdownListProps {
   forecast: ForecastMonth[];
 }
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 interface ForecastMonthItemProps {
   forecastMonth: ForecastMonth;
@@ -36,7 +22,7 @@ function ForecastMonthItem({ forecastMonth }: ForecastMonthItemProps) {
   const [open, setOpen] = useState(false);
   const { month, year, projectedIncome, projectedExpense, projectedNet, recurringItems } =
     forecastMonth;
-  const monthLabel = `${MONTH_NAMES[month]} ${year}`;
+  const monthLabel = `${getMonthNames(locale)[month]} ${year}`;
 
   return (
     <div className="border-border overflow-hidden rounded-xl border">

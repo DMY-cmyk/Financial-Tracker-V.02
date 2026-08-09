@@ -21,9 +21,7 @@ export function AssetsList({ current }: AssetsListProps) {
         {t(locale, 'paymentMethods')}
       </p>
       <div className="mb-3 flex justify-between text-sm">
-        <span className="text-muted-foreground">
-          {locale === 'id' ? 'Semua rekening' : 'All accounts'}
-        </span>
+        <span className="text-muted-foreground">{t(locale, 'nwAllAccounts')}</span>
         <span className="font-mono">
           {formatCurrency(current?.breakdown.paymentMethodBalances ?? 0)}
         </span>
@@ -33,9 +31,7 @@ export function AssetsList({ current }: AssetsListProps) {
         {t(locale, 'savingsGoals')}
       </p>
       <div className="mb-3 flex justify-between text-sm">
-        <span className="text-muted-foreground">
-          {locale === 'id' ? 'Total tabungan' : 'Total saved'}
-        </span>
+        <span className="text-muted-foreground">{t(locale, 'nwTotalSaved')}</span>
         <span className="font-mono">{formatCurrency(current?.breakdown.savingsGoals ?? 0)}</span>
       </div>
 

@@ -65,11 +65,7 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle>{t(locale, 'importData')}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {locale === 'id'
-              ? 'Unggah file JSON atau CSV berisi transaksi'
-              : 'Upload a JSON or CSV file containing transactions'}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{t(locale, 'importJsonCsvDesc')}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-4 py-2">

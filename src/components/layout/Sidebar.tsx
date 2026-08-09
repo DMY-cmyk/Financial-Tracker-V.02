@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { useStore } from '@/store';
+import { useSettings } from '@/hooks/useSettings';
 import { gentleSpring, DURATION } from '@/lib/motion';
 import { Settings, Plus, PanelLeftClose, PanelLeft, Tag, Languages } from 'lucide-react';
 import { SidebarGroup } from '@/features/navigation/SidebarGroup';
@@ -25,7 +25,7 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
-  const setLocale = useStore((s) => s.setLocale);
+  const { updateLocale } = useSettings();
   const { groups, isGroupCollapsed, toggleGroup } = useNavGroups();
 
   const isActive = (href: string) => {
@@ -153,7 +153,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
         {/* Language Switcher */}
         {collapsed ? (
           <button
-            onClick={() => setLocale(locale === 'en' ? 'id' : 'en')}
+            onClick={() => updateLocale(locale === 'en' ? 'id' : 'en')}
             aria-label={t(locale, 'switchLanguage')}
             title={t(locale, 'switchLanguage')}
             className={cn(
@@ -173,7 +173,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
               <button
                 role="radio"
                 aria-checked={locale === 'en'}
-                onClick={() => setLocale('en')}
+                onClick={() => updateLocale('en')}
                 className={cn(
                   'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
                   locale === 'en'
@@ -186,7 +186,7 @@ export function Sidebar({ collapsed, onToggleCollapse, className }: SidebarProps
               <button
                 role="radio"
                 aria-checked={locale === 'id'}
-                onClick={() => setLocale('id')}
+                onClick={() => updateLocale('id')}
                 className={cn(
                   'flex-1 rounded-md px-3 py-1 text-xs font-medium transition-all',
                   locale === 'id'

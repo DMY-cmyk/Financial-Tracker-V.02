@@ -11,7 +11,7 @@ import { api } from '@/lib/api/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RecurringTransactionForm } from '@/features/transactions/RecurringTransactionForm';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { EmptyState, InlineError } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -31,6 +31,8 @@ export default function RecurringTransactionsPage() {
   const {
     recurringTransactions,
     isLoading,
+    isError,
+    refetch,
     formOpen,
     setFormOpen,
     editingRT,
@@ -97,6 +99,21 @@ export default function RecurringTransactionsPage() {
               className="border-border bg-card shadow-card h-20 animate-pulse rounded-2xl border"
             />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t(locale, 'recurringTransactions')} />
+        <div className="mx-auto max-w-2xl">
+          <InlineError
+            message={t(locale, 'somethingWentWrong')}
+            onRetry={() => refetch()}
+            retryLabel={t(locale, 'tryAgain')}
+          />
         </div>
       </div>
     );
@@ -197,7 +214,7 @@ export default function RecurringTransactionsPage() {
                     {rt.type === 'income' ? '+' : '-'}
                     {formatCurrency(rt.amount)}
                   </span>
-                  <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex gap-1 transition-opacity pointer-fine:opacity-0 pointer-fine:group-focus-within:opacity-100 pointer-fine:group-hover:opacity-100">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -257,6 +274,8 @@ export default function RecurringTransactionsPage() {
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t(locale, 'deleteRecurring')}
         description={t(locale, 'confirmDelete')}
+        confirmLabel={t(locale, 'delete')}
+        cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
         variant="destructive"
       />

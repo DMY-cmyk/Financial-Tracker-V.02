@@ -8,13 +8,12 @@ import { useFilterPresets } from '@/features/transactions/useFilterPresets';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
-import { MONTH_NAMES } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
 import { HeroHeader } from '@/components/layout/HeroHeader';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { PeriodTabs, type Period } from '@/components/shared/PeriodTabs';
 import { useDashboardData } from '@/features/dashboard/useDashboardData';
 import { formatCurrency } from '@/lib/formatters';
 import { TransactionFilters } from '@/features/transactions/TransactionFilters';
@@ -117,7 +116,6 @@ function TransactionsPageInner() {
 
   const { presets, savePreset, deletePreset } = useFilterPresets();
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
-  const [period, setPeriod] = useState<Period>('daily');
   const { balance, expense: dashExpense, categories: dashCategories } = useDashboardData();
 
   useKeyboardShortcuts({
@@ -214,9 +212,6 @@ function TransactionsPageInner() {
           </div>
         </div>
       </HeroHeader>
-      <div className="md:hidden">
-        <PeriodTabs variant="four" value={period} onChange={setPeriod} />
-      </div>
       <motion.div {...fadeInUp} className="hidden lg:block">
         <PageHeader
           title={t(locale, 'transactions')}
@@ -239,7 +234,7 @@ function TransactionsPageInner() {
                     exportCSV(
                       transactions,
                       `transactions-${year}-${String(month + 1).padStart(2, '0')}.csv`,
-                      `${MONTH_NAMES[month]} ${year}`,
+                      `${getMonthNames(locale)[month]} ${year}`,
                       income,
                       expense,
                       income - expense
@@ -499,17 +494,6 @@ function TransactionsPageInner() {
           />
         )}
       </AnimatePresence>
-
-      {/* Mobile FAB */}
-      {selectedIds.size === 0 && (
-        <button
-          onClick={openAdd}
-          className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-          aria-label={t(locale, 'addTransaction')}
-        >
-          <Plus className="h-6 w-6" />
-        </button>
-      )}
     </div>
   );
 }

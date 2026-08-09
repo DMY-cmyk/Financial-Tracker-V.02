@@ -2,7 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
-const src = readFileSync(resolve('src/app/layout.tsx'), 'utf-8');
+const src = readFileSync(resolve('src/components/layout/SkipLink.tsx'), 'utf-8');
+const layoutSrc = readFileSync(resolve('src/app/layout.tsx'), 'utf-8');
+
+describe('Root layout renders SkipLink', () => {
+  it('mounts <SkipLink /> in the root layout', () => {
+    expect(layoutSrc).toContain('<SkipLink');
+  });
+});
 
 describe('Skip link classes', () => {
   it('uses focus:absolute (not focus:fixed)', () => {

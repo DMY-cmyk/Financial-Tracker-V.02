@@ -28,7 +28,9 @@ export function ExportPreview({ transactions }: ExportPreviewProps) {
         <tbody>
           {preview.map((tx) => (
             <tr key={tx.id} className="border-border/50 border-b">
-              <td className="text-muted-foreground py-2 pr-4">{formatDateShort(tx.date)}</td>
+              <td className="text-muted-foreground py-2 pr-4">
+                {formatDateShort(tx.date, locale)}
+              </td>
               <td className="py-2 pr-4">{tx.description}</td>
               <td className="text-muted-foreground py-2 pr-4">{tx.category}</td>
               <td

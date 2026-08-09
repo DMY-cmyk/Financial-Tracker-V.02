@@ -61,10 +61,10 @@ export function FolderCard({
         ) : (
           <div className="mt-1 flex items-center gap-3">
             <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
-              +{formatCurrencyShort(income)}
+              +{formatCurrencyShort(income, locale)}
             </span>
             <span className="font-mono text-xs text-red-600 dark:text-red-400">
-              -{formatCurrencyShort(expense)}
+              -{formatCurrencyShort(expense, locale)}
             </span>
           </div>
         )}

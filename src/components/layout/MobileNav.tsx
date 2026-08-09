@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { useStore } from '@/store';
+import { useSettings } from '@/hooks/useSettings';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Settings, Plus, Tag, Languages } from 'lucide-react';
 import { NAV_GROUPS, type NavItem } from '@/features/navigation/nav-config';
@@ -25,7 +25,7 @@ interface MobileNavProps {
 export function MobileNav({ open, onOpenChange }: MobileNavProps) {
   const pathname = usePathname();
   const locale = useLocale();
-  const setLocale = useStore((s) => s.setLocale);
+  const { updateLocale } = useSettings();
 
   // Auto-close on route change
   useEffect(() => {
@@ -97,7 +97,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
               <button
                 role="radio"
                 aria-checked={locale === 'en'}
-                onClick={() => setLocale('en')}
+                onClick={() => updateLocale('en')}
                 className={cn(
                   'flex-1 rounded-md px-3 py-2.5 text-xs font-medium transition-all',
                   locale === 'en'
@@ -110,7 +110,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
               <button
                 role="radio"
                 aria-checked={locale === 'id'}
-                onClick={() => setLocale('id')}
+                onClick={() => updateLocale('id')}
                 className={cn(
                   'flex-1 rounded-md px-3 py-2.5 text-xs font-medium transition-all',
                   locale === 'id'

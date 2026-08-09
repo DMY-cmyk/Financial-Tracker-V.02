@@ -144,7 +144,7 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
           <YAxis
             tick={{ fontSize: 10 }}
             className="fill-muted-foreground"
-            tickFormatter={(v) => formatCurrencyShort(Number(v))}
+            tickFormatter={(v) => formatCurrencyShort(Number(v), locale)}
             tickLine={false}
             axisLine={false}
           />
@@ -162,7 +162,10 @@ export function ForecastChart({ trends, forecast }: ForecastChartProps) {
                 projectedIncome: t(locale, 'projectedIncome'),
                 projectedExpense: t(locale, 'projectedExpense'),
               };
-              return [formatCurrencyShort(Number(value)), labels[String(name)] ?? String(name)];
+              return [
+                formatCurrencyShort(Number(value), locale),
+                labels[String(name)] ?? String(name),
+              ];
             }}
           />
           <Legend

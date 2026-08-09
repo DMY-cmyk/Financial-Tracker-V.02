@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { EditorialHero } from '@/components/login/EditorialHero';
 import { EditorialField } from '@/components/login/EditorialField';
-import { useLocale } from '@/lib/i18n';
+import { t, useLocale } from '@/lib/i18n';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setFieldErrors({});
 
     if (password !== confirmPassword) {
-      setError(locale === 'en' ? 'Passwords do not match' : 'Kata sandi tidak cocok');
+      setError(t(locale, 'authPasswordsDoNotMatch'));
       return;
     }
 
@@ -43,9 +43,7 @@ export default function RegisterPage() {
         if (data.error?.details) {
           setFieldErrors(data.error.details);
         } else {
-          setError(
-            data.error?.message || (locale === 'en' ? 'Registration failed' : 'Pendaftaran gagal')
-          );
+          setError(data.error?.message || t(locale, 'authRegistrationFailed'));
         }
         return;
       }
@@ -53,11 +51,7 @@ export default function RegisterPage() {
       router.push('/home');
       router.refresh();
     } catch {
-      setError(
-        locale === 'en'
-          ? 'Something went wrong. Please try again.'
-          : 'Terjadi kesalahan. Silakan coba lagi.'
-      );
+      setError(t(locale, 'authGenericError'));
     } finally {
       setLoading(false);
     }
@@ -72,20 +66,18 @@ export default function RegisterPage() {
         onSubmit={handleSubmit}
         className="relative flex max-w-xl flex-col justify-center gap-3.5 px-14 py-14"
       >
-        <div className="ft-eyebrow ft-rise-1">
-          {locale === 'en' ? 'CREATE ACCOUNT' : 'BUAT AKUN'}
-        </div>
+        <div className="ft-eyebrow ft-rise-1">{t(locale, 'authRegisterEyebrow')}</div>
         <h2 className="ft-display-up ft-rise-2 text-[44px] leading-none tracking-tight">
-          {locale === 'en' ? 'Welcome.' : 'Selamat datang.'}
+          {t(locale, 'authRegisterWelcome')}
         </h2>
         <p className="ft-display ft-rise-3 text-[15px] text-[var(--ink-3)]">
-          {locale === 'en' ? 'Create your ledger.' : 'Buat buku besar Anda.'}
+          {t(locale, 'authRegisterSubtitle')}
         </p>
 
         <div className="ft-rise-4 mt-3 flex flex-col gap-3">
           <div>
             <EditorialField
-              label={locale === 'en' ? 'Name' : 'Nama'}
+              label={t(locale, 'authNameLabel')}
               value={name}
               onChange={setName}
               type="text"
@@ -112,7 +104,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <EditorialField
-              label={locale === 'en' ? 'Password' : 'Kata Sandi'}
+              label={t(locale, 'authRegisterPasswordLabel')}
               value={password}
               onChange={setPassword}
               type="password"
@@ -124,7 +116,7 @@ export default function RegisterPage() {
             )}
           </div>
           <EditorialField
-            label={locale === 'en' ? 'Confirm Password' : 'Konfirmasi Kata Sandi'}
+            label={t(locale, 'authConfirmPasswordLabel')}
             value={confirmPassword}
             onChange={setConfirmPassword}
             type="password"
@@ -147,18 +139,12 @@ export default function RegisterPage() {
           disabled={loading}
           className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase transition-transform active:scale-[0.99] disabled:cursor-default"
         >
-          {loading
-            ? locale === 'en'
-              ? 'Creating…'
-              : 'Membuat…'
-            : locale === 'en'
-              ? 'Create account →'
-              : 'Buat akun →'}
+          {loading ? t(locale, 'authCreatingAccount') : t(locale, 'authCreateAccountButton')}
         </button>
 
         <div className="mt-6 flex justify-between border-t border-[var(--rule-soft)] pt-4 text-xs text-[var(--ink-3)]">
           <Link href="/login" className="underline">
-            {locale === 'en' ? 'Already have an account? Sign in' : 'Sudah punya akun? Masuk'}
+            {t(locale, 'authAlreadyHaveAccount')}
           </Link>
         </div>
       </form>

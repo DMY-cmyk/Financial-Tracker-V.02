@@ -16,7 +16,7 @@ export function useRecurringTransactions() {
   const initialized = useStore((s) => s.initialized);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<RecurringData>({
+  const { data, isLoading, isError, refetch } = useQuery<RecurringData>({
     queryKey: ['recurring-transactions'],
     queryFn: async () => {
       const [rtResult, catResult, pmResult] = await Promise.all([
@@ -104,6 +104,8 @@ export function useRecurringTransactions() {
     categories,
     paymentMethods,
     isLoading,
+    isError,
+    refetch,
     formOpen,
     setFormOpen,
     editingRT,

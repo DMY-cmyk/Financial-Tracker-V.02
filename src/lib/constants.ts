@@ -60,6 +60,10 @@ export const MONTH_NAMES_ID = [
   'Desember',
 ];
 
+export function getMonthNames(locale: 'en' | 'id'): string[] {
+  return locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES;
+}
+
 export const DEFAULT_EXPENSE_CATEGORIES: Omit<Category, 'id'>[] = [
   { name: 'Food', type: 'expense', color: '#D97706', icon: 'utensils', budget: 1500000 },
   { name: 'Transport', type: 'expense', color: '#3B82F6', icon: 'car', budget: 800000 },

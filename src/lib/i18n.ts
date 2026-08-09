@@ -176,9 +176,12 @@ type TranslationKeys = {
 
   // Pages
   pageNotFound: string;
+  pageNotFoundBody: string;
   somethingWentWrong: string;
+  unexpectedErrorBody: string;
   refreshPage: string;
   backToDashboard: string;
+  skipToContent: string;
 
   // Misc
   type: string;
@@ -505,6 +508,21 @@ type TranslationKeys = {
   oauthErrorAccountExistsPassword: string;
   authLoginFailed: string;
   authGenericError: string;
+  authPasswordsDoNotMatch: string;
+  authRegistrationFailed: string;
+  authRegisterEyebrow: string;
+  authRegisterWelcome: string;
+  authRegisterSubtitle: string;
+  authNameLabel: string;
+  authRegisterPasswordLabel: string;
+  authConfirmPasswordLabel: string;
+  authCreatingAccount: string;
+  authCreateAccountButton: string;
+  authAlreadyHaveAccount: string;
+  authForgotSentHeading: string;
+  authForgotSentBody: string;
+  authResetEyebrow: string;
+  authResetConfirmPasswordLabel: string;
 
   // Budget templates
   saveAsTemplate: string;
@@ -564,6 +582,17 @@ type TranslationKeys = {
   liabilitySaved: string;
   snapshotRecorded: string;
   vsLastMonth: string;
+  nwAllAccounts: string;
+  nwTotalSaved: string;
+  nwFrom: string;
+  nwLastSnapshot: string;
+  nwLiabilityNamePlaceholder: string;
+  nwAmountIdr: string;
+  nwAccounts: string;
+  nwSavings: string;
+  nwRecordThisMonth: string;
+  nwLastRecorded: string;
+  nwNoSnapshotThisMonth: string;
 
   // Recurring due banner
   recurringDue: string;
@@ -639,6 +668,33 @@ type TranslationKeys = {
   periodYearly: string;
   txSeeAll: string;
   txEmpty: string;
+
+  // Sprint 2 sweep: final i18n keys
+  formatSpreadsheet: string;
+  formatWorkbook: string;
+  formatPdfReport: string;
+  noDataToExport: string;
+  addTransactionsFirst: string;
+  noRecurringBillsToGenerate: string;
+  billNamePlaceholder: string;
+  savingsGoalsUnit: string;
+  goalNamePlaceholder: string;
+  overview: string;
+  dashboardOverviewFor: string;
+  dashboardEmptyDescription: string;
+  recordIncomeOrExpense: string;
+  scanAndExtractData: string;
+  downloadFormats: string;
+  selectPlaceholder: string;
+  pageOfTotal: string;
+  previousPage: string;
+  nextPage: string;
+  noPaymentMethodsYet: string;
+  uploadExtractPrompt: string;
+  authSignInEyebrow: string;
+  authSignInSubmit: string;
+  startAddingFirstTransaction: string;
+  importJsonCsvDesc: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -787,9 +843,12 @@ const translations: Record<Locale, TranslationKeys> = {
     dataClearedToast: 'All data cleared',
 
     pageNotFound: 'Page Not Found',
+    pageNotFoundBody: "The page you're looking for doesn't exist or has been moved.",
     somethingWentWrong: 'Something went wrong',
+    unexpectedErrorBody: 'An unexpected error occurred. Please try again or refresh the page.',
     refreshPage: 'Refresh Page',
     backToDashboard: 'Back to Dashboard',
+    skipToContent: 'Skip to main content',
 
     type: 'Type',
 
@@ -1125,6 +1184,17 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilitySaved: 'Liability saved',
     snapshotRecorded: 'Snapshot recorded',
     vsLastMonth: 'vs last month',
+    nwAllAccounts: 'All accounts',
+    nwTotalSaved: 'Total saved',
+    nwFrom: 'from',
+    nwLastSnapshot: 'Last snapshot',
+    nwLiabilityNamePlaceholder: 'e.g. Mortgage BCA',
+    nwAmountIdr: 'Amount (IDR)',
+    nwAccounts: 'Accounts',
+    nwSavings: 'Savings',
+    nwRecordThisMonth: "Record this month's snapshot",
+    nwLastRecorded: 'Last recorded',
+    nwNoSnapshotThisMonth: 'No snapshot for this month yet',
     recurringDue: 'Recurring Transactions Due',
     recurringDueDesc: 'Generate to add them to your records',
     generateAll: 'Generate All',
@@ -1235,6 +1305,49 @@ const translations: Record<Locale, TranslationKeys> = {
       'An account with this email already has a password. Sign in with your password first.',
     authLoginFailed: 'Login failed',
     authGenericError: 'Something went wrong. Please try again.',
+    authPasswordsDoNotMatch: 'Passwords do not match',
+    authRegistrationFailed: 'Registration failed',
+    authRegisterEyebrow: 'CREATE ACCOUNT',
+    authRegisterWelcome: 'Welcome.',
+    authRegisterSubtitle: 'Create your ledger.',
+    authNameLabel: 'Name',
+    authRegisterPasswordLabel: 'Password',
+    authConfirmPasswordLabel: 'Confirm Password',
+    authCreatingAccount: 'Creating…',
+    authCreateAccountButton: 'Create account →',
+    authAlreadyHaveAccount: 'Already have an account? Sign in',
+    authForgotSentHeading: 'Sent.',
+    authForgotSentBody: 'Check your inbox for a link to reset your password.',
+    authResetEyebrow: 'RESET',
+    authResetConfirmPasswordLabel: 'Confirm password',
+
+    // Sprint 2 sweep: final i18n keys
+    formatSpreadsheet: 'Spreadsheet compatible',
+    formatWorkbook: 'Formatted workbook',
+    formatPdfReport: 'Print-ready report',
+    noDataToExport: 'No data to export',
+    addTransactionsFirst: 'Add some transactions first',
+    noRecurringBillsToGenerate: 'No recurring bills to generate',
+    billNamePlaceholder: 'e.g. Electricity',
+    savingsGoalsUnit: 'goals',
+    goalNamePlaceholder: 'e.g. Emergency Fund',
+    overview: 'Overview',
+    dashboardOverviewFor: 'Your financial overview for {period}',
+    dashboardEmptyDescription:
+      'Start by adding your first transaction to see your financial overview come to life.',
+    recordIncomeOrExpense: 'Record income or expense',
+    scanAndExtractData: 'Scan and extract data',
+    downloadFormats: 'Download CSV, Excel, or PDF',
+    selectPlaceholder: 'Select...',
+    pageOfTotal: 'Page {page} of {total}',
+    previousPage: 'Previous',
+    nextPage: 'Next',
+    noPaymentMethodsYet: 'No payment methods yet.',
+    uploadExtractPrompt: 'Upload and extract a receipt to see data',
+    authSignInEyebrow: 'SIGN IN',
+    authSignInSubmit: 'Sign in →',
+    startAddingFirstTransaction: 'Start by adding your first transaction.',
+    importJsonCsvDesc: 'Upload a JSON or CSV file containing transactions',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1381,9 +1494,12 @@ const translations: Record<Locale, TranslationKeys> = {
     dataClearedToast: 'Semua data dihapus',
 
     pageNotFound: 'Halaman Tidak Ditemukan',
+    pageNotFoundBody: 'Halaman yang Anda cari tidak ada atau sudah dipindahkan.',
     somethingWentWrong: 'Terjadi Kesalahan',
+    unexpectedErrorBody: 'Terjadi kesalahan. Silakan coba lagi atau muat ulang halaman.',
     refreshPage: 'Muat Ulang',
     backToDashboard: 'Kembali ke Dasbor',
+    skipToContent: 'Lompat ke konten utama',
 
     type: 'Tipe',
 
@@ -1721,6 +1837,17 @@ const translations: Record<Locale, TranslationKeys> = {
     liabilitySaved: 'Kewajiban disimpan',
     snapshotRecorded: 'Snapshot dicatat',
     vsLastMonth: 'vs bulan lalu',
+    nwAllAccounts: 'Semua rekening',
+    nwTotalSaved: 'Total tabungan',
+    nwFrom: 'dari',
+    nwLastSnapshot: 'Snapshot terakhir',
+    nwLiabilityNamePlaceholder: 'cth. KPR BCA',
+    nwAmountIdr: 'Jumlah (IDR)',
+    nwAccounts: 'Rekening',
+    nwSavings: 'Tabungan',
+    nwRecordThisMonth: 'Catat snapshot bulan ini',
+    nwLastRecorded: 'Terakhir dicatat',
+    nwNoSnapshotThisMonth: 'Belum ada snapshot bulan ini',
     recurringDue: 'Transaksi Berulang Jatuh Tempo',
     recurringDueDesc: 'Buat untuk menambahkan ke catatan Anda',
     generateAll: 'Buat Semua',
@@ -1831,6 +1958,48 @@ const translations: Record<Locale, TranslationKeys> = {
       'Akun dengan email ini sudah memiliki kata sandi. Masuk dengan kata sandi terlebih dahulu.',
     authLoginFailed: 'Gagal masuk',
     authGenericError: 'Terjadi kesalahan. Silakan coba lagi.',
+    authPasswordsDoNotMatch: 'Kata sandi tidak cocok',
+    authRegistrationFailed: 'Pendaftaran gagal',
+    authRegisterEyebrow: 'BUAT AKUN',
+    authRegisterWelcome: 'Selamat datang.',
+    authRegisterSubtitle: 'Buat buku besar Anda.',
+    authNameLabel: 'Nama',
+    authRegisterPasswordLabel: 'Kata Sandi',
+    authConfirmPasswordLabel: 'Konfirmasi Kata Sandi',
+    authCreatingAccount: 'Membuat…',
+    authCreateAccountButton: 'Buat akun →',
+    authAlreadyHaveAccount: 'Sudah punya akun? Masuk',
+    authForgotSentHeading: 'Terkirim.',
+    authForgotSentBody: 'Periksa kotak masuk Anda untuk tautan setel ulang.',
+    authResetEyebrow: 'SETEL ULANG',
+    authResetConfirmPasswordLabel: 'Konfirmasi kata sandi',
+
+    // Sprint 2 sweep: final i18n keys
+    formatSpreadsheet: 'Kompatibel dengan spreadsheet',
+    formatWorkbook: 'Workbook terformat',
+    formatPdfReport: 'Laporan siap cetak',
+    noDataToExport: 'Tidak ada data untuk diekspor',
+    addTransactionsFirst: 'Tambahkan transaksi terlebih dahulu',
+    noRecurringBillsToGenerate: 'Tidak ada tagihan berulang untuk dibuat',
+    billNamePlaceholder: 'cth. Listrik',
+    savingsGoalsUnit: 'target',
+    goalNamePlaceholder: 'cth. Dana Darurat',
+    overview: 'Ringkasan',
+    dashboardOverviewFor: 'Ringkasan keuangan untuk {period}',
+    dashboardEmptyDescription: 'Mulai dengan menambahkan transaksi pertama Anda.',
+    recordIncomeOrExpense: 'Catat pemasukan atau pengeluaran',
+    scanAndExtractData: 'Pindai dan ekstrak data',
+    downloadFormats: 'Unduh CSV, Excel, atau PDF',
+    selectPlaceholder: 'Pilih...',
+    pageOfTotal: 'Halaman {page} dari {total}',
+    previousPage: 'Sebelumnya',
+    nextPage: 'Berikutnya',
+    noPaymentMethodsYet: 'Belum ada metode pembayaran.',
+    uploadExtractPrompt: 'Unggah dan ekstrak struk untuk melihat data',
+    authSignInEyebrow: 'MASUK',
+    authSignInSubmit: 'Masuk →',
+    startAddingFirstTransaction: 'Mulai dengan menambahkan transaksi pertama Anda.',
+    importJsonCsvDesc: 'Unggah file JSON atau CSV berisi transaksi',
   },
 };
 

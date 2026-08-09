@@ -10,6 +10,7 @@ interface CatRow {
   icon: string;
   budget: number;
   archived: number | boolean;
+  sort_order: number;
 }
 
 function rowToCategory(row: CatRow): Category {
@@ -21,6 +22,7 @@ function rowToCategory(row: CatRow): Category {
     icon: row.icon,
     budget: Number(row.budget),
     archived: Number(row.archived) === 1,
+    sortOrder: Number(row.sort_order),
   };
 }
 
@@ -29,7 +31,7 @@ export function createCategoryRepository() {
     async findAll(userId: string): Promise<Category[]> {
       const db = await getDb();
       const result = await db.query<CatRow>(
-        'SELECT * FROM categories WHERE user_id = ? ORDER BY name',
+        'SELECT * FROM categories WHERE user_id = ? ORDER BY sort_order, name',
         [userId]
       );
       return result.rows.map(rowToCategory);
@@ -56,7 +58,7 @@ export function createCategoryRepository() {
     async findByType(userId: string, type: 'income' | 'expense'): Promise<Category[]> {
       const db = await getDb();
       const result = await db.query<CatRow>(
-        'SELECT * FROM categories WHERE user_id = ? AND type = ? ORDER BY name',
+        'SELECT * FROM categories WHERE user_id = ? AND type = ? ORDER BY sort_order, name',
         [userId, type]
       );
       return result.rows.map(rowToCategory);
@@ -70,13 +72,13 @@ export function createCategoryRepository() {
     ): Promise<Category[]> {
       const db = await getDb();
       const result = await db.query<CatRow>(
-        `SELECT c.id, c.name, c.type, c.color, c.icon, c.archived,
+        `SELECT c.id, c.name, c.type, c.color, c.icon, c.archived, c.sort_order,
            COALESCE(mb.budget_amount, c.budget) AS budget
          FROM categories c
          LEFT JOIN monthly_budgets mb
            ON mb.category_id = c.id AND mb.user_id = c.user_id AND mb.month = ? AND mb.year = ?
          WHERE c.user_id = ? AND c.type = ?
-         ORDER BY c.name`,
+         ORDER BY c.sort_order, c.name`,
         [month, year, userId, type]
       );
       return result.rows.map(rowToCategory);
@@ -144,6 +146,17 @@ export function createCategoryRepository() {
         [userId, id, userId, id]
       );
       return result.rowCount > 0;
+    },
+
+    async reorder(userId: string, ids: string[]): Promise<void> {
+      const db = await getDb();
+      for (let i = 0; i < ids.length; i++) {
+        await db.query('UPDATE categories SET sort_order = ? WHERE id = ? AND user_id = ?', [
+          i,
+          ids[i],
+          userId,
+        ]);
+      }
     },
   };
 }

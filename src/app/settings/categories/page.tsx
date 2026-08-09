@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { t, useLocale } from '@/lib/i18n';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
+import { useKeyedDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageTransition } from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -169,12 +170,22 @@ export default function CategoriesPage() {
     return ordered;
   })();
 
+  const persistOrder = useKeyedDebouncedCallback((_key: string, ids: string[]) => {
+    api.categories.reorder(ids).then((r) => {
+      if (r.error) toast.error(t(locale, 'somethingWentWrong'));
+    });
+  }, 800);
+
   const handleReorderExpense = (reordered: Category[]) => {
-    setExpenseOrder(reordered.map((c) => c.id));
+    const ids = reordered.map((c) => c.id);
+    setExpenseOrder(ids);
+    persistOrder('expense', ids);
   };
 
   const handleReorderIncome = (reordered: Category[]) => {
-    setIncomeOrder(reordered.map((c) => c.id));
+    const ids = reordered.map((c) => c.id);
+    setIncomeOrder(ids);
+    persistOrder('income', ids);
   };
 
   const handleAddCategory = async () => {
@@ -203,8 +214,14 @@ export default function CategoriesPage() {
     const result = await api.categories.update(id, { budget });
     if (result.data) {
       setCategories((prev) => prev.map((c) => (c.id === id ? result.data! : c)));
+    } else {
+      toast.error(t(locale, 'somethingWentWrong'));
     }
   };
+
+  const debouncedUpdateBudget = useKeyedDebouncedCallback((id: string, budget: number) => {
+    void handleUpdateBudget(id, budget);
+  }, 500);
 
   const handleToggleArchive = async (id: string, archived: boolean) => {
     const result = await api.categories.update(id, { archived });
@@ -348,7 +365,7 @@ export default function CategoriesPage() {
                       setCategories((prev) =>
                         prev.map((cat) => (cat.id === c.id ? { ...cat, budget } : cat))
                       );
-                      handleUpdateBudget(c.id, budget);
+                      debouncedUpdateBudget(c.id, budget);
                     }}
                   />
                   <Button

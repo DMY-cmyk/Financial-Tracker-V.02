@@ -199,11 +199,7 @@ export default function BillsPage() {
       toast.success(t(locale, 'generatedBills').replace('{count}', String(result.data.generated)));
       refetch();
     } else {
-      toast.info(
-        locale === 'id'
-          ? 'Tidak ada tagihan berulang untuk dibuat'
-          : 'No recurring bills to generate'
-      );
+      toast.info(t(locale, 'noRecurringBillsToGenerate'));
     }
   };
 
@@ -396,7 +392,7 @@ export default function BillsPage() {
                 id="bill-name"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder={locale === 'id' ? 'cth. Listrik' : 'e.g. Electricity'}
+                placeholder={t(locale, 'billNamePlaceholder')}
               />
               {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
             </div>
@@ -460,15 +456,6 @@ export default function BillsPage() {
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
       />
-
-      {/* Mobile FAB */}
-      <button
-        onClick={openAdd}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-        aria-label={t(locale, 'addBill')}
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 }

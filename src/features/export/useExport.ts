@@ -9,7 +9,6 @@ import {
   type Transaction,
   type ExportReportInput,
 } from '@/lib/types';
-import { type ExportOptionsState } from '@/features/export/ExportOptions';
 import { api } from '@/lib/api/client';
 import { fetchAllTransactions } from './fetch-all-transactions';
 
@@ -19,8 +18,6 @@ interface UseExportReturn {
   setFormat: (f: ExportFormat) => void;
   scope: ExportScope;
   setScope: (s: ExportScope) => void;
-  options: ExportOptionsState;
-  setOptions: (o: ExportOptionsState) => void;
   startDate: string;
   setStartDate: (d: string) => void;
   endDate: string;
@@ -48,9 +45,6 @@ export function useExport(): UseExportReturn {
   const [scope, setScope] = useState<ExportScope>('current');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [options, setOptions] = useState<ExportOptionsState>({
-    groupByDate: false,
-  });
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   useEffect(() => {
@@ -210,8 +204,6 @@ export function useExport(): UseExportReturn {
     setFormat,
     scope,
     setScope,
-    options,
-    setOptions,
     startDate,
     setStartDate,
     endDate,

@@ -34,11 +34,7 @@ export function YearGrid({ years, isLoading }: YearGridProps) {
     return (
       <EmptyState
         title={t(locale, 'noTransactionsYet')}
-        description={
-          locale === 'id'
-            ? 'Mulai dengan menambahkan transaksi pertama Anda.'
-            : 'Start by adding your first transaction.'
-        }
+        description={t(locale, 'startAddingFirstTransaction')}
         icon={<BarChart3 className="h-12 w-12" />}
       />
     );

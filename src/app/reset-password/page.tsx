@@ -61,7 +61,7 @@ function ResetPasswordInner() {
         onSubmit={submit}
         className="flex flex-col items-stretch justify-center gap-3 px-14 py-14"
       >
-        <div className="ft-eyebrow">{locale === 'en' ? 'RESET' : 'SETEL ULANG'}</div>
+        <div className="ft-eyebrow">{t(locale, 'authResetEyebrow')}</div>
         <h2 className="ft-display-up text-4xl">{t(locale, 'resetTitle')}</h2>
         <p className="ft-display text-[15px] text-[var(--ink-3)]">{t(locale, 'resetSubtitle')}</p>
 
@@ -92,7 +92,7 @@ function ResetPasswordInner() {
         </div>
 
         <EditorialField
-          label={locale === 'en' ? 'Confirm password' : 'Konfirmasi kata sandi'}
+          label={t(locale, 'authResetConfirmPasswordLabel')}
           value={confirm}
           onChange={setConfirm}
           type="password"

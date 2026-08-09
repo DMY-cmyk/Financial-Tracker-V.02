@@ -107,6 +107,10 @@ export const updateCategorySchema = createCategorySchema.partial().extend({
   archived: z.boolean().optional(),
 });
 
+export const reorderCategoriesSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(200),
+});
+
 // === Payment method schemas ===
 
 export const createPaymentMethodSchema = z.object({
@@ -312,6 +316,7 @@ export type ListTransactionsQuery = z.infer<typeof listTransactionsQuerySchema>;
 export type DashboardSummaryQuery = z.infer<typeof dashboardSummaryQuerySchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
+export type ReorderCategoriesInput = z.infer<typeof reorderCategoriesSchema>;
 export type CreatePaymentMethodInput = z.infer<typeof createPaymentMethodSchema>;
 export type UpdatePaymentMethodInput = z.infer<typeof updatePaymentMethodSchema>;
 export type CreateUploadInput = z.infer<typeof createUploadSchema>;

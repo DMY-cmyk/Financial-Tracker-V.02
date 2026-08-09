@@ -9,9 +9,8 @@ describe('Home mobile composition', () => {
     expect(src).toContain('md:hidden');
     expect(src).toMatch(/hidden\s+md:block/);
   });
-  it('mounts SavingsRingCard, PeriodTabs, TransactionRowMobile in mobile branch', () => {
+  it('mounts SavingsRingCard, TransactionRowMobile in mobile branch', () => {
     expect(src).toContain('SavingsRingCard');
-    expect(src).toContain('PeriodTabs');
     expect(src).toContain('TransactionRowMobile');
   });
   it('passes greeting/subgreeting to HeroHeader', () => {

@@ -71,7 +71,7 @@ export function OcrPreview({
           onChange={(e) => onChange({ ...data, category: e.target.value })}
           className="border-input bg-background mt-1 w-full rounded-md border px-3 py-2 text-sm"
         >
-          <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
+          <option value="">{t(locale, 'selectPlaceholder')}</option>
           {expenseCategories.map((c) => (
             <option key={c.id} value={c.name}>
               {c.name}

@@ -191,9 +191,7 @@ export default function UploadPage() {
               <div className="flex h-48 flex-col items-center justify-center text-center sm:h-64">
                 <ScanLine className="text-muted-foreground/30 mb-3 h-10 w-10" />
                 <p className="text-muted-foreground text-sm font-medium">
-                  {locale === 'id'
-                    ? 'Unggah dan ekstrak struk untuk melihat data'
-                    : 'Upload and extract a receipt to see data'}
+                  {t(locale, 'uploadExtractPrompt')}
                 </p>
               </div>
             )}

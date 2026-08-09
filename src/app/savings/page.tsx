@@ -57,7 +57,7 @@ export default function SavingsPage() {
         <PageHeader
           title={t(locale, 'savingsPage')}
           description={
-            goals.length > 0 ? `${goals.length} ${locale === 'id' ? 'target' : 'goals'}` : undefined
+            goals.length > 0 ? `${goals.length} ${t(locale, 'savingsGoalsUnit')}` : undefined
           }
         >
           <Button onClick={form.openAdd} className="gap-2 shadow-sm">
@@ -190,7 +190,7 @@ export default function SavingsPage() {
                 id="goal-name"
                 value={form.name}
                 onChange={(e) => form.setName(e.target.value)}
-                placeholder={locale === 'id' ? 'cth. Dana Darurat' : 'e.g. Emergency Fund'}
+                placeholder={t(locale, 'goalNamePlaceholder')}
               />
               {form.errors.name && <p className="text-destructive text-xs">{form.errors.name}</p>}
             </div>
@@ -263,15 +263,6 @@ export default function SavingsPage() {
         cancelLabel={t(locale, 'cancel')}
         onConfirm={deleteConfirm.confirm}
       />
-
-      {/* Mobile FAB */}
-      <button
-        onClick={form.openAdd}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-        aria-label={t(locale, 'addSavingsGoal')}
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 }

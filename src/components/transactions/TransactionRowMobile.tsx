@@ -1,9 +1,9 @@
 'use client';
 
-import { format } from 'date-fns';
 import { Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatDateShort } from '@/lib/formatters';
+import { useLocale } from '@/lib/i18n';
 import type { Transaction, Category } from '@/lib/types';
 
 export interface TransactionRowMobileProps {
@@ -13,8 +13,9 @@ export interface TransactionRowMobileProps {
 }
 
 export function TransactionRowMobile({ transaction, category, onTap }: TransactionRowMobileProps) {
+  const locale = useLocale();
   const isExpense = transaction.type === 'expense';
-  const when = format(new Date(transaction.date), 'HH:mm – MMM dd');
+  const when = formatDateShort(transaction.date, locale);
 
   return (
     <button

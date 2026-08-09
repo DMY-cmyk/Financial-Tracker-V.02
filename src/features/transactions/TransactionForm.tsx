@@ -24,10 +24,15 @@ import { PaymentMethodIcon } from '@/components/shared/PaymentMethodIcon';
 
 interface TransactionFormProps {
   transaction?: Transaction;
+  initialType?: 'income' | 'expense';
   onClose: () => void;
 }
 
-export function TransactionForm({ transaction, onClose }: TransactionFormProps) {
+export function TransactionForm({
+  transaction,
+  initialType = 'expense',
+  onClose,
+}: TransactionFormProps) {
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
   const locale = useLocale();
@@ -46,7 +51,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
     });
   }, []);
 
-  const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense');
+  const [type, setType] = useState<'income' | 'expense'>(transaction?.type || initialType);
   const [description, setDescription] = useState(transaction?.description || '');
   const [amountStr, setAmountStr] = useState(
     transaction ? formatCurrencyInput(transaction.amount) : ''
@@ -173,13 +178,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
                 : 'text-muted-foreground hover:bg-muted'
             )}
           >
-            {tp === 'income'
-              ? locale === 'id'
-                ? 'Pemasukan'
-                : 'Income'
-              : locale === 'id'
-                ? 'Pengeluaran'
-                : 'Expense'}
+            {tp === 'income' ? t(locale, 'income') : t(locale, 'expense')}
           </button>
         ))}
       </div>
@@ -251,7 +250,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             )}
             aria-invalid={!!fieldError('category')}
           >
-            <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
+            <option value="">{t(locale, 'selectPlaceholder')}</option>
             {filteredCategories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -336,7 +335,7 @@ export function TransactionForm({ transaction, onClose }: TransactionFormProps) 
             className={cn('mt-1 w-full', fieldError('paymentMethod') ? 'border-red-500' : '')}
             aria-invalid={!!fieldError('paymentMethod')}
           >
-            <SelectValue placeholder={locale === 'id' ? 'Pilih...' : 'Select...'} />
+            <SelectValue placeholder={t(locale, 'selectPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {paymentMethods.map((p) => (

@@ -7,11 +7,10 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { FormatCard } from '@/features/export/FormatCard';
 import { ScopeSelector } from '@/features/export/ScopeSelector';
-import { ExportOptions } from '@/features/export/ExportOptions';
 import { ExportPreview } from '@/features/export/ExportPreview';
 import { ExportActionBar } from '@/features/export/ExportActionBar';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { MONTH_NAMES } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { useStore } from '@/store';
 import { FileSpreadsheet, FileDown, FileBarChart, type LucideIcon, FileX } from 'lucide-react';
 import { type ExportFormat } from '@/lib/types';
@@ -23,14 +22,14 @@ const FORMAT_ICONS: Record<string, LucideIcon> = {
   pdf: FileBarChart,
 };
 
-const FORMAT_OPTIONS: { value: ExportFormat; label: string; description: string }[] = [
-  { value: 'csv', label: 'CSV', description: 'Spreadsheet compatible' },
-  { value: 'xlsx', label: 'Excel', description: 'Formatted workbook' },
-  { value: 'pdf', label: 'PDF', description: 'Print-ready report' },
-];
-
 export default function ExportPage() {
   const locale = useLocale();
+
+  const FORMAT_OPTIONS: { value: ExportFormat; label: string; description: string }[] = [
+    { value: 'csv', label: 'CSV', description: t(locale, 'formatSpreadsheet') },
+    { value: 'xlsx', label: 'Excel', description: t(locale, 'formatWorkbook') },
+    { value: 'pdf', label: 'PDF', description: t(locale, 'formatPdfReport') },
+  ];
   const month = useStore((s) => s.ui.selectedMonth);
   const year = useStore((s) => s.ui.selectedYear);
 
@@ -39,8 +38,6 @@ export default function ExportPage() {
     setFormat,
     scope,
     setScope,
-    options,
-    setOptions,
     startDate,
     setStartDate,
     endDate,
@@ -101,24 +98,13 @@ export default function ExportPage() {
           <ScopeSelector
             scope={scope}
             onScopeChange={setScope}
-            monthLabel={`${MONTH_NAMES[month]} ${year}`}
+            monthLabel={`${getMonthNames(locale)[month]} ${year}`}
             transactionCount={allTransactionCount}
             startDate={startDate}
             setStartDate={setStartDate}
             endDate={endDate}
             setEndDate={setEndDate}
           />
-        </motion.div>
-
-        {/* Options */}
-        <motion.div
-          variants={staggerItem}
-          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
-        >
-          <h3 className="mb-4 text-sm font-semibold tracking-tight">
-            {t(locale, 'exportOptions')}
-          </h3>
-          <ExportOptions options={options} onChange={setOptions} />
         </motion.div>
 
         {/* Preview */}
@@ -133,12 +119,8 @@ export default function ExportPage() {
             <ExportPreview transactions={scopedTransactions} />
           ) : (
             <EmptyState
-              title={locale === 'id' ? 'Tidak ada data untuk diekspor' : 'No data to export'}
-              description={
-                locale === 'id'
-                  ? 'Tambahkan transaksi terlebih dahulu'
-                  : 'Add some transactions first'
-              }
+              title={t(locale, 'noDataToExport')}
+              description={t(locale, 'addTransactionsFirst')}
               icon={<FileX className="h-10 w-10" />}
             />
           )}

@@ -21,6 +21,8 @@ export interface Category {
   budget: number;
   /** Archived categories are hidden from new-transaction pickers but keep history. */
   archived?: boolean;
+  /** Drag order within its type list; lower sorts first. Legacy rows default to 0. */
+  sortOrder?: number;
 }
 
 export interface PaymentMethod {
@@ -208,7 +210,6 @@ export type ExportScope = 'current' | 'all' | 'range';
 export interface ExportState {
   format: ExportFormat;
   scope: ExportScope;
-  groupByDate: boolean;
   startDate?: string;
   endDate?: string;
 }
