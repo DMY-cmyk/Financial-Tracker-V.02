@@ -3,6 +3,7 @@
 import { Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency, formatDateShort } from '@/lib/formatters';
+import { useLocale } from '@/lib/i18n';
 import type { Transaction, Category } from '@/lib/types';
 
 export interface TransactionRowMobileProps {
@@ -12,8 +13,9 @@ export interface TransactionRowMobileProps {
 }
 
 export function TransactionRowMobile({ transaction, category, onTap }: TransactionRowMobileProps) {
+  const locale = useLocale();
   const isExpense = transaction.type === 'expense';
-  const when = formatDateShort(transaction.date);
+  const when = formatDateShort(transaction.date, locale);
 
   return (
     <button

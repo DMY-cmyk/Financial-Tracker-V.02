@@ -1,29 +1,35 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
+import {
+  createDebounced,
+  createKeyedDebounced,
+  type Debounced,
+  type KeyedDebounced,
+} from '@/lib/debounce';
 
 export function useDebouncedCallback<A extends unknown[]>(
   fn: (...args: A) => void,
   delayMs: number
 ): (...args: A) => void {
   const fnRef = useRef(fn);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedRef = useRef<Debounced<A> | null>(null);
   useEffect(() => {
     fnRef.current = fn;
   }, [fn]);
   useEffect(
     () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      debouncedRef.current?.cancel();
+      debouncedRef.current = null;
     },
-    []
+    [delayMs]
   );
   return useCallback(
     (...args: A) => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        timerRef.current = null;
-        fnRef.current(...args);
-      }, delayMs);
+      if (!debouncedRef.current) {
+        debouncedRef.current = createDebounced((...a: A) => fnRef.current(...a), delayMs);
+      }
+      debouncedRef.current(...args);
     },
     [delayMs]
   );
@@ -34,29 +40,26 @@ export function useKeyedDebouncedCallback<A extends unknown[]>(
   delayMs: number
 ): (key: string, ...args: A) => void {
   const fnRef = useRef(fn);
-  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const debouncedRef = useRef<KeyedDebounced<A> | null>(null);
   useEffect(() => {
     fnRef.current = fn;
   }, [fn]);
   useEffect(
     () => () => {
-      for (const timer of timersRef.current.values()) clearTimeout(timer);
-      timersRef.current.clear();
+      debouncedRef.current?.cancelAll();
+      debouncedRef.current = null;
     },
-    []
+    [delayMs]
   );
   return useCallback(
     (key: string, ...args: A) => {
-      const timers = timersRef.current;
-      const existing = timers.get(key);
-      if (existing) clearTimeout(existing);
-      timers.set(
-        key,
-        setTimeout(() => {
-          timers.delete(key);
-          fnRef.current(key, ...args);
-        }, delayMs)
-      );
+      if (!debouncedRef.current) {
+        debouncedRef.current = createKeyedDebounced(
+          (k: string, ...a: A) => fnRef.current(k, ...a),
+          delayMs
+        );
+      }
+      debouncedRef.current(key, ...args);
     },
     [delayMs]
   );

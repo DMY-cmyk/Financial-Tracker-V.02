@@ -35,9 +35,11 @@ export function formatDate(dateStr: string, locale: 'en' | 'id' = 'en'): string 
   });
 }
 
-export function formatDateShort(dateStr: string): string {
+export function formatDateShort(dateStr: string, locale: 'en' | 'id' = 'en'): string {
   const date = parseISO(dateStr);
-  return format(date, 'd MMM');
+  return format(date, 'd MMM', {
+    locale: locale === 'id' ? idLocale : enUS,
+  });
 }
 
 export function parseCurrencyInput(value: string): number {

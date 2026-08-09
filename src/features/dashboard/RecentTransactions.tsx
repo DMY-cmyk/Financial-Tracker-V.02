@@ -61,7 +61,7 @@ export function RecentTransactions({ transactions, categories }: RecentTransacti
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{tx.description}</p>
                   <p className="text-muted-foreground text-[10px]">
-                    {formatDateShort(tx.date)} &middot; {tx.category}
+                    {formatDateShort(tx.date, locale)} &middot; {tx.category}
                   </p>
                 </div>
                 <span

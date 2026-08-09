@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatCurrencyShort } from '@/lib/formatters';
+import { formatCurrencyShort, formatDateShort } from '@/lib/formatters';
 import { getMonthNames } from '@/lib/constants';
 
 describe('formatCurrencyShort', () => {
@@ -27,5 +27,13 @@ describe('getMonthNames', () => {
   it('locale-aware', () => {
     expect(getMonthNames('en')[2]).toBe('March');
     expect(getMonthNames('id')[2]).toBe('Maret');
+  });
+});
+
+describe('formatDateShort', () => {
+  it('locale-aware short date', () => {
+    // date-fns' id locale abbreviates August as "Agt", not "Agu".
+    expect(formatDateShort('2026-08-09', 'en')).toBe('9 Aug');
+    expect(formatDateShort('2026-08-09', 'id')).toBe('9 Agt');
   });
 });
