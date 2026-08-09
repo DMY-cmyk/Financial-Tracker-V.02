@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { t } from '@/lib/i18n';
 import { staggerGrid } from '@/lib/motion';
 import { BalanceCard } from './BalanceCard';
 import type { PaymentMethodBalance } from './types';
@@ -26,7 +27,7 @@ export function BalanceGrid({ balances, locale, isLoading, onCardClick }: Balanc
   if (balances.length === 0) {
     return (
       <p className="text-muted-foreground py-6 text-center text-sm">
-        {locale === 'id' ? 'Belum ada metode pembayaran.' : 'No payment methods yet.'}
+        {t(locale, 'noPaymentMethodsYet')}
       </p>
     );
   }

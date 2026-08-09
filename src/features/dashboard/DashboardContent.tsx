@@ -109,15 +109,13 @@ export function DashboardContent() {
       >
         <div>
           <p className="text-muted-foreground/70 text-[10px] font-semibold tracking-[0.18em] uppercase">
-            {locale === 'id' ? 'Ringkasan' : 'Overview'}
+            {t(locale, 'overview')}
           </p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-[28px]">
             {t(locale, 'dashboard')}
           </h1>
           <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
-            {locale === 'id'
-              ? `Ringkasan keuangan untuk ${monthNames[month]} ${year}`
-              : `Your financial overview for ${monthNames[month]} ${year}`}
+            {t(locale, 'dashboardOverviewFor').replace('{period}', `${monthNames[month]} ${year}`)}
           </p>
         </div>
         <div className="border-border-subtle bg-surface-inset text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[11px] font-medium tabular-nums">
@@ -186,12 +184,8 @@ export function DashboardContent() {
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <EmptyState
-            title={locale === 'id' ? 'Belum ada transaksi' : 'No transactions yet'}
-            description={
-              locale === 'id'
-                ? 'Mulai dengan menambahkan transaksi pertama Anda.'
-                : 'Start by adding your first transaction to see your financial overview come to life.'
-            }
+            title={t(locale, 'noTransactionsYet')}
+            description={t(locale, 'dashboardEmptyDescription')}
             icon={<BarChart3 className="h-12 w-12" />}
           >
             <a
@@ -297,23 +291,19 @@ export function DashboardContent() {
           <QuickActionButton
             icon={Plus}
             label={t(locale, 'addTransaction')}
-            description={
-              locale === 'id' ? 'Catat pemasukan atau pengeluaran' : 'Record income or expense'
-            }
+            description={t(locale, 'recordIncomeOrExpense')}
             href="/transactions/new"
           />
           <QuickActionButton
             icon={Upload}
             label={t(locale, 'uploadReceipt')}
-            description={locale === 'id' ? 'Pindai dan ekstrak data' : 'Scan and extract data'}
+            description={t(locale, 'scanAndExtractData')}
             href="/upload"
           />
           <QuickActionButton
             icon={Download}
             label={t(locale, 'exportData')}
-            description={
-              locale === 'id' ? 'Unduh CSV, Excel, atau PDF' : 'Download CSV, Excel, or PDF'
-            }
+            description={t(locale, 'downloadFormats')}
             href="/export"
           />
         </div>

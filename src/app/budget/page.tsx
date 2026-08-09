@@ -6,7 +6,7 @@ import { Target, BookmarkPlus, Library, Lightbulb, CalendarDays, LayoutGrid } fr
 import { Button } from '@/components/ui/button';
 import { t, useLocale } from '@/lib/i18n';
 import { useStore } from '@/store';
-import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { fadeInUp, staggerGrid, staggerGridItem } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { useBudgetData } from '@/hooks/useBudgetData';
@@ -102,7 +102,7 @@ export default function BudgetPage() {
           <div className="hidden lg:block">
             <PageHeader
               title={t(locale, 'budgetPage')}
-              description={`${(locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES)[month]} ${year}`}
+              description={`${getMonthNames(locale)[month]} ${year}`}
             />
           </div>
           <div className="flex flex-1 items-center justify-end gap-2">

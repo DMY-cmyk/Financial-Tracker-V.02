@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useStore } from '@/store';
-import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { useLocale, t } from '@/lib/i18n';
 import { ChevronLeft, ChevronRight, Calendar, Menu, LogOut, User } from 'lucide-react';
 import {
@@ -112,7 +112,7 @@ export function Topbar({ onMenuClick, menuOpen = false }: TopbarProps) {
             <div className="flex items-center gap-1.5 px-1 sm:px-2">
               <Calendar className="text-muted-foreground hidden h-3.5 w-3.5 sm:block" />
               <span className="text-center text-xs font-medium whitespace-nowrap sm:min-w-[110px]">
-                {(locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES)[month]} {year}
+                {getMonthNames(locale)[month]} {year}
               </span>
             </div>
             <button

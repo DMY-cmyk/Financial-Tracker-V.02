@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
-import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { fadeInUp, staggerGrid, staggerGridItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useInsightsData } from '@/features/insights/useInsightsData';
@@ -37,7 +37,7 @@ export default function InsightsPage() {
   const selectedYear = useStore((s) => s.ui.selectedYear);
   const { data, isLoading, error } = useInsightsData(selectedMonth, selectedYear);
 
-  const monthNames = locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES;
+  const monthNames = getMonthNames(locale);
   const headerDescription = `${monthNames[selectedMonth]} ${selectedYear}`;
 
   return (

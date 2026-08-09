@@ -199,11 +199,7 @@ export default function BillsPage() {
       toast.success(t(locale, 'generatedBills').replace('{count}', String(result.data.generated)));
       refetch();
     } else {
-      toast.info(
-        locale === 'id'
-          ? 'Tidak ada tagihan berulang untuk dibuat'
-          : 'No recurring bills to generate'
-      );
+      toast.info(t(locale, 'noRecurringBillsToGenerate'));
     }
   };
 
@@ -396,7 +392,7 @@ export default function BillsPage() {
                 id="bill-name"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder={locale === 'id' ? 'cth. Listrik' : 'e.g. Electricity'}
+                placeholder={t(locale, 'billNamePlaceholder')}
               />
               {formErrors.name && <p className="text-destructive text-xs">{formErrors.name}</p>}
             </div>

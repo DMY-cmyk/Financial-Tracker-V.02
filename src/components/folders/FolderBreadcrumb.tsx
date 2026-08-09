@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { t, useLocale } from '@/lib/i18n';
-import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { useStore } from '@/store';
 import type { DashboardView } from '@/lib/types';
 
@@ -15,7 +15,7 @@ export function FolderBreadcrumb() {
   const selectedMonth = useStore((s) => s.ui.selectedMonth);
   const setDashboardView = useStore((s) => s.setDashboardView);
 
-  const names = locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES;
+  const names = getMonthNames(locale);
 
   const navigateTo = (view: DashboardView) => {
     setDashboardView(view);

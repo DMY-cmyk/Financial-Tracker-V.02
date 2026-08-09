@@ -668,6 +668,33 @@ type TranslationKeys = {
   periodYearly: string;
   txSeeAll: string;
   txEmpty: string;
+
+  // Sprint 2 sweep: final i18n keys
+  formatSpreadsheet: string;
+  formatWorkbook: string;
+  formatPdfReport: string;
+  noDataToExport: string;
+  addTransactionsFirst: string;
+  noRecurringBillsToGenerate: string;
+  billNamePlaceholder: string;
+  savingsGoalsUnit: string;
+  goalNamePlaceholder: string;
+  overview: string;
+  dashboardOverviewFor: string;
+  dashboardEmptyDescription: string;
+  recordIncomeOrExpense: string;
+  scanAndExtractData: string;
+  downloadFormats: string;
+  selectPlaceholder: string;
+  pageOfTotal: string;
+  previousPage: string;
+  nextPage: string;
+  noPaymentMethodsYet: string;
+  uploadExtractPrompt: string;
+  authSignInEyebrow: string;
+  authSignInSubmit: string;
+  startAddingFirstTransaction: string;
+  importJsonCsvDesc: string;
 };
 
 const translations: Record<Locale, TranslationKeys> = {
@@ -1293,6 +1320,34 @@ const translations: Record<Locale, TranslationKeys> = {
     authForgotSentBody: 'Check your inbox for a link to reset your password.',
     authResetEyebrow: 'RESET',
     authResetConfirmPasswordLabel: 'Confirm password',
+
+    // Sprint 2 sweep: final i18n keys
+    formatSpreadsheet: 'Spreadsheet compatible',
+    formatWorkbook: 'Formatted workbook',
+    formatPdfReport: 'Print-ready report',
+    noDataToExport: 'No data to export',
+    addTransactionsFirst: 'Add some transactions first',
+    noRecurringBillsToGenerate: 'No recurring bills to generate',
+    billNamePlaceholder: 'e.g. Electricity',
+    savingsGoalsUnit: 'goals',
+    goalNamePlaceholder: 'e.g. Emergency Fund',
+    overview: 'Overview',
+    dashboardOverviewFor: 'Your financial overview for {period}',
+    dashboardEmptyDescription:
+      'Start by adding your first transaction to see your financial overview come to life.',
+    recordIncomeOrExpense: 'Record income or expense',
+    scanAndExtractData: 'Scan and extract data',
+    downloadFormats: 'Download CSV, Excel, or PDF',
+    selectPlaceholder: 'Select...',
+    pageOfTotal: 'Page {page} of {total}',
+    previousPage: 'Previous',
+    nextPage: 'Next',
+    noPaymentMethodsYet: 'No payment methods yet.',
+    uploadExtractPrompt: 'Upload and extract a receipt to see data',
+    authSignInEyebrow: 'SIGN IN',
+    authSignInSubmit: 'Sign in →',
+    startAddingFirstTransaction: 'Start by adding your first transaction.',
+    importJsonCsvDesc: 'Upload a JSON or CSV file containing transactions',
   },
   id: {
     dashboard: 'Dasbor',
@@ -1918,6 +1973,33 @@ const translations: Record<Locale, TranslationKeys> = {
     authForgotSentBody: 'Periksa kotak masuk Anda untuk tautan setel ulang.',
     authResetEyebrow: 'SETEL ULANG',
     authResetConfirmPasswordLabel: 'Konfirmasi kata sandi',
+
+    // Sprint 2 sweep: final i18n keys
+    formatSpreadsheet: 'Kompatibel dengan spreadsheet',
+    formatWorkbook: 'Workbook terformat',
+    formatPdfReport: 'Laporan siap cetak',
+    noDataToExport: 'Tidak ada data untuk diekspor',
+    addTransactionsFirst: 'Tambahkan transaksi terlebih dahulu',
+    noRecurringBillsToGenerate: 'Tidak ada tagihan berulang untuk dibuat',
+    billNamePlaceholder: 'cth. Listrik',
+    savingsGoalsUnit: 'target',
+    goalNamePlaceholder: 'cth. Dana Darurat',
+    overview: 'Ringkasan',
+    dashboardOverviewFor: 'Ringkasan keuangan untuk {period}',
+    dashboardEmptyDescription: 'Mulai dengan menambahkan transaksi pertama Anda.',
+    recordIncomeOrExpense: 'Catat pemasukan atau pengeluaran',
+    scanAndExtractData: 'Pindai dan ekstrak data',
+    downloadFormats: 'Unduh CSV, Excel, atau PDF',
+    selectPlaceholder: 'Pilih...',
+    pageOfTotal: 'Halaman {page} dari {total}',
+    previousPage: 'Sebelumnya',
+    nextPage: 'Berikutnya',
+    noPaymentMethodsYet: 'Belum ada metode pembayaran.',
+    uploadExtractPrompt: 'Unggah dan ekstrak struk untuk melihat data',
+    authSignInEyebrow: 'MASUK',
+    authSignInSubmit: 'Masuk →',
+    startAddingFirstTransaction: 'Mulai dengan menambahkan transaksi pertama Anda.',
+    importJsonCsvDesc: 'Unggah file JSON atau CSV berisi transaksi',
   },
 };
 

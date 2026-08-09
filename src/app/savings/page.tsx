@@ -57,7 +57,7 @@ export default function SavingsPage() {
         <PageHeader
           title={t(locale, 'savingsPage')}
           description={
-            goals.length > 0 ? `${goals.length} ${locale === 'id' ? 'target' : 'goals'}` : undefined
+            goals.length > 0 ? `${goals.length} ${t(locale, 'savingsGoalsUnit')}` : undefined
           }
         >
           <Button onClick={form.openAdd} className="gap-2 shadow-sm">
@@ -190,7 +190,7 @@ export default function SavingsPage() {
                 id="goal-name"
                 value={form.name}
                 onChange={(e) => form.setName(e.target.value)}
-                placeholder={locale === 'id' ? 'cth. Dana Darurat' : 'e.g. Emergency Fund'}
+                placeholder={t(locale, 'goalNamePlaceholder')}
               />
               {form.errors.name && <p className="text-destructive text-xs">{form.errors.name}</p>}
             </div>

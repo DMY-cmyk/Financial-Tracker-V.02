@@ -66,7 +66,7 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
       onSubmit={submit}
       className="relative flex max-w-xl flex-col justify-center gap-3.5 px-14 py-14"
     >
-      <div className="ft-eyebrow ft-rise-1">{locale === 'en' ? 'SIGN IN' : 'MASUK'}</div>
+      <div className="ft-eyebrow ft-rise-1">{t(locale, 'authSignInEyebrow')}</div>
       <h2 className="ft-display-up ft-rise-2 text-[44px] leading-none tracking-tight">
         {t(locale, 'authWelcomeBack')}
       </h2>
@@ -132,7 +132,7 @@ export function LoginForm({ locale, onSuccess, sessionExpired, oauthError }: Log
         disabled={busy}
         className="ft-rise-4 mt-3 w-full bg-[var(--ink)] px-4 py-3.5 text-xs font-semibold tracking-widest text-[var(--paper)] uppercase transition-transform active:scale-[0.99] disabled:cursor-default"
       >
-        {busy ? t(locale, 'authOpeningBooks') : locale === 'en' ? 'Sign in →' : 'Masuk →'}
+        {busy ? t(locale, 'authOpeningBooks') : t(locale, 'authSignInSubmit')}
       </button>
 
       <div className="my-3 flex items-center gap-3">

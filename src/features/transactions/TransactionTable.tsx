@@ -161,9 +161,9 @@ export function TransactionTable({
       {totalPages > 1 && onPageChange && (
         <div className="border-border bg-card shadow-card flex items-center justify-between rounded-2xl border px-4 py-3">
           <span className="text-muted-foreground text-xs tabular-nums">
-            {locale === 'id'
-              ? `Halaman ${page} dari ${totalPages}`
-              : `Page ${page} of ${totalPages}`}
+            {t(locale, 'pageOfTotal')
+              .replace('{page}', String(page))
+              .replace('{total}', String(totalPages))}
           </span>
           <div className="flex gap-1">
             <Button
@@ -172,7 +172,7 @@ export function TransactionTable({
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
               className="h-8 w-8 p-0"
-              aria-label={locale === 'id' ? 'Sebelumnya' : 'Previous'}
+              aria-label={t(locale, 'previousPage')}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -182,7 +182,7 @@ export function TransactionTable({
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
               className="h-8 w-8 p-0"
-              aria-label={locale === 'id' ? 'Berikutnya' : 'Next'}
+              aria-label={t(locale, 'nextPage')}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

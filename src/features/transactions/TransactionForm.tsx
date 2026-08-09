@@ -178,13 +178,7 @@ export function TransactionForm({
                 : 'text-muted-foreground hover:bg-muted'
             )}
           >
-            {tp === 'income'
-              ? locale === 'id'
-                ? 'Pemasukan'
-                : 'Income'
-              : locale === 'id'
-                ? 'Pengeluaran'
-                : 'Expense'}
+            {tp === 'income' ? t(locale, 'income') : t(locale, 'expense')}
           </button>
         ))}
       </div>
@@ -256,7 +250,7 @@ export function TransactionForm({
             )}
             aria-invalid={!!fieldError('category')}
           >
-            <option value="">{locale === 'id' ? 'Pilih...' : 'Select...'}</option>
+            <option value="">{t(locale, 'selectPlaceholder')}</option>
             {filteredCategories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -341,7 +335,7 @@ export function TransactionForm({
             className={cn('mt-1 w-full', fieldError('paymentMethod') ? 'border-red-500' : '')}
             aria-invalid={!!fieldError('paymentMethod')}
           >
-            <SelectValue placeholder={locale === 'id' ? 'Pilih...' : 'Select...'} />
+            <SelectValue placeholder={t(locale, 'selectPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {paymentMethods.map((p) => (

@@ -104,7 +104,7 @@ export function AllTransactionsView({
         {total > 0 && (
           <p className="text-muted-foreground mb-3 text-sm">
             {t(locale, 'showing')} {loadedCount} {t(locale, 'of')} {total}{' '}
-            {locale === 'id' ? 'transaksi' : 'transactions'}
+            {t(locale, 'folderTransactions')}
           </p>
         )}
 

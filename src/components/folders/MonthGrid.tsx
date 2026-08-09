@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { staggerGrid } from '@/lib/motion';
 import { t, useLocale } from '@/lib/i18n';
-import { MONTH_NAMES, MONTH_NAMES_ID } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { useStore } from '@/store';
 import { FolderCard } from './FolderCard';
 import type { MonthSummary } from '@/lib/api/contracts';
@@ -23,7 +23,7 @@ export function MonthGrid({ months, year }: MonthGridProps) {
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
-  const names = locale === 'id' ? MONTH_NAMES_ID : MONTH_NAMES;
+  const names = getMonthNames(locale);
 
   const monthList = useMemo(() => {
     const monthMap = new Map(months.map((m) => [m.month, m]));
