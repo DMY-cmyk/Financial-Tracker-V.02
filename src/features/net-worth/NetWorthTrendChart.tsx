@@ -1,6 +1,6 @@
 'use client';
 
-import { t, useLocale } from '@/lib/i18n';
+import { t, useLocale, type Locale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import {
   AreaChart,
@@ -53,7 +53,7 @@ function CustomTooltip({
 }: {
   active?: boolean;
   payload?: { payload: NetWorthSnapshot & { label: string } }[];
-  locale: string;
+  locale: Locale;
 }) {
   if (!active || !payload?.length) return null;
   const snap = payload[0].payload;
@@ -66,23 +66,17 @@ function CustomTooltip({
       {snap.snapshotData && (
         <div className="space-y-1 text-[11px]">
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">
-              {locale === 'id' ? 'Rekening' : 'Accounts'}
-            </span>
+            <span className="text-muted-foreground">{t(locale, 'nwAccounts')}</span>
             <span className="font-mono">
               {formatCurrency(snap.snapshotData.paymentMethodBalances)}
             </span>
           </div>
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">
-              {locale === 'id' ? 'Tabungan' : 'Savings'}
-            </span>
+            <span className="text-muted-foreground">{t(locale, 'nwSavings')}</span>
             <span className="font-mono">{formatCurrency(snap.snapshotData.savingsGoals)}</span>
           </div>
           <div className="flex justify-between gap-8">
-            <span className="text-muted-foreground">
-              {locale === 'id' ? 'Kewajiban' : 'Liabilities'}
-            </span>
+            <span className="text-muted-foreground">{t(locale, 'liabilities')}</span>
             <span className="font-mono text-red-500">
               −{formatCurrency(snap.snapshotData.liabilities)}
             </span>

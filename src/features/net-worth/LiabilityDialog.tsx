@@ -52,13 +52,13 @@ export function LiabilityDialog({
               id="liab-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={locale === 'id' ? 'cth. KPR BCA' : 'e.g. Mortgage BCA'}
+              placeholder={t(locale, 'nwLiabilityNamePlaceholder')}
             />
             {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="liab-amount">{locale === 'id' ? 'Jumlah (IDR)' : 'Amount (IDR)'}</Label>
+            <Label htmlFor="liab-amount">{t(locale, 'nwAmountIdr')}</Label>
             <Input
               id="liab-amount"
               type="number"

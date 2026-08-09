@@ -44,16 +44,14 @@ export default function ForgotPasswordPage() {
         {sent ? (
           <div className="ft-rise flex max-w-md flex-col gap-3">
             <div className="ft-eyebrow">{t(locale, 'forgotSent')}</div>
-            <h2 className="ft-display-up text-4xl">{locale === 'en' ? 'Sent.' : 'Terkirim.'}</h2>
+            <h2 className="ft-display-up text-4xl">{t(locale, 'authForgotSentHeading')}</h2>
             <p className="ft-display text-[15px] text-[var(--ink-3)]">
-              {locale === 'en'
-                ? 'Check your inbox for a link to reset your password.'
-                : 'Periksa kotak masuk Anda untuk tautan setel ulang.'}
+              {t(locale, 'authForgotSentBody')}
             </p>
           </div>
         ) : (
           <form onSubmit={submit} className="flex max-w-md flex-col gap-3">
-            <div className="ft-eyebrow">{locale === 'en' ? 'RESET' : 'SETEL ULANG'}</div>
+            <div className="ft-eyebrow">{t(locale, 'authResetEyebrow')}</div>
             <h2 className="ft-display-up text-4xl">{t(locale, 'forgotTitle')}</h2>
             <p className="ft-display text-[15px] text-[var(--ink-3)]">
               {t(locale, 'forgotSubtitle')}

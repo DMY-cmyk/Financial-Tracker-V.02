@@ -22,20 +22,16 @@ export function SnapshotButton({ history, isRecording, onRecord }: SnapshotButto
   return (
     <div className="border-border bg-card flex items-center justify-between rounded-2xl border p-5">
       <div>
-        <p className="text-sm font-semibold">
-          {locale === 'id' ? 'Catat snapshot bulan ini' : "Record this month's snapshot"}
-        </p>
+        <p className="text-sm font-semibold">{t(locale, 'nwRecordThisMonth')}</p>
         <p className="text-muted-foreground mt-0.5 text-xs">
           {currentMonthSnap
-            ? `${locale === 'id' ? 'Terakhir dicatat' : 'Last recorded'}: ${new Date(
+            ? `${t(locale, 'nwLastRecorded')}: ${new Date(
                 currentMonthSnap.createdAt
               ).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
                 dateStyle: 'medium',
                 timeStyle: 'short',
               })}`
-            : locale === 'id'
-              ? 'Belum ada snapshot bulan ini'
-              : 'No snapshot for this month yet'}
+            : t(locale, 'nwNoSnapshotThisMonth')}
         </p>
       </div>
       <Button

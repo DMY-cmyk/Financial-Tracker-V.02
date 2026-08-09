@@ -50,14 +50,14 @@ export function MonthOverMonthCard({ history, isLoading }: MonthOverMonthCardPro
           {pct && (
             <p className="text-muted-foreground mt-1 text-xs">
               {positive ? '+' : ''}
-              {pct}% {locale === 'id' ? 'dari' : 'from'} {formatCurrency(prev!.netWorth)}
+              {pct}% {t(locale, 'nwFrom')} {formatCurrency(prev!.netWorth)}
             </p>
           )}
         </>
       )}
       {latest && (
         <p className="text-muted-foreground mt-4 border-t pt-3 text-xs">
-          {locale === 'id' ? 'Snapshot terakhir' : 'Last snapshot'}:{' '}
+          {t(locale, 'nwLastSnapshot')}:{' '}
           {new Date(latest.year, latest.month).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
             month: 'short',
             year: 'numeric',
