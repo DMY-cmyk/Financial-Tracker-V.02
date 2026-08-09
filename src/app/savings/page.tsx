@@ -263,15 +263,6 @@ export default function SavingsPage() {
         cancelLabel={t(locale, 'cancel')}
         onConfirm={deleteConfirm.confirm}
       />
-
-      {/* Mobile FAB */}
-      <button
-        onClick={form.openAdd}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-        aria-label={t(locale, 'addSavingsGoal')}
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 }

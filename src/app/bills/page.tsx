@@ -460,15 +460,6 @@ export default function BillsPage() {
         cancelLabel={t(locale, 'cancel')}
         onConfirm={confirmDelete}
       />
-
-      {/* Mobile FAB */}
-      <button
-        onClick={openAdd}
-        className="bg-primary text-primary-foreground fixed right-4 bottom-20 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 lg:bottom-6 lg:hidden"
-        aria-label={t(locale, 'addBill')}
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 }

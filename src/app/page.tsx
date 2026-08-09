@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AnimatePresence } from 'framer-motion';
@@ -13,7 +12,6 @@ import { useDashboardData } from '@/features/dashboard/useDashboardData';
 import { useBudgetData } from '@/hooks/useBudgetData';
 import { HeroHeader } from '@/components/layout/HeroHeader';
 import { SavingsRingCard } from '@/components/dashboard/SavingsRingCard';
-import { PeriodTabs, type Period } from '@/components/shared/PeriodTabs';
 import { TransactionRowMobile } from '@/components/transactions/TransactionRowMobile';
 import { t } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
@@ -71,7 +69,6 @@ export default function DashboardPage() {
 
   const { balance, expense, recentTransactions, categories } = useDashboardData();
   const { totalBudget, totalSpent } = useBudgetData();
-  const [period, setPeriod] = useState<Period>('daily');
 
   const subgreetingKey: SubgreetingKey = `homeSubgreeting${timeOfDay()}` as SubgreetingKey;
 
@@ -144,10 +141,6 @@ export default function DashboardPage() {
 
         <div className="bg-background -mt-6 rounded-t-3xl px-4 pt-6 pb-24">
           <SavingsRingCard />
-
-          <div className="mt-5">
-            <PeriodTabs variant="three" value={period} onChange={setPeriod} />
-          </div>
 
           <div className="mt-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold">{t(locale, 'recentTransactions')}</h2>

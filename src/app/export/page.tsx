@@ -7,7 +7,6 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/lib/motion';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { FormatCard } from '@/features/export/FormatCard';
 import { ScopeSelector } from '@/features/export/ScopeSelector';
-import { ExportOptions } from '@/features/export/ExportOptions';
 import { ExportPreview } from '@/features/export/ExportPreview';
 import { ExportActionBar } from '@/features/export/ExportActionBar';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -39,8 +38,6 @@ export default function ExportPage() {
     setFormat,
     scope,
     setScope,
-    options,
-    setOptions,
     startDate,
     setStartDate,
     endDate,
@@ -108,17 +105,6 @@ export default function ExportPage() {
             endDate={endDate}
             setEndDate={setEndDate}
           />
-        </motion.div>
-
-        {/* Options */}
-        <motion.div
-          variants={staggerItem}
-          className="border-border bg-card shadow-card hover:shadow-card-hover rounded-2xl border p-4 transition-shadow duration-300 sm:p-6"
-        >
-          <h3 className="mb-4 text-sm font-semibold tracking-tight">
-            {t(locale, 'exportOptions')}
-          </h3>
-          <ExportOptions options={options} onChange={setOptions} />
         </motion.div>
 
         {/* Preview */}
