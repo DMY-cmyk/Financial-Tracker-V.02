@@ -170,6 +170,17 @@ describe('parseSheetRows', () => {
     expect(result.rows[0].date).toBe('2026-06-15');
   });
 
+  it('parses UTC-midnight Date cells without timezone day-shift', () => {
+    const wb = createTestWorkbook(
+      [[new Date(Date.UTC(2026, 2, 15)), 5000000, 'Salary', 'Bank BCA']],
+      []
+    );
+    const result = parseSheetRows(wb);
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].date).toBe('2026-03-15');
+  });
+
   it('handles text dates like "1 Mar 2026"', () => {
     const wb = createTestWorkbook([['1 Mar 2026', 1000000, 'Salary', 'Cash']], []);
     const result = parseSheetRows(wb);

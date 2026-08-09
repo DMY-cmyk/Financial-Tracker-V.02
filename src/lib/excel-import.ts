@@ -25,12 +25,13 @@ function parseDate(value: CellValue): string | null {
     return `${y}-${m}-${day}`;
   }
 
-  // Date object
+  // Date object (exceljs delivers date cells as UTC-midnight Dates —
+  // local getters would shift the day in UTC-negative timezones)
   if (value instanceof Date) {
     if (isNaN(value.getTime())) return null;
-    const y = String(value.getFullYear()).padStart(4, '0');
-    const m = String(value.getMonth() + 1).padStart(2, '0');
-    const d = String(value.getDate()).padStart(2, '0');
+    const y = String(value.getUTCFullYear()).padStart(4, '0');
+    const m = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(value.getUTCDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
 
