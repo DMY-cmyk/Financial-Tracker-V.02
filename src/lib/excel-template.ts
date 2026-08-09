@@ -57,7 +57,11 @@ export async function generateBulkTemplate(
   const incomeCategories = categories.filter((c) => c.type === 'income');
   const expenseCategories = categories.filter((c) => c.type === 'expense');
 
-  const helpLines: (string | null)[] = ['Bulk Import — Help & Reference', null, 'INCOME CATEGORIES'];
+  const helpLines: (string | null)[] = [
+    'Bulk Import — Help & Reference',
+    null,
+    'INCOME CATEGORIES',
+  ];
   if (incomeCategories.length > 0) {
     incomeCategories.forEach((c) => helpLines.push(`  • ${c.name}`));
   } else {

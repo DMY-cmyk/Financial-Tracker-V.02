@@ -40,9 +40,7 @@ describe('GET /api/reports/trends', () => {
     const res = await GET(makeReq('user-b'));
     expect(res.status).toBe(200);
     const body = await res.json();
-    const july = body.data.months.find(
-      (m: { monthKey: string }) => m.monthKey === '2026-07'
-    );
+    const july = body.data.months.find((m: { monthKey: string }) => m.monthKey === '2026-07');
     expect(july).toBeDefined();
     expect(july.income).toBe(7); // BUKAN 1.000.007
   });
