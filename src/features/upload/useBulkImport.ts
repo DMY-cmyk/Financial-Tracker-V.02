@@ -232,7 +232,7 @@ export function useBulkImport(): UseBulkImportReturn {
 
   const downloadTemplate = useCallback(async () => {
     const { generateBulkTemplate } = await import('@/lib/excel-template');
-    generateBulkTemplate(categories, paymentMethods);
+    await generateBulkTemplate(categories, paymentMethods);
   }, [categories, paymentMethods]);
 
   const reset = useCallback(() => {

@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import type { BulkImportRow, BulkImportResult } from './types';
 
 const MAX_DATA_ROWS = 500;
@@ -13,20 +13,16 @@ type SheetRow = CellValue[];
 function parseDate(value: CellValue): string | null {
   if (value == null || value === '') return null;
 
-  // Excel serial date number
+  // Excel serial date number (days since 1899-12-30; 25569 = 1970-01-01 UTC)
   if (typeof value === 'number') {
-    try {
-      const parsed = XLSX.SSF.parse_date_code(value);
-      if (parsed && parsed.y && parsed.m && parsed.d) {
-        const y = String(parsed.y).padStart(4, '0');
-        const m = String(parsed.m).padStart(2, '0');
-        const d = String(parsed.d).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-      }
-    } catch {
-      return null;
-    }
-    return null;
+    if (!isFinite(value) || value <= 0) return null;
+    const ms = Math.round((value - 25569) * 86400 * 1000);
+    const d = new Date(ms);
+    if (isNaN(d.getTime())) return null;
+    const y = String(d.getUTCFullYear()).padStart(4, '0');
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   // Date object
@@ -275,22 +271,7 @@ function emptyResult(errorMessage?: string): BulkImportResult {
 // Core parser
 // ---------------------------------------------------------------------------
 
-export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
-  const sheetName = workbook.SheetNames[0];
-  if (!sheetName) {
-    return emptyResult('No sheet found in workbook');
-  }
-
-  const ws = workbook.Sheets[sheetName];
-  if (!ws) {
-    return emptyResult('No sheet found in workbook');
-  }
-
-  const data: SheetRow[] = XLSX.utils.sheet_to_json(ws, {
-    header: 1,
-    defval: null,
-  });
-
+export function parseSheetRows(data: SheetRow[]): BulkImportResult {
   if (data.length === 0) {
     return emptyResult();
   }
@@ -426,11 +407,44 @@ export function parseExcelWorkbook(workbook: XLSX.WorkBook): BulkImportResult {
 // File reader entry point
 // ---------------------------------------------------------------------------
 
+// exceljs cell values can be rich objects (formula results, rich text,
+// hyperlinks). Flatten them to the primitive the parser understands.
+function normalizeExcelValue(value: unknown): CellValue {
+  if (value == null) return null;
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value instanceof Date
+  ) {
+    return value;
+  }
+  if (typeof value === 'object') {
+    const obj = value as { result?: unknown; richText?: { text: string }[]; text?: unknown };
+    if (obj.richText) return obj.richText.map((r) => r.text).join('');
+    if (obj.result !== undefined) return normalizeExcelValue(obj.result);
+    if (obj.text !== undefined) return normalizeExcelValue(obj.text);
+  }
+  return String(value);
+}
+
 export async function parseExcelFile(file: File): Promise<BulkImportResult> {
   try {
     const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
-    return parseExcelWorkbook(workbook);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const ws = workbook.worksheets[0];
+    if (!ws) {
+      return emptyResult('No sheet found in workbook');
+    }
+
+    const data: SheetRow[] = [];
+    ws.eachRow({ includeEmpty: true }, (row) => {
+      const values = row.values as unknown[]; // 1-based; index 0 unused
+      data.push(values.slice(1).map(normalizeExcelValue));
+    });
+
+    return parseSheetRows(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to read Excel file';
     return emptyResult(message);
