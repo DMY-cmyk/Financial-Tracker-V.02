@@ -13,6 +13,7 @@ import { useBudgetData } from '@/hooks/useBudgetData';
 import { HeroHeader } from '@/components/layout/HeroHeader';
 import { SavingsRingCard } from '@/components/dashboard/SavingsRingCard';
 import { TransactionRowMobile } from '@/components/transactions/TransactionRowMobile';
+import { InlineError } from '@/components/shared/EmptyState';
 import { t } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -67,7 +68,8 @@ export default function DashboardPage() {
     hasDueItems,
   } = useDueRecurring();
 
-  const { balance, expense, recentTransactions, categories } = useDashboardData();
+  const { balance, expense, recentTransactions, categories, isLoading, isError, refetch } =
+    useDashboardData();
   const { totalBudget, totalSpent } = useBudgetData();
 
   const subgreetingKey: SubgreetingKey = `homeSubgreeting${timeOfDay()}` as SubgreetingKey;
@@ -100,71 +102,109 @@ export default function DashboardPage() {
     <>
       {/* Mobile composition — < 768px */}
       <div className="md:hidden">
-        <HeroHeader
-          title={t(locale, 'dashboard')}
-          greeting={t(locale, 'homeGreeting')}
-          subgreeting={t(locale, subgreetingKey)}
-        >
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
-              <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
-                {t(locale, 'homeTotalBalance')}
-              </p>
-              <p className="mt-0.5 font-mono text-base font-bold tabular-nums">
-                {formatCurrency(balance)}
-              </p>
-            </div>
-            <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
-              <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
-                {t(locale, 'homeTotalExpense')}
-              </p>
-              <p className="text-destructive mt-0.5 font-mono text-base font-bold tabular-nums">
-                -{formatCurrency(expense)}
-              </p>
-            </div>
-          </div>
-          {hasBudget && (
-            <div className="mt-3.5">
-              <div className="bg-hero-foreground/15 ring-hero-foreground/10 h-1.5 w-full overflow-hidden rounded-full ring-1 ring-inset">
-                <div
-                  className={cn(
-                    'h-full rounded-full transition-all duration-500 ease-out',
-                    pct > 100 ? 'bg-destructive' : 'bg-hero-foreground'
-                  )}
-                  style={{ width: `${Math.min(pct, 100)}%` }}
-                />
-              </div>
+        <AnimatePresence>
+          {hasDueItems && (
+            <div className="px-4 pt-3">
+              <RecurringDueBanner
+                dueItems={dueItems}
+                totalTransactions={totalTransactions}
+                totalIncome={totalIncome}
+                totalExpense={totalExpense}
+                onGenerate={generate}
+                onDismiss={dismiss}
+                isGenerating={isGenerating}
+                locale={locale}
+              />
             </div>
           )}
-          <p className="mt-2 text-[11px] font-medium opacity-85">{caption}</p>
-        </HeroHeader>
+        </AnimatePresence>
 
-        <div className="bg-background -mt-6 rounded-t-3xl px-4 pt-6 pb-24">
-          <SavingsRingCard />
-
-          <div className="mt-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold">{t(locale, 'recentTransactions')}</h2>
-            <Link href="/transactions" className="text-primary text-xs">
-              {t(locale, 'txSeeAll')}
-            </Link>
+        {isLoading ? (
+          <div className="space-y-3 px-4 pt-6 pb-24">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="border-border bg-card shadow-card h-24 animate-pulse rounded-2xl border"
+              />
+            ))}
           </div>
-
-          <div className="mt-2 space-y-1">
-            {fiveRecent.length === 0 ? (
-              <p className="text-muted-foreground py-6 text-center text-xs">
-                {t(locale, 'txEmpty')}
-              </p>
-            ) : (
-              fiveRecent.map((tx) => (
-                <TransactionRowMobile
-                  key={tx.id}
-                  transaction={tx}
-                  category={findCategory(tx.categoryId, tx.category)}
-                />
-              ))
-            )}
+        ) : isError ? (
+          <div className="px-4 pt-6">
+            <InlineError
+              message={t(locale, 'somethingWentWrong')}
+              onRetry={() => refetch()}
+              retryLabel={t(locale, 'tryAgain')}
+            />
           </div>
-        </div>
+        ) : (
+          <>
+            <HeroHeader
+              title={t(locale, 'dashboard')}
+              greeting={t(locale, 'homeGreeting')}
+              subgreeting={t(locale, subgreetingKey)}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+                  <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+                    {t(locale, 'homeTotalBalance')}
+                  </p>
+                  <p className="mt-0.5 font-mono text-base font-bold tabular-nums">
+                    {formatCurrency(balance)}
+                  </p>
+                </div>
+                <div className="bg-hero-foreground/10 ring-hero-foreground/10 rounded-2xl p-3 ring-1 ring-inset">
+                  <p className="text-[10px] font-medium tracking-wider uppercase opacity-75">
+                    {t(locale, 'homeTotalExpense')}
+                  </p>
+                  <p className="text-destructive mt-0.5 font-mono text-base font-bold tabular-nums">
+                    -{formatCurrency(expense)}
+                  </p>
+                </div>
+              </div>
+              {hasBudget && (
+                <div className="mt-3.5">
+                  <div className="bg-hero-foreground/15 ring-hero-foreground/10 h-1.5 w-full overflow-hidden rounded-full ring-1 ring-inset">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-500 ease-out',
+                        pct > 100 ? 'bg-destructive' : 'bg-hero-foreground'
+                      )}
+                      style={{ width: `${Math.min(pct, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              <p className="mt-2 text-[11px] font-medium opacity-85">{caption}</p>
+            </HeroHeader>
+
+            <div className="bg-background -mt-6 rounded-t-3xl px-4 pt-6 pb-24">
+              <SavingsRingCard />
+
+              <div className="mt-4 flex items-center justify-between">
+                <h2 className="text-sm font-semibold">{t(locale, 'recentTransactions')}</h2>
+                <Link href="/transactions" className="text-primary text-xs">
+                  {t(locale, 'txSeeAll')}
+                </Link>
+              </div>
+
+              <div className="mt-2 space-y-1">
+                {fiveRecent.length === 0 ? (
+                  <p className="text-muted-foreground py-6 text-center text-xs">
+                    {t(locale, 'txEmpty')}
+                  </p>
+                ) : (
+                  fiveRecent.map((tx) => (
+                    <TransactionRowMobile
+                      key={tx.id}
+                      transaction={tx}
+                      category={findCategory(tx.categoryId, tx.category)}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Desktop composition — >= 768px (existing behavior, unchanged) */}
