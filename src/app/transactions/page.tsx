@@ -8,7 +8,7 @@ import { useFilterPresets } from '@/features/transactions/useFilterPresets';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useStore } from '@/store';
 import { t, useLocale } from '@/lib/i18n';
-import { MONTH_NAMES } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { staggerContainer, fadeInUp } from '@/lib/motion';
 import { BulkActionBar } from '@/features/transactions/BulkActionBar';
@@ -234,7 +234,7 @@ function TransactionsPageInner() {
                     exportCSV(
                       transactions,
                       `transactions-${year}-${String(month + 1).padStart(2, '0')}.csv`,
-                      `${MONTH_NAMES[month]} ${year}`,
+                      `${getMonthNames(locale)[month]} ${year}`,
                       income,
                       expense,
                       income - expense

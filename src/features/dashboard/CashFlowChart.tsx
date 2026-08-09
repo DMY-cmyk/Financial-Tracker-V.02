@@ -86,7 +86,7 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                   />
                   <YAxis
                     tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                    tickFormatter={(v) => formatCurrencyShort(v)}
+                    tickFormatter={(v) => formatCurrencyShort(v, locale)}
                     tickLine={false}
                     axisLine={false}
                   />
@@ -100,7 +100,7 @@ export function CashFlowChart({ data }: CashFlowChartProps) {
                     }}
                     itemStyle={{ fontFamily: 'var(--font-mono)' }}
                     formatter={(value, name) => [
-                      formatCurrencyShort(Number(value)),
+                      formatCurrencyShort(Number(value), locale),
                       t(locale, String(name) === 'income' ? 'income' : 'expense'),
                     ]}
                   />

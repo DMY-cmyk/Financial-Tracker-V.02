@@ -72,7 +72,7 @@ export function TrendChart({ data }: TrendChartProps) {
           <YAxis
             tick={{ fontSize: 11 }}
             className="fill-muted-foreground"
-            tickFormatter={(v) => formatCurrencyShort(v)}
+            tickFormatter={(v) => formatCurrencyShort(v, locale)}
             tickLine={false}
             axisLine={false}
           />
@@ -84,7 +84,7 @@ export function TrendChart({ data }: TrendChartProps) {
               fontSize: '12px',
             }}
             formatter={(value, name) => [
-              formatCurrencyShort(Number(value)),
+              formatCurrencyShort(Number(value), locale),
               String(name) === 'income' ? t(locale, 'income') : t(locale, 'expense'),
             ]}
           />

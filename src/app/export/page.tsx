@@ -10,7 +10,7 @@ import { ScopeSelector } from '@/features/export/ScopeSelector';
 import { ExportPreview } from '@/features/export/ExportPreview';
 import { ExportActionBar } from '@/features/export/ExportActionBar';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { MONTH_NAMES } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { useStore } from '@/store';
 import { FileSpreadsheet, FileDown, FileBarChart, type LucideIcon, FileX } from 'lucide-react';
 import { type ExportFormat } from '@/lib/types';
@@ -98,7 +98,7 @@ export default function ExportPage() {
           <ScopeSelector
             scope={scope}
             onScopeChange={setScope}
-            monthLabel={`${MONTH_NAMES[month]} ${year}`}
+            monthLabel={`${getMonthNames(locale)[month]} ${year}`}
             transactionCount={allTransactionCount}
             startDate={startDate}
             setStartDate={setStartDate}

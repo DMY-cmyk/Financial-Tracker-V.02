@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useDashboardData } from '@/features/dashboard/useDashboardData';
 import { t, useLocale } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/formatters';
-import { MONTH_NAMES } from '@/lib/constants';
+import { getMonthNames } from '@/lib/constants';
 import { staggerContainer, staggerItem, staggerGrid, staggerGridItem } from '@/lib/motion';
 import { BudgetAlertBanner } from '@/features/dashboard/BudgetAlertBanner';
 import { useBudgetAlertToasts } from '@/hooks/useBudgetAlertToasts';
@@ -81,6 +81,7 @@ export function DashboardContent() {
   } = useDashboardData();
 
   useBudgetAlertToasts(budgetAlerts);
+  const monthNames = getMonthNames(locale);
 
   if (isLoading) {
     return <PageSkeleton />;
@@ -115,13 +116,13 @@ export function DashboardContent() {
           </h1>
           <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
             {locale === 'id'
-              ? `Ringkasan keuangan untuk ${MONTH_NAMES[month]} ${year}`
-              : `Your financial overview for ${MONTH_NAMES[month]} ${year}`}
+              ? `Ringkasan keuangan untuk ${monthNames[month]} ${year}`
+              : `Your financial overview for ${monthNames[month]} ${year}`}
           </p>
         </div>
         <div className="border-border-subtle bg-surface-inset text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[11px] font-medium tabular-nums">
           <span className="bg-primary h-1.5 w-1.5 rounded-full" />
-          {MONTH_NAMES[month]} · {year}
+          {monthNames[month]} · {year}
         </div>
       </motion.div>
 

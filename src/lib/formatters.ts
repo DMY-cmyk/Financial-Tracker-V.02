@@ -10,11 +10,18 @@ export function formatCurrency(amount: number, locale: 'en' | 'id' = 'id'): stri
   }).format(amount);
 }
 
-export function formatCurrencyShort(amount: number): string {
-  if (amount >= 1_000_000_000) return `Rp ${(amount / 1_000_000_000).toFixed(1)}B`;
-  if (amount >= 1_000_000) return `Rp ${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `Rp ${(amount / 1_000).toFixed(0)}K`;
-  return `Rp ${amount}`;
+export function formatCurrencyShort(amount: number, locale: 'en' | 'id' = 'en'): string {
+  const sign = amount < 0 ? '-' : '';
+  const abs = Math.abs(amount);
+  const dec = (n: number) => {
+    const s = n.toFixed(1);
+    return locale === 'id' ? s.replace('.', ',') : s;
+  };
+  if (abs >= 1_000_000_000)
+    return `${sign}Rp ${dec(abs / 1_000_000_000)}${locale === 'id' ? 'M' : 'B'}`;
+  if (abs >= 1_000_000) return `${sign}Rp ${dec(abs / 1_000_000)}${locale === 'id' ? 'jt' : 'M'}`;
+  if (abs >= 1_000) return `${sign}Rp ${(abs / 1_000).toFixed(0)}${locale === 'id' ? 'rb' : 'K'}`;
+  return `${sign}Rp ${abs}`;
 }
 
 export function formatNumber(amount: number): string {

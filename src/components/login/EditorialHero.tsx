@@ -45,12 +45,12 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         <CountStat
           label={t(locale, 'authHeroNetWorth')}
           target={HERO_STATS.netWorth}
-          format={(v) => formatCurrencyShort(v)}
+          format={(v) => formatCurrencyShort(v, locale)}
         />
         <CountStat
           label={t(locale, 'authHeroThisMonth')}
           target={HERO_STATS.thisMonth}
-          format={(v) => `+${formatCurrencyShort(v)}`}
+          format={(v) => `+${formatCurrencyShort(v, locale)}`}
           color="var(--pos)"
         />
         <CountStat
