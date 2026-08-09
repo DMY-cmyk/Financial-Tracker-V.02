@@ -62,12 +62,11 @@ Card-based, widget-driven financial dashboard. Every data domain (balance, trans
 - [x] CSV and JSON export
 - [x] Scope: current month or all data
 - [x] Format selection (CSV, JSON, Excel, PDF)
-- [x] Export options (group by date)
 - [x] Transaction preview table
 - [x] Excel export via ExcelJS + JSZip — Indonesian-style template with 3 **native live** Excel charts (income/expense donut, cash flow bar, expense category pie); "Grafik" tab opens first
 - [x] PDF export via jsPDF — A4 portrait with dark gradient header, KPI boxes, page numbers, income/expense breakdown, Deskripsi column
 - [x] Toast feedback for export success/failure
-- [x] Modular components (FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar)
+- [x] Modular components (FormatCard, ScopeSelector, ExportPreview, ExportActionBar)
 - [x] Custom date range
 - [x] Downloadable monthly and annual XLSX reports (`/reports`)
 
@@ -227,8 +226,9 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 
 ### Settings
 - [x] Theme: Light / Dark / System — synced to the server (`GET/PATCH /api/settings`) so preferences follow the user across devices; localStorage keeps them working offline
-- [x] Language: English / Bahasa Indonesia — synced the same way
+- [x] Language: English / Bahasa Indonesia — synced the same way (sidebar & mobile drawer toggles persist too)
 - [x] Category & payment method management (CRUD, color picker, budget)
+- [x] Persistent category drag ordering — additive `sort_order` column + `PATCH /api/categories/reorder`; inline budget edits debounced per-category with error toasts
 - [x] Beginning Balance (Saldo Awal) per payment method — real-world account starting balance
 - [x] Edit dialog for payment methods (name, type, beginning balance, icon)
 - [x] Data management section (export, import, clear/reset)
@@ -236,6 +236,14 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] SaaS-style sectioned layout with SettingsSection component
 - [x] Delete confirmation dialog (replaces browser confirm)
 - [x] Toast feedback for data clear
+
+### UI Honesty & i18n Completeness (Sprint 2)
+- [x] Removed dead controls: `PeriodTabs`, no-op "group by date" export option, duplicate per-page mobile FABs (center bottom-nav FAB is the only one)
+- [x] `/transactions/new` honors `?type=income|expense` — the FAB's "Add Income" opens an income form
+- [x] Honest failure states: `/recurring` shows an inline error with retry (never a false empty state); mobile dashboard gets loading skeletons, an error state, and the recurring-due banner
+- [x] Locale-aware formatting: `formatCurrencyShort` (ID: `rb`/`jt`/`M`, correct negatives), `getMonthNames()`, locale-aware short dates
+- [x] ~55 new dictionary keys — register/reset flows, net-worth, export, 404/error pages, shared dialog defaults ("Hapus"/"Batal") — plus a guard test banning inline `locale === ... ?` string ternaries
+- [x] `<html lang>` follows the active locale (single owner: StoreProvider)
 
 ### Mobile Kit Visual Adoption (Figma Mobile UI Kit)
 - [x] **Brand-mint accent token family** — `--brand-mint`, `--brand-mint-soft`, `--brand-mint-strong`, `--brand-mint-foreground` (light + dark) applied opt-in to chrome (hero band, FAB, primary CTAs); `--primary` blue identity preserved
@@ -245,8 +253,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 - [x] **`<HeroHeader>`** mobile-only mint band (renders < 1024px) — title + optional greeting/subgreeting + decorative bell + children slot for metric chips
 - [x] **`<BottomNavFab>`** — 5-slot bottom nav (Home / Transactions / Add FAB / Budget / Settings) replacing legacy `BottomNav`. Center FAB pill (`bg-brand-mint`, `-translate-y-3`) opens an Add Sheet with three router-link shortcuts (Add Income / Add Expense / Scan Receipt). Sheet auto-closes on route change.
 - [x] **`<CategoryTile>`** — square pastel-blue icon tile with active-state swap to mint-blue and `aria-current="page"` on the Link branch (exported, wiring deferred)
-- [x] **`<PeriodTabs>`** — controlled pill-row tabs (3-variant Daily/Weekly/Monthly or 4-variant adding Yearly), active pill in mint
-- [x] **`<TransactionRowMobile>`** — 64px row with 52×52 mint-blue icon tile, name + italic timestamp, category tag, signed amount (red expense / foreground income)
+- [x] **`<TransactionRowMobile>`** — 64px row with 52×52 mint-blue icon tile, name + locale-aware short date, category tag, signed amount (red expense / foreground income)
 - [x] **`<SavingsRingCard>`** — recharts donut ring (mint on mint-soft track) showing aggregate goal completion %, plus revenue-last-week and top-expense-category-last-week stats with empty states
 - [x] **`Button variant="mint"`** — opt-in primary CTA variant; existing variants unchanged
 - [x] **Hero band wired to top-level mobile pages** — `/`, `/transactions`, `/budget`, `/reports`, `/settings`. Each page's existing `PageHeader` is hidden at mobile to prevent `<h1>` collision; `/budget` controls (year stepper, monthly/annual toggle) remain visible at all viewports.
@@ -289,7 +296,7 @@ Native live Excel charts, polished PDF, and Windows-friendly CSV — replacing a
 | **Validation** | Zod (API request/response schemas) |
 | **Auth** | `jose` (Edge JWT) · `bcryptjs` (password hashing) · hand-rolled Google OAuth 2.0 + PKCE |
 | **Email** | Resend (password-reset flow, dev-mode console fallback) |
-| **Testing** | Vitest (**839 tests**: validation, all services, balance, reports, auth, OAuth linking rules, password-reset flow, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, rate limiting, user-scoped clear data, upload deletion, editorial tokens + utilities + animations + hero primitives) |
+| **Testing** | Vitest (**989 tests**: validation, all services, balance, reports, auth, OAuth linking rules, password-reset flow, advanced filters, net worth, payment method icons, recurring auto-generate, spending insights, rate limiting, user-scoped clear data, upload deletion, editorial tokens + utilities + animations + hero primitives) |
 | **Charts** | Recharts (area, pie) + Chart.js (off-screen PNG rendering for export) |
 | **Animations** | Framer Motion + editorial CSS keyframes (ftRise / ftFlow / ftMarq / ftPulseSoft / ftBarGrow / ftShimmerBg) |
 | **OCR** | Tesseract.js |
@@ -326,7 +333,7 @@ The OAuth redirect URI is derived from `APP_URL` as `${APP_URL}/api/auth/google/
 ### Quality Scripts
 
 ```bash
-npm run test         # Run tests (Vitest, 839 tests)
+npm run test         # Run tests (Vitest, 989 tests)
 npm run test:watch   # Run tests in watch mode
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
@@ -373,7 +380,7 @@ src/
     dashboard/                # 8 bento widgets
     transactions/             # Table, form, filters, category chip
     upload/                   # DropZone, OcrPreview, ProcessingOverlay, ConfidenceBar
-    export/                   # FormatCard, ScopeSelector, ExportOptions, ExportPreview, ExportActionBar
+    export/                   # FormatCard, ScopeSelector, ExportPreview, ExportActionBar
     settings/                 # SettingsSection, ImportDialog
     layout/                   # AppShell, Sidebar, Topbar, BottomNav, PageHeader
     shared/                   # SummaryCard, EmptyState, NoResults, Skeletons, ConfirmDialog
@@ -384,7 +391,7 @@ src/
     ...                       # Types, formatters, calculations, i18n, validation, motion, export-utils
   hooks/                      # useDashboardData, useTransactions, useUpload, useExport, useImport
   store/                      # Zustand store (UI state only) + memoized selectors
-  __tests__/                  # Vitest tests (839 tests across 109 files)
+  __tests__/                  # Vitest tests (989 tests across 127 files)
 ```
 
 ## Documentation
