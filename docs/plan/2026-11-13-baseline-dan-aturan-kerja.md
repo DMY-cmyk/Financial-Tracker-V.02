@@ -16,7 +16,7 @@ This plan does **not** execute anything.
 - Git repo with remote `origin` = `DMY-cmyk/Financial-Tracker-V.02`. Production branch `main` (`README.md:431`: "Production (deployed to Vercel)"). `origin/main` = `58900bd` (09/08/2026, merge of PR #19 Sprint 2).
 - Active branch `feat/sprint3-design-foundation` at `963ff8e` ("feat(design): … (E1)"). It is 2 commits ahead of `origin/main` and identical to `origin/feat/sprint3-design-foundation` (difference 0/0).
 
-**Old uncommitted changes** (left as they are; initial snapshot `scratchpad\baseline\10.txt`, 11 lines)
+**Old uncommitted changes** (left as they are; the initial `git status` snapshot had 11 lines)
 - 6 chart files modified (`M`):
   - `src/features/dashboard/CashFlowChart.tsx`
   - `src/features/dashboard/CategoryBreakdown.tsx`
@@ -124,7 +124,7 @@ The following decisions are already recorded:
 ## Non-goals
 
 - This baseline task does not touch code, configuration, or the 11 old changes.
-- This baseline task does not run `npm ci`, push, merge, or deploy.
+- This baseline task does not run `npm ci`, merge, or deploy, and executing this plan pushes nothing; publishing the plan file itself happens only through a push Dzaki approves in chat.
 - Does not open `.env*`, `data/*.db`, or the production database.
 - Does not decide the fate of PR #16. That is Dzaki's decision (AC6).
 
@@ -133,3 +133,4 @@ The following decisions are already recorded:
 - 2026-11-13 baseline written; nothing executed.
 - 2026-11-13 tests not run (no `node_modules/`; `npm ci` needs network and writes to the repo). Status: not yet proven.
 - 2026-11-14 translated into English (this repo is public) and aligned with the v1 section order: the former "Langkah kerja berikutnya" became Execution phases, the former check table became the Test plan, and a Verification section was added; the working-rules summary section was removed (the project rules remain in `CLAUDE.md`); statuses use the standard vocabulary. Every AC, every `path:line` reference, and every decision is kept. The Indonesian original is in this file's previous commit.
+- 2026-11-14 review fixes: the previous line is corrected — only the project-specific rules (such as the playbook and TDD) remain in `CLAUDE.md`, not the whole removed summary; a local snapshot path in Current state was replaced by a plain description; and the Non-goals push line now states that executing this plan pushes nothing while the plan file itself is published only through an approved push.
