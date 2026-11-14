@@ -10,6 +10,22 @@ This plan is a **baseline**. It contains: a snapshot of the state as of 13/11/20
 
 This plan does **not** execute anything.
 
+### Problem statement
+
+Financial Tracker V.02 is live with real user accounts, while Sprint 3 work (11 uncommitted changes, Current state) and PR #16 are open; a schema difference already caused a production outage once (08/08/2026, Risk & rollback).
+
+### Measurable targets
+
+- T1. The 11 old changes get a written decision and the tests are green (AC1, AC2, AC5); date: not applicable (no deadline in this plan's sources).
+- T2. Task 2 (E2) is done per the Sprint 3 plan and the preflight is green before any release (AC3, AC4, AC7).
+- T3. PR #16 has a written decision before Tasks 3–4 (AC6).
+
+### Deliverables
+
+- D1. Sprint 3 Task 2 with tests.
+- D2. A written PR #16 decision.
+- D3. Updated project memory and `CLAUDE.md` figures.
+
 ## Current state (evidence, verified 2026-11-13)
 
 **Repo and branches**
@@ -85,6 +101,38 @@ The following decisions are already recorded:
 4. Decide PR #16 (AC6). If it continues, write its own plan with the playbook impact analysis.
 5. Update the project memory and `CLAUDE.md:152`/`:156` (Gap 5) with the figures measured in AC2. This is a trivial change and is mentioned when it is done.
 
+### Work breakdown & dependencies
+
+| # | Task | Depends on |
+|---|---|---|
+| 1 | Decision on the 11 old changes (Execution phases) | — |
+| 2 | Prepare the environment and run the tests | 1 |
+| 3 | Task 2, then Tasks 3–12, Task 13 preflight and PR | 2 |
+| 4 | Decide PR #16 | — |
+| 5 | Update project memory and `CLAUDE.md` | 2 |
+
+### Milestones
+
+Not applicable (this baseline names no delivery date). Milestones with buffers go into the Sprint 3 plan and the PR #16 plan.
+
+### Roles (RACI)
+
+| Deliverable/phase | R | A | C | I |
+|---|---|---|---|---|
+| Code, tests, PRs | Claude | Dzaki | — | — |
+| Release to production | Dzaki | Dzaki | — | app users (via the live app) |
+
+### Resources & budget
+
+- Technical: Next.js, Vercel, Neon Postgres (production), SQLite (dev/tests)
+- Budget: not applicable (existing hosting plan; no new spending in this plan)
+
+### Stakeholder communication
+
+| Who | When/trigger | Channel | Content |
+|---|---|---|---|
+| Dzaki | after each phase, before each PR and release | chat | AC status and permission requests |
+
 ## Test plan
 
 | AC | Named check / test |
@@ -96,6 +144,12 @@ The following decisions are already recorded:
 | AC5 | `git status --porcelain --untracked-files=all \| grep '^.. \.claude/'` → empty |
 | AC6 | `gh pr view 16 --json state,closed` shows it closed, **or** `docs/superpowers/plans/*transaction-split*.md` exists with an impact-analysis section |
 | AC7 | `gh pr checks <PR>` green; Preview test recorded; `curl -s <production-url>/api/health` → healthy status; `vercel logs` without new errors |
+
+### Test types
+
+- UAT: Dzaki checks the Vercel Preview before merge and `/api/health` after the release (AC7).
+- Security: no tests with production data; the production database is not opened.
+- Performance: not applicable (no performance target is stated in this plan's sources)
 
 ## Verification
 
@@ -116,6 +170,13 @@ The following decisions are already recorded:
 
 ## Risk & rollback
 
+| Risk | Type | Prevention | Plan B |
+|---|---|---|---|
+| Production outage from a schema difference | technical | playbook Stage 1 and additive migrations | Vercel instant rollback to the previous deployment |
+| Chart changes lost | technical | commit or stash, not `checkout` | recover from the stash or the commit |
+| PR #16 conflict grows | technical | AC6 decision before Tasks 3–4 | close it with a reason, or continue it under its own plan with the playbook Stage 1 impact analysis (AC6) |
+| Real user accounts touched by tests | non-technical (privacy) | no tests with production data | stop and report to Dzaki |
+
 - **Production outage from a schema difference.** This happened on 08/08/2026. Mitigation: playbook Stage 1 and additive migrations. Rollback: Vercel *instant rollback* to the previous deployment, because additive migrations need no reversal.
 - **Chart changes lost.** Mitigation: execution phase 1: commit or stash, not `checkout`.
 - **PR #16 conflict grows as Sprint 3 continues.** Mitigation: the AC6 decision before Tasks 3–4, which touch the transaction form.
@@ -134,3 +195,16 @@ The following decisions are already recorded:
 - 2026-11-13 tests not run (no `node_modules/`; `npm ci` needs network and writes to the repo). Status: not yet proven.
 - 2026-11-14 translated into English (this repo is public) and aligned with the v1 section order: the former "Langkah kerja berikutnya" became Execution phases, the former check table became the Test plan, and a Verification section was added; the working-rules summary section was removed (the project rules remain in `CLAUDE.md`); statuses use the standard vocabulary. Every AC, every `path:line` reference, and every decision is kept. The Indonesian original is in this file's previous commit.
 - 2026-11-14 review fixes: the previous line is corrected — only the project-specific rules (such as the playbook and TDD) remain in `CLAUDE.md`, not the whole removed summary; a local snapshot path in Current state was replaced by a plain description; and the Non-goals push line now states that executing this plan pushes nothing while the plan file itself is published only through an approved push.
+
+- 2026-11-14 — Extended to the updated plan template: Problem statement, Measurable targets, Deliverables, Test types, Work breakdown & dependencies, Milestones, Roles (RACI), Resources & budget, Stakeholder communication, a risk table with a Plan B column, and Plan revisions were added, derived from this plan's own sections. No existing line and no acceptance criterion was changed.
+
+### Plan revisions
+
+Plan revision: 2 (2026-11-14)
+
+| Revision | Date | What changed | Why | Approved |
+|---|---|---|---|---|
+| 1 | 2026-11-13 | baseline plan written | baseline for every project | Dzaki |
+| 2 | 2026-11-14 | updated plan template elements added; acceptance criteria unchanged | plan template update | Dzaki |
+
+Re-review triggers: direction or scope changes, a new request from the owner, a moved deadline, reviewer findings, or a production incident.
